@@ -1,0 +1,4 @@
+appId,a0,v0_min,v0_max,a1,v1_options,v1_0,v1_1,a2,v2_options,v2_0,v2_1,v2_2,v2_3,a3,v3_options,v3_0,v3_1,a4,v4_options,v4_0,v4_1,y,y0,y1,v1_max,v1_min,v2_max,v2_min,v3_max,v3_min,v4_max,v4_min
+forest_cover,Elevation,2050.0,2688.0,Aspect,,,,Horizontal_Distance_To_Hydrology,,,,,,Horizontal_Distance_To_Roadways,,,,Hillshade_9am,,,,Cover_Type,Spruce/Fir,Lodgepole Pine,344.0,17.0,474.0,0.0,2155.0,162.0,251.0,126.0
+adult,Age,20.0,63.0,Years of Education,,,,Marital Status,4.0,no,separated,widowed,yes,Sex,2.0,Female,Male,Capital Gain,,,,Income,Low Income,High Income,14.0,5.0,,,,,5013.0,0.0
+wine_quality,Vinegar Taint,0.27,0.84,SO2,,,,pH,,,,,,Sulphates,,,,Alcohol,,,,quality,Type 1,Type 2,112.09999999999992,11.0,3.57,3.06,0.93,0.47,12.5,9.2
