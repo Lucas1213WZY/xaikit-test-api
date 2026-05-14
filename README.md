@@ -5,25 +5,6 @@ XAI Interpretation Simulator Toolkit
 
 ```markdown
 xaikit-test/
-├── UI
-│   ├── Instance Visualization
-│   ├── Results Dashboard
-│   └── Experiment Design
-│
-├── tutorials/                    ← Tutorial notebooks and rendered quickstarts
-│   ├── xai_adapter_quickstart.ipynb
-│   ├── virtual_experiment_executor_quickstart.ipynb
-│   └── simulated_results/
-│
-├── tests/                        ← Integration tests and import/path setup
-│   ├── conftest.py
-│   └── integration/
-│       ├── test_unified_memory.py
-│       ├── test_xai_adapter_api.py
-│       ├── test_models_registry.py
-│       ├── tmp_integration_check_sim.py
-│       └── verify_refactored_models.py
-│
 ├── assets/ 
 │   └── data/     
 │       ├── ai_dataset/
@@ -42,6 +23,25 @@ xaikit-test/
 │   │   ├── ai_dataloader/        (loading AI datasets for training and explanation generation)      
 │   │   └── xai_adapter/.         (XAI methods: attribution, rules/weights, adapters to convert into standard data format))
 │   └── virtual_experiment_executor/ (API-driven virtual experiment simulation) [experiments for hypothesis generation]
+│ 
+├── tests/                        ← Integration tests and import/path setup
+│   ├── conftest.py
+│   └── integration/
+│       ├── test_unified_memory.py
+│       ├── test_xai_adapter_api.py
+│       ├── test_models_registry.py
+│       ├── tmp_integration_check_sim.py
+│       └── verify_refactored_models.py
+│ 
+├── tutorials/                    ← Tutorial notebooks and rendered quickstarts
+│   ├── xai_adapter_quickstart.ipynb
+│   ├── virtual_experiment_executor_quickstart.ipynb
+│   └── simulated_results/
+│
+├── UI
+│   ├── instance_visualization
+│   ├── results_dashboard
+│   └── experimental_design
 │
 └── README.md                      
 ```
