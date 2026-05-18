@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Literal, Optional
 
 import numpy as np
 
@@ -13,7 +13,7 @@ from ..base import (
     XAIAdapterResult,
     ensure_2d,
 )
-from .base import LocalAttribution
+from .base import LocalAttribution, _extract_interpret_scores
 
 
 def _import_shap():
@@ -50,7 +50,7 @@ class ShapTreeExplainer(LocalAttribution):
         *,
         model: Any,
         background_data: Optional[ArrayLike] = None,
-        feature_perturbation: str = "interventional",
+        feature_perturbation: str = "auto",
         target: int = 1,
         preprocessing_fn: Optional[PreprocessFn] = None,
         postprocessing_fn: Optional[PostprocessFn] = None,
@@ -302,7 +302,106 @@ class ShapGradientExplainer(LocalAttribution):
         )
 
 
+class KernelShap(LocalAttribution):
+    """SHAP KernelExplainer — model-agnostic black-box Shapley approximation.
+
+    Parameters
+    ----------
+    backend : 'native' | 'interpret'
+        'native'    — uses shap.KernelExplainer directly (default).
+        'interpret' — uses interpret.blackbox.ShapKernel; stores the
+                      InterpretML Explanation in metadata['raw_explanation']
+                      so you can call show(result.metadata['raw_explanation']).
+    """
+
+    method_name = "shap_kernel"
+
+    def __init__(
+        self,
+        *,
+        predict_fn: Callable[[np.ndarray], np.ndarray],
+        background_data: Optional[ArrayLike] = None,
+        n_background_samples: int = 45,
+        target: int = 1,
+        backend: Literal['native', 'interpret'] = 'native',
+        preprocessing_fn: Optional[PreprocessFn] = None,
+        postprocessing_fn: Optional[PostprocessFn] = None,
+    ):
+        super().__init__(
+            target=target,
+            preprocessing_fn=preprocessing_fn,
+            postprocessing_fn=postprocessing_fn,
+        )
+        self.predict_fn = predict_fn
+        self.n_background_samples = int(n_background_samples)
+        self.background_data = None
+        self.explainer = None
+        self.backend = backend
+        if background_data is not None:
+            self.fit(background_data)
+
+    def fit(self, X: ArrayLike, y: ArrayLike = None, **kwargs):
+        """Fit the background summarizer and explainer."""
+        self.background_data = ensure_2d(X)
+
+        if self.backend == 'interpret':
+            try:
+                from interpret.blackbox import ShapKernel
+            except ImportError as exc:
+                raise ImportError("InterpretML is required for backend='interpret'. "
+                                  "Install with: pip install interpret") from exc
+            self.explainer = ShapKernel(
+                predict_fn=lambda x: self.predict_fn(self.preprocessing_fn(x)),
+                data=self.background_data,
+            )
+        else:
+            shap = _import_shap()
+            background = shap.kmeans(
+                self.background_data,
+                min(self.n_background_samples, len(self.background_data)),
+            )
+            self.explainer = shap.KernelExplainer(
+                lambda x: self.predict_fn(self.preprocessing_fn(x)), background
+            )
+
+        self.is_fitted = True
+        return self
+
+    def explain(self, instances: ArrayLike) -> XAIAdapterResult:
+        self._require_fitted()
+        raw_instances = ensure_2d(instances)
+        if self.backend == 'interpret':
+            return self._explain_interpret(raw_instances)
+        return self._explain_native(raw_instances)
+
+    def _explain_native(self, raw_instances: np.ndarray) -> XAIAdapterResult:
+        shap_values = self.explainer(raw_instances)
+        vals, base = _extract_shap_values(shap_values, self.target)
+        vals = self._postprocess_values(raw_instances, vals)
+        if base.size == 1 and vals.shape[0] > 1:
+            base = np.full(vals.shape[0], float(base[0]), dtype=float)
+        return XAIAdapterResult(
+            values=vals,
+            base_values=base.astype(float),
+            method=self.method_name,
+            metadata={"n_background_samples": self.n_background_samples, "backend": "native"},
+        )
+
+    def _explain_interpret(self, raw_instances: np.ndarray) -> XAIAdapterResult:
+        n, n_features = raw_instances.shape[0], raw_instances.shape[1]
+        y_pred = np.argmax(self.predict_fn(self.preprocessing_fn(raw_instances)), axis=1)
+        explanation = self.explainer.explain_local(raw_instances, y_pred)
+        values, base_values = _extract_interpret_scores(explanation, n, n_features)
+        return XAIAdapterResult(
+            values=self._postprocess_values(raw_instances, values),
+            base_values=base_values,
+            method=self.method_name,
+            metadata={"raw_explanation": explanation, "backend": "interpret"},
+        )
+
+
 __all__ = [
+    "KernelShap",
     "ShapTreeExplainer",
     "ShapLinearExplainer",
     "ShapDeepExplainer",

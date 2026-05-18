@@ -167,7 +167,7 @@ class UnifiedDataLoader:
         Args:
             source: Data source type ('coax' or 'coxam')
             assets_root: Root assets directory
-            app_id: Optional appId filter to keep only one dataset
+            app_id: Optional dataId filter to keep only one dataset
             coax_explanation_type: For CoAX, one of {'attribution', 'importance'}
             normalizer: Optional custom normalizer
 
@@ -228,20 +228,20 @@ class UnifiedDataLoader:
         if app_id:
             source_obj = loader.data_source
             source_obj.feature_values_df = source_obj.feature_values_df[
-                source_obj.feature_values_df["appId"] == app_id
+                source_obj.feature_values_df["dataId"] == app_id
             ].copy()
             source_obj.metadata_df = source_obj.metadata_df[
-                source_obj.metadata_df["appId"] == app_id
+                source_obj.metadata_df["dataId"] == app_id
             ].copy()
 
-            if source_obj.ai_predictions_df is not None and "appId" in source_obj.ai_predictions_df.columns:
+            if source_obj.ai_predictions_df is not None and "dataId" in source_obj.ai_predictions_df.columns:
                 source_obj.ai_predictions_df = source_obj.ai_predictions_df[
-                    source_obj.ai_predictions_df["appId"] == app_id
+                    source_obj.ai_predictions_df["dataId"] == app_id
                 ].copy()
 
             for key, table in list(loader.explanation_tables.items()):
-                if "appId" in table.columns:
-                    loader.explanation_tables[key] = table[table["appId"] == app_id].copy()
+                if "dataId" in table.columns:
+                    loader.explanation_tables[key] = table[table["dataId"] == app_id].copy()
 
         if normalizer is not None:
             loader.normalizer = normalizer
@@ -358,7 +358,7 @@ class UnifiedDataLoader:
         """List all available app/dataset IDs."""
         if self.data_source.metadata_df is None:
             return []
-        return self.data_source.metadata_df['appId'].unique().tolist()
+        return self.data_source.metadata_df['dataId'].unique().tolist()
 
     def list_explanation_tables(self) -> List[str]:
         """List loaded explanation table names (assets mode)."""

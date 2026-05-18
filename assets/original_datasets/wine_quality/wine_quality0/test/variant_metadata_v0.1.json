@@ -1,0 +1,11 @@
+{
+  "dataset_id": "wine_quality",
+  "appId": "wine_quality0",
+  "features_to_use": [
+    "Alcohol"
+  ],
+  "feature_indices_in_base": [
+    10
+  ],
+  "version": "_v0.1"
+}

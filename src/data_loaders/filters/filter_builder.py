@@ -22,7 +22,7 @@ class FilterBuilder:
 
     def by_app(self, app_id: str) -> 'FilterBuilder':
         """Filter by app/dataset ID."""
-        self.conditions.append(lambda df: df[df.get('appId', df.get('app_id')) == app_id].index)
+        self.conditions.append(lambda df: df[df.get('dataId', df.get('app_id')) == app_id].index)
         return self
 
     def by_participant(self, participant_id: int) -> 'FilterBuilder':

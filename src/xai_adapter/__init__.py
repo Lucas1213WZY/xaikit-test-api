@@ -31,6 +31,7 @@ from .attribution import (
     KernelShap,
     LeaveOneFeatureOut,
     Lime,
+    LRPAdapter,
     ShapDeepExplainer,
     ShapGradientExplainer,
     ShapLinearExplainer,
@@ -38,9 +39,13 @@ from .attribution import (
     SklearnFeatureImportance,
     make_attribution,
 )
+from .concept import TCAVAdapter
 from .dataset import CSVDatasetAdapter, PrecomputedCSVXAIMethod
+from .example_based import CounterfactualAdapter, DiCEAdapter, PrototypesAdapter
+from .interpret import EBMAdapter
 from .registry import XAIAdapterRegistry, create_xai_method, get_adapter_registry, register_xai_method
 from .surrogate import (
+    AnchorsAdapter,
     CustomSurrogate,
     DecisionTreeSurrogateMethod,
     GeneratedSurrogateMethods,
@@ -83,11 +88,17 @@ __all__ = [
     "KernelShap",
     "LeaveOneFeatureOut",
     "Lime",
+    "LRPAdapter",
     "ShapTreeExplainer",
     "ShapLinearExplainer",
     "ShapDeepExplainer",
     "ShapGradientExplainer",
     "SklearnFeatureImportance",
+    "TCAVAdapter",
+    "CounterfactualAdapter",
+    "DiCEAdapter",
+    "PrototypesAdapter",
+    "AnchorsAdapter",
     "CustomSurrogate",
     "make_surrogate",
     "DecisionTreeSurrogateMethod",
@@ -103,4 +114,5 @@ __all__ = [
     "rule_list_to_tree_structure",
     "XAIAdapterRegistry",
     "get_adapter_registry",
+    "EBMAdapter",
 ]

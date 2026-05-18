@@ -1,0 +1,2 @@
+feature_names,target_name,target_options,ordinal_feature_indices,categorical_feature_options,feature_boundaries,dataset_name
+"['Age', 'Years of Education', 'Marital Status', 'Sex', 'Capital Gain']",Income,"['Low Income', 'High Income']",[],"{2: ['no', 'separated', 'widowed', 'yes'], 3: ['Female', 'Male']}","{0: (20.0, 63.0), 1: (5.0, 14.0), 4: (0.0, 5013.0)}",adult

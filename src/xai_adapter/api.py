@@ -152,7 +152,7 @@ def create_coxam_xai_method(
     Args:
         loader: UnifiedDataLoader with CoXAM explanation tables.
         method_type: 'decision_tree'/'rules' or 'logistic_regression'/'weights'.
-        app_id: Dataset appId.
+        app_id: Dataset dataId.
         model_name: Model name, e.g. 'mlp' or 'xgboost'.
         **kwargs: Extra filters, e.g. depth=3 or variant='sparse'.
     """

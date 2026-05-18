@@ -46,7 +46,7 @@ def _metadata_from_data(
     feature_names: Optional[Sequence[str]] = None,
 ) -> pd.DataFrame:
     names = _feature_names(X.shape[1], feature_names)
-    row: Dict[str, Any] = {"appId": app_id}
+    row: Dict[str, Any] = {"dataId": app_id}
     for idx, name in enumerate(names):
         row[f"a{idx}"] = name
         col = X[:, idx]
@@ -121,7 +121,7 @@ def generate_decision_tree_table(
         fidelity = float(accuracy_score(y_array, classifier.predict(X_array)))
         rows.append(
             {
-                "appId": app_id,
+                "dataId": app_id,
                 "model": model_name,
                 "depth": int(depth),
                 "fidelity": fidelity,
@@ -182,7 +182,7 @@ def generate_logistic_regression_table(
             raise ValueError("variants must contain only 'dense' and/or 'sparse'")
 
         row: Dict[str, Any] = {
-            "appId": app_id,
+            "dataId": app_id,
             "model": model_name,
             "variant": variant,
             "fidelity": fidelity,

@@ -1,0 +1,2 @@
+feature_names,target_name,target_options,ordinal_feature_indices,dataset_name
+fixed acidity|Vinegar Taint|citric acid|residual sugar|chlorides|free sulfur dioxide|SO2|density|pH|Sulphates|Alcohol,quality,Type 1|Type 2,,wine_quality

@@ -34,8 +34,8 @@ class CoAXDataSource(BaseDataSource):
         Load CoAX data.
         
         Args:
-            feature_values_df: Features (v0, v1, v2, ...)
-            metadata_df: Metadata with min-max bounds (v{i}_min, v{i}_max)
+            feature_values_df: Features (x0, x1, x2, ...)
+            metadata_df: Metadata with min-max bounds (x{i}_min, x{i}_max)
             explanation_values_df: Optional explanation values
             explanation_columns: Columns to extract from explanations
         """
@@ -53,8 +53,8 @@ class CoAXDataSource(BaseDataSource):
             raise ValueError("metadata_df must be loaded")
         if 'instanceId' not in self.feature_values_df.columns:
             raise ValueError("feature_values_df must have 'instanceId' column")
-        if 'appId' not in self.feature_values_df.columns:
-            raise ValueError("feature_values_df must have 'appId' column")
+        if 'dataId' not in self.feature_values_df.columns:
+            raise ValueError("feature_values_df must have 'dataId' column")
 
     def get_features(self, instance_ids: List[int], normalize: bool = True) -> List[List[float]]:
         """
@@ -77,15 +77,15 @@ class CoAXDataSource(BaseDataSource):
                 raise ValueError(f"Instance {instance_id} not found")
             
             feature_row = feature_row.iloc[0]
-            app_id = feature_row['appId']
+            app_id = feature_row['dataId']
 
             # Get metadata for this app
-            app_metadata = self.metadata_df[self.metadata_df['appId'] == app_id]
+            app_metadata = self.metadata_df[self.metadata_df['dataId'] == app_id]
             if app_metadata.empty:
-                raise ValueError(f"No metadata for appId: {app_id}")
+                raise ValueError(f"No metadata for dataId: {app_id}")
             app_metadata = app_metadata.iloc[0]
 
-            # Extract features (v0, v1, v2, ...)
+            # Extract features (x0, x1, x2, ...)
             scaled_row = []
             i = 0
             while True:
@@ -183,9 +183,9 @@ class CoAXDataSource(BaseDataSource):
         self.feature_values_df = self.feature_values_df[mask]
         
         # Filter metadata based on remaining app IDs
-        remaining_app_ids = self.feature_values_df['appId'].unique()
+        remaining_app_ids = self.feature_values_df['dataId'].unique()
         self.metadata_df = self.metadata_df[
-            self.metadata_df['appId'].isin(remaining_app_ids)
+            self.metadata_df['dataId'].isin(remaining_app_ids)
         ]
         
         # Filter predictions if present
@@ -206,7 +206,7 @@ class CoAXDataSource(BaseDataSource):
             'n_instances': len(self.feature_values_df),
             'n_features': self._count_features(),
             'n_apps': len(self.metadata_df),
-            'app_ids': self.metadata_df['appId'].unique().tolist(),
+            'app_ids': self.metadata_df['dataId'].unique().tolist(),
             'has_predictions': self.ai_predictions_df is not None,
             'n_explanation_columns': len(self.explanation_columns),
             'filters_applied': len(self._filters)

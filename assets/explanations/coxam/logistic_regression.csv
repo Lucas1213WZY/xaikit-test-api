@@ -1,4 +1,4 @@
-appId,model,variant,fidelity,intercept,coef_a0,coef_a1,coef_a2,coef_a3,coef_a4,C,nnz,k,coef_a2=0,coef_a2=1,coef_a4=0,coef_a4=1,coef_a1=0,coef_a1=1,coef_a5,coef_a0=0,coef_a0=1,coef_a3=0,coef_a3=1,coef_a5=0,coef_a5=1,kept_groups
+dataId,model,variant,fidelity,intercept,coef_a0,coef_a1,coef_a2,coef_a3,coef_a4,C,nnz,k,coef_a2=0,coef_a2=1,coef_a4=0,coef_a4=1,coef_a1=0,coef_a1=1,coef_a5,coef_a0=0,coef_a0=1,coef_a3=0,coef_a3=1,coef_a5=0,coef_a5=1,kept_groups
 forest_cover,xgboost,dense,0.85,-1.264990691023688,-7.921550308781455,0.6409881113645621,-1.837029697456503,-1.1542717471151656,2.65478871025735,,,,,,,,,,6.161671917463328,,,,,,,
 forest_cover,xgboost,sparse,0.8416666666666667,-0.189090458077367,-2.423207530643485,0.0,0.0,-0.2248834460708961,0.0,0.0109260086111737,,3.0,,,,,,,1.812198288781744,,,,,,,
 wine_quality,mlp,dense,0.975,-0.2857510526047521,1.6256073062982073,0.7684260340756378,-0.4278124234569031,-1.1723748169290218,-0.335614772577978,,,,,,,,,,-0.3970652395768828,,,,,,,

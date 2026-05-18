@@ -1,5 +1,6 @@
 """Surrogate XAI methods for rules-vs-weights comparisons."""
 
+from .anchors import AnchorsAdapter
 from .base import CustomSurrogate, SurrogateMethod, make_surrogate
 from .decision_tree import DecisionTreeSurrogateMethod
 from .generator import (
@@ -14,6 +15,7 @@ from .logistic_regression import LogisticRegressionSurrogateMethod
 from .rule_based import RuleListSurrogateMethod, RuleSetSurrogateMethod
 
 __all__ = [
+    "AnchorsAdapter",
     "SurrogateMethod",
     "CustomSurrogate",
     "make_surrogate",

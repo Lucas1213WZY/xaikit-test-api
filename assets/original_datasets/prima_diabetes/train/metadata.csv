@@ -1,0 +1,2 @@
+feature_names,target_name,target_options,ordinal_feature_indices,categorical_feature_options,feature_boundaries,dataset_name
+"['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DPF', 'Age']",Outcome,"['No diabetes', 'Has diabetes']",[],{},"{0: (0.0, 10.0), 1: (80.0, 181.0), 2: (38.2, 90.0), 3: (0.0, 44.0), 4: (0.0, 293.0), 5: (21.8, 44.46999999999999), 6: (0.141, 1.1350999999999998), 7: (21.0, 58.0)}",prima_diabetes

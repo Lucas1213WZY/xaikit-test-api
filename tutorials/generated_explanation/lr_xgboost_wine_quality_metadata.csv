@@ -1,0 +1,2 @@
+dataId,a0,v0_min,v0_max,a1,v1_min,v1_max,a2,v2_min,v2_max,a3,v3_min,v3_max,a4,v4_min,v4_max,a5,v5_min,v5_max
+wine_quality,Alcohol,8.7,14.0,Sulphates,0.37,1.36,SO2,7.0,289.0,Vinegar Taint,0.12,1.58,pH,2.88,3.9,Chlorides,0.012,0.415

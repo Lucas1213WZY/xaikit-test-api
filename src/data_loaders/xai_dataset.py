@@ -145,7 +145,7 @@ class XAIDatasetParser:
         if self.prediction_col not in self.df.columns:
             raise ValueError(f"CSV must include prediction column '{self.prediction_col}'")
         if not self.feature_columns:
-            raise ValueError("No feature columns found. Pass feature_columns or include v0, v1, ... columns")
+            raise ValueError("No feature columns found. Pass feature_columns or include x0, x1, ... columns")
         if not self.explanation_columns and self.missing_explanation_strategy == "error":
             raise ValueError(
                 "No explanation columns found. Pass explanation_columns or include a0_i, a1_i, ... columns"

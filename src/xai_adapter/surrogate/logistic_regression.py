@@ -116,7 +116,7 @@ class LogisticRegressionSurrogateMethod(SurrogateMethod):
         if self.app_id is None or self.model_name is None:
             raise ValueError("app_id and model_name are required")
 
-        row = explanation_df[explanation_df["appId"] == self.app_id]
+        row = explanation_df[explanation_df["dataId"] == self.app_id]
         if "model" in row.columns:
             row = row[row["model"] == self.model_name]
         if "variant" in row.columns:
@@ -125,15 +125,15 @@ class LogisticRegressionSurrogateMethod(SurrogateMethod):
                 row = variant_row
         if row.empty:
             raise ValueError(
-                f"No logistic-regression explanation found for appId={self.app_id}, "
+                f"No logistic-regression explanation found for dataId={self.app_id}, "
                 f"model_name={self.model_name}, variant={self.variant}"
             )
         self.explanation_df = explanation_df.copy()
         self.explanation_row = row.iloc[0]
 
-        meta_row = metadata_df[metadata_df["appId"] == self.app_id]
+        meta_row = metadata_df[metadata_df["dataId"] == self.app_id]
         if meta_row.empty:
-            raise ValueError(f"No metadata found for appId={self.app_id}")
+            raise ValueError(f"No metadata found for dataId={self.app_id}")
         self.metadata_df = metadata_df.copy()
         self.metadata_row = meta_row.iloc[0]
 

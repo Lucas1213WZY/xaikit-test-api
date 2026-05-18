@@ -1,0 +1,2 @@
+feature_names,target_name,target_options,ordinal_feature_indices,categorical_feature_options,feature_boundaries,dataset_name
+"['fixed_acidity', 'Vinegar_Taint', 'citric_acid', 'residual_sugar', 'chlorides', 'free_sulfur_dioxide', 'SO2', 'density', 'pH', 'Sulphates', 'Alcohol']",quality,"['Type 1', 'Type 2']",[],{},"{0: (6.1, 11.8), 1: (0.27, 0.84), 2: (0.0, 0.6), 3: (1.5900000000000007, 5.1), 4: (0.054, 0.1260999999999999), 5: (4.0, 35.0), 6: (11.0, 112.09999999999991), 7: (0.9935980000000001, 1.0), 8: (3.06, 3.57), 9: (0.47, 0.93), 10: (9.2, 12.5)}",wine_quality

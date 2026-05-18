@@ -61,18 +61,23 @@ def get_adapter_registry() -> XAIAdapterRegistry:
             KernelShap,
             LeaveOneFeatureOut,
             Lime,
+            LRPAdapter,
             ShapDeepExplainer,
             ShapGradientExplainer,
             ShapLinearExplainer,
             ShapTreeExplainer,
             SklearnFeatureImportance,
         )
+        from .concept import TCAVAdapter
+        from .example_based import CounterfactualAdapter, DiCEAdapter, PrototypesAdapter
         from .surrogate import (
+            AnchorsAdapter,
             DecisionTreeSurrogateMethod,
             LogisticRegressionSurrogateMethod,
             RuleListSurrogateMethod,
             RuleSetSurrogateMethod,
         )
+        from .interpret import EBMAdapter
 
         registry = XAIAdapterRegistry()
         registry.register("lofo", LeaveOneFeatureOut, "leave_one_feature_out")
@@ -85,12 +90,19 @@ def get_adapter_registry() -> XAIAdapterRegistry:
         registry.register("gradient_input", GradientInput, "gradient_x_input", "input_gradients")
         registry.register("deeplift", DeepLift, "deep_lift")
         registry.register("integrated_gradients", IntegratedGradients, "ig")
+        registry.register("lrp", LRPAdapter, "layer_relevance_propagation")
         registry.register("sklearn_global", SklearnFeatureImportance, "global_feature_importance")
         registry.register("precomputed_csv", PrecomputedCSVXAIMethod, "csv", "csv_dataset", "dataset_csv")
         registry.register("decision_tree", DecisionTreeSurrogateMethod, "dt", "rules")
         registry.register("logistic_regression", LogisticRegressionSurrogateMethod, "lr", "weights")
         registry.register("rule_list", RuleListSurrogateMethod, "rulelist")
         registry.register("rule_set", RuleSetSurrogateMethod, "ruleset")
+        registry.register("ebm", EBMAdapter, "interpret_ebm", "explainable_boosting")
+        registry.register("tcav", TCAVAdapter)
+        registry.register("counterfactual", CounterfactualAdapter, "cf", "wachter")
+        registry.register("dice", DiCEAdapter, "diverse_counterfactuals")
+        registry.register("anchors", AnchorsAdapter, "anchor_tabular")
+        registry.register("prototypes", PrototypesAdapter, "mmd_critic", "criticisms")
         _GLOBAL_REGISTRY = registry
     return _GLOBAL_REGISTRY
 

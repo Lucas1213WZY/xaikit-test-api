@@ -4,8 +4,9 @@ from .base import Attribution, CustomAttribution, GlobalImportance, LocalAttribu
 from .captum import CaptumAttribution, DeepLift, GradientInput, IntegratedGradients
 from .global_importance import SklearnFeatureImportance
 from .lime import Lime
-from .perturbation import KernelShap, LeaveOneFeatureOut
-from .shap import ShapDeepExplainer, ShapGradientExplainer, ShapLinearExplainer, ShapTreeExplainer
+from .lrp import LRPAdapter
+from .perturbation import LeaveOneFeatureOut
+from .shap import KernelShap, ShapDeepExplainer, ShapGradientExplainer, ShapLinearExplainer, ShapTreeExplainer
 
 __all__ = [
     "Attribution",
@@ -20,6 +21,7 @@ __all__ = [
     "KernelShap",
     "LeaveOneFeatureOut",
     "Lime",
+    "LRPAdapter",
     "SklearnFeatureImportance",
     "ShapTreeExplainer",
     "ShapLinearExplainer",

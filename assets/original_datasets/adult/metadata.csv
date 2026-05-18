@@ -1,0 +1,2 @@
+feature_names,target_name,target_options,ordinal_feature_indices,categorical_feature_options,feature_boundaries,dataset_name
+"['Years of Education', 'Marital Status', 'Capital Gain', 'Capital Loss', 'Hours per week']",Income,"['Low Income', 'High Income']",[],"{1: array(['Married', 'Never-Married', 'Separated', 'Widowed'], dtype=object)}","{0: (4.0, 15.0), 2: (0.0, 14084.0), 3: (0.0, 1902.0), 4: (10.0, 70.0)}",adult

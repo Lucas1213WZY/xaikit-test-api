@@ -1,0 +1,2 @@
+feature_names,target_name,target_options,ordinal_feature_indices,categorical_feature_options,feature_boundaries,dataset_name
+"['Grade', 'Above Sqft', 'Latitude', 'Longitude', 'Living Room Sqft']",price,"['Low Price', 'High Price']",[],{},"{0: (6.0, 11.0), 1: (750.0, 3970.0), 2: (47.271872, 47.7676), 3: (-122.398, -121.87224), 4: (1020.0, 3767.599999999984)}",king_county_house

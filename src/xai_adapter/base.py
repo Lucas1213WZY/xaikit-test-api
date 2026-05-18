@@ -89,6 +89,90 @@ class XAIAdapterResult:
         """Backward-compatible alias for signed attribution values."""
         return self.values
 
+    def to_explanation_df(
+        self,
+        instance_ids: ArrayLike,
+        predictions: ArrayLike,
+        dataset_id: str,
+        model_name: str,
+        importance: bool = False,
+    ):
+        """Convert to the standard project explanation DataFrame.
+
+        Schema: dataId, modelName, expMethod, instanceId, pred,
+                i_max, a0_i … aN_i, intercept
+
+        - ``aN_i``     — attribution (signed) or importance (absolute) normalized
+                         by ``i_max``, depending on the ``importance`` flag
+        - ``i_max``    — max absolute raw attribution for this instance
+        - ``intercept``— SHAP / adapter base value (expected model output)
+
+        Args:
+            instance_ids: Array-like of instance identifiers, length n.
+            predictions:  Array-like of model predictions (class labels), length n.
+            dataset_id:   Value written to the ``dataId`` column.
+            model_name:   Value written to the ``modelName`` column.
+            importance:   If True, ``aN_i`` values are absolute (non-negative),
+                          matching ``assets/explanations/coax/importance.csv``.
+                          If False (default), values are signed, matching
+                          ``assets/explanations/coax/attribution.csv``.
+
+        Returns:
+            pandas.DataFrame in the standard explanation schema.
+        """
+        import pandas as pd
+
+        ids   = np.asarray(instance_ids)
+        preds = np.asarray(predictions)
+        n, n_features = self.values.shape
+        rows = []
+        for i in range(n):
+            raw   = self.values[i]
+            attrs = np.abs(raw) if importance else raw
+            i_max = float(np.max(np.abs(raw))) if np.any(raw != 0) else 0.0
+            row = {
+                "dataId":     dataset_id,
+                "modelName":  model_name,
+                "expMethod":  self.method,
+                "instanceId": int(ids[i]),
+                "pred":       int(preds[i]),
+                "i_max":      i_max,
+            }
+            for k in range(n_features):
+                row[f"a{k}_i"] = attrs[k] / i_max if i_max != 0 else 0.0
+            row["intercept"] = float(self.base_values[i])
+            rows.append(row)
+        return pd.DataFrame(rows)
+
+    def save_csv(
+        self,
+        path,
+        instance_ids: ArrayLike,
+        predictions: ArrayLike,
+        dataset_id: str,
+        model_name: str,
+        importance: bool = False,
+    ) -> None:
+        """Save explanation to a CSV file in the standard project format.
+
+        Equivalent to ``to_explanation_df(..., importance=importance).to_csv(path, index=False)``.
+        Parent directories are created automatically.
+
+        Args:
+            path:         Destination file path (str or Path).
+            instance_ids: Array-like of instance identifiers, length n.
+            predictions:  Array-like of model predictions (class labels), length n.
+            dataset_id:   Value written to the ``dataId`` column.
+            model_name:   Value written to the ``modelName`` column.
+            importance:   If True, save absolute attribution values (importance format).
+        """
+        from pathlib import Path
+        dest = Path(path)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        self.to_explanation_df(
+            instance_ids, predictions, dataset_id, model_name, importance=importance
+        ).to_csv(dest, index=False)
+
 
 class XAIAdapter(ABC):
     """Common interface for external XAI library adapters."""

@@ -1,0 +1,2 @@
+feature_names,target_name,target_options,ordinal_feature_indices,categorical_feature_options,feature_boundaries,dataset_name
+['Alcohol'],quality,"['Type 1', 'Type 2']",[],{},"{0: (9.2, 12.5)}",wine_quality

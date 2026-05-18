@@ -1,0 +1,2 @@
+version,dataset_name,target_name,target_options,feature_names_subset
+v0.1,wine_quality,quality,"['Type 1', 'Type 2']","['Alcohol', 'SO2', 'Sulphates', 'Vinegar Taint', 'pH']"

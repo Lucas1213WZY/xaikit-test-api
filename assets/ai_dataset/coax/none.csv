@@ -1,4 +1,4 @@
-appId,modelName,instanceId,pred,i_max
+dataId,modelName,instanceId,pred,i_max
 forest_cover,xgboost,0,1,0
 forest_cover,xgboost,1,0,0
 forest_cover,xgboost,2,1,0

@@ -35,6 +35,18 @@ class GlobalImportance:
         raise NotImplementedError
 
 
+def _extract_interpret_scores(explanation: Any, n: int, n_features: int) -> tuple[np.ndarray, np.ndarray]:
+    """Extract (values, base_values) from an InterpretML local explanation object."""
+    values = np.zeros((n, n_features), dtype=float)
+    base_values = np.zeros(n, dtype=float)
+    for i in range(n):
+        data = explanation.data(i)
+        scores = list(data.get("scores", []))
+        values[i, :min(len(scores), n_features)] = scores[:n_features]
+        base_values[i] = float(data.get("intercept", 0.0))
+    return values, base_values
+
+
 class CustomAttribution(LocalAttribution):
     """
     Adapter for user-provided attribution functions or objects.

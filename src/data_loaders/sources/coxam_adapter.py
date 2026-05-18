@@ -68,17 +68,17 @@ class CoXAMDataSource(BaseDataSource):
                 raise ValueError(f"Instance {instance_id} not found")
             
             feature_row = feature_row.iloc[0]
-            app_id = feature_row.get('appId', feature_row.get('app_id'))
+            app_id = feature_row.get('dataId', feature_row.get('app_id'))
 
             # Get metadata
             app_metadata = self.metadata_df[
-                self.metadata_df['appId'] == app_id
+                self.metadata_df['dataId'] == app_id
             ]
             if app_metadata.empty:
-                raise ValueError(f"No metadata for appId: {app_id}")
+                raise ValueError(f"No metadata for dataId: {app_id}")
             app_metadata = app_metadata.iloc[0]
 
-            # Extract v0, v1, v2, ...
+            # Extract x0, x1, x2, ...
             scaled_row = []
             i = 0
             while True:
@@ -203,9 +203,9 @@ class CoXAMDataSource(BaseDataSource):
         
         # Filter metadata
         if self.metadata_df is not None:
-            remaining_app_ids = self.feature_values_df['appId'].unique()
+            remaining_app_ids = self.feature_values_df['dataId'].unique()
             self.metadata_df = self.metadata_df[
-                self.metadata_df['appId'].isin(remaining_app_ids)
+                self.metadata_df['dataId'].isin(remaining_app_ids)
             ]
         
         # Filter predictions
@@ -234,7 +234,7 @@ class CoXAMDataSource(BaseDataSource):
             'n_instances': len(self.feature_values_df),
             'n_features': self._count_features(),
             'n_apps': len(self.metadata_df),
-            'app_ids': self.metadata_df['appId'].unique().tolist(),
+            'app_ids': self.metadata_df['dataId'].unique().tolist(),
             'has_predictions': self.ai_predictions_df is not None,
         }
         
