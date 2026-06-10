@@ -1,0 +1,64 @@
+{
+  "study_id": "wine_quality_xai_test",
+  "seed": 42,
+  "dataset": {
+    "dataset_id": "wine_quality",
+    "model_type": "mlp",
+    "explanation_csv": "generated_explanation/de_mlp_wine_quality.csv",
+    "id_map": {
+      "dataId": "dataId",
+      "instanceId": "instanceId"
+    }
+  },
+  "ivs": {
+    "xai_method": {
+      "type": "between",
+      "levels": [
+        "shap",
+        "lime",
+        "none"
+      ]
+    },
+    "tested_w_xai": {
+      "type": "within",
+      "randomization": "trial",
+      "levels": [
+        true,
+        false
+      ]
+    }
+  },
+  "cvs": {
+    "age_group": [
+      "young",
+      "adult",
+      "senior"
+    ],
+    "gender": [
+      "male",
+      "female",
+      "other"
+    ]
+  },
+  "dvs": {
+    "accuracy": [
+      "continuous"
+    ],
+    "task_time": [
+      "continuous"
+    ]
+  },
+  "sampling": {
+    "participants_per_between_condition": 25,
+    "trials_per_participant": 10,
+    "trial_randomization_strategy": "balanced",
+    "shuffle_instances": true,
+    "instance_wise_explanation": false
+  },
+  "output": {
+    "out_dir": "experiment_output",
+    "trials_csv": "trials.csv",
+    "trials_json": "trials.json",
+    "summary_json": "design_summary.json"
+  }
+}
