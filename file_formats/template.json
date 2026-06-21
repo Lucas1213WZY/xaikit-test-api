@@ -36,7 +36,8 @@
     ],
     "gender": [
       "male",
-      "female"
+      "female",
+      "other"
     ]
   },
   "dvs": {

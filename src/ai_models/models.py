@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import os
 from abc import ABC, abstractmethod
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 import numpy as np
 
@@ -24,6 +24,107 @@ from .mlp import MLPEngine
 from .xgboost import XGBoostEngine
 from .mlp_tf import TFMLPEngine
 from .xgboost_tf import TFXGBoostEngine
+
+
+# ---------------------------------------------------------------------------
+# Metrics helpers
+# ---------------------------------------------------------------------------
+
+def _labels_and_scores_from_predictions(
+    predictions: np.ndarray,
+    *,
+    positive_label: int = 1,
+    threshold: float = 0.5,
+) -> tuple[np.ndarray, Optional[np.ndarray]]:
+    """Convert model outputs into class labels and optional score/proba values."""
+    preds = np.asarray(predictions)
+
+    if preds.ndim == 2:
+        return np.argmax(preds, axis=1), preds
+
+    flat = preds.reshape(-1)
+    is_float = np.issubdtype(flat.dtype, np.floating)
+    looks_like_binary_score = is_float and np.nanmin(flat) >= 0 and np.nanmax(flat) <= 1
+    if looks_like_binary_score:
+        return (flat >= threshold).astype(int), flat
+    return flat.astype(int), None
+
+
+def classification_metrics(
+    y_true: np.ndarray,
+    predictions: np.ndarray,
+    *,
+    positive_label: int = 1,
+    threshold: float = 0.5,
+    include_report: bool = False,
+) -> Dict[str, Any]:
+    """Compute common classification metrics from model predictions."""
+    from sklearn.metrics import (
+        accuracy_score,
+        average_precision_score,
+        balanced_accuracy_score,
+        classification_report,
+        confusion_matrix,
+        f1_score,
+        precision_score,
+        recall_score,
+        roc_auc_score,
+    )
+
+    y_true_arr = np.asarray(y_true).reshape(-1)
+    y_pred, y_score = _labels_and_scores_from_predictions(
+        predictions,
+        positive_label=positive_label,
+        threshold=threshold,
+    )
+    labels = np.unique(np.concatenate([y_true_arr, y_pred]))
+    is_binary = len(labels) <= 2
+
+    metrics: Dict[str, Any] = {
+        "accuracy": float(accuracy_score(y_true_arr, y_pred)),
+        "balanced_accuracy": float(balanced_accuracy_score(y_true_arr, y_pred)),
+        "precision_macro": float(precision_score(y_true_arr, y_pred, average="macro", zero_division=0)),
+        "recall_macro": float(recall_score(y_true_arr, y_pred, average="macro", zero_division=0)),
+        "f1_macro": float(f1_score(y_true_arr, y_pred, average="macro", zero_division=0)),
+        "precision_weighted": float(precision_score(y_true_arr, y_pred, average="weighted", zero_division=0)),
+        "recall_weighted": float(recall_score(y_true_arr, y_pred, average="weighted", zero_division=0)),
+        "f1_weighted": float(f1_score(y_true_arr, y_pred, average="weighted", zero_division=0)),
+        "confusion_matrix": confusion_matrix(y_true_arr, y_pred, labels=labels).tolist(),
+        "labels": labels.tolist(),
+    }
+
+    if is_binary:
+        metrics.update({
+            "precision": float(precision_score(y_true_arr, y_pred, pos_label=positive_label, zero_division=0)),
+            "recall": float(recall_score(y_true_arr, y_pred, pos_label=positive_label, zero_division=0)),
+            "f1": float(f1_score(y_true_arr, y_pred, pos_label=positive_label, zero_division=0)),
+        })
+
+    try:
+        if y_score is not None:
+            if is_binary:
+                if np.asarray(y_score).ndim == 2:
+                    positive_index = list(labels).index(positive_label) if positive_label in labels else -1
+                    positive_scores = y_score[:, positive_index]
+                else:
+                    positive_scores = y_score
+                metrics["roc_auc"] = float(roc_auc_score(y_true_arr, positive_scores))
+                metrics["average_precision"] = float(average_precision_score(y_true_arr, positive_scores))
+            else:
+                metrics["roc_auc_ovr"] = float(roc_auc_score(y_true_arr, y_score, multi_class="ovr"))
+                metrics["roc_auc_ovo"] = float(roc_auc_score(y_true_arr, y_score, multi_class="ovo"))
+    except ValueError:
+        metrics["roc_auc"] = None
+
+    if include_report:
+        metrics["classification_report"] = classification_report(
+            y_true_arr,
+            y_pred,
+            zero_division=0,
+            output_dict=True,
+        )
+
+    return metrics
 
 
 # ---------------------------------------------------------------------------
@@ -64,16 +165,34 @@ class UnifiedModel(ABC):
     def get_info(self) -> Dict:
         return {**self.metadata, 'is_trained': self.is_trained}
 
+    def evaluate_metrics(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        *,
+        positive_label: int = 1,
+        threshold: float = 0.5,
+        include_report: bool = False,
+    ) -> Dict[str, Any]:
+        """Return accuracy, F1, precision/recall, AUC, and confusion matrix."""
+        return classification_metrics(
+            y,
+            self.predict(X),
+            positive_label=positive_label,
+            threshold=threshold,
+            include_report=include_report,
+        )
+
 
 # ---------------------------------------------------------------------------
 # PyTorch MLP
 # ---------------------------------------------------------------------------
 
 class MLPUnifiedModel(UnifiedModel):
-    """PyTorch MLP.  cognitive_agent controls coax/coxam variant."""
+    """PyTorch MLP. cognitive_agent controls optional coax/coxam variant hooks."""
 
     def __init__(self, dataset_name: str, input_dim: int, num_classes: int,
-                 cognitive_agent: str = 'coxam', **kwargs):
+                 cognitive_agent: str = 'custom', **kwargs):
         super().__init__(dataset_name, 'mlp')
         self.engine = MLPEngine(
             input_dim=input_dim,
@@ -83,8 +202,9 @@ class MLPUnifiedModel(UnifiedModel):
             device_id=kwargs.get('device_id', -1),
             cognitive_agent=cognitive_agent,
         )
-        self.metadata.update({'input_dim': input_dim, 'num_classes': num_classes,
-                              'cognitive_agent': cognitive_agent})
+        self.metadata.update({'input_dim': input_dim, 'num_classes': num_classes})
+        if cognitive_agent in {'coax', 'coxam'}:
+            self.metadata['cognitive_agent'] = cognitive_agent
 
     def _get_framework(self) -> str: return 'pytorch'
 
@@ -115,17 +235,18 @@ class MLPUnifiedModel(UnifiedModel):
 # ---------------------------------------------------------------------------
 
 class XGBoostUnifiedModel(UnifiedModel):
-    """XGBoost.  cognitive_agent controls coax/coxam variant."""
+    """XGBoost. cognitive_agent controls optional coax/coxam variant behavior."""
 
-    def __init__(self, dataset_name: str, cognitive_agent: str = 'coxam', **kwargs):
+    def __init__(self, dataset_name: str, cognitive_agent: str = 'custom', **kwargs):
         super().__init__(dataset_name, 'xgboost')
         self.engine = XGBoostEngine(
             cognitive_agent=cognitive_agent,
             learning_rate=kwargs.get('learning_rate', 0.05),
             num_boost_round=kwargs.get('num_boost_round', None),
         )
-        self.metadata.update({'cognitive_agent': cognitive_agent,
-                              'hyperparams': {'learning_rate': kwargs.get('learning_rate', 0.05)}})
+        self.metadata.update({'hyperparams': {'learning_rate': kwargs.get('learning_rate', 0.05)}})
+        if cognitive_agent in {'coax', 'coxam'}:
+            self.metadata['cognitive_agent'] = cognitive_agent
 
     def _get_framework(self) -> str: return 'xgboost'
 
@@ -153,10 +274,10 @@ class XGBoostUnifiedModel(UnifiedModel):
 # ---------------------------------------------------------------------------
 
 class TFMLPUnifiedModel(UnifiedModel):
-    """TensorFlow/Keras MLP.  cognitive_agent controls coax/coxam variant."""
+    """TensorFlow/Keras MLP. cognitive_agent controls optional coax/coxam variant hooks."""
 
     def __init__(self, dataset_name: str, input_dim: int, num_classes: int,
-                 cognitive_agent: str = 'coxam', **kwargs):
+                 cognitive_agent: str = 'custom', **kwargs):
         super().__init__(dataset_name, 'mlp_tf')
         self.engine = TFMLPEngine(
             input_dim=input_dim,
@@ -165,8 +286,9 @@ class TFMLPUnifiedModel(UnifiedModel):
             dropout_rate=kwargs.get('dropout_rate', 0.0),
             cognitive_agent=cognitive_agent,
         )
-        self.metadata.update({'input_dim': input_dim, 'num_classes': num_classes,
-                              'cognitive_agent': cognitive_agent})
+        self.metadata.update({'input_dim': input_dim, 'num_classes': num_classes})
+        if cognitive_agent in {'coax', 'coxam'}:
+            self.metadata['cognitive_agent'] = cognitive_agent
 
     def _get_framework(self) -> str: return 'tensorflow'
 
@@ -197,16 +319,17 @@ class TFMLPUnifiedModel(UnifiedModel):
 # ---------------------------------------------------------------------------
 
 class TFXGBoostUnifiedModel(UnifiedModel):
-    """TF-compatible XGBoost (sklearn API).  cognitive_agent controls variant."""
+    """TF-compatible XGBoost (sklearn API). cognitive_agent controls optional variant."""
 
-    def __init__(self, dataset_name: str, cognitive_agent: str = 'coxam', **kwargs):
+    def __init__(self, dataset_name: str, cognitive_agent: str = 'custom', **kwargs):
         super().__init__(dataset_name, 'xgboost_tf')
         self.engine = TFXGBoostEngine(
             cognitive_agent=cognitive_agent,
             learning_rate=kwargs.get('learning_rate', 0.05),
             num_boost_round=kwargs.get('num_boost_round', None),
         )
-        self.metadata.update({'cognitive_agent': cognitive_agent})
+        if cognitive_agent in {'coax', 'coxam'}:
+            self.metadata['cognitive_agent'] = cognitive_agent
 
     def _get_framework(self) -> str: return 'tensorflow'
 
@@ -307,21 +430,30 @@ class ModelManager:
         return model
 
     def create_model(self, dataset: str, model_type: str, input_dim: int,
-                     num_classes: int, source: str = 'coxam', **kwargs) -> UnifiedModel:
+                     num_classes: int, source: Optional[str] = None, **kwargs) -> UnifiedModel:
+        """Create a new untrained model.
+
+        Omitting `source` creates a generic/custom model. Pass source='coax' or
+        source='coxam' only when the new model should use those variant hooks.
+        """
         cls = _MODEL_CLASSES.get(model_type)
         if cls is None:
             raise ValueError(f"Unknown model_type '{model_type}'.")
 
+        cognitive_agent = kwargs.pop('cognitive_agent', source or 'custom')
         if model_type in ('mlp', 'mlp_tf'):
             model = cls(dataset_name=dataset, input_dim=input_dim,
-                        num_classes=num_classes, cognitive_agent=source, **kwargs)
+                        num_classes=num_classes, cognitive_agent=cognitive_agent, **kwargs)
         else:
-            model = cls(dataset_name=dataset, cognitive_agent=source, **kwargs)
+            model = cls(dataset_name=dataset, cognitive_agent=cognitive_agent, **kwargs)
 
-        key = f'{dataset}_{model_type}_{source}_custom'
+        key = f'{dataset}_{model_type}_{cognitive_agent}_custom'
         self.loaded_models[key] = model
         self.active_model = model
-        print(f"✓ Created new {model_type} ({source}) for '{dataset}'")
+        if source:
+            print(f"✓ Created new {model_type} ({source}) for '{dataset}'")
+        else:
+            print(f"✓ Created new {model_type} for '{dataset}'")
         return model
 
     def predict(self, X: np.ndarray, model: Optional[UnifiedModel] = None) -> np.ndarray:
@@ -333,9 +465,92 @@ class ModelManager:
               y_dev: Optional[np.ndarray] = None, **kwargs) -> Dict:
         return (model or self._require_active()).train(X, y, X_dev=X_dev, y_dev=y_dev, **kwargs)
 
+    def train_until_accuracy(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        *,
+        target_accuracy: float,
+        max_epochs: int = 300,
+        check_every_epochs: int = 10,
+        batch_size: int = 1000,
+        model: Optional[UnifiedModel] = None,
+        eval_X: Optional[np.ndarray] = None,
+        eval_y: Optional[np.ndarray] = None,
+        **kwargs,
+    ) -> Dict[str, Any]:
+        """
+        Train in chunks and stop once accuracy reaches `target_accuracy`.
+
+        By default, the stop condition uses training accuracy on `X`/`y`.
+        Pass `eval_X` and `eval_y` to stop on another split.
+        """
+        if not 0 < target_accuracy <= 1:
+            raise ValueError("target_accuracy must be between 0 and 1.")
+        if max_epochs <= 0:
+            raise ValueError("max_epochs must be positive.")
+        if check_every_epochs <= 0:
+            raise ValueError("check_every_epochs must be positive.")
+
+        active_model = model or self._require_active()
+        eval_X = X if eval_X is None else eval_X
+        eval_y = y if eval_y is None else eval_y
+
+        total_epochs = 0
+        history = []
+
+        while total_epochs < max_epochs:
+            epochs_this_round = min(check_every_epochs, max_epochs - total_epochs)
+            active_model.train(
+                X,
+                y,
+                epochs=epochs_this_round,
+                batch_size=batch_size,
+                **kwargs,
+            )
+            active_model.is_trained = True
+            total_epochs += epochs_this_round
+
+            accuracy = active_model.evaluate(eval_X, eval_y)
+            history.append({"epochs": total_epochs, "accuracy": accuracy})
+            print(f"After {total_epochs} epochs: accuracy={accuracy:.4f}")
+
+            if accuracy >= target_accuracy:
+                print(f"Reached target accuracy {target_accuracy:.4f}; stopping training.")
+                break
+
+        final_accuracy = history[-1]["accuracy"]
+        return {
+            "target_accuracy": target_accuracy,
+            "final_accuracy": final_accuracy,
+            "epochs": total_epochs,
+            "batch_size": batch_size,
+            "reached_target": final_accuracy >= target_accuracy,
+            "history": history,
+        }
+
     def evaluate(self, X: np.ndarray, y: np.ndarray,
                  model: Optional[UnifiedModel] = None) -> float:
         return (model or self._require_active()).evaluate(X, y)
+
+    def evaluate_metrics(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        model: Optional[UnifiedModel] = None,
+        *,
+        positive_label: int = 1,
+        threshold: float = 0.5,
+        include_report: bool = False,
+    ) -> Dict[str, Any]:
+        """Compute common classification metrics for the active or supplied model."""
+        return (model or self._require_active()).evaluate_metrics(
+            X,
+            y,
+            positive_label=positive_label,
+            threshold=threshold,
+            include_report=include_report,
+        )
 
     def save_model(self, weight_path: str, model: Optional[UnifiedModel] = None) -> None:
         (model or self._require_active()).save(weight_path)

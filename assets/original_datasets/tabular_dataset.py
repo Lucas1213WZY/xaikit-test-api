@@ -151,7 +151,7 @@ class TabularDataset:
         for name in feature_names:
             if name not in self.feature_names:
                 raise ValueError(f"Feature '{name}' not found in the dataset")
-        feature_indices = sorted([self.feature_names.index(name) for name in feature_names if name in self.feature_names])
+        feature_indices = [self.feature_names.index(name) for name in feature_names if name in self.feature_names]
 
         # Create new dataset with selected features
         new_X = self.X[:, feature_indices]

@@ -1,0 +1,726 @@
+{
+  "iv_config": {
+    "xai_method": [
+      "shap",
+      "lime",
+      "none"
+    ],
+    "tested_w_xai": [
+      true,
+      false
+    ]
+  },
+  "between_subjects_ivs": {
+    "xai_method": [
+      "shap",
+      "lime",
+      "none"
+    ]
+  },
+  "within_subjects_ivs": {
+    "tested_w_xai": [
+      true,
+      false
+    ]
+  },
+  "block_counterbalanced_within_ivs": {},
+  "trial_randomized_within_ivs": {
+    "tested_w_xai": [
+      true,
+      false
+    ]
+  },
+  "trial_randomization_strategy": "balanced",
+  "trials_per_condition": null,
+  "trials_per_participant": 10,
+  "counterbalancing_strategy": "complete_counterbalancing",
+  "n_orders": 1,
+  "orders": [
+    {
+      "order_id": 1,
+      "sequence": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ]
+    }
+  ],
+  "n_participants": 75,
+  "participant_assignments": [
+    {
+      "participantId": 1,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 2,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 3,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 4,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 5,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 6,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 7,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 8,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 9,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 10,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 11,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 12,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 13,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 14,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 15,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 16,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 17,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 18,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 19,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 20,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 21,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 22,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 23,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 24,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 25,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 26,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 27,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 28,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 29,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 30,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 31,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 32,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 33,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 34,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 35,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 36,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 37,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 38,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 39,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 40,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 41,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 42,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 43,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 44,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 45,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 46,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 47,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 48,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 49,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 50,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 51,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 52,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 53,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 54,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 55,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 56,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 57,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 58,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 59,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 60,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 61,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 62,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 63,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 64,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 65,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 66,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 67,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 68,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 69,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 70,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 71,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 72,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    },
+    {
+      "participantId": 73,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap"
+    },
+    {
+      "participantId": 74,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime"
+    },
+    {
+      "participantId": 75,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "none"
+    }
+  ]
+}

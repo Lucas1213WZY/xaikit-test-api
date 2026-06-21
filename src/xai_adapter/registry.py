@@ -109,6 +109,42 @@ def get_adapter_registry() -> XAIAdapterRegistry:
 
 def create_xai_method(name: str, **kwargs):
     """Create an XAI method adapter from the global registry."""
+    # Support requesting adapters for all output classes by passing
+    # target=None or target in {"all", "all_classes", "every"}.
+    target = kwargs.get("target", 1)
+    if target is None or (isinstance(target, str) and target.lower() in {"all", "all_classes", "every"}):
+        # Try to infer number of classes from a provided predict_fn or
+        # from background/training data. Default to 1 if inference fails.
+        predict_fn = kwargs.get("predict_fn")
+        sample = None
+        # prefer explicit background/training samples if available
+        for k in ("background_data", "training_data", "explanation_df"):
+            if k in kwargs and kwargs[k] is not None:
+                sample = kwargs[k]
+                break
+
+        n_classes = 1
+        if predict_fn is not None and sample is not None:
+            try:
+                import numpy as _np
+                # pick a small batch
+                s = sample[:1] if hasattr(sample, "__len__") else sample
+                preds = predict_fn(s)
+                arr = _np.asarray(preds)
+                if arr.ndim == 2:
+                    n_classes = int(arr.shape[1])
+                else:
+                    n_classes = 1
+            except Exception:
+                n_classes = 1
+
+        methods = []
+        for i in range(n_classes):
+            new_kwargs = dict(kwargs)
+            new_kwargs["target"] = i
+            methods.append(get_adapter_registry().create(name, **new_kwargs))
+        return methods
+
     return get_adapter_registry().create(name, **kwargs)
 
 

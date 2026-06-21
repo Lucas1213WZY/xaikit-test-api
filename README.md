@@ -45,3 +45,7 @@ xaikit-test/
 │
 └── README.md                      
 ```
+
+## Tutorial workflow summaries
+
+- [Colab full workflow table](tutorials/colab_tutorial_full_workflow_table.md) abstracts the end-to-end sequence from `tutorials/colab_tutorial_full_workflow.ipynb`.

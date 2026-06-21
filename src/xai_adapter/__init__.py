@@ -60,6 +60,12 @@ from .surrogate import (
     make_surrogate,
     rule_list_to_tree_structure,
 )
+from .visualization import (
+    explanation_value_columns,
+    plot_explanation_visual,
+    plot_global_explanation_importance,
+    plot_instance_explanation,
+)
 
 __all__ = [
     "XAIAdapter",
@@ -115,4 +121,8 @@ __all__ = [
     "XAIAdapterRegistry",
     "get_adapter_registry",
     "EBMAdapter",
+    "explanation_value_columns",
+    "plot_explanation_visual",
+    "plot_global_explanation_importance",
+    "plot_instance_explanation",
 ]

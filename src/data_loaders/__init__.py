@@ -37,6 +37,7 @@ __version__ = "0.1.0"
 # Core API
 from .unified_loader import UnifiedDataLoader
 from .xai_dataset import CognitiveExplanationRecord, XAIDatasetLoader, XAIDatasetParser
+from .original_dataset import list_original_datasets, load_original_dataset
 
 # Data sources
 from .sources import CoAXDataSource, CoXAMDataSource
@@ -56,6 +57,8 @@ __all__ = [
     "XAIDatasetParser",
     "XAIDatasetLoader",
     "CognitiveExplanationRecord",
+    "load_original_dataset",
+    "list_original_datasets",
     
     # Data sources
     "CoAXDataSource",

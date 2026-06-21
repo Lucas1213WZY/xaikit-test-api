@@ -25,6 +25,7 @@ from .models import (
     TFMLPUnifiedModel,
     TFXGBoostUnifiedModel,
     ModelManager,
+    classification_metrics,
     load_pretrained_model,
 )
 
@@ -36,5 +37,6 @@ __all__ = [
     'XGBoostUnifiedModel',
     'TFMLPUnifiedModel',
     'TFXGBoostUnifiedModel',
+    'classification_metrics',
     'load_pretrained_model',
 ]
