@@ -1,9 +1,4 @@
-"""High-level workflow object for XAIKit tutorial experiments.
-
-`XAIKitTest` is a notebook-facing orchestration layer. It stores the repeated
-workflow state once, then delegates the real work to the existing utilities and
-`src` interfaces.
-"""
+"""High-level XAIKit workflow API."""
 
 from __future__ import annotations
 
@@ -11,51 +6,24 @@ import io
 from contextlib import redirect_stdout
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Sequence
+from typing import Any, Callable, Optional, Sequence
 
 import numpy as np
 import pandas as pd
 
-try:
-    from utils import (
-        PreparedDataset,
-        TrialGenerationResult,
-        combine_explanation_tables,
-        default_cognitive_params,
-        dummy_cognitive_model,
-        ensure_project_imports,
-        generate_experimental_trials,
-        generate_xai_explanation_tables,
-        init_experiment_config,
-        init_explanation_run,
-        init_trial_build_config,
-        prepare_dataset,
-        run_experiment_executor,
-        save_simulated_results,
-        set_factor,
-        set_iv,
-        validate_experiment_config,
-    )
-except ModuleNotFoundError:
-    from tutorials.utils import (
-        PreparedDataset,
-        TrialGenerationResult,
-        combine_explanation_tables,
-        default_cognitive_params,
-        dummy_cognitive_model,
-        ensure_project_imports,
-        generate_experimental_trials,
-        generate_xai_explanation_tables,
-        init_experiment_config,
-        init_explanation_run,
-        init_trial_build_config,
-        prepare_dataset,
-        run_experiment_executor,
-        save_simulated_results,
-        set_factor,
-        set_iv,
-        validate_experiment_config,
-    )
+from src.cognitive_models import default_cognitive_params, dummy_cognitive_model
+from src.data_loaders import PreparedDataset, prepare_dataset
+from src.experiment_design import (
+    TrialGenerationResult,
+    generate_experimental_trials,
+    init_experiment_config,
+    init_trial_build_config,
+    set_factor,
+    set_iv,
+    validate_experiment_config,
+)
+from src.virtual_experiment_executor import run_experiment_executor, save_simulated_results
+import src.xai_adapter as xai_adapter_api
 
 
 class XAIKitTest:
@@ -68,7 +36,6 @@ class XAIKitTest:
         output_dir: str | Path = ".",
         auto_validate_design: bool = True,
     ) -> None:
-        ensure_project_imports()
         self.project_name = project_name
         self.output_dir = Path(output_dir)
         self.auto_validate_design = auto_validate_design
@@ -80,36 +47,32 @@ class XAIKitTest:
         self.model = None
         self.trained_engine = None
         self.model_name: Optional[str] = None
-        self.training_info: Optional[Dict[str, Any]] = None
+        self.training_info: Optional[dict[str, Any]] = None
         self.training_stdout: str = ""
-        self.metrics: Dict[str, Dict[str, Any]] = {}
+        self.metrics: dict[str, dict[str, Any]] = {}
 
         self.trial_config = None
         self.trial_result: Optional[TrialGenerationResult] = None
-        self.trials: List[Dict[str, Any]] = []
+        self.trials: list[dict[str, Any]] = []
 
         self.explanation_config = None
-        self.explanation_paths: List[Path] = []
-        self.explanation_dfs: List[pd.DataFrame] = []
+        self.explanation_paths: list[Path] = []
+        self.explanation_dfs: list[pd.DataFrame] = []
         self.combined_explanation_path: Optional[Path] = None
         self.combined_explanations: Optional[pd.DataFrame] = None
 
-        self.cognitive_params: Dict[str, float] = default_cognitive_params()
-        self.cognitive_model: Callable[..., Dict[str, Any]] = dummy_cognitive_model
+        self.cognitive_params: dict[str, float] = default_cognitive_params()
+        self.cognitive_model: Callable[..., dict[str, Any]] = dummy_cognitive_model
         self.simulated_results: Optional[pd.DataFrame] = None
         self.simulated_csv_path: Optional[str] = None
         self.simulated_json_path: Optional[str] = None
 
-    # ------------------------------------------------------------------
-    # Experiment design
-    # ------------------------------------------------------------------
-
     def set_design(
         self,
         *,
-        iv_config: Optional[Dict[str, Dict[str, Any]]] = None,
-        cvs: Optional[Dict[str, List[Any]]] = None,
-        dvs: Optional[Dict[str, List[Any]]] = None,
+        iv_config: Optional[dict[str, dict[str, Any]]] = None,
+        cvs: Optional[dict[str, list[Any]]] = None,
+        dvs: Optional[dict[str, list[Any]]] = None,
         show: bool = True,
     ) -> "XAIKitTest":
         """Replace the stored IV/CV/DV design dictionaries."""
@@ -127,7 +90,7 @@ class XAIKitTest:
         self,
         name: str,
         iv_type: str,
-        levels: List[Any],
+        levels: list[Any],
         *,
         randomization: str = "block",
         show: bool = False,
@@ -138,27 +101,23 @@ class XAIKitTest:
             self.validate_design(show=True)
         return self
 
-    def add_cv(self, name: str, levels: List[Any], *, show: bool = False) -> "XAIKitTest":
+    def add_cv(self, name: str, levels: list[Any], *, show: bool = False) -> "XAIKitTest":
         """Add or replace one control variable."""
         set_factor(self.CVs, name, levels)
         if show:
             self.validate_design(show=True)
         return self
 
-    def add_dv(self, name: str, levels: List[Any], *, show: bool = False) -> "XAIKitTest":
+    def add_dv(self, name: str, levels: list[Any], *, show: bool = False) -> "XAIKitTest":
         """Add or replace one dependent variable."""
         set_factor(self.DVs, name, levels)
         if show:
             self.validate_design(show=True)
         return self
 
-    def validate_design(self, *, show: bool = True) -> tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
+    def validate_design(self, *, show: bool = True) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
         """Validate and optionally print the current experimental design."""
         return validate_experiment_config(self.iv_config, self.CVs, self.DVs, show=show)
-
-    # ------------------------------------------------------------------
-    # Dataset
-    # ------------------------------------------------------------------
 
     def prepare_dataset(
         self,
@@ -184,10 +143,6 @@ class XAIKitTest:
             show_summary=show_summary,
         )
         return self.data
-
-    # ------------------------------------------------------------------
-    # Trials
-    # ------------------------------------------------------------------
 
     def generate_trials(
         self,
@@ -227,10 +182,6 @@ class XAIKitTest:
         self.trials = self.trial_result.trials
         return self.trial_result
 
-    # ------------------------------------------------------------------
-    # AI model
-    # ------------------------------------------------------------------
-
     def train_AI_model(
         self,
         *,
@@ -241,12 +192,11 @@ class XAIKitTest:
         check_every_epochs: int = 10,
         batch_size: int = 1000,
         verbose: bool = False,
-        model_kwargs: Optional[Dict[str, Any]] = None,
-        train_kwargs: Optional[Dict[str, Any]] = None,
+        model_kwargs: Optional[dict[str, Any]] = None,
+        train_kwargs: Optional[dict[str, Any]] = None,
     ) -> Any:
         """Create and train the AI model used for predictions and explanations."""
         data = self._require_data()
-        ensure_project_imports()
         from src.ai_models import ModelManager
 
         def _create_and_train() -> None:
@@ -357,12 +307,12 @@ class XAIKitTest:
         positive_label: int = 1,
         threshold: float = 0.5,
         include_report: bool = False,
-    ) -> Dict[str, Dict[str, Any]]:
+    ) -> dict[str, dict[str, Any]]:
         """Evaluate the trained AI model with classic classification metrics."""
         data = self._require_data()
         manager = self._require_model_manager()
         split = split.lower()
-        results: Dict[str, Dict[str, Any]] = {}
+        results: dict[str, dict[str, Any]] = {}
 
         if split in {"train", "both"}:
             results["train"] = manager.evaluate_metrics(
@@ -467,10 +417,6 @@ class XAIKitTest:
         ax.legend()
         return ax
 
-    # ------------------------------------------------------------------
-    # Explanations and visualization
-    # ------------------------------------------------------------------
-
     def explanations(
         self,
         *,
@@ -478,7 +424,7 @@ class XAIKitTest:
         model_name: Optional[str] = None,
         output_dir: str | Path = "generated_explanation",
         target: int = 1,
-        method_kwargs: Optional[Dict[str, Dict[str, Any]]] = None,
+        method_kwargs: Optional[dict[str, dict[str, Any]]] = None,
     ) -> tuple[Optional[Path], Optional[pd.DataFrame]]:
         """Generate method-level XAI tables and combine them into one table."""
         data = self._require_data()
@@ -486,7 +432,7 @@ class XAIKitTest:
         explanation_iv_config = self._iv_config_for_explanations(methods)
         model_name = model_name or self.model_name or "model"
 
-        self.explanation_config = init_explanation_run(
+        self.explanation_config = xai_adapter_api.init_explanation_run(
             data=data,
             iv_config=explanation_iv_config,
             trained_engine=trained_engine,
@@ -495,10 +441,10 @@ class XAIKitTest:
             target=target,
             method_kwargs=method_kwargs,
         )
-        self.explanation_paths, self.explanation_dfs = generate_xai_explanation_tables(
+        self.explanation_paths, self.explanation_dfs = xai_adapter_api.generate_xai_explanation_tables(
             self.explanation_config
         )
-        self.combined_explanation_path, self.combined_explanations = combine_explanation_tables(
+        self.combined_explanation_path, self.combined_explanations = xai_adapter_api.combine_explanation_tables(
             self.explanation_dfs,
             self.explanation_config,
         )
@@ -534,15 +480,11 @@ class XAIKitTest:
             **kwargs,
         )
 
-    # ------------------------------------------------------------------
-    # Cognitive model and experiment simulation
-    # ------------------------------------------------------------------
-
     def set_cognitive_model(
         self,
-        cognitive_model: Optional[Callable[..., Dict[str, Any]]] = None,
+        cognitive_model: Optional[Callable[..., dict[str, Any]]] = None,
         *,
-        cognitive_params: Optional[Dict[str, float]] = None,
+        cognitive_params: Optional[dict[str, float]] = None,
     ) -> "XAIKitTest":
         """Store the cognitive model callable and parameter dictionary."""
         self.cognitive_model = cognitive_model or dummy_cognitive_model
@@ -558,7 +500,7 @@ class XAIKitTest:
         *,
         mode: str = "participant_by_participant",
         participant_id: Optional[int] = 1,
-        condition_filter: Optional[Dict[str, Any]] = None,
+        condition_filter: Optional[dict[str, Any]] = None,
         explanation_pool: Optional[pd.DataFrame] = None,
     ) -> pd.DataFrame:
         """Run the cognitive simulation over selected generated trial rows."""
@@ -598,10 +540,6 @@ class XAIKitTest:
         )
         return self.simulated_csv_path, self.simulated_json_path
 
-    # ------------------------------------------------------------------
-    # Internal helpers
-    # ------------------------------------------------------------------
-
     def _resolve_output_path(self, path: str | Path) -> Path:
         path = Path(path)
         if path.is_absolute():
@@ -611,7 +549,7 @@ class XAIKitTest:
     def _iv_config_for_explanations(
         self,
         methods: Optional[Sequence[Any]],
-    ) -> Dict[str, Dict[str, Any]]:
+    ) -> dict[str, dict[str, Any]]:
         iv_config = deepcopy(self.iv_config)
         if methods is None:
             return iv_config
@@ -642,7 +580,7 @@ class XAIKitTest:
             raise RuntimeError("Call train_AI_model(...) before generating explanations.")
         return self.trained_engine
 
-    def _require_trials(self) -> List[Dict[str, Any]]:
+    def _require_trials(self) -> list[dict[str, Any]]:
         if not self.trials:
             raise RuntimeError("Call generate_trials(...) before running the experiment.")
         return self.trials
@@ -673,3 +611,8 @@ class XAIKitTest:
 
 
 xaikitTest = XAIKitTest
+
+__all__ = [
+    "XAIKitTest",
+    "xaikitTest",
+]

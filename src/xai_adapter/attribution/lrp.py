@@ -76,13 +76,16 @@ class LRPAdapter(LocalAttribution):
             ) from exc
 
         self.torch = torch
-        self.model = model
+        self.original_model = model
+        self.model = self._model_for_lrp(model)
         self.predict_fn = predict_fn
         self.baseline = baseline
         self.device = device
         self.rule = rule
         self.model.eval()
         self.model.to(device)
+        if self.rule is not None:
+            self._apply_rule_to_layers()
         self.attr = LRP(self.model)
         self.baseline_tensor = None
         self.baseline_value = 0.0
@@ -109,17 +112,7 @@ class LRPAdapter(LocalAttribution):
         x = self.torch.tensor(x_np, dtype=self.torch.float32, device=self.device)
         x.requires_grad_(True)
 
-        baselines = (
-            self.baseline_tensor.repeat(x.shape[0], 1)
-            if self.baseline_tensor is not None
-            else self.torch.zeros_like(x)
-        )
-
-        attr_kwargs = {"baselines": baselines, "target": self.target}
-        if self.rule is not None:
-            attr_kwargs["rule_dict"] = self._make_rule_dict(x)
-
-        attributions = self.attr.attribute(x, **attr_kwargs)
+        attributions = self.attr.attribute(x, target=self.target)
         if isinstance(attributions, tuple):
             attributions = attributions[0]
 
@@ -131,9 +124,8 @@ class LRPAdapter(LocalAttribution):
             metadata={"rule": self.rule, "baseline": self.baseline},
         )
 
-    def _make_rule_dict(self, x: Any) -> dict:
-        """Build a Captum rule_dict applying self.rule to all Linear layers."""
-        from captum.attr import LRP
+    def _apply_rule_to_layers(self) -> None:
+        """Apply the selected Captum LRP rule to supported linear layers."""
         rule_map = {
             "epsilon": "EpsilonRule",
             "alpha1beta0": "Alpha1_Beta0_Rule",
@@ -143,9 +135,34 @@ class LRPAdapter(LocalAttribution):
         import captum.attr._utils.lrp_rules as lrp_rules
         rule_cls = getattr(lrp_rules, rule_name, None)
         if rule_cls is None:
-            return {}
+            return
         import torch.nn as nn
-        return {nn.Linear: rule_cls()}
+        for module in self.model.modules():
+            if isinstance(module, nn.Linear):
+                module.rule = rule_cls()
+
+    def _model_for_lrp(self, model: Any) -> Any:
+        """Return a Captum-LRP-compatible model, preferring logits over probabilities."""
+        nn = self.torch.nn
+
+        if hasattr(model, "feature_extractor") and hasattr(model, "final_layer"):
+            class FeatureLogitModel(nn.Module):
+                def __init__(self, base_model: Any):
+                    super().__init__()
+                    self.feature_extractor = base_model.feature_extractor
+                    self.final_layer = base_model.final_layer
+
+                def forward(self, x):
+                    return self.final_layer(self.feature_extractor(x))
+
+            return FeatureLogitModel(model)
+
+        if isinstance(model, nn.Sequential) and len(model) > 0:
+            children = list(model.children())
+            if isinstance(children[-1], (nn.Softmax, nn.LogSoftmax)):
+                return nn.Sequential(*children[:-1])
+
+        return model
 
 
 __all__ = ["LRPAdapter"]

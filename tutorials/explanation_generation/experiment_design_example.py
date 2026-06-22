@@ -17,9 +17,15 @@ import csv
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+REPO_ROOT = next(
+    candidate
+    for candidate in [Path(__file__).resolve(), *Path(__file__).resolve().parents]
+    if (candidate / "src").exists() and (candidate / "assets").exists()
+)
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
-from experiment_design.counterbalance import run_experiment_design
+from src.experiment_design import run_experiment_design
 
 # ── Load instance pool from explanation CSV ────────────────────────────────────
 def load_instances(csv_path: str) -> list[dict]:
@@ -27,7 +33,7 @@ def load_instances(csv_path: str) -> list[dict]:
         return list(csv.DictReader(f))
 
 instance_pool = load_instances(
-    "tutorials/generated_explanation/de_mlp_wine_quality.csv"
+    REPO_ROOT / "tutorials" / "generated_explanation" / "de_mlp_wine_quality.csv"
 )
 
 # ── Define Independent Variables ───────────────────────────────────────────────
@@ -71,7 +77,7 @@ result = run_experiment_design(
     trials_per_condition=3,     # data instances shown per XAI method block
     controlled_vars=controlled_vars,
     id_map=id_map,
-    output_dir="tutorials/experiment_output",
+    output_dir=REPO_ROOT / "tutorials" / "experiment_output",
     shuffle_instances=True,
     seed=42,
 )

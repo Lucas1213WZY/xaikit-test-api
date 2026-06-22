@@ -2,13 +2,144 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, List, Optional, Sequence
+
+import numpy as np
+import pandas as pd
 
 from .base import ArrayLike
 from .attribution import make_attribution
-from src.data_loaders.xai_dataset import XAIDatasetParser
 from .registry import create_xai_method
 from .surrogate import GeneratedSurrogateMethods, make_surrogate
+from src.data_loaders import PreparedDataset, make_train_data_for_xai
+from src.data_loaders.xai_dataset import XAIDatasetParser
+
+
+@dataclass
+class ExplanationRunConfig:
+    """Inputs shared by explanation-generation workflow steps."""
+
+    data: PreparedDataset
+    iv_config: dict[str, dict[str, Any]]
+    trained_engine: Any
+    model_name: str = "mlp"
+    output_dir: Path = Path("generated_explanation")
+    target: int = 1
+    method_kwargs: Optional[dict[str, dict[str, Any]]] = None
+
+    @property
+    def dataset_id(self) -> str:
+        return self.data.dataset_id
+
+
+def init_explanation_run(
+    data: PreparedDataset,
+    iv_config: dict[str, dict[str, Any]],
+    trained_engine: Any,
+    *,
+    model_name: str = "mlp",
+    output_dir: str | Path = "generated_explanation",
+    target: int = 1,
+    method_kwargs: Optional[dict[str, dict[str, Any]]] = None,
+) -> ExplanationRunConfig:
+    """Collect all shared XAI-generation settings in one object."""
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+    return ExplanationRunConfig(
+        data=data,
+        iv_config=iv_config,
+        trained_engine=trained_engine,
+        model_name=model_name,
+        output_dir=output_path,
+        target=target,
+        method_kwargs=method_kwargs or {
+            "shap": {"n_background_samples": 30},
+            "shap_kernel": {"n_background_samples": 30},
+            "lime": {"num_samples": 1000},
+        },
+    )
+
+
+def get_xai_methods_from_design(iv_config: dict[str, dict[str, Any]]) -> list[Any]:
+    """Read XAI method levels from `xai_method` or legacy `xai_type` IV names."""
+    xai_iv_name = "xai_type" if "xai_type" in iv_config else "xai_method"
+    if xai_iv_name not in iv_config:
+        raise ValueError("iv_config must include either 'xai_method' or 'xai_type'.")
+    return list(iv_config[xai_iv_name]["levels"])
+
+
+def predict_labels(trained_engine: Any, X: np.ndarray) -> np.ndarray:
+    """Convert model predictions/probabilities into integer labels."""
+    raw_predictions = trained_engine.predict(X)
+    if np.ndim(raw_predictions) > 1:
+        return np.argmax(raw_predictions, axis=1)
+    return raw_predictions.astype(int)
+
+
+def generate_xai_explanation_tables(
+    config: ExplanationRunConfig,
+) -> tuple[list[Path], list[pd.DataFrame]]:
+    """Generate one explanation CSV per non-control XAI method."""
+    train_data_for_xai = make_train_data_for_xai(config.data.split, config.data.y_train)
+    instance_ids = np.asarray(config.data.test_instance_ids)
+    predictions = predict_labels(config.trained_engine, config.data.X_test)
+
+    saved_paths: list[Path] = []
+    explanation_dfs: list[pd.DataFrame] = []
+
+    for method_name in get_xai_methods_from_design(config.iv_config):
+        method_key = str(method_name).lower()
+
+        if method_key in {"none", "no_xai", "control"}:
+            print(f"Skipping adapter generation for xai method: {method_name}")
+            continue
+
+        print(f"\nGenerating explanations for xai method: {method_name}")
+        try:
+            explainer = create_xai_method_from_engine(
+                method_key,
+                engine=config.trained_engine,
+                train_data=train_data_for_xai,
+                preprocessing_fn=lambda x: np.asarray(x, dtype=np.float32),
+                target=config.target,
+                **config.method_kwargs.get(method_key, {}),
+            )
+            result = explainer.explain(config.data.X_test)
+            explanation_df = result.to_explanation_df(
+                instance_ids=instance_ids,
+                predictions=predictions,
+                dataset_id=config.dataset_id,
+                model_name=config.model_name,
+            )
+            explanation_df["expMethod"] = method_key
+
+            out_path = config.output_dir / f"{method_key}_{config.model_name}_{config.dataset_id}.csv"
+            explanation_df.to_csv(out_path, index=False)
+            saved_paths.append(out_path)
+            explanation_dfs.append(explanation_df)
+            print(f"  Saved: {out_path} shape={explanation_df.shape}")
+        except Exception as exc:
+            print(f"  Skipped {method_name}: {type(exc).__name__}: {exc}")
+
+    return saved_paths, explanation_dfs
+
+
+def combine_explanation_tables(
+    explanation_dfs: list[pd.DataFrame],
+    config: ExplanationRunConfig,
+) -> tuple[Optional[Path], Optional[pd.DataFrame]]:
+    """Combine generated method-level explanations into one design-engine table."""
+    if not explanation_dfs:
+        print("\nNo explanation CSVs were generated. Check installed XAI dependencies.")
+        return None, None
+
+    combined_df = pd.concat(explanation_dfs, ignore_index=True)
+    combined_path = config.output_dir / f"de_{config.model_name}_{config.dataset_id}.csv"
+    combined_df.to_csv(combined_path, index=False)
+    print(f"\nCombined explanation CSV: {combined_path} shape={combined_df.shape}")
+    return combined_path, combined_df
 
 
 def _train_x(train_data: Any) -> ArrayLike:
@@ -94,7 +225,14 @@ def create_xai_method_from_engine(
             **kwargs,
         )
 
-    if key in {"deeplift", "deep_lift", "integrated_gradients", "ig"}:
+    if key in {
+        "deeplift",
+        "deep_lift",
+        "integrated_gradients",
+        "ig",
+        "lrp",
+        "layer_relevance_propagation",
+    }:
         return create_xai_method(
             name,
             model=engine.model,

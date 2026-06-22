@@ -38,6 +38,17 @@ __version__ = "0.1.0"
 from .unified_loader import UnifiedDataLoader
 from .xai_dataset import CognitiveExplanationRecord, XAIDatasetLoader, XAIDatasetParser
 from .original_dataset import list_original_datasets, load_original_dataset
+from .workflow import (
+    DatasetSplit,
+    PreparedDataset,
+    load_csv_records,
+    load_dataset_and_split,
+    load_json_config,
+    make_train_data_for_xai,
+    prepare_dataset,
+    print_dataset_split_summary,
+    split_loaded_dataset,
+)
 
 # Data sources
 from .sources import CoAXDataSource, CoXAMDataSource
@@ -59,6 +70,15 @@ __all__ = [
     "CognitiveExplanationRecord",
     "load_original_dataset",
     "list_original_datasets",
+    "DatasetSplit",
+    "PreparedDataset",
+    "load_csv_records",
+    "load_dataset_and_split",
+    "load_json_config",
+    "make_train_data_for_xai",
+    "prepare_dataset",
+    "print_dataset_split_summary",
+    "split_loaded_dataset",
     
     # Data sources
     "CoAXDataSource",
