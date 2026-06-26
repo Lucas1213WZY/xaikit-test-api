@@ -1,7 +1,6 @@
 import numpy as np
 import pickle
 import os
-from ucimlrepo import fetch_ucirepo
 from sklearn import preprocessing
 from datasets.tabular_dataset import TabularDataset
 
@@ -10,14 +9,40 @@ SAVE_PATH = "saved_dataset.pkl"
 script_dir = os.path.dirname(__file__)
 save_path = os.path.join(script_dir, "saved_dataset.pkl")
 
+
+def _normalize_adult_dataset(dataset):
+    """Keep cached Adult feature metadata aligned with the 14-column data matrix."""
+    feature_names = getattr(dataset, "feature_names", None)
+    X = getattr(dataset, "X", None)
+    target_name = getattr(dataset, "target_name", None)
+
+    if (
+        feature_names
+        and X is not None
+        and len(feature_names) == X.shape[1] + 1
+        and feature_names[-1] == target_name
+    ):
+        dataset.feature_names = feature_names[:-1]
+
+    return dataset
+
+
 def load_data(**kwargs):
 
-    load_previous = kwargs.get("load_previous", False)
+    load_previous = kwargs.get("load_previous", True)
 
     if os.path.exists(save_path) and load_previous:
         with open(save_path, 'rb') as file:
-            return pickle.load(file)
+            return _normalize_adult_dataset(pickle.load(file))
 
+    try:
+        from ucimlrepo import fetch_ucirepo
+    except ModuleNotFoundError as exc:
+        raise ModuleNotFoundError(
+            "The Adult dataset can be loaded from the local cache by calling "
+            "`load_data(load_previous=True)`. To refresh it from UCI, install "
+            "`ucimlrepo` first, for example `pip install ucimlrepo`."
+        ) from exc
 
     # fetch dataset 
     adult = fetch_ucirepo(id=2) 
@@ -39,7 +64,7 @@ def load_data(**kwargs):
     feature_names = ["Age", "Workclass", "fnlwgt", "Education",
                              "Years of Education", "Marital Status", "Occupation",
                              "Relationship", "Race", "Sex", "Capital Gain",
-                             "Capital Loss", "Hours per week", "Country", 'Income']
+                             "Capital Loss", "Hours per week", "Country"]
     # # features_to_use = [0, 1, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13]
     # categorical_features = [1, 3, 5, 6, 7, 8, 9, 10, 11, 13]
     categorical_features = [1, 3, 5, 6, 7, 8, 9, 13]
@@ -143,6 +168,7 @@ def load_data(**kwargs):
     dataset = TabularDataset(X_numpy, y_numerical, feature_names=feature_names,\
         categorical_feature_options=categorical_feature_options, target_name=target_name,\
         target_options=["Low Income", "High Income"], dataset_name="adult")
+    dataset = _normalize_adult_dataset(dataset)
 
 
     with open(save_path, "wb") as f:

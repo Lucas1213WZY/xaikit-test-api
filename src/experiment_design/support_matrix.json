@@ -1,0 +1,176 @@
+{
+  "version": "0.2",
+  "stages": ["design", "trial_generation", "explanation_generation", "execution"],
+  "aliases": {
+    "iv": {
+      "xai_type": ["xai_types"],
+      "xai_method": ["xai_methods"],
+      "xai_robustness": ["robustness"],
+      "xai_sparsity": ["sparsity"],
+      "xai_faithfulness": ["xai_fidelity", "faithfulness", "fidelity"],
+      "tested_w_xai": ["tested_with_xai", "with_xai"],
+      "num_attributes_shown": ["number_of_attributes_shown"],
+      "num_training_instances": ["number_of_training_instances", "training_instances"],
+      "dataset": ["datasets"],
+      "ai_model": ["ai_models", "ml_model"],
+      "user_task": ["task"],
+      "memory_budget": ["cognitive_budget"],
+      "attended_features": ["attention_span"]
+    },
+    "param": {
+      "retrieval_threshold": ["cog_retrieval_threshold"],
+      "attended_features": ["attention_span"]
+    },
+    "value": {
+      "adult": ["adult income"],
+      "mushrooms": ["mushroom"],
+      "wine_quality": ["wine quality"],
+      "forest_cover": ["forest cover"],
+      "breast_cancer": ["breast cancer"],
+      "heart_disease": ["heart disease"],
+      "king_county_housing": ["king county house", "king county housing"],
+      "prima_diabetes": ["prima diabetes", "pima diabetes"],
+      "none": ["no xai", "control"],
+      "decision_tree": ["decision tree", "dt", "rules"],
+      "logistic_regression": ["logistic regression", "lr"],
+      "logistic_regression_weights": ["logistic regression weights", "weights"],
+      "integrated_gradients": ["integrated gradients", "ig"],
+      "input_gradients": ["input gradients", "gradient input", "gradient x input", "gradient_input", "gradient_x_input"],
+      "lrp": ["layer wise relevance propagation", "layer-wise relevance propagation", "layer_relevance_propagation"],
+      "deeplift": ["captum deeplift", "captum's deeplift", "deep lift", "deep_lift"],
+      "rule_list": ["rule list", "rulelist"],
+      "decision_list": ["decision list"],
+      "rule_set": ["rule set", "ruleset", "interpretable decision sets", "interpretable_decision_sets"],
+      "sim2real_property": ["xaisim2real", "sim2real property", "property optimized"],
+      "faithful": ["faithfulness"],
+      "not_sparse": ["not sparse"],
+      "not_robust": ["not robust"],
+      "sparse_robust": ["robust and sparse", "sparse and robust", "robust_sparse", "robust_and_sparse"],
+      "forward_simulation": ["forward simulation", "forward prediction"],
+      "counterfactual_simulation": ["counterfactual simulation"],
+      "forward_accuracy": ["forward accuracy"],
+      "counterfactual_accuracy": ["counterfactual accuracy"],
+      "xgboost": ["xgb"],
+      "mlp_tf": ["mlp tf"],
+      "xgboost_tf": ["xgboost tf"],
+      "top_2_features": ["top 2 features", "top two features"],
+      "all_features": ["all features"]
+    }
+  },
+  "groups": {
+    "datasets": {
+      "all": ["adult", "mushrooms", "wine_quality", "forest_cover", "breast_cancer", "heart_disease", "king_county_housing", "prima_diabetes", "cardiotocography"],
+      "coax_supported": ["adult", "wine_quality", "forest_cover", "breast_cancer", "heart_disease", "king_county_housing", "prima_diabetes", "cardiotocography"],
+      "coax_tested": ["adult", "wine_quality", "forest_cover"],
+      "coxam_supported": ["mushrooms", "wine_quality", "forest_cover", "breast_cancer", "heart_disease", "king_county_housing", "prima_diabetes", "cardiotocography"],
+      "coxam_tested": ["mushrooms", "wine_quality", "forest_cover"],
+      "sim2real": ["sim2real"],
+      "supported": ["$groups.datasets.all", "$groups.datasets.sim2real"]
+    },
+    "dvs": {
+      "forward": ["forward_accuracy"],
+      "counterfactual": ["counterfactual_accuracy"],
+      "supported": ["$groups.dvs.forward", "$groups.dvs.counterfactual"]
+    },
+    "tasks": {
+      "forward": ["forward_simulation"],
+      "counterfactual": ["counterfactual_simulation"],
+      "sim2real": ["forward_simulation"],
+      "supported": ["forward_simulation", "counterfactual_simulation"]
+    },
+    "xai_types": {
+      "coax": ["none", "attribution", "importance"],
+      "coxam": ["decision_tree", "logistic_regression", "hybrid"],
+      "sim2real": ["attribution"],
+      "supported": ["$groups.xai_types.coax", "$groups.xai_types.coxam"]
+    },
+    "xai_methods": {
+      "coax": ["none", "lime", "shap", "integrated_gradients", "input_gradients", "lrp", "deeplift"],
+      "coxam": ["decision_tree", "logistic_regression", "logistic_regression_weights", "decision_list", "rule_list", "rule_set"],
+      "sim2real": ["sim2real_property"],
+      "supported": ["$groups.xai_methods.coax", "$groups.xai_methods.coxam", "$groups.xai_methods.sim2real"]
+    },
+    "xai_properties": {
+      "sim2real": ["faithful", "sparse", "robust", "sparse_robust"],
+      "robustness": ["robust", "not_robust"],
+      "sparsity": ["sparse", "not_sparse"]
+    },
+    "ai_models": {
+      "supported": ["mlp", "xgboost", "mlp_tf", "xgboost_tf"],
+      "sim2real": ["sparse", "trend_wiggle", "wiggle"]
+    },
+    "memory_budget": ["top_2_features", "all_features"]
+  },
+  "ivs": {
+    "xai_type": {"levels": "$groups.xai_types.supported"},
+    "xai_method": {"levels": "$groups.xai_methods.supported"},
+    "xai_robustness": {"levels": "$groups.xai_properties.robustness"},
+    "xai_sparsity": {"levels": "$groups.xai_properties.sparsity"},
+    "xai_faithfulness": {"levels": ["faithful", "controlled_80"], "numeric_range": [0, 1]},
+    "tested_w_xai": {"type": "boolean"},
+    "num_attributes_shown": {"numeric_range": [1, 10], "integer": true},
+    "num_training_instances": {"numeric_range": [1, 14], "integer": true},
+    "dataset": {"levels": "$groups.datasets.supported"},
+    "ai_model": {"levels": "$groups.ai_models.supported"},
+    "user_task": {"levels": "$groups.tasks.supported"},
+    "memory_budget": {"levels": "$groups.memory_budget"},
+    "retrieval_threshold": {"numeric": true},
+    "exemplar_distance_sensitivity": {"numeric_range": [1, 10]},
+    "attended_features": {"numeric_range": [1, 5], "integer": true},
+    "feature_class_sensitivity": {"numeric_range": [1, 7]},
+    "opportunity_cost": {"numeric_range": [0, 10]},
+    "diffusion_noise": {"numeric_range": [0, 1]},
+    "counterfactual_margin": {"numeric_range": [0, 1]}
+  },
+  "semantic_cvs": ["dataset", "user_task", "ai_model", "xai_faithfulness"],
+  "cognitive_models": {
+    "placeholder": {
+      "tasks": "$groups.tasks.forward",
+      "dvs": "$groups.dvs.forward",
+      "xai_types": "$groups.xai_types.supported",
+      "xai_methods": "$groups.xai_methods.supported",
+      "datasets_supported": "$groups.datasets.all",
+      "cognitive_params": {}
+    },
+    "coax": {
+      "tasks": "$groups.tasks.forward",
+      "dvs": "$groups.dvs.forward",
+      "xai_types": "$groups.xai_types.coax",
+      "xai_methods": "$groups.xai_methods.coax",
+      "datasets_supported": "$groups.datasets.coax_supported",
+      "datasets_tested": "$groups.datasets.coax_tested",
+      "cognitive_params": {
+        "retrieval_threshold": {"range": [-2.3, -1.5]},
+        "exemplar_distance_sensitivity": {"range": [1, 10]},
+        "attended_features": {"range": [1, 5], "integer": true},
+        "feature_class_sensitivity": {"range": [1, 7]}
+      }
+    },
+    "coxam": {
+      "tasks": ["$groups.tasks.forward", "$groups.tasks.counterfactual"],
+      "dvs": "$groups.dvs.supported",
+      "xai_types": "$groups.xai_types.coxam",
+      "xai_methods": "$groups.xai_methods.coxam",
+      "datasets_supported": "$groups.datasets.coxam_supported",
+      "datasets_tested": "$groups.datasets.coxam_tested",
+      "cognitive_params": {
+        "retrieval_threshold": {"range": [-2.8, -1.5]},
+        "opportunity_cost": {"range": [0, 10]},
+        "diffusion_noise": {"range": [0, 1]},
+        "counterfactual_margin": {"range": [0, 1]}
+      }
+    },
+    "sim2real": {
+      "tasks": "$groups.tasks.sim2real",
+      "dvs": "$groups.dvs.forward",
+      "xai_types": "$groups.xai_types.sim2real",
+      "xai_methods": "$groups.xai_methods.sim2real",
+      "xai_properties": "$groups.xai_properties.sim2real",
+      "ai_functions": "$groups.ai_models.sim2real",
+      "datasets_supported": "$groups.datasets.sim2real",
+      "cognitive_params": {
+        "memory_budget": {"levels": "$groups.memory_budget"}
+      }
+    }
+  }
+}

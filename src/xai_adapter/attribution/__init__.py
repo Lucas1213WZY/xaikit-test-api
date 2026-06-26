@@ -7,6 +7,7 @@ from .lime import Lime
 from .lrp import LRPAdapter
 from .perturbation import LeaveOneFeatureOut
 from .shap import KernelShap, ShapDeepExplainer, ShapGradientExplainer, ShapLinearExplainer, ShapTreeExplainer
+from .sim2real import Sim2RealPropertyAttribution
 
 __all__ = [
     "Attribution",
@@ -27,4 +28,5 @@ __all__ = [
     "ShapLinearExplainer",
     "ShapDeepExplainer",
     "ShapGradientExplainer",
+    "Sim2RealPropertyAttribution",
 ]

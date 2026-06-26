@@ -41,10 +41,7 @@
     ]
   },
   "dvs": {
-    "accuracy": [
-      "continuous"
-    ],
-    "task_time": [
+    "forward_accuracy": [
       "continuous"
     ]
   },

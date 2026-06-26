@@ -29,8 +29,7 @@ DEFAULT_CVS = {
 }
 
 DEFAULT_DVS = {
-    "accuracy": ["continuous"],
-    "task_time": ["continuous"],
+    "forward_accuracy": ["continuous"],
 }
 
 
@@ -118,6 +117,8 @@ def configure_experiment(
     dvs: Optional[dict[str, list[Any]]] = None,
     *,
     available_datasets: Optional[list[str]] = None,
+    support_check: bool = True,
+    strict: bool = False,
     show: bool = True,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, list[Any]], dict[str, list[Any]]]:
     """Build, validate, and optionally summarize IV/CV/DV configuration."""
@@ -137,6 +138,17 @@ def configure_experiment(
             available_datasets=available_datasets,
         )
 
+    if support_check:
+        from .support import validate_design_support
+
+        validate_design_support(
+            iv_config,
+            control_vars,
+            dependent_vars,
+            strict=strict,
+            show=show,
+        )
+
     return iv_config, control_vars, dependent_vars
 
 
@@ -146,6 +158,8 @@ def validate_experiment_config(
     dvs: dict[str, list[Any]],
     *,
     available_datasets: Optional[list[str]] = None,
+    support_check: bool = True,
+    strict: bool = False,
     show: bool = True,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, list[Any]], dict[str, list[Any]]]:
     """Validate and optionally summarize an iteratively-built experiment config."""
@@ -159,6 +173,17 @@ def validate_experiment_config(
             cvs,
             dvs,
             available_datasets=available_datasets,
+        )
+
+    if support_check:
+        from .support import validate_design_support
+
+        validate_design_support(
+            iv_config,
+            cvs,
+            dvs,
+            strict=strict,
+            show=show,
         )
 
     return iv_config, cvs, dvs
@@ -223,12 +248,14 @@ def inspect_experiment_structure(
     return inspect_design_roles(iv_config, show=show)
 
 
-def build_controlled_vars(model_type: str, cvs: dict[str, list[Any]]) -> dict[str, str]:
+def build_controlled_vars(model_type: Optional[str], cvs: dict[str, list[Any]]) -> dict[str, str]:
     """Encode control-variable levels as trial-table metadata columns."""
-    return {
-        "model_type": model_type,
+    controlled_vars = {
         **{f"CV_{k}_levels": "|".join(str(v) for v in vals) for k, vals in cvs.items()},
     }
+    if model_type is not None:
+        controlled_vars["model_type"] = model_type
+    return controlled_vars
 
 
 def select_trial_rows(

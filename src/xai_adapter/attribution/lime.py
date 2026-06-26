@@ -64,7 +64,14 @@ class Lime(LocalAttribution):
         """Fit the LIME tabular explainer on training data."""
         training_data = ensure_2d(X)
         training_labels = y if y is not None else self.training_labels
-        self.feature_names = self.feature_names or [f"feature_{i}" for i in range(training_data.shape[1])]
+        n_features = training_data.shape[1]
+        if self.feature_names is None or len(self.feature_names) != n_features:
+            self.feature_names = [f"feature_{i}" for i in range(n_features)]
+        self.categorical_features = [
+            int(feature_idx)
+            for feature_idx in self.categorical_features
+            if 0 <= int(feature_idx) < n_features
+        ]
 
         if self.backend == 'interpret':
             try:
@@ -138,8 +145,13 @@ class Lime(LocalAttribution):
                 num_samples=self.num_samples,
             )
             row = np.zeros(len(self.feature_names), dtype=float)
-            for feat_idx, importance in dict(exp.as_map().get(self.target, {})).items():
-                row[feat_idx] = importance
+            explanation_map = dict(exp.as_map().get(self.target, {}))
+            if not explanation_map and getattr(exp, "local_exp", None):
+                first_label = next(iter(exp.local_exp))
+                explanation_map = dict(exp.local_exp[first_label])
+            for feat_idx, importance in explanation_map.items():
+                if 0 <= int(feat_idx) < len(self.feature_names):
+                    row[int(feat_idx)] = importance
             values.append(row)
             base_values.append(float(exp.intercept.get(self.target, 0.0)))
             explanation_objects.append(exp)

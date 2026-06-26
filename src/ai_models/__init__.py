@@ -24,9 +24,19 @@ from .models import (
     XGBoostUnifiedModel,
     TFMLPUnifiedModel,
     TFXGBoostUnifiedModel,
+    Sim2RealUnifiedModel,
     ModelManager,
+    MODEL_REQUIRES_ONE_HOT_ENCODING,
     classification_metrics,
     load_pretrained_model,
+    requires_one_hot_encoding,
+)
+from .sim2real import (
+    BaseSim2RealFunction,
+    SparseFunction,
+    TrendWiggleFunction,
+    WiggleFunction,
+    create_sim2real_function,
 )
 
 __all__ = [
@@ -37,6 +47,14 @@ __all__ = [
     'XGBoostUnifiedModel',
     'TFMLPUnifiedModel',
     'TFXGBoostUnifiedModel',
+    'Sim2RealUnifiedModel',
+    'MODEL_REQUIRES_ONE_HOT_ENCODING',
+    'BaseSim2RealFunction',
+    'SparseFunction',
+    'TrendWiggleFunction',
+    'WiggleFunction',
+    'create_sim2real_function',
     'classification_metrics',
     'load_pretrained_model',
+    'requires_one_hot_encoding',
 ]

@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from src.data_loaders import PreparedDataset, load_csv_records, load_json_config
+from src.workflow_standard import DEFAULT_EXPLANATION_INSTANCE_LIMIT
 
 from .config import (
     DesignRoles,
@@ -24,6 +25,7 @@ from .counterbalance import (
     factorial_conditions,
     make_within_condition_order_labels,
 )
+from .support import validate_ui_config_support
 
 
 @dataclass
@@ -33,12 +35,13 @@ class TrialBuildConfig:
     data: PreparedDataset
     iv_config: dict[str, dict[str, Any]]
     cvs: dict[str, list[Any]]
-    model_name: str = "mlp"
+    model_name: Optional[str] = None
     participants_per_between_condition: int = 25
     trials_per_participant: int = 10
     trial_randomization_strategy: str = "balanced"
     instance_wise_explanation: bool = False
     shuffle_instances: bool = True
+    max_trial_instances: Optional[int] = DEFAULT_EXPLANATION_INSTANCE_LIMIT
     seed: int = 42
     output_dir: Path = Path("experiment_output")
     trials_csv: str = "trials.csv"
@@ -71,12 +74,13 @@ def init_trial_build_config(
     iv_config: dict[str, dict[str, Any]],
     cvs: dict[str, list[Any]],
     *,
-    model_name: str = "mlp",
+    model_name: Optional[str] = None,
     participants_per_between_condition: int = 25,
     trials_per_participant: int = 10,
     trial_randomization_strategy: str = "balanced",
     instance_wise_explanation: bool = False,
     shuffle_instances: bool = True,
+    max_trial_instances: Optional[int] = DEFAULT_EXPLANATION_INSTANCE_LIMIT,
     seed: int = 42,
     output_dir: str | Path = "experiment_output",
     trials_csv: str = "trials.csv",
@@ -94,6 +98,7 @@ def init_trial_build_config(
         trial_randomization_strategy=trial_randomization_strategy,
         instance_wise_explanation=instance_wise_explanation,
         shuffle_instances=shuffle_instances,
+        max_trial_instances=max_trial_instances,
         seed=seed,
         output_dir=Path(output_dir),
         trials_csv=trials_csv,
@@ -125,9 +130,13 @@ def generate_experimental_trials(
         experiment_structure.between_ivs or None,
     )
 
+    trial_instance_ids = config.data.test_instance_ids
+    if config.max_trial_instances is not None:
+        trial_instance_ids = trial_instance_ids[:config.max_trial_instances]
+
     instance_pool = [
         {"dataId": config.data.dataset_id, "instanceId": str(instance_id)}
-        for instance_id in config.data.test_instance_ids
+        for instance_id in trial_instance_ids
     ]
     controlled_vars = build_controlled_vars(config.model_name, config.cvs)
 
@@ -173,21 +182,26 @@ def generate_experimental_trials(
         print(f"  Summary : {summary_path}")
         preview_trial_rows(trials, experiment_structure, n=preview_rows)
 
+    dataset_config = {
+        "dataset_id": config.data.dataset_id,
+        "id_map": {"dataId": "dataId", "instanceId": "instanceId"},
+    }
+    if config.model_name is not None:
+        dataset_config["model_type"] = config.model_name
+
     return TrialGenerationResult(
         config={
             "ivs": config.iv_config,
             "cvs": config.cvs,
-            "dataset": {
-                "dataset_id": config.data.dataset_id,
-                "model_type": config.model_name,
-                "id_map": {"dataId": "dataId", "instanceId": "instanceId"},
-            },
+            "dataset": dataset_config,
             "sampling": {
                 "participants_per_between_condition": config.participants_per_between_condition,
                 "trials_per_participant": config.trials_per_participant,
                 "trial_randomization_strategy": config.trial_randomization_strategy,
                 "instance_wise_explanation": config.instance_wise_explanation,
                 "shuffle_instances": config.shuffle_instances,
+                "max_trial_instances": config.max_trial_instances,
+                "instance_pool_rows": len(instance_pool),
             },
             "output": {
                 "out_dir": str(config.output_dir),
@@ -236,9 +250,19 @@ def preview_trial_rows(
 def generate_trials_from_ui_config(
     config: dict[str, Any],
     *,
+    validate_support: bool = True,
+    strict: bool = False,
     show: bool = True,
 ) -> TrialGenerationResult:
     """Generate trial CSV/JSON/summary artifacts from a UI-exported config."""
+    if validate_support:
+        validate_ui_config_support(
+            config,
+            stage="trial_generation",
+            strict=strict,
+            show=show,
+        )
+
     iv_config = config["ivs"]
     cvs = config["cvs"]
     dataset_cfg = config["dataset"]
@@ -262,7 +286,7 @@ def generate_trials_from_ui_config(
     )
 
     instance_pool = load_csv_records(dataset_cfg["explanation_csv"])
-    controlled_vars = build_controlled_vars(dataset_cfg["model_type"], cvs)
+    controlled_vars = build_controlled_vars(dataset_cfg.get("model_type"), cvs)
 
     trials = build_trial_sequence(
         assignments=assignments,

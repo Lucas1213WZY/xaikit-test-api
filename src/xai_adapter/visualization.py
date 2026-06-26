@@ -50,20 +50,97 @@ def _raw_feature_values_for_instance(
     instance_id: Optional[Any],
     feature_names: List[str],
 ) -> Dict[str, Any]:
-    if data is None or instance_id is None or not hasattr(data, "df"):
+    row = _raw_row_for_instance(data, instance_id)
+    if row is None:
         return {}
+    values = {}
+    for feature in feature_names:
+        raw_feature = _raw_feature_name_for_display(feature, row.index)
+        values[feature] = _decode_raw_feature_value(data, raw_feature, row.get(raw_feature))
+    return values
+
+
+def _raw_row_for_instance(data: Optional[Any], instance_id: Optional[Any]) -> Optional[pd.Series]:
+    if data is None or instance_id is None or not hasattr(data, "df"):
+        return None
     try:
         row_idx = int(instance_id)
     except (TypeError, ValueError):
         row_idx = instance_id
 
     if row_idx in data.df.index:
-        row = data.df.loc[row_idx]
-    elif isinstance(row_idx, int) and 0 <= row_idx < len(data.df):
-        row = data.df.iloc[row_idx]
-    else:
-        return {}
-    return {feature: row.get(feature) for feature in feature_names}
+        return data.df.loc[row_idx]
+    if isinstance(row_idx, int) and 0 <= row_idx < len(data.df):
+        return data.df.iloc[row_idx]
+    return None
+
+
+def _raw_feature_name_for_display(feature: str, raw_columns: Any) -> str:
+    """Map encoded labels like `Sex=Female` back to the raw dataframe column."""
+    if feature in raw_columns:
+        return feature
+    if "=" in feature:
+        base = feature.split("=", 1)[0]
+        if base in raw_columns:
+            return base
+    return feature
+
+
+def _decode_raw_feature_value(data: Any, raw_feature: str, value: Any) -> Any:
+    """Return dataset category labels for raw categorical values when possible."""
+    dataset = getattr(data, "dataset", None)
+    raw_names = getattr(data, "raw_feature_names", getattr(data, "feature_names", []))
+    categorical_options = getattr(dataset, "categorical_feature_options", {}) or {}
+    if raw_feature not in raw_names:
+        return value
+
+    feature_idx = raw_names.index(raw_feature)
+    if feature_idx not in categorical_options:
+        return value
+
+    try:
+        option_idx = int(value)
+    except (TypeError, ValueError):
+        return value
+
+    options = categorical_options[feature_idx]
+    if 0 <= option_idx < len(options):
+        return options[option_idx]
+    return value
+
+
+def _categorical_state_for_feature(
+    data: Optional[Any],
+    instance_id: Optional[Any],
+    feature: str,
+) -> Optional[List[bool]]:
+    """Return per-circle selected state for categorical or one-hot features."""
+    row = _raw_row_for_instance(data, instance_id)
+    if row is None:
+        return None
+
+    raw_feature = _raw_feature_name_for_display(feature, row.index)
+    dataset = getattr(data, "dataset", None)
+    raw_names = getattr(data, "raw_feature_names", getattr(data, "feature_names", []))
+    categorical_options = getattr(dataset, "categorical_feature_options", {}) or {}
+    if raw_feature not in raw_names:
+        return None
+
+    feature_idx = raw_names.index(raw_feature)
+    if feature_idx not in categorical_options:
+        return None
+
+    try:
+        category_index = int(row.get(raw_feature))
+    except (TypeError, ValueError):
+        return None
+
+    num_options = len(categorical_options[feature_idx])
+    if num_options <= 0:
+        return None
+    if num_options == 1:
+        return [category_index == 0, category_index == 1]
+    return [option_idx == category_index for option_idx in range(num_options)]
 
 
 def _format_feature_value(value: Any) -> str:
@@ -206,15 +283,37 @@ def plot_explanation_visual(
 
     raw_ax.set_xlim(0, 1)
     for idx, item in shown.reset_index(drop=True).iterrows():
-        raw_ax.barh(idx, 1.0, height=0.32, color="#dddddd", edgecolor="#eeeeee")
         raw_value = item["raw_value"]
         feature = item["feature"]
         fraction = 0.0
-        if data is not None and hasattr(data, "df") and feature in data.df.columns and raw_value is not None and not pd.isna(raw_value):
-            feature_min = float(pd.to_numeric(data.df[feature], errors="coerce").min())
-            feature_max = float(pd.to_numeric(data.df[feature], errors="coerce").max())
-            if feature_max > feature_min:
-                fraction = (float(raw_value) - feature_min) / (feature_max - feature_min)
+        category_state = _categorical_state_for_feature(data, row.get("instanceId"), feature)
+        if category_state is not None:
+            num_options = len(category_state)
+            x_positions = np.linspace(0.16, 0.84, num_options)
+            for selected, x_pos in zip(category_state, x_positions):
+                raw_ax.scatter(
+                    [x_pos],
+                    [idx],
+                    s=92,
+                    facecolors="#000000" if selected else "white",
+                    edgecolors="#000000" if selected else "#999999",
+                    linewidths=1.4,
+                    zorder=3,
+                )
+            continue
+
+        raw_ax.barh(idx, 1.0, height=0.32, color="#dddddd", edgecolor="#eeeeee")
+        raw_feature = (
+            _raw_feature_name_for_display(feature, data.df.columns)
+            if data is not None and hasattr(data, "df")
+            else feature
+        )
+        if data is not None and hasattr(data, "df") and raw_feature in data.df.columns and raw_value is not None and not pd.isna(raw_value):
+            feature_min = float(pd.to_numeric(data.df[raw_feature], errors="coerce").min())
+            feature_max = float(pd.to_numeric(data.df[raw_feature], errors="coerce").max())
+            raw_number = pd.to_numeric(pd.Series([raw_value]), errors="coerce").iloc[0]
+            if feature_max > feature_min and not pd.isna(raw_number):
+                fraction = (float(raw_number) - feature_min) / (feature_max - feature_min)
                 fraction = float(np.clip(fraction, 0, 1))
         raw_ax.barh(idx, fraction, height=0.32, color="#000000")
 

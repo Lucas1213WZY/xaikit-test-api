@@ -7,6 +7,13 @@ from typing import Any, Optional
 import numpy as np
 import pandas as pd
 
+from src.workflow_standard import (
+    EXPLANATION_METHOD_COL,
+    INSTANCE_ID_COL,
+    PREDICTION_COL,
+    PREDICTION_ONLY_METHOD,
+)
+
 
 def get_trial_instance_attributes(
     trial_info: dict[str, Any],
@@ -15,7 +22,7 @@ def get_trial_instance_attributes(
     label_column: str,
 ) -> dict[str, float]:
     """Extract raw feature values for the trial's original dataset row id."""
-    instance_id = int(trial_info["instanceId"])
+    instance_id = int(trial_info[INSTANCE_ID_COL])
     row = raw_dataset.iloc[instance_id]
     feature_row = row.drop(labels=[label_column], errors="ignore")
     return {k: float(v) for k, v in feature_row.items()}
@@ -26,14 +33,18 @@ def get_trial_ai_prediction(
     explanation_pool: pd.DataFrame,
 ) -> Optional[int]:
     """Return the trained AI model prediction stored in the explanation CSV."""
-    if "pred" not in explanation_pool.columns:
+    if PREDICTION_COL not in explanation_pool.columns:
         return None
 
-    instance_id = int(trial_info["instanceId"])
-    matches = explanation_pool[explanation_pool["instanceId"].astype(int) == instance_id]
+    instance_id = int(trial_info[INSTANCE_ID_COL])
+    matches = explanation_pool[explanation_pool[INSTANCE_ID_COL].astype(int) == instance_id]
     if matches.empty:
         return None
-    return int(matches.iloc[0]["pred"])
+    if EXPLANATION_METHOD_COL in matches:
+        explanation_matches = matches[matches[EXPLANATION_METHOD_COL].astype(str) != PREDICTION_ONLY_METHOD]
+        if not explanation_matches.empty:
+            matches = explanation_matches
+    return int(matches.iloc[0][PREDICTION_COL])
 
 
 def get_trial_instance_explanation(
@@ -45,10 +56,10 @@ def get_trial_instance_explanation(
     if xai_method in {"none", "no_xai", "control"}:
         return {}
 
-    instance_id = int(trial_info["instanceId"])
+    instance_id = int(trial_info[INSTANCE_ID_COL])
     matches = explanation_pool[
-        (explanation_pool["instanceId"].astype(int) == instance_id)
-        & (explanation_pool["expMethod"].astype(str).str.lower() == xai_method)
+        (explanation_pool[INSTANCE_ID_COL].astype(int) == instance_id)
+        & (explanation_pool[EXPLANATION_METHOD_COL].astype(str).str.lower() == xai_method)
     ]
     if matches.empty:
         return {}
@@ -57,7 +68,7 @@ def get_trial_instance_explanation(
     explanation_cols = [c for c in explanation_pool.columns if c.startswith("a") and c.endswith("_i")]
     explanation = {c: float(row[c]) for c in explanation_cols}
 
-    for optional_col in ["pred", "i_max", "intercept"]:
+    for optional_col in [PREDICTION_COL, "i_max", "intercept"]:
         if optional_col in row:
             explanation[optional_col] = float(row[optional_col])
 
@@ -100,8 +111,17 @@ def dummy_cognitive_model(
     attr_values = [abs(v) for k, v in explanation.items() if k.startswith("a") and k.endswith("_i")]
     explanation_strength = float(np.mean(attr_values)) if attr_values else 0.0
 
-    retrieval_threshold = float(cognitive_params.get("cog_retrieval_threshold", -0.3))
-    chi_value = float(cognitive_params.get("cog_chi", 0.001))
+    retrieval_threshold = float(cognitive_params.get(
+        "retrieval_threshold",
+        cognitive_params.get("cog_retrieval_threshold", -0.3),
+    ))
+    exemplar_distance_sensitivity = float(cognitive_params.get("exemplar_distance_sensitivity", 1.0))
+    attended_features = float(cognitive_params.get("attended_features", 5.0))
+    feature_class_sensitivity = float(cognitive_params.get(
+        "feature_class_sensitivity",
+        cognitive_params.get("cog_chi", 0.001),
+    ))
+    chi_value = 0.001 * feature_class_sensitivity
     ddm_a = float(cognitive_params.get("cog_ddm_a", 0.8))
     ddm_s = float(cognitive_params.get("cog_ddm_s", 1.0))
     lapse = float(cognitive_params.get("lapse", 0.005))
@@ -109,7 +129,16 @@ def dummy_cognitive_model(
     t_enc = float(cognitive_params.get("cog_T_enc", 1.5))
     t_op = float(cognitive_params.get("cog_T_op", 0.5))
 
-    accuracy_probability = 0.5 + (0.08 * ddm_a) + (0.05 * ddm_s) - (0.03 * abs(retrieval_threshold))
+    attention_bonus = 0.01 * np.clip(attended_features, 1, 5)
+    distance_penalty = 0.004 * np.clip(exemplar_distance_sensitivity, 1, 10)
+    accuracy_probability = (
+        0.5
+        + (0.08 * ddm_a)
+        + (0.05 * ddm_s)
+        + attention_bonus
+        - distance_penalty
+        - (0.03 * abs(retrieval_threshold))
+    )
     if has_xai:
         accuracy_probability += chi_value + (0.05 * explanation_strength)
     accuracy_probability = float(np.clip(accuracy_probability, lapse, 1.0 - lapse))

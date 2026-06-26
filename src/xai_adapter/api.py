@@ -9,12 +9,17 @@ from typing import Any, List, Optional, Sequence
 import numpy as np
 import pandas as pd
 
-from .base import ArrayLike
+from .base import ArrayLike, XAIAdapterResult
 from .attribution import make_attribution
 from .registry import create_xai_method
 from .surrogate import GeneratedSurrogateMethods, make_surrogate
 from src.data_loaders import PreparedDataset, make_train_data_for_xai
 from src.data_loaders.xai_dataset import XAIDatasetParser
+from src.workflow_standard import (
+    DEFAULT_EXPLANATION_INSTANCE_LIMIT,
+    EXPLANATION_METHOD_COL,
+    prediction_labels,
+)
 
 
 @dataclass
@@ -28,6 +33,7 @@ class ExplanationRunConfig:
     output_dir: Path = Path("generated_explanation")
     target: int = 1
     method_kwargs: Optional[dict[str, dict[str, Any]]] = None
+    max_test_instances: int = DEFAULT_EXPLANATION_INSTANCE_LIMIT
 
     @property
     def dataset_id(self) -> str:
@@ -43,6 +49,7 @@ def init_explanation_run(
     output_dir: str | Path = "generated_explanation",
     target: int = 1,
     method_kwargs: Optional[dict[str, dict[str, Any]]] = None,
+    max_test_instances: int = DEFAULT_EXPLANATION_INSTANCE_LIMIT,
 ) -> ExplanationRunConfig:
     """Collect all shared XAI-generation settings in one object."""
     output_path = Path(output_dir)
@@ -59,6 +66,7 @@ def init_explanation_run(
             "shap_kernel": {"n_background_samples": 30},
             "lime": {"num_samples": 1000},
         },
+        max_test_instances=max_test_instances,
     )
 
 
@@ -72,10 +80,7 @@ def get_xai_methods_from_design(iv_config: dict[str, dict[str, Any]]) -> list[An
 
 def predict_labels(trained_engine: Any, X: np.ndarray) -> np.ndarray:
     """Convert model predictions/probabilities into integer labels."""
-    raw_predictions = trained_engine.predict(X)
-    if np.ndim(raw_predictions) > 1:
-        return np.argmax(raw_predictions, axis=1)
-    return raw_predictions.astype(int)
+    return prediction_labels(trained_engine.predict(X))
 
 
 def generate_xai_explanation_tables(
@@ -83,8 +88,11 @@ def generate_xai_explanation_tables(
 ) -> tuple[list[Path], list[pd.DataFrame]]:
     """Generate one explanation CSV per non-control XAI method."""
     train_data_for_xai = make_train_data_for_xai(config.data.split, config.data.y_train)
-    instance_ids = np.asarray(config.data.test_instance_ids)
-    predictions = predict_labels(config.trained_engine, config.data.X_test)
+    test_limit = min(config.max_test_instances, len(config.data.X_test))
+    X_test = config.data.X_test[:test_limit]
+    instance_ids = np.asarray(config.data.test_instance_ids)[:test_limit]
+    predictions = predict_labels(config.trained_engine, X_test)
+    print(f"Generating explanations for {test_limit} test instances.")
 
     saved_paths: list[Path] = []
     explanation_dfs: list[pd.DataFrame] = []
@@ -93,7 +101,7 @@ def generate_xai_explanation_tables(
         method_key = str(method_name).lower()
 
         if method_key in {"none", "no_xai", "control"}:
-            print(f"Skipping adapter generation for xai method: {method_name}")
+            print(f"Skipping explanation generation for xai method: {method_name}")
             continue
 
         print(f"\nGenerating explanations for xai method: {method_name}")
@@ -106,14 +114,15 @@ def generate_xai_explanation_tables(
                 target=config.target,
                 **config.method_kwargs.get(method_key, {}),
             )
-            result = explainer.explain(config.data.X_test)
+            result = explainer.explain(X_test)
+            result = _aggregate_result_to_raw_features(config.data, result, X_test)
             explanation_df = result.to_explanation_df(
                 instance_ids=instance_ids,
                 predictions=predictions,
                 dataset_id=config.dataset_id,
                 model_name=config.model_name,
             )
-            explanation_df["expMethod"] = method_key
+            explanation_df[EXPLANATION_METHOD_COL] = method_key
 
             out_path = config.output_dir / f"{method_key}_{config.model_name}_{config.dataset_id}.csv"
             explanation_df.to_csv(out_path, index=False)
@@ -124,6 +133,63 @@ def generate_xai_explanation_tables(
             print(f"  Skipped {method_name}: {type(exc).__name__}: {exc}")
 
     return saved_paths, explanation_dfs
+
+
+def _aggregate_result_to_raw_features(
+    data: PreparedDataset,
+    result: XAIAdapterResult,
+    explained_instances: np.ndarray,
+) -> XAIAdapterResult:
+    """Collapse one-hot model attributions back to original feature columns."""
+    raw_feature_count = len(data.raw_feature_names)
+    values = np.asarray(result.values)
+
+    if values.ndim != 2:
+        return result
+    if values.shape[1] == raw_feature_count:
+        return result
+    if values.shape[1] != len(data.model_feature_names):
+        return result
+    if not data.split.one_hot_encode:
+        return result
+    if not hasattr(data.dataset, "aggregate_importances"):
+        return result
+
+    aggregated_values = data.dataset.aggregate_importances(
+        np.asarray(explained_instances),
+        values,
+    )
+    metadata = dict(result.metadata)
+    metadata["aggregated_from_model_features"] = True
+    metadata["model_feature_names"] = list(data.model_feature_names)
+    metadata["raw_feature_names"] = list(data.raw_feature_names)
+
+    return XAIAdapterResult(
+        values=np.asarray(aggregated_values),
+        base_values=result.base_values,
+        method=result.method,
+        metadata=metadata,
+    )
+
+
+def generate_sim2real_explanations(
+    *,
+    model: Any,
+    X: ArrayLike,
+    properties: Sequence[str] = ("faithful", "sparse", "robust", "sparse_robust"),
+    **kwargs,
+) -> dict[str, Any]:
+    """Generate property-optimized XAIsim2real explanations for one input set."""
+    results = {}
+    for property_name in properties:
+        explainer = create_xai_method(
+            "xaisim2real",
+            model=model,
+            property_name=property_name,
+            **kwargs,
+        )
+        results[property_name] = explainer.explain(X)
+    return results
 
 
 def combine_explanation_tables(

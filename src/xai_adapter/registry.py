@@ -66,6 +66,7 @@ def get_adapter_registry() -> XAIAdapterRegistry:
             ShapGradientExplainer,
             ShapLinearExplainer,
             ShapTreeExplainer,
+            Sim2RealPropertyAttribution,
             SklearnFeatureImportance,
         )
         from .concept import TCAVAdapter
@@ -92,6 +93,7 @@ def get_adapter_registry() -> XAIAdapterRegistry:
         registry.register("integrated_gradients", IntegratedGradients, "ig")
         registry.register("lrp", LRPAdapter, "layer_relevance_propagation")
         registry.register("sklearn_global", SklearnFeatureImportance, "global_feature_importance")
+        registry.register("sim2real_property", Sim2RealPropertyAttribution, "property_optimized", "xaisim2real")
         registry.register("precomputed_csv", PrecomputedCSVXAIMethod, "csv", "csv_dataset", "dataset_csv")
         registry.register("decision_tree", DecisionTreeSurrogateMethod, "dt", "rules")
         registry.register("logistic_regression", LogisticRegressionSurrogateMethod, "lr", "weights")

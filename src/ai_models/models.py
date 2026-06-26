@@ -21,6 +21,7 @@ from typing import Any, Dict, Optional
 import numpy as np
 
 from .mlp import MLPEngine
+from .sim2real import BaseSim2RealFunction, create_sim2real_function
 from .xgboost import XGBoostEngine
 from .mlp_tf import TFMLPEngine
 from .xgboost_tf import TFXGBoostEngine
@@ -182,6 +183,27 @@ class UnifiedModel(ABC):
             threshold=threshold,
             include_report=include_report,
         )
+
+    def test_accuracy(self, X: np.ndarray, y: np.ndarray) -> float:
+        """Return classification accuracy for a held-out/test split."""
+        return float(self.evaluate(X, y))
+
+    def confusion_matrix(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        *,
+        positive_label: int = 1,
+        threshold: float = 0.5,
+    ) -> np.ndarray:
+        """Return the confusion matrix for model predictions on `X`."""
+        metrics = self.evaluate_metrics(
+            X,
+            y,
+            positive_label=positive_label,
+            threshold=threshold,
+        )
+        return np.asarray(metrics["confusion_matrix"], dtype=int)
 
 
 # ---------------------------------------------------------------------------
@@ -353,6 +375,60 @@ class TFXGBoostUnifiedModel(UnifiedModel):
 
 
 # ---------------------------------------------------------------------------
+# XAIsim2real deterministic functions
+# ---------------------------------------------------------------------------
+
+class Sim2RealUnifiedModel(UnifiedModel):
+    """Deterministic analytical functions used in the XAIsim2real paper."""
+
+    def __init__(self, dataset_name: str = "sim2real", function_name: str = "sparse", **kwargs):
+        super().__init__(dataset_name, "sim2real")
+        self.engine: BaseSim2RealFunction = create_sim2real_function(function_name)
+        self.is_trained = True
+        self.metadata.update(self.engine.get_info())
+
+    def _get_framework(self) -> str:
+        return "analytical"
+
+    @property
+    def function_name(self) -> str:
+        return self.engine.function_name
+
+    @property
+    def input_dim(self) -> int:
+        return self.engine.input_dim
+
+    @property
+    def output_type(self) -> str:
+        return self.engine.output_type
+
+    def load(self, weight_path: str) -> None:
+        self.is_trained = True
+
+    def train(self, X, y, X_dev=None, y_dev=None, **kwargs) -> Dict:
+        self.is_trained = True
+        return {"framework": "analytical", "trained": False, "reason": "deterministic sim2real function"}
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        return self.engine.predict(X)
+
+    def evaluate(self, X: np.ndarray, y: np.ndarray) -> float:
+        return self.engine.evaluate(X, y)
+
+    def save(self, weight_path: str) -> None:
+        return None
+
+    def ground_truth_weights(self, X: np.ndarray) -> np.ndarray:
+        return self.engine.ground_truth_weights(X)
+
+    def ground_truth_base_values(self, X: np.ndarray) -> np.ndarray:
+        return self.engine.ground_truth_base_values(X)
+
+    def trend_weights(self) -> np.ndarray:
+        return self.engine.trend_weights()
+
+
+# ---------------------------------------------------------------------------
 # Model Manager
 # ---------------------------------------------------------------------------
 
@@ -374,7 +450,27 @@ _MODEL_CLASSES = {
     'xgboost':      XGBoostUnifiedModel,
     'mlp_tf':       TFMLPUnifiedModel,
     'xgboost_tf':   TFXGBoostUnifiedModel,
+    'sim2real':     Sim2RealUnifiedModel,
 }
+
+MODEL_REQUIRES_ONE_HOT_ENCODING = {
+    'mlp': True,
+    'mlp_tf': True,
+    'xgboost': False,
+    'xgboost_tf': False,
+    'sim2real': False,
+}
+
+
+def requires_one_hot_encoding(model_type: str) -> bool:
+    """Return whether the model family expects one-hot encoded categorical features."""
+    model_key = model_type.lower().strip()
+    if model_key not in MODEL_REQUIRES_ONE_HOT_ENCODING:
+        raise ValueError(
+            f"Unknown model_type '{model_type}'. "
+            f"Choose from {list(MODEL_REQUIRES_ONE_HOT_ENCODING)}"
+        )
+    return MODEL_REQUIRES_ONE_HOT_ENCODING[model_key]
 
 
 class ModelManager:
@@ -429,8 +525,8 @@ class ModelManager:
         print(f"✓ Loaded {model_type} ({source}) for '{dataset}'")
         return model
 
-    def create_model(self, dataset: str, model_type: str, input_dim: int,
-                     num_classes: int, source: Optional[str] = None, **kwargs) -> UnifiedModel:
+    def create_model(self, dataset: str, model_type: str, input_dim: Optional[int] = None,
+                     num_classes: Optional[int] = None, source: Optional[str] = None, **kwargs) -> UnifiedModel:
         """Create a new untrained model.
 
         Omitting `source` creates a generic/custom model. Pass source='coax' or
@@ -440,8 +536,19 @@ class ModelManager:
         if cls is None:
             raise ValueError(f"Unknown model_type '{model_type}'.")
 
+        if model_type == 'sim2real':
+            function_name = kwargs.pop('function_name', dataset.replace('sim2real_', ''))
+            model = cls(dataset_name=dataset, function_name=function_name, **kwargs)
+            key = f'{dataset}_{model_type}_{model.function_name}'
+            self.loaded_models[key] = model
+            self.active_model = model
+            print(f"✓ Created sim2real function '{model.function_name}'")
+            return model
+
         cognitive_agent = kwargs.pop('cognitive_agent', source or 'custom')
         if model_type in ('mlp', 'mlp_tf'):
+            if input_dim is None or num_classes is None:
+                raise ValueError("input_dim and num_classes are required for MLP models.")
             model = cls(dataset_name=dataset, input_dim=input_dim,
                         num_classes=num_classes, cognitive_agent=cognitive_agent, **kwargs)
         else:
@@ -471,6 +578,7 @@ class ModelManager:
         y: np.ndarray,
         *,
         target_accuracy: float,
+        target_metric: str = "accuracy",
         max_epochs: int = 300,
         check_every_epochs: int = 10,
         batch_size: int = 1000,
@@ -480,7 +588,7 @@ class ModelManager:
         **kwargs,
     ) -> Dict[str, Any]:
         """
-        Train in chunks and stop once accuracy reaches `target_accuracy`.
+        Train in chunks and stop once `target_metric` reaches `target_accuracy`.
 
         By default, the stop condition uses training accuracy on `X`/`y`.
         Pass `eval_X` and `eval_y` to stop on another split.
@@ -491,6 +599,7 @@ class ModelManager:
             raise ValueError("max_epochs must be positive.")
         if check_every_epochs <= 0:
             raise ValueError("check_every_epochs must be positive.")
+        target_metric = str(target_metric)
 
         active_model = model or self._require_active()
         eval_X = X if eval_X is None else eval_X
@@ -511,27 +620,68 @@ class ModelManager:
             active_model.is_trained = True
             total_epochs += epochs_this_round
 
-            accuracy = active_model.evaluate(eval_X, eval_y)
-            history.append({"epochs": total_epochs, "accuracy": accuracy})
-            print(f"After {total_epochs} epochs: accuracy={accuracy:.4f}")
+            metrics = active_model.evaluate_metrics(eval_X, eval_y)
+            if target_metric not in metrics:
+                available = sorted(key for key, value in metrics.items() if np.isscalar(value) or value is None)
+                raise ValueError(
+                    f"Unknown target_metric '{target_metric}'. "
+                    f"Choose one of: {available}"
+                )
+            metric_value = metrics[target_metric]
+            if metric_value is None:
+                raise ValueError(f"Metric '{target_metric}' is not available for this evaluation split.")
 
-            if accuracy >= target_accuracy:
-                print(f"Reached target accuracy {target_accuracy:.4f}; stopping training.")
+            history_row = {"epochs": total_epochs, target_metric: float(metric_value)}
+            if target_metric != "accuracy" and "accuracy" in metrics:
+                history_row["accuracy"] = float(metrics["accuracy"])
+            history.append(history_row)
+            print(f"After {total_epochs} epochs: {target_metric}={float(metric_value):.4f}")
+
+            if float(metric_value) >= target_accuracy:
+                print(f"Reached target {target_metric} {target_accuracy:.4f}; stopping training.")
                 break
 
-        final_accuracy = history[-1]["accuracy"]
-        return {
-            "target_accuracy": target_accuracy,
-            "final_accuracy": final_accuracy,
+        final_score = history[-1][target_metric]
+        result = {
+            "target_metric": target_metric,
+            "target_score": target_accuracy,
+            "final_score": final_score,
             "epochs": total_epochs,
             "batch_size": batch_size,
-            "reached_target": final_accuracy >= target_accuracy,
+            "reached_target": final_score >= target_accuracy,
             "history": history,
         }
+        if target_metric == "accuracy":
+            result["target_accuracy"] = target_accuracy
+            result["final_accuracy"] = final_score
+        return result
+
+    def train_until_metric(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        *,
+        target_metric: str,
+        target_score: float,
+        **kwargs,
+    ) -> Dict[str, Any]:
+        """Train in chunks and stop once the selected metric reaches `target_score`."""
+        return self.train_until_accuracy(
+            X,
+            y,
+            target_accuracy=target_score,
+            target_metric=target_metric,
+            **kwargs,
+        )
 
     def evaluate(self, X: np.ndarray, y: np.ndarray,
                  model: Optional[UnifiedModel] = None) -> float:
         return (model or self._require_active()).evaluate(X, y)
+
+    def test_accuracy(self, X: np.ndarray, y: np.ndarray,
+                      model: Optional[UnifiedModel] = None) -> float:
+        """Return classification accuracy for a held-out/test split."""
+        return (model or self._require_active()).test_accuracy(X, y)
 
     def evaluate_metrics(
         self,
@@ -550,6 +700,23 @@ class ModelManager:
             positive_label=positive_label,
             threshold=threshold,
             include_report=include_report,
+        )
+
+    def confusion_matrix(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        model: Optional[UnifiedModel] = None,
+        *,
+        positive_label: int = 1,
+        threshold: float = 0.5,
+    ) -> np.ndarray:
+        """Return the confusion matrix for the active or supplied model."""
+        return (model or self._require_active()).confusion_matrix(
+            X,
+            y,
+            positive_label=positive_label,
+            threshold=threshold,
         )
 
     def save_model(self, weight_path: str, model: Optional[UnifiedModel] = None) -> None:

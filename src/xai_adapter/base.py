@@ -8,6 +8,14 @@ from typing import Any, Callable, Dict, Optional
 
 import numpy as np
 
+from src.workflow_standard import (
+    DATA_ID_COL,
+    EXPLANATION_METHOD_COL,
+    INSTANCE_ID_COL,
+    MODEL_NAME_COL,
+    PREDICTION_COL,
+)
+
 
 ArrayLike = Any
 PreprocessFn = Callable[[ArrayLike], np.ndarray]
@@ -131,11 +139,11 @@ class XAIAdapterResult:
             attrs = np.abs(raw) if importance else raw
             i_max = float(np.max(np.abs(raw))) if np.any(raw != 0) else 0.0
             row = {
-                "dataId":     dataset_id,
-                "modelName":  model_name,
-                "expMethod":  self.method,
-                "instanceId": int(ids[i]),
-                "pred":       int(preds[i]),
+                DATA_ID_COL:     dataset_id,
+                MODEL_NAME_COL:  model_name,
+                EXPLANATION_METHOD_COL:  self.method,
+                INSTANCE_ID_COL: int(ids[i]),
+                PREDICTION_COL:  int(preds[i]),
                 "i_max":      i_max,
             }
             for k in range(n_features):

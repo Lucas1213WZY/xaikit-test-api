@@ -39,14 +39,17 @@ from .unified_loader import UnifiedDataLoader
 from .xai_dataset import CognitiveExplanationRecord, XAIDatasetLoader, XAIDatasetParser
 from .original_dataset import list_original_datasets, load_original_dataset
 from .workflow import (
+    DEFAULT_DATASET_FEATURES,
     DatasetSplit,
     PreparedDataset,
+    get_default_feature_cols,
     load_csv_records,
     load_dataset_and_split,
     load_json_config,
     make_train_data_for_xai,
     prepare_dataset,
     print_dataset_split_summary,
+    reencode_prepared_dataset,
     split_loaded_dataset,
 )
 
@@ -68,6 +71,8 @@ __all__ = [
     "XAIDatasetParser",
     "XAIDatasetLoader",
     "CognitiveExplanationRecord",
+    "DEFAULT_DATASET_FEATURES",
+    "get_default_feature_cols",
     "load_original_dataset",
     "list_original_datasets",
     "DatasetSplit",
@@ -78,6 +83,7 @@ __all__ = [
     "make_train_data_for_xai",
     "prepare_dataset",
     "print_dataset_split_summary",
+    "reencode_prepared_dataset",
     "split_loaded_dataset",
     
     # Data sources
