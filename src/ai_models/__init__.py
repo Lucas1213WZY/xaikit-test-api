@@ -18,7 +18,7 @@ Quick Start:
 """
 
 from .registry import ModelRegistry
-from .models import (
+from .model_api import (
     UnifiedModel,
     MLPUnifiedModel,
     XGBoostUnifiedModel,
@@ -31,12 +31,23 @@ from .models import (
     load_pretrained_model,
     requires_one_hot_encoding,
 )
-from .sim2real import (
+from .models.synthetic import (
     BaseSim2RealFunction,
     SparseFunction,
     TrendWiggleFunction,
     WiggleFunction,
     create_sim2real_function,
+)
+from .evaluation import (
+    confusion_matrix_table,
+    evaluate_model,
+    metrics_table,
+    plot_auc_curves,
+    plot_confusion_matrix,
+    plot_training_history,
+    positive_class_scores,
+    training_history_table,
+    training_summary_table,
 )
 
 __all__ = [
@@ -57,4 +68,13 @@ __all__ = [
     'classification_metrics',
     'load_pretrained_model',
     'requires_one_hot_encoding',
+    'evaluate_model',
+    'metrics_table',
+    'confusion_matrix_table',
+    'plot_confusion_matrix',
+    'plot_auc_curves',
+    'plot_training_history',
+    'training_summary_table',
+    'training_history_table',
+    'positive_class_scores',
 ]

@@ -4,16 +4,18 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
-import pandas as pd
+if TYPE_CHECKING:
+    import pandas as pd
 
 from .counterbalance import factorial_conditions, split_ivs_by_design_role
 
 
 DEFAULT_IV_CONFIG = {
     "xai_method": {
-        "type": "between",
+        "type": "within",
+        "randomization": "block",
         "levels": ["shap", "lime", "none"],
     },
     "tested_w_xai": {

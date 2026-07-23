@@ -132,6 +132,38 @@
       "datasets_supported": "$groups.datasets.all",
       "cognitive_params": {}
     },
+    "knn": {
+      "tasks": "$groups.tasks.supported",
+      "dvs": "$groups.dvs.supported",
+      "xai_types": "$groups.xai_types.supported",
+      "xai_methods": "$groups.xai_methods.supported",
+      "datasets_supported": "$groups.datasets.all",
+      "cognitive_params": {}
+    },
+    "decision_tree": {
+      "tasks": "$groups.tasks.supported",
+      "dvs": "$groups.dvs.supported",
+      "xai_types": "$groups.xai_types.supported",
+      "xai_methods": "$groups.xai_methods.supported",
+      "datasets_supported": "$groups.datasets.all",
+      "cognitive_params": {}
+    },
+    "logistic_regression": {
+      "tasks": "$groups.tasks.supported",
+      "dvs": "$groups.dvs.supported",
+      "xai_types": "$groups.xai_types.supported",
+      "xai_methods": "$groups.xai_methods.supported",
+      "datasets_supported": "$groups.datasets.all",
+      "cognitive_params": {}
+    },
+    "mlp_baseline": {
+      "tasks": "$groups.tasks.supported",
+      "dvs": "$groups.dvs.supported",
+      "xai_types": "$groups.xai_types.supported",
+      "xai_methods": "$groups.xai_methods.supported",
+      "datasets_supported": "$groups.datasets.all",
+      "cognitive_params": {}
+    },
     "coax": {
       "tasks": "$groups.tasks.forward",
       "dvs": "$groups.dvs.forward",

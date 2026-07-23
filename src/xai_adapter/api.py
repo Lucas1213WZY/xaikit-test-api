@@ -16,8 +16,13 @@ from .surrogate import GeneratedSurrogateMethods, make_surrogate
 from src.data_loaders import PreparedDataset, make_train_data_for_xai
 from src.data_loaders.xai_dataset import XAIDatasetParser
 from src.workflow_standard import (
+    DATA_ID_COL,
     DEFAULT_EXPLANATION_INSTANCE_LIMIT,
     EXPLANATION_METHOD_COL,
+    INSTANCE_ID_COL,
+    MODEL_NAME_COL,
+    PREDICTION_COL,
+    PREDICTION_ONLY_METHOD,
     prediction_labels,
 )
 
@@ -28,12 +33,15 @@ class ExplanationRunConfig:
 
     data: PreparedDataset
     iv_config: dict[str, dict[str, Any]]
-    trained_engine: Any
+    trained_ai_model: Any
     model_name: str = "mlp"
     output_dir: Path = Path("generated_explanation")
     target: int = 1
     method_kwargs: Optional[dict[str, dict[str, Any]]] = None
     max_test_instances: int = DEFAULT_EXPLANATION_INSTANCE_LIMIT
+    instance_ids: Optional[Sequence[Any]] = None
+    instance_ids_by_method: Optional[dict[str, Sequence[Any]]] = None
+    predictions_by_instance: Optional[dict[int, Any]] = None
 
     @property
     def dataset_id(self) -> str:
@@ -43,13 +51,16 @@ class ExplanationRunConfig:
 def init_explanation_run(
     data: PreparedDataset,
     iv_config: dict[str, dict[str, Any]],
-    trained_engine: Any,
+    trained_ai_model: Any,
     *,
     model_name: str = "mlp",
     output_dir: str | Path = "generated_explanation",
     target: int = 1,
     method_kwargs: Optional[dict[str, dict[str, Any]]] = None,
     max_test_instances: int = DEFAULT_EXPLANATION_INSTANCE_LIMIT,
+    instance_ids: Optional[Sequence[Any]] = None,
+    instance_ids_by_method: Optional[dict[str, Sequence[Any]]] = None,
+    predictions_by_instance: Optional[dict[int, Any]] = None,
 ) -> ExplanationRunConfig:
     """Collect all shared XAI-generation settings in one object."""
     output_path = Path(output_dir)
@@ -57,7 +68,7 @@ def init_explanation_run(
     return ExplanationRunConfig(
         data=data,
         iv_config=iv_config,
-        trained_engine=trained_engine,
+        trained_ai_model=trained_ai_model,
         model_name=model_name,
         output_dir=output_path,
         target=target,
@@ -67,6 +78,12 @@ def init_explanation_run(
             "lime": {"num_samples": 1000},
         },
         max_test_instances=max_test_instances,
+        instance_ids=list(instance_ids) if instance_ids is not None else None,
+        instance_ids_by_method={
+            str(method).lower(): list(ids)
+            for method, ids in (instance_ids_by_method or {}).items()
+        } or None,
+        predictions_by_instance=predictions_by_instance,
     )
 
 
@@ -78,9 +95,64 @@ def get_xai_methods_from_design(iv_config: dict[str, dict[str, Any]]) -> list[An
     return list(iv_config[xai_iv_name]["levels"])
 
 
-def predict_labels(trained_engine: Any, X: np.ndarray) -> np.ndarray:
+def predict_labels(trained_ai_model: Any, X: np.ndarray) -> np.ndarray:
     """Convert model predictions/probabilities into integer labels."""
-    return prediction_labels(trained_engine.predict(X))
+    return prediction_labels(trained_ai_model.predict(X))
+
+
+def generate_ai_prediction_table(
+    config: ExplanationRunConfig,
+) -> tuple[Path, pd.DataFrame]:
+    """Predict every train/test instance and save a complete prediction table."""
+    instance_ids = np.asarray(
+        list(dict.fromkeys([
+            *map(int, config.data.train_instance_ids),
+            *map(int, config.data.test_instance_ids),
+        ])),
+        dtype=int,
+    )
+    if np.any(instance_ids < 0) or np.any(
+        instance_ids >= len(config.data.split.X_model)
+    ):
+        raise ValueError("Dataset train/test instance IDs contain an out-of-range row.")
+
+    if config.predictions_by_instance is None:
+        predictions = predict_labels(
+            config.trained_ai_model,
+            config.data.split.X_model[instance_ids],
+        )
+    else:
+        missing = [
+            int(instance_id)
+            for instance_id in instance_ids
+            if int(instance_id) not in config.predictions_by_instance
+        ]
+        if missing:
+            raise ValueError(
+                "The stored AI prediction mapping is missing dataset rows: "
+                f"{missing[:10]}."
+            )
+        predictions = np.asarray([
+            config.predictions_by_instance[int(instance_id)]
+            for instance_id in instance_ids
+        ])
+    prediction_df = pd.DataFrame({
+        DATA_ID_COL: config.dataset_id,
+        MODEL_NAME_COL: config.model_name,
+        EXPLANATION_METHOD_COL: PREDICTION_ONLY_METHOD,
+        INSTANCE_ID_COL: instance_ids,
+        PREDICTION_COL: predictions.astype(int),
+    })
+    output_path = (
+        config.output_dir
+        / f"predictions_{config.model_name}_{config.dataset_id}.csv"
+    )
+    prediction_df.to_csv(output_path, index=False)
+    print(
+        "\nSaved complete AI prediction table: "
+        f"{output_path} shape={prediction_df.shape}"
+    )
+    return output_path, prediction_df
 
 
 def generate_xai_explanation_tables(
@@ -88,12 +160,6 @@ def generate_xai_explanation_tables(
 ) -> tuple[list[Path], list[pd.DataFrame]]:
     """Generate one explanation CSV per non-control XAI method."""
     train_data_for_xai = make_train_data_for_xai(config.data.split, config.data.y_train)
-    test_limit = min(config.max_test_instances, len(config.data.X_test))
-    X_test = config.data.X_test[:test_limit]
-    instance_ids = np.asarray(config.data.test_instance_ids)[:test_limit]
-    predictions = predict_labels(config.trained_engine, X_test)
-    print(f"Generating explanations for {test_limit} test instances.")
-
     saved_paths: list[Path] = []
     explanation_dfs: list[pd.DataFrame] = []
 
@@ -104,18 +170,42 @@ def generate_xai_explanation_tables(
             print(f"Skipping explanation generation for xai method: {method_name}")
             continue
 
+        instance_ids = _explanation_ids_for_method(config, method_key)
+        if len(instance_ids) == 0:
+            print(
+                f"Skipping explanation generation for {method_name}: "
+                "no sampled XAI-visible trial instances."
+            )
+            continue
+        explained_instances = config.data.split.X_model[instance_ids]
+        if config.predictions_by_instance is None:
+            predictions = predict_labels(
+                config.trained_ai_model,
+                explained_instances,
+            )
+        else:
+            predictions = np.asarray([
+                config.predictions_by_instance[int(instance_id)]
+                for instance_id in instance_ids
+            ])
+
         print(f"\nGenerating explanations for xai method: {method_name}")
+        print(f"  Sampled instances: {len(instance_ids)}")
         try:
-            explainer = create_xai_method_from_engine(
+            explainer = create_xai_method(
                 method_key,
-                engine=config.trained_engine,
+                ai_model=config.trained_ai_model,
                 train_data=train_data_for_xai,
                 preprocessing_fn=lambda x: np.asarray(x, dtype=np.float32),
                 target=config.target,
                 **config.method_kwargs.get(method_key, {}),
             )
-            result = explainer.explain(X_test)
-            result = _aggregate_result_to_raw_features(config.data, result, X_test)
+            result = explainer.explain(explained_instances)
+            result = _aggregate_result_to_raw_features(
+                config.data,
+                result,
+                explained_instances,
+            )
             explanation_df = result.to_explanation_df(
                 instance_ids=instance_ids,
                 predictions=predictions,
@@ -133,6 +223,41 @@ def generate_xai_explanation_tables(
             print(f"  Skipped {method_name}: {type(exc).__name__}: {exc}")
 
     return saved_paths, explanation_dfs
+
+
+def _explanation_ids_for_method(
+    config: ExplanationRunConfig,
+    method_key: str,
+) -> np.ndarray:
+    """Resolve the sampled instance IDs that need one method's explanation."""
+    if config.instance_ids_by_method is not None:
+        values = config.instance_ids_by_method.get(method_key, [])
+    elif config.instance_ids is not None:
+        values = config.instance_ids
+    else:
+        test_limit = min(config.max_test_instances, len(config.data.X_test))
+        values = np.asarray(config.data.test_instance_ids)[:test_limit]
+
+    instance_ids = np.asarray(
+        list(dict.fromkeys(int(value) for value in values)),
+        dtype=int,
+    )
+    if np.any(instance_ids < 0) or np.any(
+        instance_ids >= len(config.data.split.X_model)
+    ):
+        raise ValueError("Explanation instance_ids contain an out-of-range dataset row.")
+    if config.predictions_by_instance is not None:
+        missing = [
+            int(instance_id)
+            for instance_id in instance_ids
+            if int(instance_id) not in config.predictions_by_instance
+        ]
+        if missing:
+            raise ValueError(
+                "Explanation instance IDs are missing stored AI predictions: "
+                f"{missing[:10]}."
+            )
+    return instance_ids
 
 
 def _aggregate_result_to_raw_features(
@@ -208,110 +333,6 @@ def combine_explanation_tables(
     return combined_path, combined_df
 
 
-def _train_x(train_data: Any) -> ArrayLike:
-    if hasattr(train_data, "X"):
-        return train_data.X
-    return train_data
-
-
-def _train_y(train_data: Any) -> Optional[ArrayLike]:
-    return getattr(train_data, "y", None)
-
-
-def _categorical_features(train_data: Any) -> Optional[list[int]]:
-    return getattr(train_data, "categorical_feature_indices", None)
-
-
-def _feature_names(train_data: Any) -> Optional[list[str]]:
-    return getattr(train_data, "feature_names", None)
-
-
-def create_xai_method_from_engine(
-    name: str,
-    *,
-    engine: Any,
-    train_data: Any,
-    preprocessing_fn,
-    target: int = 1,
-    **kwargs,
-):
-    """
-    Create an XAI method adapter from a CoAX-style `engine` and `train_data`.
-
-    `engine` is expected to expose `predict(...)`; gradient methods also use
-    `engine.model` and prefer `engine.forward_logits_or_probs(...)` when it is
-    available.
-    """
-    key = name.lower()
-    train_x = _train_x(train_data)
-    predict_fn = kwargs.pop("predict_fn", engine.predict)
-
-    if key in {"lofo", "leave_one_feature_out"}:
-        return create_xai_method(
-            name,
-            predict_fn=predict_fn,
-            background_data=train_x,
-            preprocessing_fn=preprocessing_fn,
-            target=target,
-            **kwargs,
-        )
-
-    if key in {"shap", "shap_kernel"}:
-        return create_xai_method(
-            name,
-            predict_fn=predict_fn,
-            background_data=train_x,
-            preprocessing_fn=preprocessing_fn,
-            target=target,
-            **kwargs,
-        )
-
-    if key in {"lime", "lime_tabular"}:
-        return create_xai_method(
-            name,
-            predict_fn=predict_fn,
-            training_data=train_x,
-            training_labels=kwargs.pop("training_labels", _train_y(train_data)),
-            categorical_features=kwargs.pop("categorical_features", _categorical_features(train_data)),
-            feature_names=kwargs.pop("feature_names", _feature_names(train_data)),
-            preprocessing_fn=preprocessing_fn,
-            target=target,
-            **kwargs,
-        )
-
-    if key in {"gradient_input", "gradient_x_input", "input_gradients"}:
-        return create_xai_method(
-            name,
-            model=engine.model,
-            forward_fn=kwargs.pop("forward_fn", getattr(engine, "forward_logits_or_probs", None)),
-            predict_fn=predict_fn,
-            background_data=train_x,
-            preprocessing_fn=preprocessing_fn,
-            target=target,
-            **kwargs,
-        )
-
-    if key in {
-        "deeplift",
-        "deep_lift",
-        "integrated_gradients",
-        "ig",
-        "lrp",
-        "layer_relevance_propagation",
-    }:
-        return create_xai_method(
-            name,
-            model=engine.model,
-            predict_fn=predict_fn,
-            background_data=train_x,
-            preprocessing_fn=preprocessing_fn,
-            target=target,
-            **kwargs,
-        )
-
-    return create_xai_method(name, **kwargs)
-
-
 def create_custom_xai_method(
     algorithm: Any,
     *,
@@ -343,58 +364,6 @@ def create_custom_surrogate_method(
     return make_surrogate(fit_fn, explain_fn, name=method_name)
 
 
-def create_coxam_xai_method(
-    loader,
-    method_type: str,
-    app_id: str,
-    model_name: str,
-    **kwargs,
-):
-    """
-    Create a CoXAM rules-vs-weights method from data-loader explanation tables.
-
-    Args:
-        loader: UnifiedDataLoader with CoXAM explanation tables.
-        method_type: 'decision_tree'/'rules' or 'logistic_regression'/'weights'.
-        app_id: Dataset dataId.
-        model_name: Model name, e.g. 'mlp' or 'xgboost'.
-        **kwargs: Extra filters, e.g. depth=3 or variant='sparse'.
-    """
-    if getattr(loader.data_source, "source_type", None) != "coxam":
-        raise AttributeError("create_coxam_xai_method requires a CoXAM data loader")
-
-    key = method_type.lower().strip()
-    if key in {"decision_tree", "dt", "rules"}:
-        table_name = "decision_tree"
-        factory_name = "rules"
-    elif key in {"logistic_regression", "lr", "weights"}:
-        table_name = "logistic_regression"
-        factory_name = "weights"
-    else:
-        raise ValueError("method_type must be 'decision_tree'/'rules' or 'logistic_regression'/'weights'")
-
-    explanation_df = loader.get_explanation_table(table_name)
-    if "model" in explanation_df.columns:
-        explanation_df = explanation_df[explanation_df["model"] == model_name]
-    if table_name == "decision_tree" and "depth" in kwargs and "depth" in explanation_df.columns:
-        explanation_df = explanation_df[explanation_df["depth"] == kwargs["depth"]]
-    if table_name == "logistic_regression" and "variant" in kwargs and "variant" in explanation_df.columns:
-        explanation_df = explanation_df[explanation_df["variant"] == kwargs["variant"]]
-    if explanation_df.empty:
-        raise ValueError(
-            f"No rows found for method={key}, app_id={app_id}, model_name={model_name}, filters={kwargs}"
-        )
-
-    return create_xai_method(
-        factory_name,
-        explanation_df=explanation_df,
-        metadata_df=loader.get_metadata(),
-        app_id=app_id,
-        model_name=model_name,
-        **kwargs,
-    )
-
-
 def get_coxam_xai_predictions(
     loader,
     instance_ids: List[int],
@@ -404,9 +373,9 @@ def get_coxam_xai_predictions(
     **kwargs,
 ) -> List[Any]:
     """Apply a CoXAM XAI method to raw features from a data loader."""
-    method = create_coxam_xai_method(
-        loader,
-        method_type=method_type,
+    method = create_xai_method(
+        method_type,
+        loader=loader,
         app_id=app_id,
         model_name=model_name,
         **kwargs,

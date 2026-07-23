@@ -42,8 +42,7 @@ DEFAULT_CVS = {
 }
 
 DEFAULT_DVS = {
-    "accuracy": ["continuous"],
-    "task_time": ["continuous"],
+    "forward_accuracy": ["continuous"],
 }
 
 
@@ -160,6 +159,8 @@ def validate_experiment_config(
     dvs: Dict[str, List[Any]],
     *,
     available_datasets: Optional[List[str]] = None,
+    support_check: bool = True,
+    strict: bool = False,
     show: bool = True,
 ) -> tuple[Dict[str, Dict[str, Any]], Dict[str, List[Any]], Dict[str, List[Any]]]:
     """Validate and optionally summarize an iteratively-built experiment config."""
@@ -173,6 +174,18 @@ def validate_experiment_config(
             cvs,
             dvs,
             available_datasets=available_datasets,
+        )
+
+    if support_check:
+        ensure_project_imports()
+        from src.experiment_design.support import validate_design_support
+
+        validate_design_support(
+            iv_config,
+            cvs,
+            dvs,
+            strict=strict,
+            show=show,
         )
 
     return iv_config, cvs, dvs
@@ -818,7 +831,7 @@ def generate_xai_explanation_tables(
     config: ExplanationRunConfig,
 ) -> tuple[List[Path], List[pd.DataFrame]]:
     """Generate one explanation CSV per non-control XAI method."""
-    from src.xai_adapter import create_xai_method_from_engine
+    from src.xai_adapter import create_xai_method
 
     train_data_for_xai = make_train_data_for_xai(config.data.split, config.data.y_train)
     instance_ids = np.asarray(config.data.test_instance_ids)
@@ -836,9 +849,9 @@ def generate_xai_explanation_tables(
 
         print(f"\nGenerating explanations for xai method: {method_name}")
         try:
-            explainer = create_xai_method_from_engine(
+            explainer = create_xai_method(
                 method_key,
-                engine=config.trained_engine,
+                ai_model=config.trained_engine,
                 train_data=train_data_for_xai,
                 preprocessing_fn=lambda x: np.asarray(x, dtype=np.float32),
                 target=config.target,

@@ -6,7 +6,7 @@ from typing import Optional
 
 import numpy as np
 
-from src.ai_models.sim2real import create_sim2real_function
+from src.ai_models.models.synthetic import create_sim2real_function
 
 from ..base import ArrayLike, PreprocessFn, XAIAdapterResult, ensure_2d
 from ..metrics import (

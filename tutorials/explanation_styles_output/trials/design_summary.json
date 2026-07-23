@@ -1,0 +1,1667 @@
+{
+  "iv_config": {
+    "validation_condition": [
+      "feature_check",
+      "change_prediction",
+      "predict_without_timer",
+      "predict_with_timer"
+    ],
+    "explanation_property": [
+      "faithful",
+      "sparse",
+      "robust",
+      "sparse_robust"
+    ]
+  },
+  "between_subjects_ivs": {
+    "validation_condition": [
+      "feature_check",
+      "change_prediction",
+      "predict_without_timer",
+      "predict_with_timer"
+    ],
+    "explanation_property": [
+      "faithful",
+      "sparse",
+      "robust",
+      "sparse_robust"
+    ]
+  },
+  "within_subjects_ivs": {},
+  "block_counterbalanced_within_ivs": {},
+  "trial_randomized_within_ivs": {},
+  "requested_counterbalancing_strategy": "auto",
+  "trial_randomization_strategy": "random",
+  "trials_per_condition": null,
+  "trials_per_participant": 30,
+  "counterbalancing_strategy": "complete_counterbalancing",
+  "n_conditions": 1,
+  "n_orders": 1,
+  "counterbalancing_diagnostics": {
+    "n_conditions": 1,
+    "n_orders": 1,
+    "expected_position_count": 1.0,
+    "expected_immediate_pair_count": 0,
+    "position_balanced": true,
+    "immediate_pair_balanced": true,
+    "position_counts": {
+      "1": {
+        "{\"withinCondition\": \"single_condition\"}": 1
+      }
+    },
+    "immediate_pair_counts": {}
+  },
+  "orders": [
+    {
+      "order_id": 1,
+      "sequence": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ]
+    }
+  ],
+  "n_participants": 160,
+  "participant_assignments": [
+    {
+      "participantId": 1,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 2,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 3,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 4,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 5,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 6,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 7,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 8,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 9,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 10,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 11,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 12,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 13,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 14,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 15,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 16,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 17,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 18,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 19,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 20,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 21,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 22,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 23,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 24,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 25,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 26,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 27,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 28,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 29,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 30,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 31,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 32,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 33,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 34,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 35,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 36,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 37,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 38,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 39,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 40,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 41,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 42,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 43,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 44,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 45,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 46,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 47,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 48,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 49,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 50,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 51,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 52,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 53,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 54,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 55,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 56,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 57,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 58,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 59,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 60,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 61,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 62,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 63,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 64,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 65,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 66,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 67,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 68,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 69,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 70,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 71,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 72,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 73,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 74,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 75,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 76,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 77,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 78,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 79,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 80,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 81,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 82,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 83,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 84,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 85,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 86,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 87,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 88,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 89,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 90,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 91,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 92,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 93,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 94,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 95,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 96,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 97,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 98,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 99,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 100,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 101,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 102,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 103,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 104,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 105,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 106,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 107,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 108,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 109,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 110,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 111,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 112,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 113,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 114,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 115,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 116,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 117,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 118,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 119,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 120,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 121,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 122,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 123,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 124,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 125,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 126,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 127,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 128,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 129,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 130,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 131,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 132,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 133,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 134,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 135,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 136,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 137,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 138,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 139,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 140,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 141,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 142,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 143,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 144,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 145,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 146,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 147,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 148,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "feature_check",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 149,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 150,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 151,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 152,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "change_prediction",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 153,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 154,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 155,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 156,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_without_timer",
+      "explanation_property": "sparse_robust"
+    },
+    {
+      "participantId": 157,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "faithful"
+    },
+    {
+      "participantId": 158,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse"
+    },
+    {
+      "participantId": 159,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "robust"
+    },
+    {
+      "participantId": 160,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "validation_condition": "predict_with_timer",
+      "explanation_property": "sparse_robust"
+    }
+  ]
+}

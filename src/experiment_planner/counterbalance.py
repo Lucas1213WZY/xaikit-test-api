@@ -15,9 +15,12 @@ from __future__ import annotations
 import csv
 import json
 import random
+from collections import Counter
 from itertools import permutations, product
 from pathlib import Path
 from typing import Any
+
+import numpy as np
 
 
 # ── 1. FACTORIAL CONDITIONS ────────────────────────────────────────────────────
@@ -167,25 +170,153 @@ def balanced_latin_square(conditions: list) -> list[list]:
     return [[conditions[i] for i in row] for row in square_indices]
 
 
-def choose_counterbalancing(within_conditions: list) -> tuple[list[list], str]:
+def choose_counterbalancing(
+    within_conditions: list,
+    strategy: str = "auto",
+) -> tuple[list[list], str]:
     """
-    Auto-select counterbalancing strategy based on number of within-subjects conditions.
+    Select a counterbalancing strategy for within-subjects conditions.
 
-    Rules:
-        n <= 4  → complete counterbalancing (all n! orders)
-        n >  4  → balanced Latin square (Bradley method)
+    Strategies:
+        auto                  n <= 4 uses complete counterbalancing; otherwise
+                              Bradley balanced Latin square.
+        complete              all n! orderings; requires n <= 4.
+        balanced_latin_square Bradley (1958) balanced Latin square.
 
     Args:
         within_conditions: list of condition labels for within-subjects IV.
+        strategy: one of 'auto', 'complete', or 'balanced_latin_square'.
 
     Returns:
         (orders, strategy_name)
     """
     n = len(within_conditions)
-    if n <= 4:
+    strategy = strategy.lower()
+    aliases = {
+        "auto": "auto",
+        "complete": "complete",
+        "complete_counterbalancing": "complete",
+        "balanced_latin_square": "balanced_latin_square",
+        "balanced_latin_square_bradley_1958": "balanced_latin_square",
+        "bradley": "balanced_latin_square",
+        "bradley_1958": "balanced_latin_square",
+    }
+    if strategy not in aliases:
+        raise ValueError(
+            "counterbalancing_strategy must be one of 'auto', 'complete', "
+            f"or 'balanced_latin_square' (got {strategy!r})."
+        )
+
+    resolved_strategy = aliases[strategy]
+    if resolved_strategy == "auto":
+        resolved_strategy = "complete" if n <= 4 else "balanced_latin_square"
+
+    if resolved_strategy == "complete":
         return complete_counterbalancing(within_conditions), "complete_counterbalancing"
-    else:
-        return balanced_latin_square(within_conditions), "balanced_latin_square"
+    return balanced_latin_square(within_conditions), "balanced_latin_square_bradley_1958"
+
+
+def _condition_key(condition: Any) -> str:
+    """Stable condition key for diagnostics and JSON summaries."""
+    return json.dumps(condition, sort_keys=True, default=str)
+
+
+def counterbalancing_diagnostics(orders: list[list]) -> dict[str, Any]:
+    """Return position and immediate-pair balance diagnostics for condition orders."""
+    if not orders:
+        return {
+            "n_conditions": 0,
+            "n_orders": 0,
+            "position_counts": {},
+            "immediate_pair_counts": {},
+            "position_balanced": True,
+            "immediate_pair_balanced": True,
+        }
+
+    n_conditions = len(orders[0])
+    condition_keys = sorted({_condition_key(condition) for row in orders for condition in row})
+    position_counts = {
+        str(position + 1): dict(
+            Counter(_condition_key(row[position]) for row in orders)
+        )
+        for position in range(n_conditions)
+    }
+    pair_counts = Counter(
+        f"{_condition_key(row[position])} -> {_condition_key(row[position + 1])}"
+        for row in orders
+        for position in range(max(0, n_conditions - 1))
+    )
+
+    expected_position_count = (
+        len(orders) / n_conditions
+        if n_conditions
+        else 0
+    )
+    n_ordered_pairs = n_conditions * (n_conditions - 1)
+    expected_immediate_pair_count = (
+        sum(pair_counts.values()) / n_ordered_pairs
+        if n_ordered_pairs
+        else 0
+    )
+
+    position_balanced = all(
+        counts.get(condition, 0) == expected_position_count
+        for counts in position_counts.values()
+        for condition in condition_keys
+    )
+    immediate_pair_balanced = all(
+        pair_counts.get(f"{left} -> {right}", 0) == expected_immediate_pair_count
+        for left in condition_keys
+        for right in condition_keys
+        if left != right
+    )
+
+    return {
+        "n_conditions": n_conditions,
+        "n_orders": len(orders),
+        "expected_position_count": expected_position_count,
+        "expected_immediate_pair_count": expected_immediate_pair_count,
+        "position_balanced": position_balanced,
+        "immediate_pair_balanced": immediate_pair_balanced,
+        "position_counts": position_counts,
+        "immediate_pair_counts": dict(sorted(pair_counts.items())),
+    }
+
+
+def to_psychopy_trial_list(order: list) -> list[dict[str, Any]]:
+    """
+    Convert one generated order into a PsychoPy-compatible trialList.
+
+    The generated list can be passed to psychopy.data.TrialHandler with
+    method='sequential'. PsychoPy stays optional; the Bradley order generation
+    remains local and testable.
+    """
+    trial_list = []
+    for condition in order:
+        if isinstance(condition, dict):
+            trial_list.append(condition.copy())
+        else:
+            trial_list.append({"withinCondition": condition})
+    return trial_list
+
+
+def make_psychopy_trial_handler(order: list, *, n_reps: int = 1, seed: int | None = None):
+    """Create a PsychoPy TrialHandler for an already-counterbalanced order."""
+    try:
+        from psychopy import data
+    except ImportError as exc:
+        raise ImportError(
+            "PsychoPy is not installed. Install it to use "
+            "make_psychopy_trial_handler(), or use to_psychopy_trial_list() "
+            "without PsychoPy."
+        ) from exc
+
+    return data.TrialHandler(
+        trialList=to_psychopy_trial_list(order),
+        nReps=n_reps,
+        method="sequential",
+        seed=seed,
+    )
 
 
 # ── 3. PARTICIPANT ASSIGNMENT ──────────────────────────────────────────────────
@@ -474,7 +605,11 @@ def export_trials_csv(trials: list[dict], path: str | Path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     if not trials:
         raise ValueError("Trial list is empty — nothing to export.")
-    fieldnames = list(trials[0].keys())
+    fieldnames = list(dict.fromkeys(
+        field
+        for trial in trials
+        for field in trial
+    ))
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -487,7 +622,13 @@ def export_trials_json(trials: list[dict], path: str | Path) -> Path:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(trials, f, indent=2, ensure_ascii=False)
+        json.dump(
+            trials,
+            f,
+            indent=2,
+            ensure_ascii=False,
+            default=_json_default,
+        )
     return path
 
 
@@ -501,12 +642,14 @@ def export_design_summary(
     path: str | Path,
     block_within_ivs: dict | None = None,
     trial_within_ivs: dict | None = None,
+    counterbalancing_strategy: str | None = None,
     trial_randomization_strategy: str | None = None,
     trials_per_condition: int | None = None,
     trials_per_participant: int | None = None,
 ) -> Path:
     """Export a human-readable design summary JSON alongside the trial CSV."""
     path = Path(path)
+    diagnostics = counterbalancing_diagnostics(orders)
     summary = {
         "iv_config": iv_config,
         "between_subjects_ivs": between_ivs,
@@ -515,11 +658,14 @@ def export_design_summary(
             block_within_ivs if block_within_ivs is not None else within_ivs
         ),
         "trial_randomized_within_ivs": trial_within_ivs or {},
+        "requested_counterbalancing_strategy": counterbalancing_strategy,
         "trial_randomization_strategy": trial_randomization_strategy,
         "trials_per_condition": trials_per_condition,
         "trials_per_participant": trials_per_participant,
         "counterbalancing_strategy": strategy,
-        "n_orders": len(orders),
+        "n_conditions": diagnostics["n_conditions"],
+        "n_orders": diagnostics["n_orders"],
+        "counterbalancing_diagnostics": diagnostics,
         "orders": [
             {"order_id": i + 1, "sequence": o} for i, o in enumerate(orders)
         ],
@@ -536,13 +682,26 @@ def export_design_summary(
     }
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(summary, f, indent=2)
+        json.dump(summary, f, indent=2, default=_json_default)
     return path
+
+
+def _json_default(value: Any) -> Any:
+    """Convert common scientific-Python values for artifact JSON export."""
+    if isinstance(value, np.generic):
+        return value.item()
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    if isinstance(value, Path):
+        return str(value)
+    raise TypeError(
+        f"Object of type {value.__class__.__name__} is not JSON serializable"
+    )
 
 
 # ── 6. HIGH-LEVEL PIPELINE ────────────────────────────────────────────────────
 
-def run_experiment_design(
+def build_experiment_plan(
     iv_config: dict[str, dict],
     instance_pool: list[dict],
     n_participants: int,
@@ -551,6 +710,7 @@ def run_experiment_design(
     controlled_vars: dict[str, Any] | None = None,
     id_map: dict[str, str] | None = None,
     output_dir: str | Path = "experiment_output",
+    counterbalancing_strategy: str = "auto",
     trial_randomization_strategy: str = "balanced",
     instance_wise_explanation: bool = False,
     shuffle_instances: bool = True,
@@ -580,6 +740,9 @@ def run_experiment_design(
                                  {'dataId': 'dataId', 'instanceId': 'instanceId'}
                                  None → both IDs are auto-generated (1, 2, 3 ...).
         output_dir:            Folder for output files.
+        counterbalancing_strategy:
+                               'auto', 'complete', or 'balanced_latin_square'
+                               for block-level within-subject conditions.
         trial_randomization_strategy:
                                For within IVs with {'randomization': 'trial'}:
                                'balanced' splits trials_per_participant evenly
@@ -608,7 +771,10 @@ def run_experiment_design(
     # Only block-level within IVs are sent into counterbalancing.
     within_labels = make_within_condition_order_labels(block_within_ivs)
 
-    orders, strategy = choose_counterbalancing(within_labels)
+    orders, strategy = choose_counterbalancing(
+        within_labels,
+        strategy=counterbalancing_strategy,
+    )
 
     # Assign participants
     assignments = assign_participants(n_participants, orders, between_ivs or None)
@@ -641,6 +807,7 @@ def run_experiment_design(
         path=output_dir / "design_summary.json",
         block_within_ivs=block_within_ivs,
         trial_within_ivs=trial_within_ivs,
+        counterbalancing_strategy=counterbalancing_strategy,
         trial_randomization_strategy=trial_randomization_strategy,
         trials_per_condition=trials_per_condition,
         trials_per_participant=trials_per_participant,

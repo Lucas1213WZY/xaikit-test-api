@@ -2,33 +2,101 @@
 
 `src.xai_adapter` wraps external XAI libraries behind a consistent adapter API.
 It owns the sklearn-like XAI method interface for feature attribution, CoXAM
-rules-vs-weights surrogates, and thin wrappers around precomputed CSV explanations.
+rules-vs-weights surrogates, concept/example-based explanations, glass-box
+models, and thin wrappers around precomputed CSV explanations.
 
-Supported adapters:
+Every adapter's `explain(...)` returns an `XAIAdapterResult` with `values`
+(signed per-feature attributions), `base_values` (per-instance intercept),
+`attributions`, and `importances`.
 
-- `lofo`: local leave-one-feature-out, numpy only
-- `shap` / `shap_kernel`: SHAP `KernelExplainer`
-- `lime` / `lime_tabular`: LIME tabular explainer
-- `gradient_input`: gradient times input for torch models
-- `deeplift`: Captum DeepLift
-- `integrated_gradients` / `ig`: Captum Integrated Gradients
-- `sklearn_global`: sklearn-style `feature_importances_` or `coef_`
-- `precomputed_csv` / `csv`: expose precomputed explanation vectors from a `data_loaders.XAIDatasetParser`
-- `decision_tree` / `rules`: CoXAM decision-tree surrogate from explanation tables
-- `logistic_regression` / `weights`: CoXAM logistic-regression surrogate from explanation tables
+## Registered adapters
+
+Names below are what you pass to `create_xai_method(name, ...)`; aliases in
+parentheses resolve to the same adapter ([registry.py](registry.py)).
+
+**Attribution (local + global)**
+
+- `lofo` (`leave_one_feature_out`): local leave-one-feature-out, numpy only
+- `shap_kernel` (`shap`): SHAP `KernelExplainer`, model-agnostic black box
+- `shap_tree` (`shap_treeexplainer`): SHAP `TreeExplainer` for tree ensembles
+- `shap_linear` (`shap_linearexplainer`): SHAP `LinearExplainer` for linear/logistic models
+- `shap_deep` (`shap_deepexplainer`): SHAP `DeepExplainer` for PyTorch/TensorFlow models
+- `shap_gradient` (`shap_gradientexplainer`): SHAP `GradientExplainer` for PyTorch/TensorFlow models
+- `lime` (`lime_tabular`): LIME tabular explainer
+- `gradient_input` (`gradient_x_input`, `input_gradients`): gradient × input, torch models
+- `deeplift` (`deep_lift`): Captum DeepLift
+- `integrated_gradients` (`ig`): Captum Integrated Gradients
+- `lrp` (`layer_relevance_propagation`): Layer-wise Relevance Propagation via Captum, torch models
+- `sklearn_global` (`global_feature_importance`): sklearn-style `feature_importances_` or `coef_`
+- `sim2real_property` (`property_optimized`, `xaisim2real`): property-optimized attribution matrices
+
+**Surrogate (CoXAM rules/weights + rule extraction)**
+
+- `decision_tree` (`dt`, `rules`): CoXAM decision-tree surrogate
+- `logistic_regression` (`lr`, `weights`): CoXAM logistic-regression surrogate
+- `rule_list` (`rulelist`): ordered rule-list surrogate (first-match semantics)
+- `rule_set` (`ruleset`): unordered rule-set surrogate (confidence-sorted)
+- `anchors` (`anchor_tabular`): Anchors rule-based local explanations via alibi
+
+**Concept**
+
+- `tcav`: TCAV concept attribution via Captum
+
+**Glass-box / interpretable**
+
+- `ebm` (`interpret_ebm`, `explainable_boosting`): InterpretML Explainable Boosting Machine
+
+**Example-based**
+
+- `counterfactual` (`cf`, `wachter`): Wachter et al. (2017) counterfactuals via alibi
+- `dice` (`diverse_counterfactuals`): Diverse Counterfactual Explanations via dice-ml
+- `prototypes` (`mmd_critic`, `criticisms`): MMD-Critic prototypes and criticisms
+
+**Dataset-backed**
+
+- `precomputed_csv` (`csv`, `csv_dataset`, `dataset_csv`): expose precomputed explanation vectors from a `data_loaders.XAIDatasetParser`
+
+Construction helpers (functions, not registry names):
+
+- `create_custom_xai_method` / `register_xai_method`: wrap a custom attribution function or object
 - `make_surrogate` / `create_custom_surrogate_method`: wrap custom surrogate fit/explain callables
 - `generate_surrogate_xai_methods`: train fresh rules/weights surrogates when a new CSV has instances and AI predictions but no precomputed CoXAM tables
+
+`create_xai_method` is the single entry point for building any adapter. It takes
+three optional wiring arguments on top of the adapter's own kwargs:
+
+- `ai_model=`: a trained AI model (exposes `predict`, `model`,
+  optionally `forward_logits_or_probs`). When given with `train_data=`, the model
+  and training data are wired into each attribution adapter's expected kwargs
+  automatically (LOFO, kernel SHAP, LIME, gradient×input, DeepLift, IG, LRP).
+- `train_data=`: training data used with `ai_model=` (exposes `X`/`y`/
+  `feature_names`/`categorical_feature_indices`).
+- `loader=`: a CoXAM data loader. For a `rules`/`weights` (or `decision_tree`/
+  `logistic_regression`) name, the surrogate's explanation and metadata tables
+  are read from the loader and filtered by `model_name`/`depth`/`variant`.
+
+All three default to `None`; omit them to pass adapter kwargs directly.
+
+## Package layout
 
 The public API is organized by adapter family:
 
 ```text
 xai_adapter/
+  base.py               # XAIAdapter base class, XAIAdapterResult, baseline helpers
+  registry.py           # name -> adapter registry, create_xai_method / register_xai_method
+  api.py                # engine/design/run helpers, custom + surrogate constructors
   attribution/          # local attribution and global importance methods
-  surrogate/            # rules/weights and custom surrogate methods
+  surrogate/            # rules/weights, rule list/set, anchors, custom surrogates
+  concept/              # TCAV concept attribution
+  interpret/            # glass-box models (InterpretML EBM)
+  example_based/        # counterfactuals (Wachter, DiCE) and prototypes (MMD-Critic)
   dataset.py            # precomputed CSV explanations
+  metrics.py            # faithfulness / fidelity metrics
+  visualization.py      # explanation plotting helpers
 ```
 
-Library-backed attribution classes can be imported from `attribution`:
+Library-backed attribution classes can be imported directly from `attribution`:
 
 ```python
 from src.xai_adapter.attribution import (
@@ -36,14 +104,14 @@ from src.xai_adapter.attribution import (
     DeepLift,
     GradientInput,
     KernelShap,
-    LimeTabular,
+    Lime,
     LeaveOneFeatureOut,
 )
 ```
 
-`KernelShap` uses SHAP's `KernelExplainer`, and `LimeTabular` uses LIME's
-tabular explainer. The old `*Method` names and `create_xai_method(...)`
-factory aliases remain available for compatibility.
+`KernelShap` uses SHAP's `KernelExplainer`, and `Lime` uses LIME's tabular
+explainer. In most cases, prefer the registry entry point `create_xai_method(name, ...)`
+over importing classes directly.
 
 Example:
 
@@ -66,19 +134,36 @@ absolute_importances = result.importances
 Use `preprocessing_fn` and `postprocessing_fn` when the model consumes
 preprocessed/OHE features but you want to explain raw feature rows.
 
-For CoAX-style engine objects:
+For a trained AI model, pass `ai_model=` and `train_data=` to the
+same `create_xai_method` — it wires the model and training data into the adapter:
 
 ```python
-from src.xai_adapter import create_xai_method_from_engine
+from src.xai_adapter import create_xai_method
 
-method = create_xai_method_from_engine(
+method = create_xai_method(
     "lofo",
-    engine=engine,
+    ai_model=ai_model,
     train_data=train_data,
     preprocessing_fn=preprocessing_fn,
 )
 
 result = method.explain(instances)
+```
+
+For CoXAM rules/weights surrogates read from a data loader, pass `loader=`; the
+method name selects the surrogate and the tables come from the loader:
+
+```python
+from src.xai_adapter import create_xai_method
+
+rules = create_xai_method(
+    "rules", loader=loader, app_id="wine_quality", model_name="mlp", depth=3,
+)
+weights = create_xai_method(
+    "weights", loader=loader, app_id="wine_quality", model_name="mlp", variant="sparse",
+)
+
+predictions = rules.apply_batch(loader.get_features([0, 1, 2], normalize=False))
 ```
 
 Custom XAI algorithms can be wrapped as adapters too:

@@ -1,0 +1,355 @@
+{
+  "iv_config": {
+    "xai_method": [
+      "decision_tree",
+      "logistic_regression"
+    ],
+    "tested_w_xai": [
+      true,
+      false
+    ]
+  },
+  "between_subjects_ivs": {},
+  "within_subjects_ivs": {
+    "xai_method": [
+      "decision_tree",
+      "logistic_regression"
+    ],
+    "tested_w_xai": [
+      true,
+      false
+    ]
+  },
+  "block_counterbalanced_within_ivs": {
+    "xai_method": [
+      "decision_tree",
+      "logistic_regression"
+    ]
+  },
+  "trial_randomized_within_ivs": {
+    "tested_w_xai": [
+      true,
+      false
+    ]
+  },
+  "requested_counterbalancing_strategy": "balanced_latin_square",
+  "trial_randomization_strategy": "balanced",
+  "trials_per_condition": null,
+  "trials_per_participant": 12,
+  "counterbalancing_strategy": "balanced_latin_square_bradley_1958",
+  "n_conditions": 2,
+  "n_orders": 2,
+  "counterbalancing_diagnostics": {
+    "n_conditions": 2,
+    "n_orders": 2,
+    "expected_position_count": 1.0,
+    "expected_immediate_pair_count": 1.0,
+    "position_balanced": true,
+    "immediate_pair_balanced": true,
+    "position_counts": {
+      "1": {
+        "{\"xai_method\": \"decision_tree\"}": 1,
+        "{\"xai_method\": \"logistic_regression\"}": 1
+      },
+      "2": {
+        "{\"xai_method\": \"logistic_regression\"}": 1,
+        "{\"xai_method\": \"decision_tree\"}": 1
+      }
+    },
+    "immediate_pair_counts": {
+      "{\"xai_method\": \"decision_tree\"} -> {\"xai_method\": \"logistic_regression\"}": 1,
+      "{\"xai_method\": \"logistic_regression\"} -> {\"xai_method\": \"decision_tree\"}": 1
+    }
+  },
+  "orders": [
+    {
+      "order_id": 1,
+      "sequence": [
+        {
+          "xai_method": "decision_tree"
+        },
+        {
+          "xai_method": "logistic_regression"
+        }
+      ]
+    },
+    {
+      "order_id": 2,
+      "sequence": [
+        {
+          "xai_method": "logistic_regression"
+        },
+        {
+          "xai_method": "decision_tree"
+        }
+      ]
+    }
+  ],
+  "n_participants": 24,
+  "participant_assignments": [
+    {
+      "participantId": 1,
+      "within_order": [
+        {
+          "xai_method": "decision_tree"
+        },
+        {
+          "xai_method": "logistic_regression"
+        }
+      ]
+    },
+    {
+      "participantId": 2,
+      "within_order": [
+        {
+          "xai_method": "logistic_regression"
+        },
+        {
+          "xai_method": "decision_tree"
+        }
+      ]
+    },
+    {
+      "participantId": 3,
+      "within_order": [
+        {
+          "xai_method": "decision_tree"
+        },
+        {
+          "xai_method": "logistic_regression"
+        }
+      ]
+    },
+    {
+      "participantId": 4,
+      "within_order": [
+        {
+          "xai_method": "logistic_regression"
+        },
+        {
+          "xai_method": "decision_tree"
+        }
+      ]
+    },
+    {
+      "participantId": 5,
+      "within_order": [
+        {
+          "xai_method": "decision_tree"
+        },
+        {
+          "xai_method": "logistic_regression"
+        }
+      ]
+    },
+    {
+      "participantId": 6,
+      "within_order": [
+        {
+          "xai_method": "logistic_regression"
+        },
+        {
+          "xai_method": "decision_tree"
+        }
+      ]
+    },
+    {
+      "participantId": 7,
+      "within_order": [
+        {
+          "xai_method": "decision_tree"
+        },
+        {
+          "xai_method": "logistic_regression"
+        }
+      ]
+    },
+    {
+      "participantId": 8,
+      "within_order": [
+        {
+          "xai_method": "logistic_regression"
+        },
+        {
+          "xai_method": "decision_tree"
+        }
+      ]
+    },
+    {
+      "participantId": 9,
+      "within_order": [
+        {
+          "xai_method": "decision_tree"
+        },
+        {
+          "xai_method": "logistic_regression"
+        }
+      ]
+    },
+    {
+      "participantId": 10,
+      "within_order": [
+        {
+          "xai_method": "logistic_regression"
+        },
+        {
+          "xai_method": "decision_tree"
+        }
+      ]
+    },
+    {
+      "participantId": 11,
+      "within_order": [
+        {
+          "xai_method": "decision_tree"
+        },
+        {
+          "xai_method": "logistic_regression"
+        }
+      ]
+    },
+    {
+      "participantId": 12,
+      "within_order": [
+        {
+          "xai_method": "logistic_regression"
+        },
+        {
+          "xai_method": "decision_tree"
+        }
+      ]
+    },
+    {
+      "participantId": 13,
+      "within_order": [
+        {
+          "xai_method": "decision_tree"
+        },
+        {
+          "xai_method": "logistic_regression"
+        }
+      ]
+    },
+    {
+      "participantId": 14,
+      "within_order": [
+        {
+          "xai_method": "logistic_regression"
+        },
+        {
+          "xai_method": "decision_tree"
+        }
+      ]
+    },
+    {
+      "participantId": 15,
+      "within_order": [
+        {
+          "xai_method": "decision_tree"
+        },
+        {
+          "xai_method": "logistic_regression"
+        }
+      ]
+    },
+    {
+      "participantId": 16,
+      "within_order": [
+        {
+          "xai_method": "logistic_regression"
+        },
+        {
+          "xai_method": "decision_tree"
+        }
+      ]
+    },
+    {
+      "participantId": 17,
+      "within_order": [
+        {
+          "xai_method": "decision_tree"
+        },
+        {
+          "xai_method": "logistic_regression"
+        }
+      ]
+    },
+    {
+      "participantId": 18,
+      "within_order": [
+        {
+          "xai_method": "logistic_regression"
+        },
+        {
+          "xai_method": "decision_tree"
+        }
+      ]
+    },
+    {
+      "participantId": 19,
+      "within_order": [
+        {
+          "xai_method": "decision_tree"
+        },
+        {
+          "xai_method": "logistic_regression"
+        }
+      ]
+    },
+    {
+      "participantId": 20,
+      "within_order": [
+        {
+          "xai_method": "logistic_regression"
+        },
+        {
+          "xai_method": "decision_tree"
+        }
+      ]
+    },
+    {
+      "participantId": 21,
+      "within_order": [
+        {
+          "xai_method": "decision_tree"
+        },
+        {
+          "xai_method": "logistic_regression"
+        }
+      ]
+    },
+    {
+      "participantId": 22,
+      "within_order": [
+        {
+          "xai_method": "logistic_regression"
+        },
+        {
+          "xai_method": "decision_tree"
+        }
+      ]
+    },
+    {
+      "participantId": 23,
+      "within_order": [
+        {
+          "xai_method": "decision_tree"
+        },
+        {
+          "xai_method": "logistic_regression"
+        }
+      ]
+    },
+    {
+      "participantId": 24,
+      "within_order": [
+        {
+          "xai_method": "logistic_regression"
+        },
+        {
+          "xai_method": "decision_tree"
+        }
+      ]
+    }
+  ]
+}

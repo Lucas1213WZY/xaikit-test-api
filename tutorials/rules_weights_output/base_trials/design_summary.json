@@ -1,0 +1,2723 @@
+{
+  "iv_config": {
+    "dataset": [
+      "wine_quality",
+      "mushrooms"
+    ],
+    "xai_type": [
+      "decision_tree",
+      "logistic_regression",
+      "hybrid"
+    ],
+    "complexity": [
+      "low",
+      "high"
+    ],
+    "tested_w_xai": [
+      false,
+      true
+    ]
+  },
+  "between_subjects_ivs": {
+    "dataset": [
+      "wine_quality",
+      "mushrooms"
+    ],
+    "xai_type": [
+      "decision_tree",
+      "logistic_regression",
+      "hybrid"
+    ],
+    "complexity": [
+      "low",
+      "high"
+    ]
+  },
+  "within_subjects_ivs": {
+    "tested_w_xai": [
+      false,
+      true
+    ]
+  },
+  "block_counterbalanced_within_ivs": {},
+  "trial_randomized_within_ivs": {
+    "tested_w_xai": [
+      false,
+      true
+    ]
+  },
+  "requested_counterbalancing_strategy": "auto",
+  "trial_randomization_strategy": "balanced",
+  "trials_per_condition": null,
+  "trials_per_participant": 40,
+  "counterbalancing_strategy": "complete_counterbalancing",
+  "n_conditions": 1,
+  "n_orders": 1,
+  "counterbalancing_diagnostics": {
+    "n_conditions": 1,
+    "n_orders": 1,
+    "expected_position_count": 1.0,
+    "expected_immediate_pair_count": 0,
+    "position_balanced": true,
+    "immediate_pair_balanced": true,
+    "position_counts": {
+      "1": {
+        "{\"withinCondition\": \"single_condition\"}": 1
+      }
+    },
+    "immediate_pair_counts": {}
+  },
+  "orders": [
+    {
+      "order_id": 1,
+      "sequence": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ]
+    }
+  ],
+  "n_participants": 240,
+  "participant_assignments": [
+    {
+      "participantId": 1,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 2,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 3,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 4,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 5,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 6,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 7,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 8,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 9,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 10,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 11,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 12,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 13,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 14,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 15,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 16,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 17,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 18,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 19,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 20,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 21,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 22,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 23,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 24,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 25,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 26,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 27,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 28,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 29,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 30,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 31,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 32,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 33,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 34,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 35,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 36,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 37,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 38,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 39,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 40,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 41,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 42,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 43,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 44,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 45,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 46,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 47,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 48,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 49,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 50,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 51,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 52,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 53,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 54,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 55,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 56,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 57,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 58,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 59,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 60,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 61,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 62,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 63,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 64,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 65,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 66,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 67,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 68,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 69,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 70,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 71,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 72,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 73,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 74,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 75,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 76,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 77,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 78,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 79,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 80,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 81,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 82,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 83,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 84,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 85,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 86,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 87,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 88,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 89,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 90,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 91,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 92,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 93,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 94,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 95,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 96,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 97,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 98,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 99,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 100,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 101,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 102,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 103,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 104,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 105,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 106,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 107,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 108,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 109,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 110,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 111,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 112,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 113,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 114,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 115,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 116,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 117,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 118,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 119,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 120,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 121,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 122,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 123,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 124,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 125,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 126,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 127,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 128,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 129,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 130,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 131,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 132,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 133,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 134,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 135,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 136,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 137,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 138,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 139,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 140,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 141,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 142,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 143,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 144,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 145,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 146,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 147,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 148,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 149,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 150,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 151,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 152,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 153,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 154,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 155,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 156,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 157,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 158,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 159,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 160,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 161,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 162,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 163,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 164,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 165,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 166,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 167,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 168,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 169,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 170,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 171,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 172,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 173,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 174,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 175,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 176,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 177,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 178,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 179,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 180,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 181,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 182,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 183,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 184,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 185,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 186,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 187,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 188,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 189,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 190,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 191,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 192,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 193,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 194,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 195,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 196,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 197,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 198,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 199,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 200,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 201,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 202,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 203,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 204,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 205,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 206,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 207,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 208,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 209,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 210,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 211,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 212,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 213,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 214,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 215,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 216,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 217,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 218,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 219,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 220,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 221,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 222,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 223,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 224,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 225,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 226,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 227,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 228,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 229,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 230,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 231,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 232,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 233,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 234,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "wine_quality",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    },
+    {
+      "participantId": 235,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "low"
+    },
+    {
+      "participantId": 236,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "decision_tree",
+      "complexity": "high"
+    },
+    {
+      "participantId": 237,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "low"
+    },
+    {
+      "participantId": 238,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "logistic_regression",
+      "complexity": "high"
+    },
+    {
+      "participantId": 239,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "low"
+    },
+    {
+      "participantId": 240,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "dataset": "mushrooms",
+      "xai_type": "hybrid",
+      "complexity": "high"
+    }
+  ]
+}

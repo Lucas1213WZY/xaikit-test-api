@@ -30,7 +30,7 @@ def ensure_prediction_coverage(
     *,
     trials: list[dict[str, Any]] | pd.DataFrame,
     data: Any,
-    trained_engine: Any,
+    trained_ai_model: Any,
     model_name: str = "model",
     show: bool = True,
 ) -> pd.DataFrame:
@@ -64,16 +64,20 @@ def ensure_prediction_coverage(
     if not missing_instance_ids:
         return aligned_pool
 
-    test_id_to_position = {
-        int(instance_id): position
+    instance_rows = {
+        int(instance_id): data.X_test[position:position + 1]
         for position, instance_id in enumerate(np.asarray(data.test_instance_ids))
     }
+    instance_rows.update({
+        int(instance_id): data.X_train[position:position + 1]
+        for position, instance_id in enumerate(np.asarray(data.train_instance_ids))
+    })
     prediction_rows = []
     for instance_id in missing_instance_ids:
-        position = test_id_to_position.get(instance_id)
-        if position is None:
+        model_row = instance_rows.get(instance_id)
+        if model_row is None:
             continue
-        pred = prediction_labels(trained_engine.predict(data.X_test[position:position + 1]))[0]
+        pred = prediction_labels(trained_ai_model.predict(model_row))[0]
         prediction_rows.append({
             DATA_ID_COL: data.dataset_id,
             MODEL_NAME_COL: model_name,
@@ -87,7 +91,7 @@ def ensure_prediction_coverage(
 
     if show:
         print(
-            "Added AI predictions for "
-            f"{len(prediction_rows)} trial instance(s) that did not have generated explanations."
+            "Added prediction-only coverage for "
+            f"{len(prediction_rows)} trial instance(s) used without a visible explanation."
         )
     return pd.concat([aligned_pool, pd.DataFrame(prediction_rows)], ignore_index=True)

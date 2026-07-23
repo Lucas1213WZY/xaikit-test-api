@@ -12,7 +12,8 @@
   },
   "ivs": {
     "xai_method": {
-      "type": "between",
+      "type": "within",
+      "randomization": "block",
       "levels": [
         "shap",
         "lime",
@@ -49,8 +50,9 @@
     "cognitive_state": ["categorical"]
   },
   "sampling": {
-    "participants_per_between_condition": 25,
-    "trials_per_participant": 10,
+    "participants_per_between_condition": 24,
+    "trials_per_participant": 12,
+    "counterbalancing_strategy": "balanced_latin_square",
     "trial_randomization_strategy": "balanced",
     "shuffle_instances": true,
     "instance_wise_explanation": false

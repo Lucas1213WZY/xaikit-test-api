@@ -1,0 +1,797 @@
+{
+  "iv_config": {
+    "xai_type": [
+      "none",
+      "importance",
+      "attribution"
+    ],
+    "dataset": [
+      "wine_quality",
+      "adult",
+      "forest_cover"
+    ],
+    "tested_w_xai": [
+      false,
+      true
+    ]
+  },
+  "between_subjects_ivs": {
+    "xai_type": [
+      "none",
+      "importance",
+      "attribution"
+    ],
+    "dataset": [
+      "wine_quality",
+      "adult",
+      "forest_cover"
+    ]
+  },
+  "within_subjects_ivs": {
+    "tested_w_xai": [
+      false,
+      true
+    ]
+  },
+  "block_counterbalanced_within_ivs": {},
+  "trial_randomized_within_ivs": {
+    "tested_w_xai": [
+      false,
+      true
+    ]
+  },
+  "requested_counterbalancing_strategy": "auto",
+  "trial_randomization_strategy": "balanced",
+  "trials_per_condition": null,
+  "trials_per_participant": 20,
+  "counterbalancing_strategy": "complete_counterbalancing",
+  "n_conditions": 1,
+  "n_orders": 1,
+  "counterbalancing_diagnostics": {
+    "n_conditions": 1,
+    "n_orders": 1,
+    "expected_position_count": 1.0,
+    "expected_immediate_pair_count": 0,
+    "position_balanced": true,
+    "immediate_pair_balanced": true,
+    "position_counts": {
+      "1": {
+        "{\"withinCondition\": \"single_condition\"}": 1
+      }
+    },
+    "immediate_pair_counts": {}
+  },
+  "orders": [
+    {
+      "order_id": 1,
+      "sequence": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ]
+    }
+  ],
+  "n_participants": 72,
+  "participant_assignments": [
+    {
+      "participantId": 1,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 2,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 3,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 4,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 5,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 6,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 7,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 8,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 9,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 10,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 11,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 12,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 13,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 14,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 15,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 16,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 17,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 18,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 19,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 20,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 21,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 22,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 23,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 24,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 25,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 26,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 27,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 28,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 29,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 30,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 31,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 32,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 33,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 34,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 35,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 36,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 37,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 38,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 39,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 40,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 41,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 42,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 43,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 44,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 45,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 46,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 47,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 48,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 49,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 50,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 51,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 52,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 53,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 54,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 55,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 56,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 57,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 58,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 59,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 60,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 61,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 62,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 63,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 64,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 65,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 66,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "none",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 67,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 68,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 69,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "importance",
+      "dataset": "forest_cover"
+    },
+    {
+      "participantId": 70,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 71,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "adult"
+    },
+    {
+      "participantId": 72,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_type": "attribution",
+      "dataset": "forest_cover"
+    }
+  ]
+}

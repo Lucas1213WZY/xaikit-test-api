@@ -1,0 +1,55 @@
+{
+  "study_title": "Understanding different explanation displays",
+  "research_questions": [
+    "RQ1: Does the explanation display change task accuracy?",
+    "RQ2: Does the most useful display depend on the task or time limit?"
+  ],
+  "study_summary": "Participants practice the task, then answer new questions using one explanation display.",
+  "consent_text": "Replace this text with your approved consent information. Explain the purpose, duration, voluntary participation, risks, data handling, compensation, and contacts.",
+  "start_survey_questions": [
+    "What is your age range?",
+    "How familiar are you with AI systems?"
+  ],
+  "end_survey_questions": [
+    "How easy was the task?",
+    "How helpful was the display?"
+  ],
+  "procedure_steps": [
+    {
+      "title": "Welcome and consent",
+      "kind": "consent",
+      "description": "Read the consent page and choose whether to continue.",
+      "duration_min": 3
+    },
+    {
+      "title": "Start-of-study survey",
+      "kind": "survey",
+      "description": "Answer the planned background questions.",
+      "duration_min": 3
+    },
+    {
+      "title": "Instructions and practice",
+      "kind": "practice",
+      "description": "Read the instructions and complete 10 practice questions with feedback.",
+      "duration_min": 7
+    },
+    {
+      "title": "Main questions",
+      "kind": "trials",
+      "description": "Complete 30 randomized questions without feedback.",
+      "duration_min": 15
+    },
+    {
+      "title": "End-of-study survey",
+      "kind": "survey",
+      "description": "Complete the planned ratings.",
+      "duration_min": 3
+    },
+    {
+      "title": "Debrief",
+      "kind": "debrief",
+      "description": "Show the debrief and researcher contact information.",
+      "duration_min": 1
+    }
+  ]
+}

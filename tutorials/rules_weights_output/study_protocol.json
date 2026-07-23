@@ -1,0 +1,56 @@
+{
+  "study_title": "Comparing rule and weight displays",
+  "research_questions": [
+    "RQ1: Does display type change prediction accuracy?",
+    "RQ2: Does display type change success when editing one value to change the AI answer?",
+    "RQ3: Do visibility and display complexity change these effects?"
+  ],
+  "study_summary": "Participants predict AI answers and edit one value to try to change an answer.",
+  "consent_text": "Replace this text with your approved consent information. Explain the purpose, duration, voluntary participation, risks, data handling, compensation, and contacts.",
+  "start_survey_questions": [
+    "What is your age range?",
+    "How familiar are you with AI systems?"
+  ],
+  "end_survey_questions": [
+    "How difficult was each task?",
+    "How helpful was the display?"
+  ],
+  "procedure_steps": [
+    {
+      "title": "Welcome and consent",
+      "kind": "consent",
+      "description": "Read the consent page and choose whether to continue.",
+      "duration_min": 3
+    },
+    {
+      "title": "Start-of-study survey",
+      "kind": "survey",
+      "description": "Answer the planned background questions.",
+      "duration_min": 3
+    },
+    {
+      "title": "Instructions and practice",
+      "kind": "practice",
+      "description": "Learn both tasks and complete practice questions with feedback.",
+      "duration_min": 8
+    },
+    {
+      "title": "Prediction and editing questions",
+      "kind": "trials",
+      "description": "Complete 40 prediction questions followed by 40 editing questions.",
+      "duration_min": 25
+    },
+    {
+      "title": "End-of-study survey",
+      "kind": "survey",
+      "description": "Complete the planned ratings.",
+      "duration_min": 3
+    },
+    {
+      "title": "Debrief",
+      "kind": "debrief",
+      "description": "Show the debrief and researcher contact information.",
+      "duration_min": 1
+    }
+  ]
+}

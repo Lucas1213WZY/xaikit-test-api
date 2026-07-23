@@ -1,9 +1,13 @@
-"""Deterministic AI functions from the XAIsim2real paper.
+"""Synthetic data-generating functions with known ground-truth attributions.
 
-These models are analytical functions rather than trained estimators. They
-implement the same public shape as the other engines where practical, while
-also exposing ground-truth local weights used by property-optimized
-explanations.
+These are closed-form, deterministic analytical functions rather than trained
+estimators: because the function is known exactly, so are its per-instance
+feature attributions. That makes them the reference point for benchmarking XAI
+methods against truth. They implement the same public shape as the other
+engines where practical, and additionally expose ground-truth local weights
+used by property-optimized explanations.
+
+The concrete functions implemented here are taken from the XAIsim2real paper.
 """
 
 from __future__ import annotations

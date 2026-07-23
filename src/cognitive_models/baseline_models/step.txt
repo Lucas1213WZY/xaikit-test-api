@@ -1,0 +1,6 @@
+1. Train with training data, save, and test on test data instances
+2. Important: Input for w XAI: concatenate the data instance with explanations
+    Separate model for each condition x (w/ or w/o XAI)
+3. Standardize the whole workflow
+    testing every stage
+4. Implement train testing phases

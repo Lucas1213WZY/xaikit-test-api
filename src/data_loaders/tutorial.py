@@ -57,20 +57,20 @@ def tutorial_coxam_explanations():
         assets_root="assets",
     )
     
-    from src.xai_adapter import create_coxam_xai_method, get_adapter_registry
+    from src.xai_adapter import create_xai_method, get_adapter_registry
     available = get_adapter_registry().list_available()
     print(f"✓ Available explanation methods: {available}")
 
-    dt_method = create_coxam_xai_method(
-        loader,
-        method_type="rules",
+    dt_method = create_xai_method(
+        "rules",
+        loader=loader,
         app_id="wine_quality",
         model_name="mlp",
         depth=3,
     )
-    lr_method = create_coxam_xai_method(
-        loader,
-        method_type="weights",
+    lr_method = create_xai_method(
+        "weights",
+        loader=loader,
         app_id="wine_quality",
         model_name="mlp",
         variant="sparse",
@@ -147,7 +147,7 @@ def tutorial_comparison():
     ┌─ CoXAM ─────────────────────────────────────────────────────────┐
     │ • Model interpretation algorithms (DT, LR, etc.)                │
     │ • Compute explanations on-demand, flexible & extensible         │
-    │ • Use: create_coxam_xai_method(...).apply_batch(instances)       │
+    │ • Use: create_xai_method(name, loader=...).apply_batch(rows)     │
     │ • Example: Generate rules from Decision Tree model              │
     └─────────────────────────────────────────────────────────────────┘
     """)

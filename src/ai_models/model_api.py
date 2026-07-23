@@ -1,13 +1,16 @@
 """
-Models Core
-===========
+Model API
+=========
 Unified interface for MLP and XGBoost models (PyTorch and TensorFlow).
 
+Wraps the concrete implementations in ``src.ai_models.models`` behind the
+UnifiedModel / ModelManager interface.
+
 Supported model_type values:
-  'mlp'          — PyTorch MLP  (src.ai_models.mlp.MLPEngine)
-  'xgboost'      — XGBoost      (src.ai_models.xgboost.XGBoostEngine)
-  'mlp_tf'       — TF/Keras MLP (src.ai_models.mlp_tf.TFMLPEngine)
-  'xgboost_tf'   — TF-compatible XGBoost (src.ai_models.xgboost_tf.TFXGBoostEngine)
+  'mlp'          — PyTorch MLP  (src.ai_models.models.mlp.MLPEngine)
+  'xgboost'      — XGBoost      (src.ai_models.models.xgboost.XGBoostEngine)
+  'mlp_tf'       — TF/Keras MLP (src.ai_models.models.mlp.TFMLPEngine)
+  'xgboost_tf'   — TF-compatible XGBoost (src.ai_models.models.xgboost.TFXGBoostEngine)
 
 Pass source='coax' or source='coxam' to select the cognitive-agent variant.
 """
@@ -20,11 +23,9 @@ from typing import Any, Dict, Optional
 
 import numpy as np
 
-from .mlp import MLPEngine
-from .sim2real import BaseSim2RealFunction, create_sim2real_function
-from .xgboost import XGBoostEngine
-from .mlp_tf import TFMLPEngine
-from .xgboost_tf import TFXGBoostEngine
+from .models.mlp import MLPEngine, TFMLPEngine
+from .models.xgboost import TFXGBoostEngine, XGBoostEngine
+from .models.synthetic import BaseSim2RealFunction, create_sim2real_function
 
 
 # ---------------------------------------------------------------------------

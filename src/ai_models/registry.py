@@ -7,18 +7,18 @@ Central registry of available datasets, models, and their locations.
 from typing import Dict, List, Optional
 import os
 
+from .paths import MODEL_WEIGHTS_ROOT
+
 
 class ModelRegistry:
     """
     Registry for tracking available models across different sources.
     Supports multiple model sources: CoXAM, CoAX, and custom paths.
     """
-    
-    # Base paths for pre-trained models (organized by source)
-    MODEL_SOURCES = {
-        'coxam': '/Users/wangzhuoyulucas/Documents/GitHub/xaik-tool-cognitive-agent/src/models/coxam',
-        'coax': '/Users/wangzhuoyulucas/Documents/GitHub/xaik-tool-cognitive-agent/src/models/coax',
-    }
+
+    # Pre-trained weights live under
+    #   <repo>/assets/model_weights/<model_type>/<cognitive_agent>/
+    MODEL_AGENTS = ['coxam', 'coax']
     
     # Supported datasets
     DATASETS = [
@@ -47,11 +47,10 @@ class ModelRegistry:
         """Discover available pre-trained models in the model sources."""
         self.available_models = {}
         
-        for source_name, source_path in self.MODEL_SOURCES.items():
-            for model_type in self.MODEL_TYPES:
-                # Use lowercase folder names for unified models
-                model_dir = os.path.join(source_path, model_type)
-                
+        for model_type in self.MODEL_TYPES:
+            for source_name in self.MODEL_AGENTS:
+                model_dir = os.path.join(str(MODEL_WEIGHTS_ROOT), model_type, source_name)
+
                 if not os.path.exists(model_dir):
                     continue
                 
@@ -103,7 +102,7 @@ class ModelRegistry:
     
     def list_sources(self) -> List[str]:
         """List all model sources."""
-        return list(self.MODEL_SOURCES.keys())
+        return list(self.MODEL_AGENTS)
     
     def filter_by_dataset(self, dataset: str) -> Dict:
         """Get all model variants for a dataset."""

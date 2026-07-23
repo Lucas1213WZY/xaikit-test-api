@@ -1,0 +1,111 @@
+{
+  "researchQuestions": "Does the type of XAI method (Decision Tree vs Logistic Regression vs Hybrid explanations) affect users' ability to accurately simulate AI model behavior, as measured by both forward-simulation accuracy and counterfactual-simulation accuracy?",
+  "studyDesign": {
+    "dependentVariables": [
+      {
+        "measure": "forward_sim",
+        "name": "",
+        "formula": ""
+      },
+      {
+        "measure": "counterfactual_sim",
+        "name": "",
+        "formula": ""
+      }
+    ],
+    "modelFramework": "CoXAM",
+    "independentVariables": [
+      {
+        "factor": "XAI Type",
+        "levelsOrRange": "Decision Tree | Logistic Regression | Hybrid",
+        "allocation": "Between-subjects",
+        "counterbalancing": ""
+      },
+      {
+        "factor": "User Task",
+        "levelsOrRange": "Forward simulation | Counterfactual simulation",
+        "allocation": "Within-subjects",
+        "counterbalancing": "Full counterbalancing"
+      }
+    ],
+    "controlVariablesCV": [
+      {
+        "name": "dataset",
+        "type": "Categorical (nominal)"
+      },
+      {
+        "name": "age",
+        "type": "Ordinal"
+      }
+    ],
+    "randomVariablesRV": [
+      {
+        "name": "",
+        "type": ""
+      }
+    ],
+    "design": "mixed",
+    "dataset": "Wine Quality",
+    "totalConditions": 6,
+    "betweenSubjectsCells": 3,
+    "participantsPerCondition": 150,
+    "totalParticipants": 450,
+    "timePerParticipantMin": 30,
+    "costPerParticipant": 12,
+    "estimatedTotalTimeMin": 13500,
+    "estimatedTotalCost": 5400
+  },
+  "apparatus": {
+    "description": "Software: qualtrics, python\nStimulus will be the explantions per instance shown to the user, the test material will be only testing so only data instances will be shown without erxplanations",
+    "link": ""
+  },
+  "procedure": [
+    {
+      "title": "Welcome & consent",
+      "note": "Study Title: The Effect of Explanation Type on User Understanding of AI Model Behavior\n\nPrincipal Investigator: [Your Name], [Your Institution]\n\nPurpose of the Study:\nYou are being invited to participate in a research study investigating how different types of AI explanations (Decision Tree, Logistic Regression, or Hybrid) affect how well users can understand and predict the behavior of an AI model trained on wine quality data.\n\nWhat You Will Be Asked to Do:\nYou will be shown a series of AI predictions about wine quality, along with explanations of how the AI made those predictions. You will then be asked to predict what the AI would do on new instances, and to answer questions about the AI's decision-making.\n\nTime Commitment:\nThe study is expected to take approximately 30 minutes.\n\nRisks and Benefits:\nThere are no known risks associated with participating in this study. Your participation will contribute to research on explainable AI and human-AI interaction.\n\nConfidentiality:\nYour responses will be kept confidential. Data will be stored securely and only accessible to the research team.\n\nVoluntary Participation:\nYour participation is entirely voluntary. You may withdraw at any time without penalty.\n\nBy proceeding, you confirm that you have read and understood the above information and consent to participate."
+    },
+    {
+      "title": "Training — Step 1: Predict label from data instance only (no AI, no XAI)"
+    },
+    {
+      "title": "Training — Step 2: See AI prediction + XAI explanation, make prediction"
+    },
+    {
+      "title": "Training — Step 3: Feedback on both attempts"
+    },
+    {
+      "title": "Test session",
+      "note": "18 trials with AI prediction + XAI explanation or without XAI + AI prediction, collecting your DVs"
+    }
+  ],
+  "userModel": "CoXAM",
+  "_rawAnswers": {
+    "overview": "Compare global explanation methods (Decision Tree vs Logistic Regression) to see which improves users' understanding of the AI model",
+    "rq": "Does the type of XAI method (Decision Tree vs Logistic Regression vs Hybrid explanations) affect users' ability to accurately simulate AI model behavior, as measured by both forward-simulation accuracy and counterfactual-simulation accuracy?",
+    "variables": "Dependent variables: Accuracy, 0-1, percentage; Task Time in seconds.\nIndependent variable: XAI types, levels: {lime, shap, none}; Tested with XAI, levels: {True, False};\nControl variable: AI model, xai accuracy, dataset\nRandom variable: gender, expertise, prior knowledge",
+    "design": "mixed: 3 (XAI Types, between) x 2 (Tested with XAI）\ni will counterbalance the within-test trials with XAI by trials, meaning under each XAI type, between conditions, the trials are alternating between tested with and without XAI randomly",
+    "participants": "Target N is 150, per group N will be 50\nRecruitment through prolific (participants must be above 18 years old)\nThere should be a consent form but there is no risk or hazard that might happen cuz it's done through survey and interface\nleave the compensation as 10 dollars per survey for now",
+    "apparatus": "Software: qualtrics, python\nStimulus will be the explantions per instance shown to the user, the test material will be only testing so only data instances will be shown without erxplanations",
+    "procedure": "1. each trial will be in 3 stages: 1. only data instance, meter bars and make prediction 2. show XAI to predict again, 3. check AI and XAI prediction feedback\n\nand each session will have 20 traiing and 10 testing and the testing is only step 1 of training\n\n",
+    "dataset": "\n\nThe AI should be MLP model\nThe dataset that I will choose will be the adult income dataset",
+    "sd_iv_agent": "CoXAM",
+    "ds_agent": "CoAX",
+    "sd_iv": "XAI type",
+    "sd_iv_levels": "",
+    "sd_conditions": "6",
+    "sd_dv": "[{\"measure\":\"forward_sim\",\"name\":\"\",\"formula\":\"\"},{\"measure\":\"counterfactual_sim\",\"name\":\"\",\"formula\":\"\"}]",
+    "sd_design": "Mixed",
+    "sd_balancing": "Randomized order",
+    "sd_cv": "[{\"name\":\"dataset\",\"type\":\"Categorical (nominal)\"},{\"name\":\"age\",\"type\":\"Ordinal\"}]",
+    "ds_dataset": "Wine Quality",
+    "sd_participants": "150",
+    "sd_iv_factor": "xai_type",
+    "sd_cog_param": "",
+    "sd_ivs": "[{\"factor\":\"xai_type\",\"label\":\"XAI Type\",\"levels\":\"Decision Tree | Logistic Regression | Hybrid\",\"alloc\":\"Between-subjects\",\"balancing\":\"\"},{\"factor\":\"user_task\",\"label\":\"User Task\",\"levels\":\"Forward simulation | Counterfactual simulation\",\"alloc\":\"Within-subjects\",\"balancing\":\"Full counterbalancing\"}]",
+    "sd_rv": "[{\"name\":\"\",\"type\":\"\"}]",
+    "user_model": "CoXAM",
+    "sd_time_per": "30",
+    "sd_cost_per": "12",
+    "proc_steps": "[{\"title\":\"Welcome & consent\",\"note\":\"Study Title: The Effect of Explanation Type on User Understanding of AI Model Behavior\\n\\nPrincipal Investigator: [Your Name], [Your Institution]\\n\\nPurpose of the Study:\\nYou are being invited to participate in a research study investigating how different types of AI explanations (Decision Tree, Logistic Regression, or Hybrid) affect how well users can understand and predict the behavior of an AI model trained on wine quality data.\\n\\nWhat You Will Be Asked to Do:\\nYou will be shown a series of AI predictions about wine quality, along with explanations of how the AI made those predictions. You will then be asked to predict what the AI would do on new instances, and to answer questions about the AI's decision-making.\\n\\nTime Commitment:\\nThe study is expected to take approximately 30 minutes.\\n\\nRisks and Benefits:\\nThere are no known risks associated with participating in this study. Your participation will contribute to research on explainable AI and human-AI interaction.\\n\\nConfidentiality:\\nYour responses will be kept confidential. Data will be stored securely and only accessible to the research team.\\n\\nVoluntary Participation:\\nYour participation is entirely voluntary. You may withdraw at any time without penalty.\\n\\nBy proceeding, you confirm that you have read and understood the above information and consent to participate.\"},{\"title\":\"Training — Step 1: Predict label from data instance only (no AI, no XAI)\"},{\"title\":\"Training — Step 2: See AI prediction + XAI explanation, make prediction\"},{\"title\":\"Training — Step 3: Feedback on both attempts\"},{\"title\":\"Test session\",\"note\":\"18 trials with AI prediction + XAI explanation or without XAI + AI prediction, collecting your DVs\"}]"
+  }
+}

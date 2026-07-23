@@ -267,7 +267,7 @@ def validate_xaikit_test(
     strict: bool = False,
     show: bool = True,
 ) -> ValidationReport:
-    """Validate the full XAIKitTest workflow object for a given stage."""
+    """Validate the full xaikitTest workflow object for a given stage."""
     support = support or load_support_matrix()
     stage = normalize_stage(stage)
     report = validate_design_support(
@@ -449,9 +449,9 @@ def _extract_test_context(test: Any, support: dict[str, Any], report: Validation
 
 def _validate_stage_requirements(report: ValidationReport, test: Any, stage: str) -> None:
     checks = (
-        ("trial_generation", "data", lambda t, r: getattr(t, "data", None) is None, "No prepared dataset is attached to this XAIKitTest object.", "Call `prepare_dataset(...)` before this stage."),
+        ("trial_generation", "data", lambda t, r: getattr(t, "data", None) is None, "No prepared dataset is attached to this xaikitTest object.", "Call `prepare_dataset(...)` before this stage."),
         ("trial_generation", "xai_method", lambda t, r: not ({"xai_method", "xai_type"} & r.normalized.get("ivs", {}).keys()), "No XAI method/type IV was found.", "Add `xai_method` or `xai_type` if explanation condition is part of the experiment."),
-        ("explanation_generation", "trained_engine", lambda t, r: getattr(t, "trained_engine", None) is None, "No trained AI model is attached yet.", "Call `train_AI_model(...)` before generating explanations."),
+        ("explanation_generation", "trained_ai_model", lambda t, r: getattr(t, "trained_ai_model", None) is None, "No trained AI model is attached yet.", "Call `train_AI_model(...)` before generating explanations."),
         ("execution", "trials", lambda t, r: not getattr(t, "trials", []), "No generated trials were found.", "Call `generate_trials(...)` before execution."),
         ("execution", "combined_explanations", lambda t, r: getattr(t, "combined_explanations", None) is None, "No combined explanation table was found.", "Call `explanations(...)`, or pass an `explanation_pool` to `run_experiment(...)`."),
     )

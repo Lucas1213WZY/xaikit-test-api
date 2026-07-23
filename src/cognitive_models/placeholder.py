@@ -41,6 +41,14 @@ def get_trial_ai_prediction(
     if matches.empty:
         return None
     if EXPLANATION_METHOD_COL in matches:
+        xai_method = str(
+            trial_info.get("xai_method", trial_info.get("xai_type", "none"))
+        ).lower()
+        method_matches = matches[
+            matches[EXPLANATION_METHOD_COL].astype(str).str.lower() == xai_method
+        ]
+        if not method_matches.empty:
+            matches = method_matches
         explanation_matches = matches[matches[EXPLANATION_METHOD_COL].astype(str) != PREDICTION_ONLY_METHOD]
         if not explanation_matches.empty:
             matches = explanation_matches
@@ -54,6 +62,12 @@ def get_trial_instance_explanation(
     """Select explanation values matching the trial's XAI method and instance."""
     xai_method = str(trial_info.get("xai_method", trial_info.get("xai_type", "none"))).lower()
     if xai_method in {"none", "no_xai", "control"}:
+        return {}
+    phase = str(trial_info.get("phase", "testing")).lower()
+    tested_w_xai = trial_info.get("tested_w_xai", True)
+    if isinstance(tested_w_xai, str):
+        tested_w_xai = tested_w_xai.strip().lower() in {"true", "1", "yes", "y"}
+    if phase != "training" and not bool(tested_w_xai):
         return {}
 
     instance_id = int(trial_info[INSTANCE_ID_COL])

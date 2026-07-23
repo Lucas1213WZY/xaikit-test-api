@@ -25,7 +25,7 @@ REPO_ROOT = next(
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from src.experiment_design import run_experiment_design
+from src.experiment_planner import build_experiment_plan
 
 # ── Load instance pool from explanation CSV ────────────────────────────────────
 def load_instances(csv_path: str) -> list[dict]:
@@ -39,9 +39,10 @@ instance_pool = load_instances(
 # ── Define Independent Variables ───────────────────────────────────────────────
 iv_config = {
     # Within-subjects: every participant sees all 3 XAI methods
-    # → counterbalancing applied (complete: 3! = 6 orders)
+    # → Bradley balanced Latin square applied explicitly below
     "xai_method": {
         "type": "within",
+        "randomization": "block",
         "levels": ["shap", "lime", "decision_explanation"],
     },
     # Between-subjects: each participant sees only ONE display type
@@ -70,7 +71,7 @@ id_map = {"dataId": "dataId", "instanceId": "instanceId"}
 # id_map = None
 
 # ── Run full pipeline ──────────────────────────────────────────────────────────
-result = run_experiment_design(
+result = build_experiment_plan(
     iv_config=iv_config,
     instance_pool=instance_pool,
     n_participants=12,          # multiple of n_orders (6) keeps assignment balanced
@@ -78,6 +79,7 @@ result = run_experiment_design(
     controlled_vars=controlled_vars,
     id_map=id_map,
     output_dir=REPO_ROOT / "tutorials" / "experiment_output",
+    counterbalancing_strategy="balanced_latin_square",
     shuffle_instances=True,
     seed=42,
 )

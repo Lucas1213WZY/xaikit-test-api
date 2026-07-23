@@ -17,10 +17,9 @@ from .base import (
 from .api import (
     ExplanationRunConfig,
     combine_explanation_tables,
-    create_coxam_xai_method,
     create_custom_surrogate_method,
     create_custom_xai_method,
-    create_xai_method_from_engine,
+    generate_ai_prediction_table,
     generate_surrogate_xai_methods,
     generate_sim2real_explanations,
     generate_xai_explanation_tables,
@@ -70,9 +69,11 @@ from .surrogate import (
 )
 from .visualization import (
     explanation_value_columns,
+    plot_decision_tree_instance_view,
     plot_explanation_visual,
     plot_global_explanation_importance,
     plot_instance_explanation,
+    plot_logistic_regression_instance_view,
 )
 
 __all__ = [
@@ -89,8 +90,7 @@ __all__ = [
     "register_xai_method",
     "create_custom_xai_method",
     "create_custom_surrogate_method",
-    "create_xai_method_from_engine",
-    "create_coxam_xai_method",
+    "generate_ai_prediction_table",
     "generate_surrogate_xai_methods",
     "generate_sim2real_explanations",
     "generate_xai_explanation_tables",
@@ -138,7 +138,9 @@ __all__ = [
     "get_adapter_registry",
     "EBMAdapter",
     "explanation_value_columns",
+    "plot_decision_tree_instance_view",
     "plot_explanation_visual",
     "plot_global_explanation_importance",
     "plot_instance_explanation",
+    "plot_logistic_regression_instance_view",
 ]

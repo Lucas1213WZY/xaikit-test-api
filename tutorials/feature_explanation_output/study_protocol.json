@@ -1,0 +1,55 @@
+{
+  "study_title": "Learning from feature explanations",
+  "research_questions": [
+    "RQ1: Does the explanation display change prediction accuracy?",
+    "RQ2: Does an explanation remain helpful when it is no longer visible?"
+  ],
+  "study_summary": "Participants learn from one display and predict the AI answer with and without that display visible.",
+  "consent_text": "Replace this text with your approved consent information. Explain the purpose, duration, voluntary participation, risks, data handling, compensation, and contacts.",
+  "start_survey_questions": [
+    "What is your age range?",
+    "How familiar are you with AI systems?"
+  ],
+  "end_survey_questions": [
+    "How difficult was the prediction task?",
+    "How helpful was the display?"
+  ],
+  "procedure_steps": [
+    {
+      "title": "Welcome and consent",
+      "kind": "consent",
+      "description": "Read the consent page and choose whether to continue.",
+      "duration_min": 3
+    },
+    {
+      "title": "Start-of-study survey",
+      "kind": "survey",
+      "description": "Answer the planned background questions.",
+      "duration_min": 3
+    },
+    {
+      "title": "Instructions and practice",
+      "kind": "practice",
+      "description": "Complete 10 practice questions in each session with the planned feedback.",
+      "duration_min": 8
+    },
+    {
+      "title": "Two test sessions",
+      "kind": "trials",
+      "description": "Complete two counterbalanced 18-question phases per session.",
+      "duration_min": 20
+    },
+    {
+      "title": "End-of-study survey",
+      "kind": "survey",
+      "description": "Complete the planned ratings.",
+      "duration_min": 3
+    },
+    {
+      "title": "Debrief",
+      "kind": "debrief",
+      "description": "Show the debrief and researcher contact information.",
+      "duration_min": 1
+    }
+  ]
+}
