@@ -8,7 +8,7 @@
       "xai_robustness": ["robustness"],
       "xai_sparsity": ["sparsity"],
       "xai_faithfulness": ["xai_fidelity", "faithfulness", "fidelity"],
-      "tested_w_xai": ["tested_with_xai", "with_xai"],
+      "tested_w_xai": ["tested_with_xai", "tested_xai", "with_xai"],
       "num_attributes_shown": ["number_of_attributes_shown"],
       "num_training_instances": ["number_of_training_instances", "training_instances"],
       "dataset": ["datasets"],

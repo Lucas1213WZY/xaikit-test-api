@@ -195,7 +195,7 @@ def build_walkthrough_pages(
         "research_questions": protocol.get("research_questions", []),
     }]
     for step_number, step in enumerate(protocol["procedure_steps"], start=1):
-        if step["kind"] == "trials":
+        if step["stage"] == "trials":
             for trial_number, (_, trial) in enumerate(trial_rows.iterrows(), start=1):
                 pages.append({
                     "page_type": "trial",
@@ -206,16 +206,16 @@ def build_walkthrough_pages(
             continue
 
         page = {
-            "page_type": step["kind"],
+            "page_type": step["stage"],
             "title": step["title"],
             "description": step.get("description", ""),
             "duration_min": step.get("duration_min"),
             "resource": step.get("resource", ""),
             "step_number": step_number,
         }
-        if step["kind"] == "consent":
+        if step["stage"] == "consent":
             page["content"] = protocol.get("consent_text", "")
-        elif step["kind"] == "survey":
+        elif step["stage"] == "survey":
             use_start = not any(p.get("page_type") == "survey" for p in pages)
             page["questions"] = protocol[
                 "start_survey_questions" if use_start else "end_survey_questions"

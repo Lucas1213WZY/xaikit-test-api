@@ -9,37 +9,37 @@ from typing import Any, Callable, Optional
 DEFAULT_PROCEDURE = [
     {
         "title": "Welcome and consent",
-        "kind": "consent",
+        "stage": "consent",
         "description": "Explain the study and collect informed consent.",
         "duration_min": 3,
     },
     {
         "title": "Start-of-study survey",
-        "kind": "survey",
+        "stage": "survey",
         "description": "Collect only the background information needed for the analysis.",
         "duration_min": 3,
     },
     {
         "title": "Instructions and practice",
-        "kind": "practice",
+        "stage": "practice",
         "description": "Explain the task and provide practice questions with feedback.",
         "duration_min": 5,
     },
     {
         "title": "Main questions",
-        "kind": "trials",
+        "stage": "trials",
         "description": "Present the randomized test questions and collect the dependent variables.",
         "duration_min": 15,
     },
     {
         "title": "End-of-study survey",
-        "kind": "survey",
+        "stage": "survey",
         "description": "Collect the planned post-task ratings and comments.",
         "duration_min": 3,
     },
     {
         "title": "Debrief",
-        "kind": "debrief",
+        "stage": "debrief",
         "description": "Thank the participant and provide withdrawal and contact information.",
         "duration_min": 1,
     },
@@ -75,11 +75,15 @@ def normalize_study_protocol(protocol: Optional[dict[str, Any]]) -> dict[str, An
     for position, raw_step in enumerate(normalized.get("procedure_steps") or [], start=1):
         step = dict(raw_step) if isinstance(raw_step, dict) else {"title": str(raw_step)}
         step.setdefault("title", f"Step {position}")
-        step.setdefault("kind", "information")
+        # `kind` was the previous name for this field; accept it silently so
+        # protocols saved before the rename still load.
+        if "stage" not in step and "kind" in step:
+            step["stage"] = step.pop("kind")
+        step.setdefault("stage", "information")
         step.setdefault("description", "")
         step.setdefault("duration_min", None)
         step["title"] = str(step["title"]).strip() or f"Step {position}"
-        step["kind"] = str(step["kind"]).strip().lower() or "information"
+        step["stage"] = str(step["stage"]).strip().lower() or "information"
         step["description"] = str(step["description"]).strip()
         steps.append(step)
     normalized["procedure_steps"] = steps
@@ -98,8 +102,8 @@ def validate_study_protocol(protocol: dict[str, Any]) -> list[str]:
         problems.append("Add the consent information participants will see.")
     if not protocol["procedure_steps"]:
         problems.append("Add at least one procedure step.")
-    if not any(step["kind"] == "trials" for step in protocol["procedure_steps"]):
-        problems.append("Mark one procedure step with kind='trials'.")
+    if not any(step["stage"] == "trials" for step in protocol["procedure_steps"]):
+        problems.append("Mark one procedure step with stage='trials'.")
     return problems
 
 
@@ -158,9 +162,9 @@ def edit_study_protocol(
     def add_step_row(step: Optional[dict[str, Any]] = None) -> None:
         value = step or {}
         step_title = widgets.Text(value=str(value.get("title", "New step")), description="Step:")
-        kind = widgets.Dropdown(
+        stage = widgets.Dropdown(
             options=["consent", "survey", "practice", "trials", "debrief", "information"],
-            value=str(value.get("kind", "information")), description="Type:",
+            value=str(value.get("stage", value.get("kind", "information"))), description="Stage:",
         )
         duration = widgets.FloatText(value=float(value.get("duration_min") or 0), description="Minutes:")
         description = widgets.Textarea(
@@ -175,10 +179,10 @@ def edit_study_protocol(
         move_down = widgets.Button(description="Down", icon="arrow-down")
         remove = widgets.Button(description="Remove step", icon="trash", button_style="danger")
         box = widgets.VBox([
-            widgets.HBox([step_title, kind, duration]), description, resource,
+            widgets.HBox([step_title, stage, duration]), description, resource,
             widgets.HBox([move_up, move_down, remove]),
         ])
-        row = {"title": step_title, "kind": kind, "duration": duration,
+        row = {"title": step_title, "stage": stage, "duration": duration,
                "description": description, "resource": resource, "box": box,
                "up": move_up, "down": move_down}
         step_rows.append(row)
@@ -219,7 +223,7 @@ def edit_study_protocol(
             "procedure_steps": [
                 {
                     "title": row["title"].value,
-                    "kind": row["kind"].value,
+                    "stage": row["stage"].value,
                     "duration_min": row["duration"].value,
                     "description": row["description"].value,
                     "resource": row["resource"].value,

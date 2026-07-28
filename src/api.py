@@ -22,8 +22,11 @@ from src.cognitive_models import (
 from src.data_loaders import PreparedDataset, prepare_dataset, reencode_prepared_dataset
 from src.experiment_planner import (
     TrialGenerationResult,
+    UIDesignConversion,
     ValidationReport,
+    apply_ui_design,
     init_experiment_config,
+    to_xaikit_test_inputs,
     select_trial_rows,
     load_support_matrix,
     set_factor,
@@ -241,6 +244,51 @@ class xaikitTest:
         if self.auto_validate_design:
             self.validate_design(show=show)
         return self
+
+    def load_ui_design(
+        self,
+        source: str | Path | dict[str, Any],
+        *,
+        prepare_dataset: bool = True,
+        set_protocol: bool = True,
+        show: bool = True,
+        **convert_kwargs: Any,
+    ) -> "UIDesignConversion":
+        """Load a UI-exported experiment design into this workflow object.
+
+        Converts the study-builder `experiment-design.json` into the canonical
+        XAIKit config, applies the IV/CV/DV design, and optionally prepares the
+        dataset and stores the study protocol. Apparatus configurations have no
+        trial-API equivalent yet, so they are retained on `self.apparatus` and on
+        `self.ui_design_config['apparatus']` rather than being applied.
+
+        Args:
+            source: Path to the exported JSON, or the already-parsed dict.
+            prepare_dataset: Also call `prepare_dataset(...)` with the mapped dataset.
+            set_protocol: Store the converted procedure as the study protocol.
+            show: Print the conversion and validation reports.
+            **convert_kwargs: Forwarded to `convert_ui_design` (e.g. `explanation_csv`,
+                `model_type`, `seed`, `dv_aliases`).
+
+        Returns:
+            The conversion result. `self.trial_settings_from_ui_design()` returns the
+            matching `generate_trials(...)` keywords.
+        """
+        return apply_ui_design(
+            self,
+            source,
+            prepare_dataset=prepare_dataset,
+            set_protocol=set_protocol,
+            show=show,
+            **convert_kwargs,
+        )
+
+    def trial_settings_from_ui_design(self) -> dict[str, Any]:
+        """Return `generate_trials(...)` keywords implied by the loaded UI design."""
+        config = getattr(self, "ui_design_config", None)
+        if not config:
+            raise ValueError("No UI design has been loaded. Call `load_ui_design(...)` first.")
+        return to_xaikit_test_inputs(config)["trials"]
 
     def add_iv(
         self,

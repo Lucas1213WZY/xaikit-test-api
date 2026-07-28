@@ -58,6 +58,17 @@ from .trials import (
     init_trial_build_config,
     preview_trial_rows,
 )
+from .ui_to_code_converter import (
+    DEFAULT_DV_ALIASES,
+    UIDesignConversion,
+    apply_ui_design,
+    convert_ui_design,
+    convert_ui_design_file,
+    generate_trials_from_ui_design,
+    load_ui_design,
+    print_ui_design_conversion,
+    to_xaikit_test_inputs,
+)
 from .support import (
     SUPPORTED_STAGES,
     ValidationIssue,
@@ -76,11 +87,20 @@ from .support import (
 __all__ = [
     "DEFAULT_CVS",
     "DEFAULT_DVS",
+    "DEFAULT_DV_ALIASES",
     "DEFAULT_IV_CONFIG",
     "DesignRoles",
     "TrialBuildConfig",
     "TrialGenerationResult",
+    "UIDesignConversion",
+    "apply_ui_design",
     "assign_participants",
+    "convert_ui_design",
+    "convert_ui_design_file",
+    "generate_trials_from_ui_design",
+    "load_ui_design",
+    "print_ui_design_conversion",
+    "to_xaikit_test_inputs",
     "balanced_latin_square",
     "between_iv",
     "build_controlled_vars",

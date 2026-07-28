@@ -1,0 +1,127 @@
+{
+  "researchQuestions": "Does the type of XAI explanation method (LIME vs Integrated Gradients) affect how accurately users can predict the AI model's decisions?",
+  "studyDesign": {
+    "dependentVariables": [
+      {
+        "measure": "forward_sim",
+        "name": "",
+        "formula": ""
+      },
+      {
+        "measure": "decision_time",
+        "name": "",
+        "formula": ""
+      }
+    ],
+    "modelFramework": "",
+    "independentVariables": [
+      {
+        "factor": "XAI Method",
+        "levelsOrRange": "LIME | SHAP | Integrated Gradients | Input Gradients (paper)",
+        "allocation": "Between-subjects",
+        "counterbalancing": ""
+      },
+      {
+        "factor": "Tested with XAI",
+        "levelsOrRange": "With XAI vs Without XAI",
+        "allocation": "Between-subjects",
+        "counterbalancing": ""
+      },
+      {
+        "factor": "XAI Type",
+        "levelsOrRange": "None | Attribution | Importance",
+        "allocation": "Within-subjects",
+        "counterbalancing": ""
+      }
+    ],
+    "controlVariablesCV": [],
+    "randomVariablesRV": [],
+    "design": "mixed",
+    "dataset": "Wine Quality",
+    "totalConditions": 24,
+    "betweenSubjectsCells": 8,
+    "participantsPerCondition": 25,
+    "totalParticipants": 200,
+    "trialsPerParticipant": 10,
+    "totalTrials": 2000
+  },
+  "apparatus": [
+    {
+      "id": "ap_mrma2qe0_0",
+      "label": "Configuration 1",
+      "group": "All participants",
+      "mode": "ours",
+      "params": {
+        "widgets": "",
+        "instanceIds": "1-10",
+        "showTutorial": "0",
+        "showPrediction": "0",
+        "xaiType": "importance",
+        "appId": "wine_quality"
+      },
+      "url": ""
+    },
+    {
+      "id": "ap_mrsw97y9_0",
+      "label": "Configuration 2",
+      "group": "All participants",
+      "mode": "ours",
+      "params": {
+        "showTutorial": "0",
+        "focusOnImportant": "0",
+        "xaiType": "attribution",
+        "userSimulation": "0",
+        "expMethod": "lime",
+        "appId": "wine_quality",
+        "instanceIds": "1-5",
+        "showPrediction": "0",
+        "userPrediction": "1"
+      },
+      "url": ""
+    }
+  ],
+  "procedure": [
+    {
+      "title": "Welcome & consent",
+      "note": "Greet the participant, explain the study, and collect informed consent."
+    },
+    {
+      "title": "Training / practice",
+      "note": "Walk through the interface with a few practice trials so the task is understood before it counts."
+    },
+    {
+      "title": "Demographics questionnaire",
+      "note": "Short background questions (e.g. age range, AI familiarity)."
+    },
+    {
+      "title": "Main task (trials)",
+      "note": "The core trials where your dependent variables are collected, in the counterbalanced order from Study Design."
+    },
+    {
+      "title": "Post-task questionnaire",
+      "note": "Self-report measures (e.g. trust, workload, satisfaction)."
+    },
+    {
+      "title": "Debrief",
+      "note": "Explain the study's purpose, answer questions, and thank the participant."
+    }
+  ],
+  "userModel": "CoAX",
+  "mlProxyBaselines": [],
+  "cognitiveConfig": {},
+  "_rawAnswers": {
+    "sd_dv": "[{\"measure\":\"forward_sim\",\"name\":\"\",\"formula\":\"\"},{\"measure\":\"decision_time\",\"name\":\"\",\"formula\":\"\"}]",
+    "ml_proxies": "[]",
+    "apparatus_list": "[{\"id\":\"ap_mrma2qe0_0\",\"label\":\"Configuration 1\",\"group\":\"All participants\",\"mode\":\"ours\",\"params\":{\"widgets\":\"\",\"instanceIds\":\"1-10\",\"showTutorial\":\"0\",\"showPrediction\":\"0\",\"xaiType\":\"importance\",\"appId\":\"wine_quality\"},\"url\":\"\"},{\"id\":\"ap_mrsw97y9_0\",\"label\":\"Configuration 2\",\"group\":\"All participants\",\"mode\":\"ours\",\"params\":{\"showTutorial\":\"0\",\"focusOnImportant\":\"0\",\"xaiType\":\"attribution\",\"userSimulation\":\"0\",\"expMethod\":\"lime\",\"appId\":\"wine_quality\",\"instanceIds\":\"1-5\",\"showPrediction\":\"0\",\"userPrediction\":\"1\"},\"url\":\"\"}]",
+    "proc_steps": "[{\"title\":\"Welcome & consent\",\"note\":\"Greet the participant, explain the study, and collect informed consent.\"},{\"title\":\"Training / practice\",\"note\":\"Walk through the interface with a few practice trials so the task is understood before it counts.\"},{\"title\":\"Demographics questionnaire\",\"note\":\"Short background questions (e.g. age range, AI familiarity).\"},{\"title\":\"Main task (trials)\",\"note\":\"The core trials where your dependent variables are collected, in the counterbalanced order from Study Design.\"},{\"title\":\"Post-task questionnaire\",\"note\":\"Self-report measures (e.g. trust, workload, satisfaction).\"},{\"title\":\"Debrief\",\"note\":\"Explain the study's purpose, answer questions, and thank the participant.\"}]",
+    "run_status": "done",
+    "rq": "Does the type of XAI explanation method (LIME vs Integrated Gradients) affect how accurately users can predict the AI model's decisions?",
+    "sd_ivs": "[{\"factor\":\"xai_method\",\"label\":\"XAI Method\",\"levels\":\"LIME | SHAP | Integrated Gradients | Input Gradients (paper)\",\"alloc\":\"Between-subjects\",\"cogParam\":\"\",\"min\":\"\",\"max\":\"\"},{\"factor\":\"tested_xai\",\"label\":\"Tested with XAI\",\"levels\":\"With XAI vs Without XAI\",\"alloc\":\"Between-subjects\",\"cogParam\":\"\",\"min\":\"\",\"max\":\"\",\"balancing\":\"Randomized order\"},{\"factor\":\"xai_type\",\"label\":\"XAI Type\",\"levels\":\"None | Attribution | Importance\",\"alloc\":\"Within-subjects\",\"cogParam\":\"\",\"min\":\"\",\"max\":\"\"}]",
+    "sd_conditions": "24",
+    "sd_cv": "[]",
+    "ds_dataset": "Wine Quality",
+    "sd_participants": "25",
+    "sd_trials": "10",
+    "user_model": "CoAX"
+  }
+}
