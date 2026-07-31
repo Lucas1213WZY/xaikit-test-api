@@ -41,6 +41,12 @@ import src.experiment_planner as experiment_planner_api
 import src.virtual_experiment_executor as virtual_experiment_api
 from src.ai_models import evaluation as ai_eval
 from src.experiment_planner import preview as ep_preview
+from src.experiment_planner.design_export import (
+    DesignExport,
+    apply_design_export,
+    load_design_export,
+    parse_design_export,
+)
 from src.experiment_planner.protocol import (
     default_study_protocol,
     edit_study_protocol,
@@ -58,7 +64,15 @@ class xaikitTest:
         *,
         output_dir: str | Path = ".",
         auto_validate_design: bool = True,
+        design: Any = None,
     ) -> None:
+        """Create a study workflow.
+
+        ``design`` accepts an experiment-design UI export -- a ``DesignExport``, a
+        path to the exported JSON, or the already-loaded dict -- and registers its
+        IVs, CVs, DVs and study protocol immediately, so the design never has to be
+        retyped as ``add_iv``/``add_cv``/``add_dv`` calls.
+        """
         self.project_name = project_name
         self.output_dir = Path(output_dir)
         self.auto_validate_design = auto_validate_design
@@ -98,6 +112,29 @@ class xaikitTest:
         self.study_protocol: dict[str, Any] = default_study_protocol()
         self.walkthrough_previewed: bool = False
         self.walkthrough_approved: bool = False
+        self.design_export = None
+
+        if design is not None:
+            self.set_design_export(design)
+
+    def set_design_export(self, design: Any, **apply_kwargs: Any) -> "xaikitTest":
+        """Register an experiment-design UI export's variables and protocol.
+
+        ``design`` is a ``DesignExport``, a path to the exported JSON, or the
+        already-loaded dict. Remaining keyword arguments are passed through to
+        ``apply_design_export`` (``dv_names``, ``include_rvs``, ``show``,
+        ``report``).
+        """
+        if isinstance(design, DesignExport):
+            parsed = design
+        elif isinstance(design, dict):
+            parsed = parse_design_export(design)
+        else:
+            parsed = load_design_export(design)
+
+        self.design_export = parsed
+        apply_design_export(self, parsed, **apply_kwargs)
+        return self
 
     def set_study_protocol(
         self,

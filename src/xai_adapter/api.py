@@ -88,8 +88,13 @@ def init_explanation_run(
 
 
 def get_xai_methods_from_design(iv_config: dict[str, dict[str, Any]]) -> list[Any]:
-    """Read XAI method levels from `xai_method` or legacy `xai_type` IV names."""
-    xai_iv_name = "xai_type" if "xai_type" in iv_config else "xai_method"
+    """Read XAI method levels from `xai_method` or legacy `xai_type` IV names.
+
+    `xai_method` wins when a design names both, matching how instance selection and
+    per-trial explanation lookup resolve the method. Preferring `xai_type` here
+    made those disagree, and a design declaring both IVs generated an empty pool.
+    """
+    xai_iv_name = "xai_method" if "xai_method" in iv_config else "xai_type"
     if xai_iv_name not in iv_config:
         raise ValueError("iv_config must include either 'xai_method' or 'xai_type'.")
     return list(iv_config[xai_iv_name]["levels"])

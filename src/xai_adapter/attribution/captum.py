@@ -35,8 +35,14 @@ class CaptumAttribution(LocalAttribution):
         target: int = 1,
         preprocessing_fn: Optional[PreprocessFn] = None,
         postprocessing_fn: Optional[PostprocessFn] = None,
+        forward_fn: Optional[Callable] = None,
         **attribute_kwargs,
     ):
+        # `forward_fn` is accepted because the registry wires it into every
+        # gradient method, but Captum differentiates through the torch module
+        # itself and its `attribute()` takes no such argument. Swallow it here so
+        # it never reaches Captum.
+        del forward_fn
         super().__init__(
             target=target,
             preprocessing_fn=preprocessing_fn,
