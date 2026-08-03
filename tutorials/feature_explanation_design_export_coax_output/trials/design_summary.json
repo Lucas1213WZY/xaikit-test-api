@@ -1,0 +1,3079 @@
+{
+  "iv_config": {
+    "xai_method": [
+      "lime",
+      "shap",
+      "integrated_gradients",
+      "input_gradients"
+    ],
+    "tested_w_xai": [
+      true,
+      false
+    ],
+    "xai_type": [
+      "none",
+      "attribution",
+      "importance"
+    ]
+  },
+  "between_subjects_ivs": {
+    "xai_method": [
+      "lime",
+      "shap",
+      "integrated_gradients",
+      "input_gradients"
+    ],
+    "xai_type": [
+      "none",
+      "attribution",
+      "importance"
+    ]
+  },
+  "within_subjects_ivs": {
+    "tested_w_xai": [
+      true,
+      false
+    ]
+  },
+  "block_counterbalanced_within_ivs": {},
+  "trial_randomized_within_ivs": {
+    "tested_w_xai": [
+      true,
+      false
+    ]
+  },
+  "requested_counterbalancing_strategy": "auto",
+  "trial_randomization_strategy": "balanced",
+  "trials_per_condition": null,
+  "trials_per_participant": 6,
+  "counterbalancing_strategy": "complete_counterbalancing",
+  "n_conditions": 1,
+  "n_orders": 1,
+  "counterbalancing_diagnostics": {
+    "n_conditions": 1,
+    "n_orders": 1,
+    "expected_position_count": 1.0,
+    "expected_immediate_pair_count": 0,
+    "position_balanced": true,
+    "immediate_pair_balanced": true,
+    "position_counts": {
+      "1": {
+        "{\"withinCondition\": \"single_condition\"}": 1
+      }
+    },
+    "immediate_pair_counts": {}
+  },
+  "orders": [
+    {
+      "order_id": 1,
+      "sequence": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ]
+    }
+  ],
+  "n_participants": 300,
+  "participant_assignments": [
+    {
+      "participantId": 1,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 2,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 3,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 4,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 5,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 6,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 7,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 8,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 9,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 10,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 11,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 12,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 13,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 14,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 15,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 16,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 17,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 18,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 19,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 20,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 21,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 22,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 23,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 24,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 25,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 26,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 27,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 28,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 29,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 30,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 31,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 32,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 33,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 34,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 35,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 36,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 37,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 38,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 39,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 40,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 41,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 42,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 43,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 44,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 45,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 46,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 47,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 48,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 49,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 50,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 51,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 52,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 53,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 54,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 55,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 56,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 57,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 58,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 59,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 60,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 61,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 62,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 63,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 64,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 65,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 66,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 67,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 68,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 69,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 70,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 71,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 72,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 73,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 74,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 75,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 76,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 77,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 78,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 79,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 80,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 81,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 82,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 83,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 84,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 85,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 86,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 87,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 88,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 89,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 90,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 91,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 92,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 93,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 94,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 95,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 96,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 97,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 98,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 99,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 100,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 101,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 102,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 103,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 104,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 105,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 106,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 107,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 108,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 109,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 110,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 111,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 112,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 113,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 114,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 115,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 116,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 117,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 118,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 119,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 120,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 121,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 122,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 123,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 124,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 125,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 126,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 127,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 128,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 129,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 130,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 131,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 132,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 133,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 134,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 135,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 136,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 137,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 138,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 139,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 140,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 141,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 142,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 143,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 144,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 145,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 146,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 147,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 148,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 149,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 150,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 151,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 152,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 153,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 154,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 155,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 156,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 157,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 158,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 159,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 160,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 161,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 162,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 163,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 164,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 165,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 166,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 167,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 168,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 169,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 170,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 171,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 172,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 173,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 174,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 175,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 176,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 177,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 178,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 179,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 180,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 181,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 182,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 183,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 184,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 185,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 186,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 187,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 188,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 189,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 190,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 191,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 192,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 193,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 194,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 195,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 196,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 197,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 198,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 199,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 200,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 201,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 202,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 203,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 204,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 205,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 206,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 207,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 208,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 209,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 210,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 211,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 212,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 213,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 214,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 215,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 216,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 217,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 218,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 219,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 220,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 221,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 222,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 223,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 224,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 225,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 226,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 227,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 228,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 229,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 230,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 231,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 232,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 233,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 234,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 235,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 236,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 237,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 238,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 239,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 240,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 241,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 242,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 243,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 244,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 245,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 246,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 247,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 248,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 249,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 250,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 251,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 252,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 253,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 254,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 255,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 256,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 257,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 258,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 259,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 260,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 261,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 262,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 263,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 264,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 265,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 266,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 267,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 268,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 269,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 270,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 271,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 272,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 273,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 274,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 275,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 276,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 277,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 278,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 279,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 280,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 281,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 282,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 283,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 284,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 285,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 286,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 287,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 288,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 289,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 290,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 291,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "lime",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 292,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 293,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 294,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "shap",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 295,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 296,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 297,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "integrated_gradients",
+      "xai_type": "importance"
+    },
+    {
+      "participantId": 298,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "none"
+    },
+    {
+      "participantId": 299,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "attribution"
+    },
+    {
+      "participantId": 300,
+      "within_order": [
+        {
+          "withinCondition": "single_condition"
+        }
+      ],
+      "xai_method": "input_gradients",
+      "xai_type": "importance"
+    }
+  ]
+}

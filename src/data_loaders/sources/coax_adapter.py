@@ -8,6 +8,37 @@ from ..base.data_source import BaseDataSource
 from ..normalizers.minmax import MinMaxNormalizer
 
 
+# CoAX names feature columns x0, x1, ... in the canonical export under
+# assets/ai_dataset/coax. An older export names them v0, v1, ..., so the prefix
+# is detected per table rather than hardcoded.
+CANONICAL_FEATURE_PREFIX = "x"
+LEGACY_FEATURE_PREFIX = "v"
+
+
+def feature_prefix(df: pd.DataFrame) -> str:
+    """Return the feature-column prefix a CoAX table uses ('x' or 'v')."""
+    if df is None:
+        return CANONICAL_FEATURE_PREFIX
+    columns = set(df.columns)
+    if f"{CANONICAL_FEATURE_PREFIX}0" in columns:
+        return CANONICAL_FEATURE_PREFIX
+    if f"{LEGACY_FEATURE_PREFIX}0" in columns:
+        return LEGACY_FEATURE_PREFIX
+    return CANONICAL_FEATURE_PREFIX
+
+
+def bounds_prefix(metadata_df: pd.DataFrame) -> str:
+    """Return the prefix a CoAX metadata table uses for min/max bounds."""
+    if metadata_df is None:
+        return CANONICAL_FEATURE_PREFIX
+    columns = set(metadata_df.columns)
+    if f"{CANONICAL_FEATURE_PREFIX}0_min" in columns:
+        return CANONICAL_FEATURE_PREFIX
+    if f"{LEGACY_FEATURE_PREFIX}0_min" in columns:
+        return LEGACY_FEATURE_PREFIX
+    return CANONICAL_FEATURE_PREFIX
+
+
 class CoAXDataSource(BaseDataSource):
     """
     Data source adapter for CoAX synthetic data.
@@ -86,17 +117,19 @@ class CoAXDataSource(BaseDataSource):
             app_metadata = app_metadata.iloc[0]
 
             # Extract features (x0, x1, x2, ...)
+            values_prefix = feature_prefix(self.feature_values_df)
+            meta_prefix = bounds_prefix(self.metadata_df)
             scaled_row = []
             i = 0
             while True:
-                val_col = f'v{i}'
+                val_col = f'{values_prefix}{i}'
                 if val_col not in feature_row.index or pd.isna(feature_row[val_col]):
                     break
 
                 value = feature_row[val_col]
                 if normalize:
-                    min_col = f'v{i}_min'
-                    max_col = f'v{i}_max'
+                    min_col = f'{meta_prefix}{i}_min'
+                    max_col = f'{meta_prefix}{i}_max'
                     min_val = app_metadata.get(min_col, None) if min_col in app_metadata.index else None
                     max_val = app_metadata.get(max_col, None) if max_col in app_metadata.index else None
                     

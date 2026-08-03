@@ -1,0 +1,55 @@
+# systemd unit for the study server on a lab machine without Docker.
+#
+# As a user service (no root needed -- the usual case on a shared server):
+#   mkdir -p ~/.config/systemd/user
+#   cp deploy/xaikit-api.service ~/.config/systemd/user/
+#   # edit the paths and EnvironmentFile below, then:
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now xaikit-api
+#   systemctl --user status xaikit-api
+#   journalctl --user -u xaikit-api -f
+#
+# User services normally stop when you log out. Ask your admin to run
+#   loginctl enable-linger $USER
+# so it survives logout and reboots.
+#
+# As a system service instead: drop this in /etc/systemd/system/, uncomment
+# User=/Group=, and use systemctl without --user.
+
+[Unit]
+Description=XAIKit study API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# User=xaikit
+# Group=xaikit
+WorkingDirectory=%h/xaikit-api
+
+# Token, allowed origins and runs directory live here, not in this file, so the
+# unit can be committed and the secret cannot. chmod 600 it.
+EnvironmentFile=%h/xaikit-api/.env
+
+# Point this at the interpreter of the environment you installed into, e.g.
+#   %h/miniconda3/envs/xaikit-api/bin/uvicorn
+ExecStart=%h/miniconda3/envs/xaikit-api/bin/uvicorn server.app:app \
+    --host 127.0.0.1 \
+    --port 8000 \
+    --workers 1
+
+# One worker, and never more: a study is stateful in-process object and stages
+# run on a single background thread. Restarting drops in-memory studies, so
+# restart only on failure rather than on a schedule.
+Restart=on-failure
+RestartSec=5
+
+# The service reads the repo and writes only its runs directory.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=%h/xaikit-api/server_runs
+
+[Install]
+WantedBy=default.target

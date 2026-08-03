@@ -253,7 +253,7 @@ def test_prediction_balancing_is_half_half_and_randomized_within_each_phase():
 
     counts = (
         balanced_df.groupby(["participantId", "phase"])
-        ["sampled_ai_prediction"]
+        ["ai_prediction"]
         .value_counts()
     )
     assert (counts.loc[(slice(None), "training", slice(None))] == 2).all()
@@ -267,7 +267,7 @@ def test_prediction_balancing_is_half_half_and_randomized_within_each_phase():
 
     phase_sequences = balanced_df.groupby(
         ["participantId", "phase"], sort=False
-    )["sampled_ai_prediction"].apply(list)
+    )["ai_prediction"].apply(list)
     assert any(sequence != sorted(sequence) for sequence in phase_sequences)
 
 
@@ -294,12 +294,12 @@ def test_trial_json_converts_numpy_prediction_labels(tmp_path):
     trials = [{
         "participantId": 1,
         "instanceId": "7",
-        "sampled_ai_prediction": np.int64(1),
+        "ai_prediction": np.int64(1),
     }]
 
     json_path = export_trials_json(trials, tmp_path / "trials.json")
 
-    assert json_path.read_text().count('"sampled_ai_prediction": 1') == 1
+    assert json_path.read_text().count('"ai_prediction": 1') == 1
 
 
 def test_complete_prediction_table_is_saved_before_execution(tmp_path):

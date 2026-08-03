@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <title>xAI iframe</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/papaparse@latest/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/10.4.3/decimal.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <script src="iframe.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+
+  <body>
+
+    <table id="feature-weights-table" style="display: none">
+      <thead id="feature-weights-thead">
+        <tr>
+          <th style="text-align: right">Attribute</th>
+          <th>Value</th>
+          <th></th>
+          <th></th>
+          <th class="explanation-col">Factor ($1k)</th>
+          <th class="explanation-col"></th>
+          <th class="explanation-col no-padding">Partial Sum ($1k)</th>
+        </tr>
+      </thead>
+      <tbody id="feature-weights-tbody">
+      </tbody>
+    </table>
+
+
+    <div id="counterfactual-div" style="display: none">
+      <h2 class="text-lg mb-4">Current case</h2>
+      <table id="current-case-counterfactual-table">
+        <thead id="current-case-counterfactual-thead">
+          <tr>
+            <th style="text-align: right" class="tooltip" title="Attributes that affect the prediction on the case">Attribute</th>
+            <th class="tooltip" title="Values of each attribute that characterise the case">Value</th>
+            <th></th>
+            <th class="diff-col"></th>
+          </tr>
+        </thead>
+        <tbody id="current-case-counterfactual-tbody">
+        </tbody>
+      </table>
+      <h2 class="text-lg mb-4 mt-10">Example with different outcome</h2>
+      <table id="counterfactual-table">
+        <thead id="counterfactual-thead">
+          <tr>
+            <th style="text-align: right" class="tooltip" title="Attributes that affect the prediction on the case">Attribute</th>
+            <th class="tooltip" title="Values of each attribute that characterise the case">Value</th>
+            <th></th>
+            <th class="diff-col tooltip" title="For numerical values, the meters indicate the percentage difference against the current case. Hover over each meter to see the absolute difference">Diff</th>
+          </tr>
+        </thead>
+        <tbody id="counterfactual-tbody">
+        </tbody>
+      </table>
+    </div>
+
+    <div id="similar-div" style="display: none">
+      <h2 class="text-lg mb-4">Current case</h2>
+      <table id="current-case-similar-table">
+        <thead id="current-case-similar-thead">
+          <tr>
+            <th style="text-align: right" class="tooltip" title="Attributes that affect the prediction on the case">Attribute</th>
+            <th class="tooltip" title="Values of each attribute that characterise the case">Value</th>
+            <th></th>
+            <th class="diff-col"></th>
+          </tr>
+        </thead>
+        <tbody id="current-case-similar-tbody">
+        </tbody>
+      </table>
+      <h2 class="text-lg mb-4 mt-10">Similar example</h2>
+      <table id="similar-table">
+        <thead id="similar-thead">
+          <tr>
+            <th style="text-align: right" class="tooltip" title="Attributes that affect the prediction on the case">Attribute</th>
+            <th class="tooltip" title="Values of each attribute that characterise the case">Value</th>
+            <th></th>
+            <th class="diff-col tooltip" title="For numerical values, the meters indicate the percentage difference against the current case. Hover over each meter to see the absolute difference">Diff</th>
+          </tr>
+        </thead>
+        <tbody id="similar-tbody">
+        </tbody>
+      </table>
+    </div>
+
+    <div id="feature-importance-div" style="display: none">
+      <table id="feature-importance-table">
+        <thead id="feature-importance-thead">
+          <tr>
+            <th style="text-align: right" class="tooltip" title="Attributes that affect the prediction on the case">Attribute</th>
+            <th class="tooltip" title="Values of each attribute that characterise the case" colspan="1" style="text-align: center;">Value</th>
+            <th></th>
+            <th class="explanation-col tooltip border-black border-b-2" colspan="2" title="Importance of each attribute towards the prediction">Importance</th>
+            <th class="prediction-col"></th>
+          </tr>
+        </thead>
+        <tbody id="feature-importance-tbody">
+        </tbody>
+      </table>
+    </div>
+
+    <div id="feature-attribution-div" style="display: none">
+      <table id="feature-attribution-table">
+        <thead id="feature-attribution-thead">
+          <tr>
+            <th style="text-align: right" class="tooltip" title="Attributes that affect the prediction on the case">Attribute</th>
+            <th class="tooltip" title="Values of each attribute that characterise the case" colspan="1" style="text-align: center;">Value</th>
+            <th></th>
+            <th class="explanation-col tooltip border-black border-b-2" colspan="2" title="Influence of each attribute towards the prediction">Influence</th>
+            <th class="prediction-col"></th>
+          </tr>
+        </thead>
+        <tbody id="feature-attribution-tbody">
+        </tbody>
+      </table>
+    </div>
+    <div id="toggleContainer"></div>
+  </body>
+</html>

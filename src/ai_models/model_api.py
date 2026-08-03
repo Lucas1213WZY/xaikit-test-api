@@ -506,7 +506,10 @@ class ModelManager:
                 f"Available: {self.registry.list_available_models()}"
             )
 
-        meta = _DATASET_DEFAULTS.get(dataset, {'input_dim': 13, 'num_classes': 2})
+        meta = dict(_DATASET_DEFAULTS.get(dataset, {'input_dim': 13, 'num_classes': 2}))
+        # The checkpoint is the authority on its own shape; _DATASET_DEFAULTS is a
+        # per-dataset guess that does not know which feature subset was trained on.
+        meta.update(_shape_from_checkpoint(model_info['weight_path']))
         cls = _MODEL_CLASSES.get(model_type)
         if cls is None:
             raise ValueError(f"Unknown model_type '{model_type}'. "
@@ -743,6 +746,31 @@ class ModelManager:
         if not self.active_model:
             raise ValueError("No active model. Call load_model() or create_model() first.")
         return self.active_model
+
+
+def _shape_from_checkpoint(weight_path: str) -> Dict[str, int]:
+    """Read input_dim / num_classes out of a torch checkpoint, if it is one.
+
+    Returns an empty dict for non-torch weights or an unreadable file, leaving
+    the caller's defaults in place.
+    """
+    try:
+        import torch
+
+        state = torch.load(weight_path, weights_only=True, map_location='cpu')
+    except Exception:
+        return {}
+    if not hasattr(state, 'items'):
+        return {}
+
+    shape: Dict[str, int] = {}
+    first = state.get('feature_extractor.0.weight')
+    if first is not None and getattr(first, 'ndim', 0) == 2:
+        shape['input_dim'] = int(first.shape[1])
+    final = state.get('final_layer.weight')
+    if final is not None and getattr(final, 'ndim', 0) == 2:
+        shape['num_classes'] = int(final.shape[0])
+    return shape
 
 
 def load_pretrained_model(dataset: str, model_type: str = 'mlp',

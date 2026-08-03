@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <title>xAI visualisation generator</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="index.js" defer></script>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>xAI visualisation generator</h1>
+      <br>
+      <h3>Input your parameters below:</h3>
+      <div class="selectors">
+        <div>
+          Dataset
+          <select id="input_appId" title="appId">
+            <option value="wine_quality">
+              Red Wine Quality
+            </option>
+            <option value="adult">
+              Adult Income
+            </option>
+            <option value="heart_disease">
+              Health : Heart Disease
+            </option>
+            <option value="king_county_house">
+              Housing : King County
+            </option>
+            <option value="prima_diabetes">
+              Prima Indians Diabetes
+            </option>
+            <option value="mushrooms" selected>
+              Mushrooms
+            </option>
+            <option value="forest_cover">
+              Forest Cover
+            </option>
+            <option value="breast_cancer">
+              Breast Cancer
+            </option>
+            <option value="cardiotocography">
+              Fetus
+            </option>
+          </select>
+          AI Prediction Model
+          <select id="input_model_name" title="modelName">
+            <option value="mlp">
+              MLP
+            </option>
+            <option value="xgboost">
+              XGBoost
+            </option>
+
+          </select>
+          Explanation Method
+          <select id="input_exp_method" title="expMethod">
+            <option value="lime">
+              LIME
+            </option>
+            <option value="shap" selected>
+              SHAP
+            </option>
+            <option value="integrated_gradients">
+              Integrated Gradients
+            </option>
+          </select>
+          &nbsp; Datapoint
+          <input
+            id="input_instanceId"
+            type="number"
+            value="0"
+            min="0"
+            max="200"
+            size="5"
+            maxlength="3"
+            title="pairId"
+          /><br><br>
+          Explanation Type
+          <select id="input_xaiType" title="xaiType">
+            <option value="attribution" selected>Feature attribution</option>
+            <option value="importance">Feature importance</option>
+            <option value="weights">Feature weights</option>
+            <option value="counterfactual">Counterfactual example</option>
+            <option value="similar">Similar example</option>
+            <option value="none">None</option>
+          </select>
+          User Prediction
+          <select id="input_userPrediction" title="userPrediction">
+            <option value="none">None</option>
+            <option value="0">0</option>
+            <option value="1">1</option>
+          </select>
+
+          <br><br>
+          <input id="input_showTutorial" type="checkbox" />
+          <label for="input_showTutorial" type="checkbox">Show Tutorial</label>
+          <input id="input_showPrediction" type="checkbox" checked />
+          <label for="input_showPrediction" type="checkbox">Show Prediction</label>
+          <input id="input_userSimulation" type="checkbox" />
+          <label for="input_userSimulation" type="checkbox">User Simulation</label>
+          <input id="input_showGroundTruth" type="checkbox" />
+          <label for="input_showGroundTruth" type="checkbox">Show Ground Truth</label>
+          <input id="input_focusOnImportant" type="checkbox" checked/>
+          <label for="input_focusOnImportant" type="checkbox">Focus on Important Features</label>
+        </div>
+        <br>
+        <div>
+          iFrame URL:
+          <a id="text_url" href=""></a><br>
+          <button onclick="copyIframeHtml()">Copy Iframe</button>
+          <button onclick="copyUrl()">Copy URL</button>
+        </div>
+      </div>
+
+      <!-- Iframes - retrived through request to iframes.html -->
+      <div class="iframes">
+        <iframe
+          id="interactiveIframe"
+          src="iframe.html?appId=wine_quality&instanceId=1&isRef=0&xaiType=attribution&showExplanation=1&showPrediction=1&showTutorial=1&showUserPrediction=0&userPrediction=0&showGroundTruth=0"
+          width="100%"
+          height="1000px"
+          frameBorder="0"
+        ></iframe>
+      </div>
+    </div>
+  </body>
+</html>

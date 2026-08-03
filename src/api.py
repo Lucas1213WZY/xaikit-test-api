@@ -55,6 +55,24 @@ from src.experiment_planner.protocol import (
 )
 
 
+def _model_input_dim(model: Any, _depth: int = 4) -> Optional[int]:
+    """Find the feature width a wrapped AI model was built for.
+
+    The wrapper nests the torch module under ``engine`` today and may expose it as
+    ``model`` after renaming, so both names are followed rather than hardcoded.
+    Returns None when the width cannot be determined (e.g. non-torch models).
+    """
+    seen = model
+    for _ in range(_depth):
+        if seen is None:
+            return None
+        width = getattr(seen, "input_dim", None)
+        if isinstance(width, int):
+            return width
+        seen = getattr(seen, "engine", None) or getattr(seen, "model", None)
+    return None
+
+
 class xaikitTest:
     """Collate one XAI experiment workflow into a single reusable object."""
 
@@ -373,12 +391,19 @@ class xaikitTest:
         instance_wise_explanation: bool = False,
         shuffle_instances: bool = True,
         max_trial_instances: Optional[int] = DEFAULT_EXPLANATION_INSTANCE_LIMIT,
+        allowed_instance_ids: Optional[Sequence[int]] = None,
         seed: int = 42,
         output_dir: str | Path = "experiment_output",
         preview_rows: int = 10,
         show: bool = True,
     ) -> TrialGenerationResult:
-        """Build training rows followed by held-out testing rows."""
+        """Build training rows followed by held-out testing rows.
+
+        ``allowed_instance_ids`` restricts both phases to instances an external
+        corpus can serve -- pass ``CoAXAssetRepository.available_instance_ids()``
+        to keep trials runnable against a fixed study set. Leave it unset to
+        sample the dataset freely.
+        """
         data = self._require_data()
         ai_predictions_by_instance = None
         if balance_by_ai_prediction:
@@ -412,6 +437,7 @@ class xaikitTest:
             instance_wise_explanation=instance_wise_explanation,
             shuffle_instances=shuffle_instances,
             max_trial_instances=max_trial_instances,
+            allowed_instance_ids=allowed_instance_ids,
             seed=seed,
             output_dir=self._resolve_output_path(output_dir),
         )
@@ -422,6 +448,60 @@ class xaikitTest:
         )
         self.trials = self.trial_result.trials
         return self.trial_result
+
+    def load_AI_model(
+        self,
+        *,
+        model_type: str = "mlp",
+        source: str = "coax",
+        dataset_id: Optional[str] = None,
+    ) -> Any:
+        """Load a pretrained AI model instead of training a new one.
+
+        Weights come from ``assets/model_weights/<model_type>/<source>/``. Use this
+        for replications, where predictions and explanations must come from the
+        same AI model that produced the published study assets rather than from a
+        freshly trained one.
+
+        After this call the study behaves exactly as it would after
+        ``train_AI_model``: ``generate_trials(balance_by_ai_prediction=True)`` and
+        ``explanations()`` both read from the loaded model.
+        """
+        from src.ai_models import ModelManager
+
+        data = self._require_data()
+        dataset_id = dataset_id or data.dataset_id
+
+        self.model_manager = ModelManager()
+        self.model = self.model_manager.load_model(
+            dataset=dataset_id,
+            model_type=model_type,
+            source=source,
+        )
+        # The checkpoint fixes the feature space. Prepared data with a different
+        # number of columns would either fail deep inside predict() or, worse,
+        # line up by accident against the wrong attributes.
+        expected = _model_input_dim(self.model)
+        actual = int(data.X_train.shape[1])
+        if expected is not None and int(expected) != actual:
+            raise ValueError(
+                f"Pretrained {model_type} ({source}) for {dataset_id!r} expects "
+                f"{int(expected)} features, but the prepared dataset has {actual}: "
+                f"{list(getattr(data, 'raw_feature_names', []))}. "
+                "Call prepare_dataset(...) with the same feature_cols the weights "
+                "were trained on."
+            )
+
+        self.model_name = model_type
+        self.model_source = source
+        self.trained_ai_model = getattr(self.model, "engine", self.model)
+        self.training_info = None
+        self.training_stdout = ""
+        # Any cached predictions came from a different model; drop them.
+        self.ai_predictions_by_instance = None
+        self.prediction_table_path = None
+        self.prediction_table = None
+        return self.model
 
     def train_AI_model(
         self,

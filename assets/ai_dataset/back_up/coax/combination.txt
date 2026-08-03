@@ -1,0 +1,11 @@
+=== attribution.csv ===
+         dataId modelName expMethod  rows
+0         adult   xgboost      lime   300
+1  forest_cover   xgboost      shap   300
+2  wine_quality       mlp      lime   120
+
+=== importance.csv ===
+         dataId modelName expMethod  rows
+0         adult   xgboost      lime   300
+1  forest_cover   xgboost      shap   300
+2  wine_quality       mlp      lime   120

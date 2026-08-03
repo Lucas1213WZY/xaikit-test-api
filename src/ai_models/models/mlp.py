@@ -54,10 +54,18 @@ class MLPModel(nn.Module):
         self._coax = (cognitive_agent == 'coax')
 
         h = hidden_dimension
-        self.feature_extractor = nn.Sequential(
-            nn.Linear(input_dim, h), nn.ReLU(), nn.Dropout(p=dropout_rate),
-            nn.Linear(h, h),         nn.ReLU(), nn.Dropout(p=dropout_rate),
-        )
+        # Dropout is only added when it does something. At p=0 it is a no-op that
+        # still occupies a Sequential slot, which shifts every later module's index
+        # and makes saved state_dict keys unloadable. Every checkpoint under
+        # assets/model_weights was saved without it, and the Keras variant below
+        # already adds it conditionally.
+        layers: list[nn.Module] = []
+        for in_features in (input_dim, h):
+            layers.append(nn.Linear(in_features, h))
+            layers.append(nn.ReLU())
+            if dropout_rate:
+                layers.append(nn.Dropout(p=dropout_rate))
+        self.feature_extractor = nn.Sequential(*layers)
         self.final_layer = nn.Linear(h, num_classes)
 
         # coax keeps softmax as a named attribute (needed by Captum hooks)

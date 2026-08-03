@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import random
-from typing import Any, Optional
+from typing import Any, Optional, Sequence
 
 from src.data_loaders import PreparedDataset, load_csv_records, load_json_config
 from src.workflow_standard import DEFAULT_EXPLANATION_INSTANCE_LIMIT
@@ -46,6 +46,7 @@ class TrialBuildConfig:
     instance_wise_explanation: bool = False
     shuffle_instances: bool = True
     max_trial_instances: Optional[int] = DEFAULT_EXPLANATION_INSTANCE_LIMIT
+    allowed_instance_ids: Optional[Sequence[int]] = None
     seed: int = 42
     output_dir: Path = Path("experiment_output")
     trials_csv: str = "trials.csv"
@@ -88,6 +89,7 @@ def init_trial_build_config(
     instance_wise_explanation: bool = False,
     shuffle_instances: bool = True,
     max_trial_instances: Optional[int] = DEFAULT_EXPLANATION_INSTANCE_LIMIT,
+    allowed_instance_ids: Optional[Sequence[int]] = None,
     seed: int = 42,
     output_dir: str | Path = "experiment_output",
     trials_csv: str = "trials.csv",
@@ -113,6 +115,7 @@ def init_trial_build_config(
         instance_wise_explanation=instance_wise_explanation,
         shuffle_instances=shuffle_instances,
         max_trial_instances=max_trial_instances,
+        allowed_instance_ids=list(allowed_instance_ids) if allowed_instance_ids is not None else None,
         seed=seed,
         output_dir=Path(output_dir),
         trials_csv=trials_csv,
@@ -147,7 +150,25 @@ def generate_experimental_trials(
         experiment_structure.between_ivs or None,
     )
 
+    train_instance_ids = config.data.train_instance_ids
     trial_instance_ids = config.data.test_instance_ids
+
+    if config.allowed_instance_ids is not None:
+        # Constrained generation: keep only instances an external asset set can
+        # serve, so trials stay runnable against a fixed study corpus.
+        allowed = {int(value) for value in config.allowed_instance_ids}
+        train_instance_ids = [i for i in train_instance_ids if int(i) in allowed]
+        trial_instance_ids = [i for i in trial_instance_ids if int(i) in allowed]
+        if not trial_instance_ids:
+            raise ValueError(
+                "No testing instances remain after applying allowed_instance_ids. "
+                "The dataset split and the allowed set do not overlap."
+            )
+        if config.num_training > 0 and not train_instance_ids:
+            raise ValueError(
+                "No training instances remain after applying allowed_instance_ids."
+            )
+
     if config.max_trial_instances is not None:
         trial_instance_ids = trial_instance_ids[:config.max_trial_instances]
 
@@ -171,7 +192,7 @@ def generate_experimental_trials(
     )
     trials = _add_training_and_testing_phases(
         trials,
-        train_instance_ids=config.data.train_instance_ids,
+        train_instance_ids=train_instance_ids,
         dataset_id=config.data.dataset_id,
         num_training=config.num_training,
         condition_columns=[
@@ -184,7 +205,7 @@ def generate_experimental_trials(
     if config.ai_predictions_by_instance is not None:
         trials = _balance_phase_instances_by_ai_prediction(
             trials,
-            train_instance_ids=config.data.train_instance_ids,
+            train_instance_ids=train_instance_ids,
             test_instance_ids=trial_instance_ids,
             predictions_by_instance=config.ai_predictions_by_instance,
             seed=config.seed,
@@ -452,7 +473,7 @@ def _balance_phase_instances_by_ai_prediction(
                 instance_id = selected_by_label[label][offset]
                 label_offsets[label] += 1
                 balanced_trials[row_position]["instanceId"] = str(instance_id)
-                balanced_trials[row_position]["sampled_ai_prediction"] = label
+                balanced_trials[row_position]["ai_prediction"] = label
 
     return balanced_trials
 
@@ -477,7 +498,7 @@ def preview_trial_rows(
         *experiment_structure.trial_within_ivs.keys(),
         "dataId",
         "instanceId",
-        "sampled_ai_prediction",
+        "ai_prediction",
     ]
 
     print(f"\nPreviewing first {min(n, len(trials))} trial rows:")

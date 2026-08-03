@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XAI Interpretability Simulator</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="simulation_mockup/styles.css" />
+
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="control-panel">
+        <div class="panel-header">
+          <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Collapse sidebar" aria-expanded="true">
+            <i class="ti ti-layout-sidebar-left-collapse" aria-hidden="true"></i>
+          </button>
+          <h1>XAI Interpretation Simulator</h1>
+          <button id="run-button" type="button">
+            <svg class="run-play-icon" width="9" height="10" viewBox="0 0 9 10" fill="none" aria-hidden="true">
+              <path d="M1.5 1l6 4-6 4V1z" fill="currentColor"/>
+            </svg>
+            <span class="run-spinner" aria-hidden="true"></span>
+            <span class="run-label">Run Simulation</span>
+          </button>
+        </div>
+
+        <div class="control-scroll">
+          <div class="field compact-controls">
+            <label><select id="case-number" aria-label="Case"></select></label>
+          </div>
+
+          <div class="ctrl-section compact-controls">
+            <div class="ctrl-section-label">Data</div>
+            <div class="field">
+              <label>Dataset<select id="dataset"></select></label>
+            </div>
+            <div class="field">
+              <label><select id="instance-number" aria-label="Instance Number"></select></label>
+            </div>
+          </div>
+
+          <div class="ctrl-section compact-controls">
+            <div class="ctrl-section-label">XAI Configuration</div>
+            <div class="field">
+              <label>XAI Type
+                <select id="xai-type">
+                  <option value="None">None</option>
+                  <option value="Importance">Importance</option>
+                  <option value="Attribution">Attribution</option>
+                </select>
+              </label>
+            </div>
+            <div class="field">
+              <label>
+                <select id="tested" aria-label="Tested">
+                  <option value="w/ XAI">With XAI</option>
+                  <option value="w/o XAI">Without XAI</option>
+                </select>
+              </label>
+            </div>
+            <div class="field">
+              <label>Human Reasoning
+                <select id="reasoning-strategy">
+                  <option value="Sensitive-features categorization">Sensitive-Features Categorization</option>
+                  <option value="Salient-features categorization">Salient-Features Categorization</option>
+                  <option value="Importance categorization">Importance Categorization</option>
+                  <option value="Attribution Sum">Attribution Sum</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div class="ctrl-section">
+            <div class="ctrl-section-label">Cognitive Parameters</div>
+            <div class="field">
+              <label class="slider-field" title="Higher values means more likely to forget exemplars.">
+                <span class="param-label">
+                  Retrieval Threshold
+                  <span class="quality-badge quality-down" title="Increasing this generally worsens decision quality.">
+                    <i class="ti ti-arrow-down" aria-hidden="true"></i>
+                  </span>
+                </span>
+                <div class="slider-row">
+                  <input id="retrieval-threshold" type="range" min="-2.3" max="-1.5" step="0.01" value="-1.8" />
+                  <span class="slider-val" id="retrieval-threshold-value">-1.80</span>
+                </div>
+              </label>
+            </div>
+            <div class="field">
+              <label class="slider-field" title="How strongly distance between current instance and exemplars affects similarity.">
+                <span class="param-label">
+                  Exemplar Distance Sensitivity
+                  <span class="quality-badge quality-up" title="Increasing this generally improves decision quality.">
+                    <i class="ti ti-arrow-up" aria-hidden="true"></i>
+                  </span>
+                </span>
+                <div class="slider-row">
+                  <input id="sensitivity" type="range" min="1" max="10" step="0.1" value="10" />
+                  <span class="slider-val" id="sensitivity-value">10.0</span>
+                </div>
+              </label>
+            </div>
+            <div class="field">
+              <label class="slider-field" title="How many features are selected when comparing exemplars.">
+                <span class="param-label">
+                  Attended Features
+                  <span class="quality-badge quality-up" title="Increasing this generally improves decision quality.">
+                    <i class="ti ti-arrow-up" aria-hidden="true"></i>
+                  </span>
+                </span>
+                <div class="slider-row">
+                  <input id="k" type="range" min="1" max="5" step="1" value="3" />
+                  <span class="slider-val" id="k-value">3</span>
+                </div>
+              </label>
+            </div>
+            <div class="field">
+              <label class="slider-field" title="Controls how strongly feature attribution evidence is mapped to classes in the attribution sum strategy.">
+                <span class="param-label">
+                  Feature-Class Sensitivity
+                  <span class="quality-badge quality-up" title="Increasing this generally improves decision quality.">
+                    <i class="ti ti-arrow-up" aria-hidden="true"></i>
+                  </span>
+                </span>
+                <div class="slider-row">
+                  <input id="scaling-factor" type="range" min="1" max="7" step="0.1" value="3" />
+                  <span class="slider-val" id="scaling-factor-value">3.0</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- <div class="ctrl-section">
+            <div class="ctrl-section-label">Execution</div>
+            <div class="field">
+              <label>Runs<input id="n-sessions" type="number" min="1" value="2" /></label>
+            </div>
+          </div> -->
+        </div>
+        <div class="resize-handle" id="resize-handle"></div>
+      </section>
+
+      <section class="work-area">
+        <div class="preview-pane">
+          <div class="pane-title">
+            <span id="instance-label">Instance</span>
+          </div>
+          <div class="iframe-wrap">
+            <iframe id="xai-frame" title="XAI instance preview"></iframe>
+          </div>
+        </div>
+
+        <div class="results-pane">
+          <div class="pane-title">
+            <span>AI Prediction</span>
+            <span id="status"></span>
+          </div>
+          <div class="prediction-summary" id="prediction-summary">
+            <div class="prediction-row">
+              <span class="prediction-label">
+                <span class="prediction-icon prediction-icon-simulation"><i class="ti ti-robot" aria-hidden="true"></i></span>
+                <span>Simulation</span>
+              </span>
+              <span class="prediction-value prediction-simulation" id="simulation-prediction">-</span>
+              <span class="prediction-confidence" id="simulation-confidence"></span>
+            </div>
+            <div class="prediction-row">
+              <span class="prediction-label">
+                <span class="prediction-icon prediction-icon-human"><i class="ti ti-user" aria-hidden="true"></i></span>
+                <span>Human</span>
+              </span>
+              <span class="prediction-value prediction-human" id="human-prediction">-</span>
+              <span class="prediction-confidence" id="human-confidence"></span>
+            </div>
+            <div class="prediction-row">
+              <span class="prediction-label">
+                <span class="prediction-icon prediction-icon-actual">AI</span>
+                <span>Actual</span>
+              </span>
+              <span class="prediction-value prediction-actual" id="actual-prediction">-</span>
+              <span class="prediction-confidence" id="actual-confidence"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      function updateSliderFill(el) {
+        const min = parseFloat(el.min), max = parseFloat(el.max), val = parseFloat(el.value);
+        const pct = ((val - min) / (max - min) * 100).toFixed(1) + '%';
+        el.style.setProperty('--fill', pct);
+      }
+
+      const sliders = [
+        ['retrieval-threshold', 'retrieval-threshold-value', v => parseFloat(v).toFixed(2)],
+        ['sensitivity',         'sensitivity-value',         v => parseFloat(v).toFixed(1)],
+        ['k',                   'k-value',                   v => parseInt(v)],
+        ['scaling-factor',      'scaling-factor-value',      v => parseFloat(v).toFixed(1)],
+      ];
+      sliders.forEach(([id, outId, fmt]) => {
+        const el = document.getElementById(id);
+        const out = document.getElementById(outId);
+        if (el && out) {
+          updateSliderFill(el);
+          el.addEventListener('input', () => {
+            out.textContent = fmt(el.value);
+            updateSliderFill(el);
+          });
+          out.textContent = fmt(el.value);
+        }
+      });
+    </script>
+    <script src="simulation_mockup/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XAI Interpretation Simulator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        background: #f5f4f0;
+        color: #1a1916;
+        font-family: 'DM Sans', sans-serif;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .tabs-shell {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        height: 100vh;
+      }
+
+      .tabs-bar {
+        align-items: center;
+        background: #fff;
+        border-bottom: 1px solid #e4e2dc;
+        display: flex;
+        gap: 8px;
+        padding: 10px 14px;
+      }
+
+      .tab-btn {
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        color: #6b6960;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 500;
+        padding: 6px 12px;
+      }
+
+      .tab-btn.active {
+        background: #eef3fd;
+        border-color: #c0d0f7;
+        color: #2f6de0;
+      }
+
+      .frame-wrap {
+        min-height: 0;
+      }
+
+      iframe {
+        border: 0;
+        display: none;
+        height: 100%;
+        width: 100%;
+      }
+
+      iframe.active {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="tabs-shell">
+      <nav class="tabs-bar" aria-label="Simulator views">
+        <button class="tab-btn active" type="button" data-tab="case">Case by Case</button>
+        <button class="tab-btn" type="button" data-tab="experiment">Experiment</button>
+      </nav>
+      <section class="frame-wrap">
+        <iframe class="active" id="case-frame" title="Case by case simulator" src="/api/case_by_case"></iframe>
+        <iframe id="experiment-frame" title="Experiment simulator" src="/api/global_statistics"></iframe>
+      </section>
+    </main>
+
+    <script>
+      const buttons = Array.from(document.querySelectorAll('.tab-btn'));
+      const frames = {
+        case: document.getElementById('case-frame'),
+        experiment: document.getElementById('experiment-frame'),
+      };
+      const aliases = {
+        cases: 'case',
+        case_by_case: 'case',
+        global_statistics: 'experiment',
+      };
+
+      function tabFromHash() {
+        const key = window.location.hash.replace(/^#/, '');
+        return frames[key] ? key : aliases[key];
+      }
+
+      function activateTab(tab, updateHash = true) {
+        const nextTab = frames[tab] ? tab : 'case';
+        buttons.forEach(item => item.classList.toggle('active', item.dataset.tab === nextTab));
+        Object.entries(frames).forEach(([key, frame]) => {
+          frame.classList.toggle('active', key === nextTab);
+        });
+        if (updateHash && window.location.hash !== `#${nextTab}`) {
+          history.replaceState(null, '', `#${nextTab}`);
+        }
+      }
+
+      buttons.forEach(button => {
+        button.addEventListener('click', () => {
+          activateTab(button.dataset.tab);
+        });
+      });
+      window.addEventListener('hashchange', () => activateTab(tabFromHash(), false));
+      activateTab(tabFromHash(), false);
+    </script>
+  </body>
+</html>

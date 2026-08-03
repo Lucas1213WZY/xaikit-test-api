@@ -1,0 +1,11 @@
+# Vendored CoAX datasets and generated outputs
+data/
+results/
+UI/xai_methods/*.csv
+UI/data/*.csv
+UI/model_predict_user/*.csv
+
+# Local/editor/runtime noise
+__pycache__/
+*.py[cod]
+.DS_Store

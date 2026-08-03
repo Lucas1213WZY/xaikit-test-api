@@ -1,0 +1,41 @@
+.git
+.gitignore
+**/__pycache__
+**/*.pyc
+.DS_Store
+**/.DS_Store
+
+# Notebooks and their outputs are development material, not part of the service.
+tutorials/
+UI/
+tests/
+tmp/
+file_formats/
+server_runs/
+
+# ---------------------------------------------------------------------------
+# Human participant data -- must NOT enter the image.
+#
+# An image layer travels wherever the image goes: a registry, a teammate's
+# laptop, the deploy host's disk. Anyone who can pull it can read every file in
+# it, whether or not the API ever serves that file. The study pipeline does not
+# read any of these paths, so they are excluded rather than trusted to stay
+# unserved. Verified by building the copy set without them and running the full
+# pipeline (see server/README.md, "What is not in the image").
+# ---------------------------------------------------------------------------
+
+# Raw participant responses from the CoAX and CoXAM studies.
+assets/human_data/
+assets/human_trials_and_cognitive_parameters/
+
+# Per-participant fitted parameters and trial-by-trial records, keyed by
+# Prolific participant id. The runner's FITTED_COAX_PARAMS holds the aggregate
+# means it derives from these, so the source rows are not needed at runtime.
+src/cognitive_models/CoAX/results/
+src/cognitive_models/CoAX/data/
+src/cognitive_models/CoXAM/datasets/
+src/cognitive_models/CoXAM/outputs/
+
+# The reference study's own UI and mockup server, not part of this service.
+src/cognitive_models/CoAX/UI/
+src/cognitive_models/CoAX/simulation_mockup/

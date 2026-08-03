@@ -1,0 +1,14 @@
+# Caddy obtains and renews the TLS certificate for XAIKIT_DOMAIN automatically,
+# then proxies to the study server. Point the domain's A record at this host
+# first -- certificate issuance verifies over port 80.
+{$XAIKIT_DOMAIN} {
+	encode gzip
+
+	reverse_proxy api:8000 {
+		# Stage endpoints return immediately, but /results on a large study can
+		# take a while to serialize; keep the proxy from cutting it off.
+		transport http {
+			read_timeout 600s
+		}
+	}
+}

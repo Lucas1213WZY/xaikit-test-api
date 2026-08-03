@@ -1,0 +1,7 @@
+# Per-study artifacts written by the study server (server/README.md).
+server_runs/
+
+# Raw human participant data — kept out of the repo.
+assets/human_data/
+src/cognitive_models/CoXAM/datasets/mushrooms and wine quality user data v0.1.csv
+src/cognitive_models/CoXAM/datasets/mushrooms and wine quality v0.2.jmp

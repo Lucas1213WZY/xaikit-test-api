@@ -1,0 +1,53 @@
+flowchart TD
+  AIDatasetLoader["AIDatasetLoader"] --> filter_by_app_and_model["filter_by_app_and_model"]
+  LogisticRegressionInterpreter["LogisticRegressionInterpreter"] --> LRExp["lr_exp"]
+  DecisionTreeInterpreter["DecisionTreeInterpreter"] --> DTExp["dt_exp"]
+
+  Chunk["Chunk"] --> DeclarativeMemory["DeclarativeMemory"]
+  DeclarativeMemory --> CombinedMemory["CombinedMemory"]
+  WorkingMemoryQueue["WorkingMemoryQueue"] --> CombinedMemory
+  remember_number_to_sf["remember_number_to_sf"] --> breakdown_number_to_sf["breakdown_number_to_sf"]
+  build_number_profile["build_number_profile"] --> CombinedMemory
+  retrieve_number_to_sf["retrieve_number_to_sf"] --> build_number_profile
+  retrieve_number_to_sf --> digits_to_value["digits_to_value"]
+
+  add_lr_calculation_to_memory["add_lr_calculation_to_memory"] --> remember_number_to_sf
+  lr_calculation["lr_calculation"] --> build_number_profile
+  lr_calculation --> lr_evidence["lr_evidence"]
+  lr_calculation --> drift_diffusion_decision["drift_diffusion_decision"]
+  cf_lr_calculation["cf_lr_calculation"] --> slider_step["slider_step"]
+  cf_lr_calculation --> snap_to_step["snap_to_step"]
+  cf_lr_calculation --> CombinedMemory
+  recall_change_lr["recall_change_lr"] --> CombinedMemory
+
+  add_lr_heuristic_to_memory["add_lr_heuristic_to_memory"] --> CombinedMemory
+  lr_heuristic["lr_heuristic"] --> _retrieve_lr_beliefs["_retrieve_lr_beliefs"]
+  _retrieve_lr_beliefs --> CombinedMemory
+  lr_heuristic --> lr_evidence
+  lr_heuristic --> drift_diffusion_decision
+  cf_lr_heuristic["cf_lr_heuristic"] --> _retrieve_lr_beliefs
+  cf_lr_heuristic --> slider_step
+  cf_lr_heuristic --> snap_to_step
+
+  add_dt_to_memory["add_dt_to_memory"] --> remember_number_to_sf
+  dt_traverse["dt_traverse"] --> build_number_profile
+  dt_traverse --> drift_diffusion_decision
+  refresh_dt_path_in_memory["refresh_dt_path_in_memory"] --> CombinedMemory
+  cf_change_path_dt["cf_change_path_dt"] --> build_number_profile
+  cf_change_path_dt --> drift_diffusion_decision
+  cf_change_path_dt --> slider_step
+  cf_change_path_dt --> snap_to_step
+  cf_change_path_dt --> CombinedMemory
+  recall_change_dt["recall_change_dt"] --> CombinedMemory
+  recall_change_dt --> slider_step
+  recall_change_dt --> snap_to_step
+
+  LRExp --> add_lr_calculation_to_memory
+  LRExp --> lr_calculation
+  LRExp --> add_lr_heuristic_to_memory
+  LRExp --> lr_heuristic
+  LRExp --> cf_lr_calculation
+  LRExp --> cf_lr_heuristic
+  DTExp --> add_dt_to_memory
+  DTExp --> dt_traverse
+  DTExp --> cf_change_path_dt

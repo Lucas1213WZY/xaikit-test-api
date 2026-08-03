@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XAI Interpretability Simulator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f5f4f0;
+    color: #1a1916;
+    min-height: 100vh;
+  }
+
+  .app-shell {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .app-shell.sidebar-collapsed {
+    grid-template-columns: 38px 1fr;
+  }
+
+  .control-panel {
+    background: #fff;
+    border-right: 1px solid #e4e2dc;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .app-shell.sidebar-collapsed .control-panel {
+    align-items: center;
+  }
+
+  .panel-header {
+    align-items: center;
+    border-bottom: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 98px;
+    justify-content: center;
+    padding: 16px 18px;
+    position: relative;
+    text-align: center;
+  }
+
+  .sidebar-toggle {
+    align-items: center;
+    background: #fafaf8;
+    border: 1px solid #e4e2dc;
+    border-radius: 6px;
+    color: #6b6960;
+    cursor: pointer;
+    display: inline-flex;
+    font-family: inherit;
+    height: 28px;
+    justify-content: center;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    transition: background .15s, color .15s, border-color .15s;
+    width: 28px;
+  }
+
+  .sidebar-toggle:hover {
+    background: #e2e0da;
+    border-color: #bbb8af;
+    color: #1a1916;
+  }
+
+  .sidebar-toggle i {
+    font-size: 16px;
+  }
+
+  .app-shell.sidebar-collapsed .panel-header {
+    align-items: center;
+    border-bottom: none;
+    height: 100%;
+    justify-content: flex-start;
+    padding: 16px 0 0;
+    width: 38px;
+  }
+
+  .app-shell.sidebar-collapsed .panel-header h1,
+  .app-shell.sidebar-collapsed #run-btn,
+  .app-shell.sidebar-collapsed .control-scroll {
+    display: none;
+  }
+
+  .app-shell.sidebar-collapsed .sidebar-toggle {
+    background: #ecebe7;
+    border-color: #d0cec6;
+    color: #6b6960;
+    position: static;
+  }
+
+  .app-shell.sidebar-collapsed .sidebar-toggle:hover {
+    background: #e2e0da;
+    border-color: #bbb8af;
+    color: #1a1916;
+  }
+
+  .panel-header h1 {
+    color: #1a1916;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  #run-btn {
+    align-items: center;
+    background: #eef3fd;
+    border: 1px solid #c0d0f7;
+    border-radius: 6px;
+    color: #2f6de0;
+    cursor: pointer;
+    display: flex;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 500;
+    gap: 5px;
+    justify-content: center;
+    line-height: 1;
+    min-height: 29px;
+    padding: 5px 12px;
+    transition: all 0.15s;
+    width: 190px;
+  }
+  #run-btn:hover { background: #dce9fc; border-color: #a0b8f2; }
+  #run-btn:active { transform: scale(0.97); }
+  #run-btn:disabled { color: #8b98b0; cursor: not-allowed; opacity: 0.75; }
+  #run-btn.loading .run-play-icon { display: none; }
+  #run-btn:not(.loading) .run-spinner { display: none; }
+  #run-btn .run-play-icon {
+    font-size: 10px;
+    line-height: 1;
+  }
+  .run-spinner {
+    animation: runSpin 0.75s linear infinite;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    height: 12px;
+    width: 12px;
+  }
+  @keyframes runSpin { to { transform: rotate(360deg); } }
+
+  .control-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 18px 24px;
+  }
+
+  .ctrl-section { margin-bottom: 20px; }
+
+  .ctrl-section-label {
+    color: #a8a59e;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .field { margin-bottom: 10px; }
+
+  .field label {
+    color: #6b6960;
+    display: flex;
+    flex-direction: column;
+    font-size: 16px;
+    gap: 5px;
+  }
+
+  .meta-list {
+    display: grid;
+    gap: 10px;
+  }
+
+  .meta-row {
+    display: grid;
+    grid-template-columns: 112px 1fr;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #e4e2dc;
+  }
+
+  .meta-row:last-child { border-bottom: none; }
+
+  .meta-label {
+    color: #a8a59e;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .meta-value {
+    color: #1a1916;
+    font-size: 16px;
+    line-height: 1.35;
+  }
+
+  .meta-value div + div { margin-top: 4px; }
+
+  .iv-list {
+    margin-left: 16px;
+  }
+
+  .iv-list li {
+    padding-left: 2px;
+  }
+
+  .iv-list li + li {
+    margin-top: 8px;
+  }
+
+  .iv-list strong {
+    font-weight: 500;
+  }
+
+  .iv-levels {
+    color: #6b6960;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .meta-value.mono {
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+  }
+
+  #app-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: #fafaf8;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23a8a59e'/%3E%3C/svg%3E");
+    background-position: right 10px center;
+    background-repeat: no-repeat;
+    border: 1px solid #e4e2dc;
+    border-radius: 6px;
+    color: #1a1916;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 18px;
+    outline: none;
+    padding: 7px 28px 7px 10px;
+    transition: border-color .15s, box-shadow .15s;
+    width: 100%;
+  }
+  #app-select:hover { border-color: #d0cec6; }
+  #app-select:focus { border-color: #c0d0f7; box-shadow: 0 0 0 3px #eef3fd; }
+
+  .work-area {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-height: 0;
+    min-width: 0;
+    overflow: auto;
+  }
+
+  #spinner-wrap {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin: 14px auto 0;
+  }
+  .spinner {
+    width: 34px; height: 34px;
+    border: 3px solid #e0ddd8;
+    border-top-color: #1a1a1a;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #spinner-wrap p { font-size: 13px; color: #999; }
+
+  #chart-section {
+    display: none;
+    width: 100%;
+    max-width: none;
+    margin-top: 0;
+    background: #fff;
+    border-top: 1px solid #e4e2dc;
+    overflow-x: auto;
+    padding: 18px 18px 18px;
+    animation: fadeUp 0.5s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header,
+  .chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .section-header {
+    border-bottom: 1px solid #e4e2dc;
+    margin: -16px -18px 12px;
+    padding: 9px 18px;
+  }
+
+  .chart-header {
+    border-bottom: 1px solid #e4e2dc;
+    margin: -18px -18px 14px;
+    padding: 9px 18px;
+  }
+
+  .section-title {
+    color: #6b6960;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  #legend {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1916;
+  }
+  #legend > span {
+    align-items: center;
+    background: #fafaf8;
+    border: 1px solid #e4e2dc;
+    border-radius: 999px;
+    display: flex;
+    gap: 8px;
+    padding: 6px 12px;
+  }
+  .swatch {
+    align-items: center;
+    border-radius: 5px;
+    display: inline-flex;
+    height: 18px;
+    justify-content: center;
+    width: 18px;
+  }
+
+  .charts-wrapper {
+    align-items: stretch;
+    display: flex;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .charts-block {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 860px;
+  }
+
+  .y-labels {
+    display: grid;
+    flex-shrink: 0;
+    grid-template-rows: 146px 1fr;
+    margin-right: 6px;
+    padding-bottom: 122px;
+    padding-top: 29px;
+  }
+
+  .y-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 15px;
+    color: #888;
+    align-self: center;
+    justify-self: center;
+    white-space: nowrap;
+  }
+
+  .charts-inner { flex: 1; display: flex; min-width: 820px; }
+  .chart-col { flex: 1; display: flex; flex-direction: column; }
+
+  .col-label {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #666;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+  }
+
+  .canvas-wrap {
+    height: min(55vh, 486px);
+    min-height: 398px;
+    min-width: 0;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+  }
+
+  .canvas-wrap canvas {
+    height: 100% !important;
+    width: 100% !important;
+  }
+
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    background: #f0ede8;
+    border-radius: 8px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .toggle-btn {
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+  .toggle-btn.active {
+    background: #fff;
+    color: #1a1a1a;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .divider {
+    display: none;
+  }
+
+  #stats-table {
+    background: #fff !important;
+    border: none !important;
+    border-bottom: 1px solid #e4e2dc !important;
+    border-radius: 0 !important;
+    margin-top: 0 !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    padding: 16px 18px 12px !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+  }
+
+  #stats-table table {
+    font-size: 14px !important;
+    min-width: 780px;
+  }
+
+  #stats-table th,
+  #stats-table td {
+    padding: 4px 6px !important;
+  }
+
+  #stats-table p {
+    margin-top: 6px !important;
+    font-size: 13px !important;
+  }
+
+  @media (max-width: 760px) {
+    .app-shell { grid-template-columns: 1fr; }
+    .app-shell.sidebar-collapsed { grid-template-columns: 38px 1fr; }
+    .control-panel { border-right: none; border-bottom: 1px solid #e4e2dc; }
+    .chart-col { min-width: 390px; }
+    .divider { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<main class="app-shell">
+  <section class="control-panel">
+    <div class="panel-header">
+      <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Collapse sidebar" aria-expanded="true" onclick="toggleSidebar()">
+        <i class="ti ti-layout-sidebar-left-collapse" aria-hidden="true"></i>
+      </button>
+      <h1>XAI Interpretation Simulator</h1>
+      <button id="run-btn" onclick="handleRun()" type="button">
+        <i class="ti ti-player-play-filled run-play-icon" aria-hidden="true"></i>
+        <span class="run-spinner" aria-hidden="true"></span>
+        <span class="run-label">Run Experiment</span>
+      </button>
+    </div>
+
+    <div class="control-scroll">
+      <div class="ctrl-section">
+        <div class="ctrl-section-label">Data</div>
+        <div class="field">
+          <label>Dataset<select id="app-select" onchange="switchApp()"></select></label>
+        </div>
+      </div>
+
+      <div class="ctrl-section">
+          <div class="ctrl-section-label">Experiment Design</div>
+          <div class="meta-list">
+            <div class="meta-row">
+            <div class="meta-label">Independent Variables</div>
+            <div class="meta-value">
+              <ol class="iv-list">
+                <li>
+                  <strong>Reasoning</strong>
+                  <span class="iv-levels">Sensitive-features categorization, Salient-features categorization, Importance categorization, Attribution Sum</span>
+                </li>
+                <li>
+                  <strong>XAI Type</strong>
+                  <span class="iv-levels">None, Importance, Attribution</span>
+                </li>
+                <li>
+                  <strong>Testing Condition</strong>
+                  <span class="iv-levels">w/ XAI, w/o XAI</span>
+                </li>
+              </ol>
+            </div>
+          </div>
+          <div class="meta-row">
+            <div class="meta-label">Dependent Variables</div>
+            <div class="meta-value">Decision Quality</div>
+          </div>
+          <div class="meta-row">
+            <div class="meta-label">Number of Participants</div>
+            <div class="meta-value mono" id="meta-participants">-</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="work-area">
+    <div id="spinner-wrap">
+      <div class="spinner"></div>
+    </div>
+
+    <div id="chart-section">
+  <div class="chart-header">
+    <div class="section-title">CoAX vs. Human Prevalence and Accuracy</div>
+  </div>
+
+  <div id="legend">
+    <span>
+      <span class="swatch" style="background:#E87B2F;">
+        <i class="ti ti-user" style="font-size:13px; color:#fff;" aria-hidden="true"></i>
+      </span>
+      Human
+    </span>
+    <span>
+      <span class="swatch" style="background:#2868C8;">
+        <i class="ti ti-robot" style="font-size:13px; color:#fff;" aria-hidden="true"></i>
+      </span>
+      CoAX
+    </span>
+  </div>
+
+  <div class="charts-block">
+    <div class="charts-wrapper">
+      <div class="y-labels">
+        <div class="y-label">Prevalence</div>
+        <div class="y-label">Correct Label</div>
+      </div>
+      <div class="charts-inner">
+        <div class="chart-col">
+          <div class="col-label">w/o XAI</div>
+          <div class="canvas-wrap">
+            <canvas id="chartLeft" role="img" aria-label="Accuracy without XAI by XAI type"></canvas>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="chart-col">
+          <div class="col-label">w/ XAI</div>
+          <div class="canvas-wrap">
+            <canvas id="chartRight" role="img" aria-label="Accuracy with XAI by XAI type"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ============================================================
+   HARDCODED DATA — edit this to update the chart
+   Columns: appId, XAIType, "Tested w/ XAI", Agent, Strategy,
+            Prevalence, "Mean(Accuracy)", "Std Err(Accuracy)", "N Rows"
+   ============================================================ */
+const RAW_DATA = [
+  { appId:'adult income',        XAIType:'None',        'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Sensitive-features categorization', Prevalence:1,            'Mean(Accuracy)':0.7287581699, 'Std Err(Accuracy)':0.0412237772 },
+  { appId:'adult income',        XAIType:'None',        'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Sensitive-features categorization', Prevalence:null,         'Mean(Accuracy)':0.6472222222, 'Std Err(Accuracy)':0.0244910591 },
+  { appId:'adult income',        XAIType:'None',        'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Sensitive-features categorization', Prevalence:1,            'Mean(Accuracy)':0.7398989899, 'Std Err(Accuracy)':0.0284047482 },
+  { appId:'adult income',        XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Sensitive-features categorization', Prevalence:0.1909090909, 'Mean(Accuracy)':0.7407407407, 'Std Err(Accuracy)':0.0217993271 },
+  { appId:'adult income',        XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Salient-features categorization',  Prevalence:0.3454545455, 'Mean(Accuracy)':0.7660818713, 'Std Err(Accuracy)':0.0229681485 },
+  { appId:'adult income',        XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Attribution Sum',                  Prevalence:0.4636363636, 'Mean(Accuracy)':0.7919389978, 'Std Err(Accuracy)':0.0125286539 },
+  { appId:'adult income',        XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Sensitive-features categorization', Prevalence:null,         'Mean(Accuracy)':0.6907407407, 'Std Err(Accuracy)':0.0147548275 },
+  { appId:'adult income',        XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Salient-features categorization',  Prevalence:null,         'Mean(Accuracy)':0.6194444444, 'Std Err(Accuracy)':0.0283513578 },
+  { appId:'adult income',        XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Attribution Sum',                  Prevalence:null,         'Mean(Accuracy)':0.712037037,  'Std Err(Accuracy)':0.0235055424 },
+  { appId:'adult income',        XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Sensitive-features categorization', Prevalence:0.2162162162, 'Mean(Accuracy)':0.7361111111, 'Std Err(Accuracy)':0.0377226201 },
+  { appId:'adult income',        XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Salient-features categorization',  Prevalence:0.3693693694, 'Mean(Accuracy)':0.8292682927, 'Std Err(Accuracy)':0.0379379597 },
+  { appId:'adult income',        XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Importance categorization',        Prevalence:0.045045045,  'Mean(Accuracy)':0.8333333333, 'Std Err(Accuracy)':0.0496903995 },
+  { appId:'adult income',        XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Attribution Sum',                  Prevalence:0.3693693694, 'Mean(Accuracy)':0.9214092141, 'Std Err(Accuracy)':0.0226230459 },
+  { appId:'adult income',        XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'CoAX',  Strategy:'Sensitive-features categorization', Prevalence:null,         'Mean(Accuracy)':0.6212962963, 'Std Err(Accuracy)':0.0219848164 },
+  { appId:'adult income',        XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'CoAX',  Strategy:'Salient-features categorization',  Prevalence:null,         'Mean(Accuracy)':0.9064814815, 'Std Err(Accuracy)':0.0357738781 },
+  { appId:'adult income',        XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'CoAX',  Strategy:'Importance categorization',        Prevalence:null,         'Mean(Accuracy)':0.6842592593, 'Std Err(Accuracy)':0.0170810207 },
+  { appId:'adult income',        XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'CoAX',  Strategy:'Attribution Sum',                  Prevalence:null,         'Mean(Accuracy)':0.9351851852, 'Std Err(Accuracy)':0.0250702622 },
+  { appId:'adult income',        XAIType:'Attribution', 'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Sensitive-features categorization', Prevalence:0.3541666667, 'Mean(Accuracy)':0.8202614379, 'Std Err(Accuracy)':0.0335266087 },
+  { appId:'adult income',        XAIType:'Attribution', 'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Attribution Sum',                  Prevalence:0.6458333333, 'Mean(Accuracy)':0.8297491039, 'Std Err(Accuracy)':0.0131204338 },
+  { appId:'adult income',        XAIType:'Attribution', 'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Sensitive-features categorization', Prevalence:null,         'Mean(Accuracy)':0.7231481481, 'Std Err(Accuracy)':0.0236934495 },
+  { appId:'adult income',        XAIType:'Attribution', 'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Attribution Sum',                  Prevalence:null,         'Mean(Accuracy)':0.7648148148, 'Std Err(Accuracy)':0.0092974945 },
+  { appId:'adult income',        XAIType:'Attribution', 'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Attribution Sum',                  Prevalence:1,            'Mean(Accuracy)':0.8664529915, 'Std Err(Accuracy)':0.0134100996 },
+  { appId:'adult income',        XAIType:'Attribution', 'Tested w/ XAI':'w/ XAI',  Agent:'CoAX',  Strategy:'Attribution Sum',                  Prevalence:null,         'Mean(Accuracy)':0.8175925926, 'Std Err(Accuracy)':0.0115097189 },
+
+  { appId:'forest_cover', XAIType:'None',        'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Sensitive-features categorization', Prevalence:1,            'Mean(Accuracy)':0.5666666667, 'Std Err(Accuracy)':0.0247140896 },
+  { appId:'forest_cover', XAIType:'None',        'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Sensitive-features categorization', Prevalence:null,         'Mean(Accuracy)':0.5175925926, 'Std Err(Accuracy)':0.0130821469 },
+  { appId:'forest_cover', XAIType:'None',        'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Sensitive-features categorization', Prevalence:1,            'Mean(Accuracy)':0.6574074074, 'Std Err(Accuracy)':0.0281385433 },
+  { appId:'forest_cover', XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Sensitive-features categorization', Prevalence:0.3894736842, 'Mean(Accuracy)':0.6156156156, 'Std Err(Accuracy)':0.0185658028 },
+  { appId:'forest_cover', XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Salient-features categorization',  Prevalence:0.3684210526, 'Mean(Accuracy)':0.6206349206, 'Std Err(Accuracy)':0.0185709098 },
+  { appId:'forest_cover', XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Attribution Sum',                  Prevalence:0.2421052632, 'Mean(Accuracy)':0.6425120773, 'Std Err(Accuracy)':0.0151546972 },
+  { appId:'forest_cover', XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Sensitive-features categorization', Prevalence:null,         'Mean(Accuracy)':0.5462962963, 'Std Err(Accuracy)':0.0131396461 },
+  { appId:'forest_cover', XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Salient-features categorization',  Prevalence:null,         'Mean(Accuracy)':0.5537037037, 'Std Err(Accuracy)':0.0197962757 },
+  { appId:'forest_cover', XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Attribution Sum',                  Prevalence:null,         'Mean(Accuracy)':0.562037037,  'Std Err(Accuracy)':0.0073774137 },
+  { appId:'forest_cover', XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Sensitive-features categorization', Prevalence:0.3689320388, 'Mean(Accuracy)':0.6081871345, 'Std Err(Accuracy)':0.0251392141 },
+  { appId:'forest_cover', XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Salient-features categorization',  Prevalence:0.213592233,  'Mean(Accuracy)':0.654040404,  'Std Err(Accuracy)':0.0280605659 },
+  { appId:'forest_cover', XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Importance categorization',        Prevalence:0.0388349515, 'Mean(Accuracy)':0.7361111111, 'Std Err(Accuracy)':0.0917788315 },
+  { appId:'forest_cover', XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Attribution Sum',                  Prevalence:0.3786407767, 'Mean(Accuracy)':0.7165242165, 'Std Err(Accuracy)':0.0196598581 },
+  { appId:'forest_cover', XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'CoAX',  Strategy:'Sensitive-features categorization', Prevalence:null,         'Mean(Accuracy)':0.5944444444, 'Std Err(Accuracy)':0.0286144743 },
+  { appId:'forest_cover', XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'CoAX',  Strategy:'Salient-features categorization',  Prevalence:null,         'Mean(Accuracy)':0.5546296296, 'Std Err(Accuracy)':0.0214952669 },
+  { appId:'forest_cover', XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'CoAX',  Strategy:'Importance categorization',        Prevalence:null,         'Mean(Accuracy)':0.5648148148, 'Std Err(Accuracy)':0.0352959204 },
+  { appId:'forest_cover', XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'CoAX',  Strategy:'Attribution Sum',                  Prevalence:null,         'Mean(Accuracy)':0.7185185185, 'Std Err(Accuracy)':0.0180036996 },
+  { appId:'forest_cover', XAIType:'Attribution', 'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Sensitive-features categorization', Prevalence:0.6833333333, 'Mean(Accuracy)':0.5636856369, 'Std Err(Accuracy)':0.022588527  },
+  { appId:'forest_cover', XAIType:'Attribution', 'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Attribution Sum',                  Prevalence:0.3166666667, 'Mean(Accuracy)':0.6140350877, 'Std Err(Accuracy)':0.0270281182 },
+  { appId:'forest_cover', XAIType:'Attribution', 'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Sensitive-features categorization', Prevalence:null,         'Mean(Accuracy)':0.562037037,  'Std Err(Accuracy)':0.0166711006 },
+  { appId:'forest_cover', XAIType:'Attribution', 'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Attribution Sum',                  Prevalence:null,         'Mean(Accuracy)':0.637962963,  'Std Err(Accuracy)':0.0106116455 },
+  { appId:'forest_cover', XAIType:'Attribution', 'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Attribution Sum',                  Prevalence:1,            'Mean(Accuracy)':0.9468253968, 'Std Err(Accuracy)':0.0088609316 },
+  { appId:'forest_cover', XAIType:'Attribution', 'Tested w/ XAI':'w/ XAI',  Agent:'CoAX',  Strategy:'Attribution Sum',                  Prevalence:null,         'Mean(Accuracy)':0.9722222222, 'Std Err(Accuracy)':0.0058053669 },
+
+  { appId:'wine_quality', XAIType:'None',        'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Sensitive-features categorization', Prevalence:1,            'Mean(Accuracy)':0.6929824561, 'Std Err(Accuracy)':0.0380865959 },
+  { appId:'wine_quality', XAIType:'None',        'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Sensitive-features categorization', Prevalence:null,         'Mean(Accuracy)':0.5984444444, 'Std Err(Accuracy)':0.0217639594 },
+  { appId:'wine_quality', XAIType:'None',        'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Sensitive-features categorization', Prevalence:1,            'Mean(Accuracy)':0.6714975845, 'Std Err(Accuracy)':0.0364508098 },
+  { appId:'wine_quality', XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Sensitive-features categorization', Prevalence:0.243697479,  'Mean(Accuracy)':0.6436781609, 'Std Err(Accuracy)':0.0297618261 },
+  { appId:'wine_quality', XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Salient-features categorization',  Prevalence:0.4369747899, 'Mean(Accuracy)':0.702991453,  'Std Err(Accuracy)':0.0190483499 },
+  { appId:'wine_quality', XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Attribution Sum',                  Prevalence:0.3193277311, 'Mean(Accuracy)':0.7777777778, 'Std Err(Accuracy)':0.0221747557 },
+  { appId:'wine_quality', XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Sensitive-features categorization', Prevalence:null,         'Mean(Accuracy)':0.5824074074, 'Std Err(Accuracy)':0.018763545  },
+  { appId:'wine_quality', XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Salient-features categorization',  Prevalence:null,         'Mean(Accuracy)':0.65,         'Std Err(Accuracy)':0.0299768133 },
+  { appId:'wine_quality', XAIType:'Importance',  'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Attribution Sum',                  Prevalence:null,         'Mean(Accuracy)':0.7759259259, 'Std Err(Accuracy)':0.0223627951 },
+  { appId:'wine_quality', XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Sensitive-features categorization', Prevalence:0.3524590164, 'Mean(Accuracy)':0.6033591731, 'Std Err(Accuracy)':0.0259870298 },
+  { appId:'wine_quality', XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Salient-features categorization',  Prevalence:0.1803278689, 'Mean(Accuracy)':0.648989899,  'Std Err(Accuracy)':0.0415782071 },
+  { appId:'wine_quality', XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Importance categorization',        Prevalence:0.0737704918, 'Mean(Accuracy)':0.5098765432, 'Std Err(Accuracy)':0.0317901235 },
+  { appId:'wine_quality', XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Attribution Sum',                  Prevalence:0.393442623,  'Mean(Accuracy)':0.7615740741, 'Std Err(Accuracy)':0.0216280857 },
+  { appId:'wine_quality', XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'CoAX',  Strategy:'Sensitive-features categorization', Prevalence:null,         'Mean(Accuracy)':0.5277777778, 'Std Err(Accuracy)':0.0140948962 },
+  { appId:'wine_quality', XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'CoAX',  Strategy:'Salient-features categorization',  Prevalence:null,         'Mean(Accuracy)':0.5953703704, 'Std Err(Accuracy)':0.027671679  },
+  { appId:'wine_quality', XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'CoAX',  Strategy:'Importance categorization',        Prevalence:null,         'Mean(Accuracy)':0.4753703704, 'Std Err(Accuracy)':0.0286140816 },
+  { appId:'wine_quality', XAIType:'Importance',  'Tested w/ XAI':'w/ XAI',  Agent:'CoAX',  Strategy:'Attribution Sum',                  Prevalence:null,         'Mean(Accuracy)':0.812962963,  'Std Err(Accuracy)':0.0193430733 },
+  { appId:'wine_quality', XAIType:'Attribution', 'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Sensitive-features categorization', Prevalence:0.5,          'Mean(Accuracy)':0.653256705,  'Std Err(Accuracy)':0.0295230556 },
+  { appId:'wine_quality', XAIType:'Attribution', 'Tested w/ XAI':'w/o XAI', Agent:'Human', Strategy:'Attribution Sum',                  Prevalence:0.5,          'Mean(Accuracy)':0.7624521073, 'Std Err(Accuracy)':0.0243345654 },
+  { appId:'wine_quality', XAIType:'Attribution', 'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Sensitive-features categorization', Prevalence:null,         'Mean(Accuracy)':0.5907407407, 'Std Err(Accuracy)':0.0175648433 },
+  { appId:'wine_quality', XAIType:'Attribution', 'Tested w/ XAI':'w/o XAI', Agent:'CoAX',  Strategy:'Attribution Sum',                  Prevalence:null,         'Mean(Accuracy)':0.7268518519, 'Std Err(Accuracy)':0.0141628994 },
+  { appId:'wine_quality', XAIType:'Attribution', 'Tested w/ XAI':'w/ XAI',  Agent:'Human', Strategy:'Attribution Sum',                  Prevalence:1,            'Mean(Accuracy)':0.8444444444, 'Std Err(Accuracy)':0.0163668298 },
+  { appId:'wine_quality', XAIType:'Attribution', 'Tested w/ XAI':'w/ XAI',  Agent:'CoAX',  Strategy:'Attribution Sum',                  Prevalence:null,         'Mean(Accuracy)':0.7981481481, 'Std Err(Accuracy)':0.0080939799 },
+];
+
+/* ============================================================
+   Everything below is chart logic — no need to edit
+   ============================================================ */
+
+let chartLeft = null, chartRight = null;
+let currentView = 'grouped'; /* 'simple' = by XAI type, 'grouped' = by strategy */
+const BAR_WIDTH = 18;
+let chartRenderState = 'empty';
+
+const DATASET_STATS = {
+  'adult income': { participants: 103 },
+  adult: { participants: 103 },
+  forest_cover: { participants: 113 },
+  mushrooms: { participants: 57 },
+  wine_quality: { participants: 119 },
+};
+
+function setView(view) {
+  currentView = view;
+  document.getElementById('btn-simple').classList.toggle('active', view === 'simple');
+  document.getElementById('btn-grouped').classList.toggle('active', view === 'grouped');
+  const appId = document.getElementById('app-select').value;
+  drawCharts(appId);
+}
+
+/* ── data helpers ── */
+function getRows(data, appId, xaiType, cond, agent, strategy) {
+  return data.filter(r =>
+    (appId === 'all' || r.appId === appId) &&
+    r.XAIType === xaiType &&
+    r['Tested w/ XAI'] === cond &&
+    r.Agent === agent &&
+    r.Strategy === strategy
+  );
+}
+
+function rowMean(rows, key) {
+  const vals = rows.map(r => r[key]).filter(v => v != null && !isNaN(v));
+  return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+}
+
+function strategyLabel(s) { return s; }
+
+function formatPct(value) {
+  return `${Math.round(value * 100)}%`;
+}
+
+function splitVerticalLabel(label) {
+  if (!label || label.length <= 18) return [label];
+  const words = label.split(' ');
+  if (words.length < 2) return [label];
+  return [words.slice(0, -1).join(' '), words[words.length - 1]];
+}
+
+/* ── error-bar plugin ── */
+const errorBarPlugin = {
+  id: 'errorBar',
+  afterDraw(chart) {
+    const { ctx } = chart;
+    chart.data.datasets.forEach((ds, di) => {
+      if (!ds._errBars) return;
+      const meta = chart.getDatasetMeta(di);
+      meta.data.forEach((bar, i) => {
+        const err = ds._errBars[i];
+        const val = ds.data[i];
+        if (err == null || val == null) return;
+        const drawnTop = bar.y;
+        const baseline = chart.scales.y.getPixelForValue(0);
+        const fullTop  = chart.scales.y.getPixelForValue(val);
+        const progress = baseline === fullTop ? 1 : (baseline - drawnTop) / (baseline - fullTop);
+        const errPx = chart.scales.y.getPixelForValue(val - err) - chart.scales.y.getPixelForValue(val);
+        const x = bar.x, hw = 4;
+        const top = drawnTop - errPx * progress;
+        const bot = drawnTop + errPx * progress;
+        ctx.save();
+        ctx.strokeStyle = 'rgba(40,40,40,0.6)'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(x,top); ctx.lineTo(x,bot); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-hw,top); ctx.lineTo(x+hw,top); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x-hw,bot); ctx.lineTo(x+hw,bot); ctx.stroke();
+        ctx.restore();
+      });
+    });
+  }
+};
+
+/* ── build chart data for one panel (cond = 'w/o XAI' or 'w/ XAI') ── */
+function buildChartData(appId, cond) {
+  const xaiTypes = ['None', 'Importance', 'Attribution'];
+
+  /* collect all (xaiType, strategy) pairs that have data, preserving order */
+  const strategyOrder = [
+    'Sensitive-features categorization',
+    'Salient-features categorization',
+    'Importance categorization',
+    'Attribution Sum',
+  ];
+
+  const groups = []; /* { xaiType, strategy, label } */
+  xaiTypes.forEach(xaiType => {
+    if (xaiType === 'None' && cond === 'w/ XAI') {
+      /* placeholder: None has no data for w/ XAI */
+      const placeholderStrategy = 'Sensitive-features categorization';
+      groups.push({ xaiType, strategy: null, label: strategyLabel(placeholderStrategy) });
+      return;
+    }
+    strategyOrder.forEach(strat => {
+      const hasData = RAW_DATA.some(r =>
+        (appId === 'all' || r.appId === appId) &&
+        r.XAIType === xaiType &&
+        r['Tested w/ XAI'] === cond &&
+        r.Strategy === strat
+      );
+      /* Always include all 4 strategies for Importance group so columns align */
+      if (xaiType === 'Importance') {
+        groups.push({ xaiType, strategy: hasData ? strat : null, label: strategyLabel(strat) });
+      } else if (xaiType === 'Attribution' && ['Sensitive-features categorization', 'Attribution Sum'].includes(strat)) {
+        groups.push({ xaiType, strategy: strat, label: strategyLabel(strat) });
+      } else {
+        if (hasData) groups.push({ xaiType, strategy: strat });
+      }
+    });
+  });
+
+  const labels = groups.map(g => g.label || (g.strategy ? strategyLabel(g.strategy) : ''));
+
+  /* xaiType boundary lines — record where each xaiType group starts */
+  const xaiTypeBoundaries = []; /* { xaiType, startIdx, endIdx } */
+  let i = 0;
+  while (i < groups.length) {
+    const xt = groups[i].xaiType;
+    const start = i;
+    while (i < groups.length && groups[i].xaiType === xt) i++;
+    xaiTypeBoundaries.push({ xaiType: xt, startIdx: start, endIdx: i - 1 });
+  }
+
+  const agentsCfg = [
+    { key: 'Human', color: '#E87B2F' },
+    { key: 'CoAX',  color: '#2868C8' },
+  ];
+
+  const datasets = agentsCfg.map(cfg => {
+    const means = [], errs = [];
+    groups.forEach(g => {
+      if (g.strategy === null) { means.push(null); errs.push(null); return; }
+      const rows = getRows(RAW_DATA, appId, g.xaiType, cond, cfg.key, g.strategy);
+      const m = rowMean(rows, 'Mean(Accuracy)');
+      const e = rowMean(rows, 'Std Err(Accuracy)');
+      means.push(m !== null ? parseFloat((m*100).toFixed(2)) : null);
+      errs.push(e !== null ? parseFloat((e*100*1.96).toFixed(2)) : null);
+    });
+    return {
+      label: cfg.key, data: means, _errBars: errs,
+      backgroundColor: cfg.color, borderColor: cfg.color,
+      barThickness: BAR_WIDTH,
+      maxBarThickness: BAR_WIDTH,
+      borderWidth: 0, borderRadius: 3, borderSkipped: false,
+    };
+  });
+
+  return { labels, datasets, xaiTypeBoundaries, groups };
+}
+
+/* ── xaiType group label plugin ── */
+function makeGroupLabelPlugin(xaiTypeBoundaries) {
+  return {
+    id: 'groupLabel_' + Math.random(),
+    afterDraw(chart) {
+      const { ctx, chartArea, scales } = chart;
+      ctx.save();
+      ctx.font = '600 14px -apple-system, sans-serif';
+      ctx.fillStyle = '#555';
+      ctx.textAlign = 'center';
+
+      xaiTypeBoundaries.forEach(b => {
+        const xStart = scales.x.getPixelForTick(b.startIdx);
+        const xEnd   = scales.x.getPixelForTick(b.endIdx);
+        const cx = (xStart + xEnd) / 2;
+        const y  = chartArea.bottom + 146;
+        ctx.fillText(b.xaiType, cx, y);
+
+        /* bracket line */
+        ctx.strokeStyle = '#bbb'; ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(xStart - (scales.x.getPixelForTick(1)-scales.x.getPixelForTick(0))/2 + 2, chartArea.bottom + 134);
+        ctx.lineTo(xEnd   + (scales.x.getPixelForTick(1)-scales.x.getPixelForTick(0))/2 - 2, chartArea.bottom + 134);
+        ctx.stroke();
+      });
+      ctx.restore();
+    }
+  };
+}
+
+function makePrevalencePlugin(appId, cond, groups, { showBars = true, showAxis = true } = {}) {
+  return {
+    id: 'prevalence_' + Math.random(),
+    afterDraw(chart) {
+      const { ctx, chartArea, scales } = chart;
+      const bandTop = 18;
+      const bandBottom = chartArea.top - 18;
+      const bandHeight = Math.max(0, bandBottom - bandTop);
+      if (bandHeight < 28) return;
+
+      const xStep = groups.length > 1
+        ? Math.abs(scales.x.getPixelForTick(1) - scales.x.getPixelForTick(0))
+        : Math.max(26, chartArea.width * 0.45);
+      const humanBars = chart.getDatasetMeta(0)?.data || [];
+
+      ctx.save();
+      if (showAxis) {
+        ctx.strokeStyle = '#bdbdbd';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(chartArea.left, bandTop);
+        ctx.lineTo(chartArea.left, bandBottom);
+        ctx.stroke();
+
+        ctx.fillStyle = '#999';
+        ctx.font = '14px -apple-system, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        [0, 0.5, 1].forEach(value => {
+          const y = bandBottom - bandHeight * value;
+          ctx.fillText(formatPct(value), scales.y.right - 5, y);
+        });
+      }
+
+      if (!showBars) {
+        ctx.restore();
+        return;
+      }
+
+      ctx.strokeStyle = '#E87B2F';
+      ctx.fillStyle = '#1a1916';
+      ctx.lineWidth = 1.4;
+      ctx.font = '600 13px -apple-system, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+
+      groups.forEach((g, i) => {
+        if (!g.strategy) return;
+        const rows = getRows(RAW_DATA, appId, g.xaiType, cond, 'Human', g.strategy);
+        const prevalence = rowMean(rows, 'Prevalence');
+        if (prevalence === null) return;
+
+        const clamped = Math.max(0, Math.min(1, prevalence));
+        const humanBar = humanBars[i];
+        const x = humanBar?.x ?? scales.x.getPixelForTick(i) - xStep * 0.16;
+        const barWidth = BAR_WIDTH;
+        const h = Math.max(1, bandHeight * clamped);
+        const y = bandBottom - h;
+        ctx.strokeRect(x - barWidth / 2, y, barWidth, h);
+        ctx.fillText(formatPct(clamped), x, y - 3);
+      });
+
+      ctx.restore();
+    }
+  };
+}
+
+const accuracyMidlinePlugin = {
+  id: 'accuracyMidline',
+  afterDraw(chart) {
+    const { ctx, chartArea, scales } = chart;
+    if (!scales.y) return;
+    const y = scales.y.getPixelForValue(50);
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(chartArea.left, y);
+    ctx.lineTo(chartArea.right, y);
+    ctx.stroke();
+    ctx.restore();
+  }
+};
+
+function makeAccuracyAxisPlugin({ showAxis = true } = {}) {
+  return {
+    id: 'accuracyAxis_' + Math.random(),
+    afterDraw(chart) {
+      const { ctx, chartArea, scales } = chart;
+      if (!showAxis || !scales.y) return;
+
+      ctx.save();
+      ctx.strokeStyle = '#bdbdbd';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(chartArea.left, chartArea.top);
+      ctx.lineTo(chartArea.left, chartArea.bottom);
+      ctx.stroke();
+
+      ctx.fillStyle = '#999';
+      ctx.font = '14px -apple-system, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      [0, 25, 50, 75, 100].forEach(value => {
+        ctx.fillText(`${value}%`, chartArea.left - 5, scales.y.getPixelForValue(value));
+      });
+      ctx.restore();
+    }
+  };
+}
+
+/* ── custom vertical labels because Chart.js clips long rotated ticks ── */
+function makeReasoningLabelPlugin() {
+  return {
+    id: 'reasoningLabel_' + Math.random(),
+    afterDraw(chart) {
+      const { ctx, chartArea, scales } = chart;
+      ctx.save();
+      ctx.font = '600 13px -apple-system, sans-serif';
+      ctx.fillStyle = '#555';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+
+      chart.data.labels.forEach((label, i) => {
+        if (!label) return;
+        const lines = splitVerticalLabel(label);
+        const x = scales.x.getPixelForTick(i);
+        const y = chartArea.bottom + 10;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(-Math.PI / 2);
+        const lineGap = 12;
+        const start = -((lines.length - 1) * lineGap) / 2;
+        lines.forEach((line, lineIndex) => {
+          ctx.fillText(line, 0, start + lineIndex * lineGap);
+        });
+        ctx.restore();
+      });
+
+      ctx.restore();
+    }
+  };
+}
+
+/* ── make chart options ── */
+function makeOptions(xaiTypeBoundaries) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: { padding: { top: 146, right: 0, bottom: 154, left: 42 } },
+    animation: {
+      duration: 900, easing: 'easeOutQuart',
+      y: { from: ctx => ctx.chart.scales.y.getPixelForValue(0) }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          title: ctx => {
+            const idx = ctx[0].dataIndex;
+            const chart = ctx[0].chart;
+            return chart._groupsRef?.[idx]?.strategy || ctx[0].label;
+          },
+          label: ctx => {
+            if (ctx.raw === null) return ` Accuracy: N/A`;
+            return ` Accuracy: ${ctx.raw.toFixed(1)}%`;
+          },
+          afterLabel: ctx => {
+            const err = ctx.dataset._errBars?.[ctx.dataIndex];
+            return err != null ? ` 95% CI: ± ${err.toFixed(1)}%` : '';
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        min: 0, max: 100,
+        ticks: { display: false, stepSize:25 },
+        grid: { display:false },
+        border: { display:false }
+      },
+      x: {
+        ticks: {
+          display: false,
+        },
+        grid: { display:false },
+        border: { display:true, color:'#bdbdbd', width:1 }
+      }
+    }
+  };
+}
+
+/* ── vertical separator plugin between xaiType groups ── */
+function makeSeparatorPlugin(xaiTypeBoundaries) {
+  return {
+    id: 'separator_' + Math.random(),
+    afterDraw(chart) {
+      if (xaiTypeBoundaries.length < 2) return;
+      const { ctx, chartArea, scales } = chart;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4,3]);
+      for (let i = 1; i < xaiTypeBoundaries.length; i++) {
+        const idx = xaiTypeBoundaries[i].startIdx;
+        const prevIdx = idx - 1;
+        const x = (scales.x.getPixelForTick(prevIdx) + scales.x.getPixelForTick(idx)) / 2;
+        ctx.beginPath();
+        ctx.moveTo(x, chartArea.top);
+        ctx.lineTo(x, chartArea.bottom + 106);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+  };
+}
+
+/* ── simple view: average by XAI type (original) ── */
+function groupMeanSimple(data, appId, xaiType, cond, agent) {
+  const rows = data.filter(r =>
+    (appId === 'all' || r.appId === appId) &&
+    r.XAIType === xaiType &&
+    r['Tested w/ XAI'] === cond &&
+    r.Agent === agent
+  );
+  const means = rows.map(r => r['Mean(Accuracy)']).filter(v => v != null && !isNaN(v));
+  const errs  = rows.map(r => r['Std Err(Accuracy)']).filter(v => v != null && !isNaN(v));
+  const avg = arr => arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null;
+  return { mean: avg(means), stderr: avg(errs) };
+}
+
+function buildSimpleData(appId, cond) {
+  const xaiTypes = ['None', 'Importance', 'Attribution'];
+  const agentsCfg = [
+    { key: 'Human', color: '#E87B2F' },
+    { key: 'CoAX',  color: '#2868C8' },
+  ];
+  const datasets = agentsCfg.map(cfg => {
+    const means = [], errs = [];
+    xaiTypes.forEach(t => {
+      const r = groupMeanSimple(RAW_DATA, appId, t, cond, cfg.key);
+      means.push(r.mean !== null ? parseFloat((r.mean*100).toFixed(2)) : null);
+      errs.push(r.stderr !== null ? parseFloat((r.stderr*100).toFixed(2)) : null);
+    });
+    return {
+      label: cfg.key, data: means, _errBars: errs,
+      backgroundColor: cfg.color, borderColor: cfg.color,
+      barThickness: BAR_WIDTH,
+      maxBarThickness: BAR_WIDTH,
+      borderWidth: 0, borderRadius: 4, borderSkipped: false,
+    };
+  });
+  return { labels: xaiTypes, datasets };
+}
+
+function makeSimpleOptions() {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: { padding: { left: 42 } },
+    animation: {
+      duration: 900, easing: 'easeOutQuart',
+      y: { from: ctx => ctx.chart.scales.y.getPixelForValue(0) }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ctx.raw !== null ? ` Accuracy: ${ctx.raw.toFixed(1)}%` : ` Accuracy: N/A`,
+          afterLabel: ctx => {
+            const err = ctx.dataset._errBars?.[ctx.dataIndex];
+            return err != null ? ` 95% CI: ± ${err.toFixed(1)}%` : '';
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        min: 0, max: 100,
+        ticks: { display: false, stepSize:25 },
+        grid: { display:false },
+        border: { display:false }
+      },
+      x: {
+        ticks: { font:{size:14}, color:'#666' },
+        grid: { display:false },
+        border: { display:true, color:'#bdbdbd', width:1 }
+      }
+    }
+  };
+}
+
+/* ── draw / redraw both charts ── */
+function drawCharts(appId) {
+  chartRenderState = 'loaded';
+  if (chartLeft)  { chartLeft.destroy();  chartLeft  = null; }
+  if (chartRight) { chartRight.destroy(); chartRight = null; }
+
+  if (currentView === 'simple') {
+    ['w/o XAI','w/ XAI'].forEach((cond, ci) => {
+      const canvasId = ci === 0 ? 'chartLeft' : 'chartRight';
+      const { labels, datasets } = buildSimpleData(appId, cond);
+      const chart = new Chart(document.getElementById(canvasId), {
+        type: 'bar',
+        data: { labels, datasets },
+        options: makeSimpleOptions(),
+        plugins: [accuracyMidlinePlugin, makeAccuracyAxisPlugin({ showAxis: ci === 0 }), errorBarPlugin]
+      });
+      if (ci === 0) chartLeft = chart;
+      else chartRight = chart;
+    });
+  } else {
+    ['w/o XAI','w/ XAI'].forEach((cond, ci) => {
+      const canvasId = ci === 0 ? 'chartLeft' : 'chartRight';
+      const { labels, datasets, xaiTypeBoundaries, groups } = buildChartData(appId, cond);
+      const chart = new Chart(document.getElementById(canvasId), {
+        type: 'bar',
+        data: { labels, datasets },
+        options: makeOptions(xaiTypeBoundaries),
+        plugins: [accuracyMidlinePlugin, makeAccuracyAxisPlugin({ showAxis: ci === 0 }), errorBarPlugin, makePrevalencePlugin(appId, cond, groups, { showAxis: ci === 0 }), makeReasoningLabelPlugin(), makeGroupLabelPlugin(xaiTypeBoundaries), makeSeparatorPlugin(xaiTypeBoundaries)]
+      });
+      chart._groupsRef = groups;
+      if (ci === 0) chartLeft = chart;
+      else chartRight = chart;
+    });
+  }
+}
+
+function resizeCharts() {
+  const select = document.getElementById('app-select');
+  if (!select?.value || (!chartLeft && !chartRight)) return;
+
+  if (chartRenderState === 'loaded') drawCharts(select.value);
+  else drawEmptyCharts(select.value);
+}
+
+let resizeTimer = null;
+function scheduleChartResize() {
+  window.clearTimeout(resizeTimer);
+  resizeTimer = window.setTimeout(resizeCharts, 80);
+}
+
+function toggleSidebar() {
+  const shell = document.querySelector('.app-shell');
+  const button = document.getElementById('sidebar-toggle');
+  const icon = button?.querySelector('i');
+  if (!shell || !button || !icon) return;
+
+  const isCollapsed = shell.classList.toggle('sidebar-collapsed');
+  button.setAttribute('aria-expanded', String(!isCollapsed));
+  button.setAttribute('aria-label', isCollapsed ? 'Expand sidebar' : 'Collapse sidebar');
+  icon.className = isCollapsed
+    ? 'ti ti-layout-sidebar-left-expand'
+    : 'ti ti-layout-sidebar-left-collapse';
+  scheduleChartResize();
+}
+
+window.addEventListener('resize', scheduleChartResize);
+window.visualViewport?.addEventListener('resize', scheduleChartResize);
+
+if ('ResizeObserver' in window) {
+  const chartResizeObserver = new ResizeObserver(scheduleChartResize);
+  document.querySelectorAll('.canvas-wrap, .charts-wrapper, .chart-col').forEach(el => {
+    chartResizeObserver.observe(el);
+  });
+}
+
+let lastZoomSignature = '';
+function zoomSignature() {
+  const vv = window.visualViewport;
+  return [
+    window.devicePixelRatio,
+    window.innerWidth,
+    window.innerHeight,
+    vv?.width,
+    vv?.height,
+    vv?.scale
+  ].map(v => Math.round((v || 0) * 100) / 100).join('|');
+}
+
+window.setInterval(() => {
+  const nextSignature = zoomSignature();
+  if (lastZoomSignature && nextSignature !== lastZoomSignature) {
+    scheduleChartResize();
+  }
+  lastZoomSignature = nextSignature;
+}, 250);
+
+function placeStatsTable() {
+  const chartSection = document.getElementById('chart-section');
+  const statsTable = document.getElementById('stats-table');
+  if (chartSection && statsTable && statsTable.nextElementSibling !== chartSection) {
+    chartSection.parentElement.insertBefore(statsTable, chartSection);
+  }
+}
+
+function drawEmptyCharts(appId) {
+  chartRenderState = 'empty';
+  if (chartLeft)  { chartLeft.destroy();  chartLeft  = null; }
+  if (chartRight) { chartRight.destroy(); chartRight = null; }
+
+  ['w/o XAI','w/ XAI'].forEach((cond, ci) => {
+    const canvasId = ci === 0 ? 'chartLeft' : 'chartRight';
+    const { labels, xaiTypeBoundaries, groups } = buildChartData(appId, cond);
+    const datasets = [
+      { label: 'Human', data: labels.map(() => null), backgroundColor: '#E87B2F', borderColor: '#E87B2F', barThickness: BAR_WIDTH, maxBarThickness: BAR_WIDTH },
+      { label: 'CoAX', data: labels.map(() => null), backgroundColor: '#2868C8', borderColor: '#2868C8', barThickness: BAR_WIDTH, maxBarThickness: BAR_WIDTH },
+    ];
+    const chart = new Chart(document.getElementById(canvasId), {
+      type: 'bar',
+      data: { labels, datasets },
+      options: makeOptions(xaiTypeBoundaries),
+      plugins: [accuracyMidlinePlugin, makeAccuracyAxisPlugin({ showAxis: ci === 0 }), makePrevalencePlugin(appId, cond, groups, { showBars: false, showAxis: ci === 0 }), makeReasoningLabelPlugin(), makeGroupLabelPlugin(xaiTypeBoundaries), makeSeparatorPlugin(xaiTypeBoundaries)]
+    });
+    chart._groupsRef = groups;
+    if (ci === 0) chartLeft = chart;
+    else chartRight = chart;
+  });
+}
+
+function setStatsTableLoaded(isLoaded) {
+  const statsTable = document.getElementById('stats-table');
+  if (!statsTable) return;
+
+  statsTable.querySelectorAll('tbody tr').forEach(row => {
+    Array.from(row.cells).forEach((cell, index) => {
+      if (index === 0 || !cell.textContent.trim()) return;
+      if (!cell.dataset.loadedValue) cell.dataset.loadedValue = cell.textContent;
+      cell.textContent = isLoaded ? cell.dataset.loadedValue : '-';
+    });
+  });
+}
+
+function showEmptyResults({ loading = false } = {}) {
+  const spinner = document.getElementById('spinner-wrap');
+  const chartSection = document.getElementById('chart-section');
+  const statsTable = document.getElementById('stats-table');
+  const appId = document.getElementById('app-select').value;
+
+  placeStatsTable();
+  setStatsTableLoaded(false);
+  drawEmptyCharts(appId);
+  spinner.style.display = 'none';
+  statsTable.style.display = 'block';
+  chartSection.style.display = 'block';
+}
+
+function switchApp() {
+  updateDatasetStats();
+  showEmptyResults();
+}
+
+function appDisplayName(id) {
+  return id.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function formatCount(value) {
+  return Number.isFinite(value) ? value.toLocaleString() : '-';
+}
+
+function updateDatasetStats() {
+  const select = document.getElementById('app-select');
+  const stats = DATASET_STATS[select.value] || {};
+  document.getElementById('meta-participants').textContent = formatCount(stats.participants);
+}
+
+function populateAppSelect() {
+  const appIds = [...new Set(RAW_DATA.map(r => r.appId))].sort();
+  const select = document.getElementById('app-select');
+  select.innerHTML = '';
+  appIds.forEach(id => {
+    const opt = document.createElement('option');
+    opt.value = id;
+    opt.textContent = appDisplayName(id);
+    select.appendChild(opt);
+  });
+  updateDatasetStats();
+  return appIds;
+}
+
+function handleRun() {
+  const btn     = document.getElementById('run-btn');
+  const label   = btn.querySelector('.run-label');
+  const spinner = document.getElementById('spinner-wrap');
+  const chartSection = document.getElementById('chart-section');
+  const statsTable = document.getElementById('stats-table');
+  btn.disabled  = true;
+  btn.classList.add('loading');
+  const originalLabel = 'Run Experiment';
+  label.textContent = 'Thinking';
+  showEmptyResults({ loading: true });
+
+  setTimeout(() => {
+    const select = document.getElementById('app-select');
+    placeStatsTable();
+    setStatsTableLoaded(true);
+    spinner.style.display = 'none';
+    statsTable.style.display = 'block';
+    chartSection.style.display = 'block';
+    drawCharts(select.value);
+    label.textContent = originalLabel;
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }, 3000);
+}
+
+populateAppSelect();
+window.addEventListener('DOMContentLoaded', () => showEmptyResults());
+
+</script>
+
+  <!-- ── Stats Table ── -->
+  <div id="stats-table" style="display:none; width:100%; max-width:1200px; margin-top:32px; background:#fff; border-radius:14px; border:1px solid #e5e3de; padding:28px 32px; overflow-x:auto;">
+    <div class="section-header">
+      <div class="section-title">Fit of CoAX and Baselines</div>
+    </div>
+    <table style="width:100%; border-collapse:collapse; font-size:14px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; white-space:nowrap;">
+      <thead>
+        <tr>
+          <th style="border-bottom:1px solid #222; padding:6px 10px; text-align:left; font-weight:600;"></th>
+          <th colspan="4" style="border-bottom:1px solid #222; border-top:1px solid #222; padding:6px 10px; text-align:center; font-weight:600;">None XAI</th>
+          <th style="width:16px;"></th>
+          <th colspan="4" style="border-bottom:1px solid #222; border-top:1px solid #222; padding:6px 10px; text-align:center; font-weight:600;">Importance XAI</th>
+          <th style="width:16px;"></th>
+          <th colspan="4" style="border-bottom:1px solid #222; border-top:1px solid #222; padding:6px 10px; text-align:center; font-weight:600;">Attribution XAI</th>
+        </tr>
+        <tr>
+          <th style="padding:4px 10px; text-align:left; font-weight:500; color:#555;">Metric</th>
+          <th style="padding:4px 10px; text-align:center; font-weight:500; color:#555;">DT</th>
+          <th style="padding:4px 10px; text-align:center; font-weight:500; color:#555;">KNN</th>
+          <th style="padding:4px 10px; text-align:center; font-weight:500; color:#555;">MLP</th>
+          <th style="padding:4px 10px; text-align:center; font-weight:500; color:#555;">CoAX</th>
+          <th></th>
+          <th style="padding:4px 10px; text-align:center; font-weight:500; color:#555;">DT</th>
+          <th style="padding:4px 10px; text-align:center; font-weight:500; color:#555;">KNN</th>
+          <th style="padding:4px 10px; text-align:center; font-weight:500; color:#555;">MLP</th>
+          <th style="padding:4px 10px; text-align:center; font-weight:500; color:#555;">CoAX</th>
+          <th></th>
+          <th style="padding:4px 10px; text-align:center; font-weight:500; color:#555;">DT</th>
+          <th style="padding:4px 10px; text-align:center; font-weight:500; color:#555;">KNN</th>
+          <th style="padding:4px 10px; text-align:center; font-weight:500; color:#555;">MLP</th>
+          <th style="padding:4px 10px; text-align:center; font-weight:500; color:#555;">CoAX</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-top:1px solid #ddd;">
+          <td style="padding:6px 10px; font-weight:500;">NLL ↓</td>
+          <td style="padding:6px 10px; text-align:center;">0.61 ± 0.10</td>
+          <td style="padding:6px 10px; text-align:center;">0.58 ± 0.14</td>
+          <td style="padding:6px 10px; text-align:center;">0.61 ± 0.07</td>
+          <td style="padding:6px 10px; text-align:center; font-weight:700;">0.47 ± 0.22</td>
+          <td></td>
+          <td style="padding:6px 10px; text-align:center;">0.60 ± 0.10</td>
+          <td style="padding:6px 10px; text-align:center;">0.59 ± 0.11</td>
+          <td style="padding:6px 10px; text-align:center;">0.60 ± 0.09</td>
+          <td style="padding:6px 10px; text-align:center; font-weight:700;">0.38 ± 0.23</td>
+          <td></td>
+          <td style="padding:6px 10px; text-align:center;">0.58 ± 0.09</td>
+          <td style="padding:6px 10px; text-align:center;">0.46 ± 0.16</td>
+          <td style="padding:6px 10px; text-align:center;">0.43 ± 0.11</td>
+          <td style="padding:6px 10px; text-align:center; font-weight:700;">0.31 ± 0.21</td>
+        </tr>
+        <tr style="border-top:1px solid #eee;">
+          <td style="padding:6px 10px; font-weight:500;">BIC ↓</td>
+          <td style="padding:6px 10px; text-align:center;">27.7 ± 3.6</td>
+          <td style="padding:6px 10px; text-align:center;">26.7 ± 5.0</td>
+          <td style="padding:6px 10px; text-align:center;">27.7 ± 2.5</td>
+          <td style="padding:6px 10px; text-align:center; font-weight:700;">26.0 ± 7.9</td>
+          <td></td>
+          <td style="padding:6px 10px; text-align:center;">27.4 ± 3.6</td>
+          <td style="padding:6px 10px; text-align:center;">27.0 ± 4.0</td>
+          <td style="padding:6px 10px; text-align:center;">27.4 ± 3.2</td>
+          <td style="padding:6px 10px; text-align:center; font-weight:700;">25.8 ± 7.2</td>
+          <td></td>
+          <td style="padding:6px 10px; text-align:center;">26.7 ± 3.2</td>
+          <td style="padding:6px 10px; text-align:center;">22.3 ± 5.8</td>
+          <td style="padding:6px 10px; text-align:center;">21.3 ± 4.0</td>
+          <td style="padding:6px 10px; text-align:center; font-weight:700;">25.7 ± 7.6</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="margin-top:10px; font-size:13px; color:#888;">NLL: Negative Log-Likelihood &nbsp;·&nbsp; BIC: Bayesian Information Criterion</p>
+  </div>
+
+</body>
+</html>

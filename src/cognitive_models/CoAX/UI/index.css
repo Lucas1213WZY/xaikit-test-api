@@ -1,0 +1,234 @@
+/* general styles */
+
+
+h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+
+body {
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 16px;
+  font: 14px Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  overflow: auto;
+}
+
+.container {
+  padding: 40px;
+  height: 100%;
+}
+
+h3 {
+  line-height: 0em;
+}
+
+.tutorial {
+  display: inline-block;  /* Keeps the element in line but allows width and height */
+  width: 20px;            /* Specify width to ensure enough space for single digits */
+  height: 20px;           /* Same for height */
+  line-height: 20px;      /* This should be equal to height to vertically center the text */
+  text-align: center;     /* Horizontally centers the text */
+  border-radius: 50%;     /* Makes the span circular */
+  background-color: #0070c0; /* Background color of the circle */
+  color: white;           /* Text color */
+  font-size: 12px;        /* Adjust font size as needed */
+  margin: auto;
+}
+
+span {
+  text-align: center;
+}
+
+.selectors {
+  margin-bottom: 30px;
+}
+
+/* TABLE STYLES */
+
+table {
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+
+/* default cell padding */
+th,
+td {
+  padding: 5px 10px;
+  font-size: 17px
+}
+
+.no-padding {
+  padding: 0;
+}
+
+/* various col styles */
+
+.attribute {
+  text-align: right;
+}
+
+.value {
+  text-align: center;
+  padding: 10;
+}
+
+.symbol {
+  text-align: center;
+  width: 10px;
+  padding: 0;
+  background: rgb(181, 214, 255, 0.4);
+;
+}
+
+.factor {
+  width: 110px;
+  text-align: right;
+  background: rgb(181, 214, 255);
+  border-left: 2px solid black;
+  border-right: 2px solid black;
+
+}
+
+.partial {
+  width: 110px;
+  text-align: right;
+  background: rgb(181, 214, 255);
+}
+
+.importance {
+  text-align: right;
+  padding-left: 0;
+  border-right: 2px solid black;
+}
+
+.prediction {
+  text-align: center;
+  border: 2px solid black;
+  opacity: 1.0 !important;
+}
+
+.others {
+  color: #aaa;
+  position: relative;
+}
+
+.difference {
+  width: 45px;
+  padding: 0px;
+  text-align: center;
+}
+
+.difference meter:hover {
+  cursor: pointer;
+}
+
+/* METER STYLES */
+
+/* default meter styling */
+.meter-container {
+  text-align: center;
+  width: 100px;
+  padding-right: 15px;
+}
+
+meter {
+  width: 100%;
+  height: 25px;
+  border-radius: 30px;
+}
+
+meter:hover {
+  cursor: pointer;
+}
+
+.diff-meter {
+  width: 30px;
+  padding: 0;
+}
+
+.diff-meter:hover {
+  cursor: pointer;
+}
+
+/* meter colours */
+meter::-webkit-meter-optimum-value {
+  /* background: rgba(60, 136, 232); */
+  background: black;
+}
+meter::-moz-meter-bar {
+  /* background: rgba(60, 136, 232); */
+  background: black;
+}
+
+.diff-meter::-webkit-meter-optimum-value {
+  background: red;
+}
+
+.diff-meter::-moz-meter-bar {
+  background: red;
+}
+
+/* CHART STYLES */
+
+#feature-importance-div,
+#feature-attribution-div {
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  justify-content: start;
+  align-items: center;
+}
+
+#toggleContainer {
+  margin-top: -5px; /* Optional: Add space between elements */
+  text-align: center;
+}
+
+#feature-importance-canvas,
+#feature-attribution-canvas {
+  width: 120px;
+  opacity: 1;
+}
+
+#feature-attribution-chart,
+#feature-importance-chart {
+  border-left: 2px solid black;
+  border-bottom: 2px solid black;
+  border-right: 2px solid black;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.greyed-out td:not(.dont-grey),
+.greyed-out .meter-container,
+.greyed-out .attribute,
+.greyed-out .value {
+  opacity: 0.1;
+  pointer-events: none;
+  transition: opacity 2s;
+}
+
+/* TOOLTIPS */
+
+.tooltip {
+  cursor: help;
+}
+
+.tooltip:hover {
+  text-decoration: underline;
+}
+
+/* USER SIMULATION */
+
+.user-simulation-input {
+  width: 90px;
+  text-align: center;
+  border: 1px solid lightgrey;
+}

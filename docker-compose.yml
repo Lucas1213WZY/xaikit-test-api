@@ -1,0 +1,37 @@
+# Study server behind Caddy, which obtains and renews the TLS certificate.
+# Set XAIKIT_DOMAIN, XAIKIT_API_TOKEN and XAIKIT_ALLOWED_ORIGINS in a .env file
+# next to this one, then: docker compose up -d --build
+services:
+  api:
+    build: .
+    restart: unless-stopped
+    environment:
+      # Comma-separated origins allowed to call this API from a browser.
+      XAIKIT_ALLOWED_ORIGINS: ${XAIKIT_ALLOWED_ORIGINS:?set your UI origin, e.g. https://you.github.io}
+      # Shared bearer token. Every request must send Authorization: Bearer <token>.
+      XAIKIT_API_TOKEN: ${XAIKIT_API_TOKEN:?set a long random token}
+      XAIKIT_SERVER_RUNS_DIR: /data/server_runs
+    volumes:
+      - study_data:/data
+    expose:
+      - "8000"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      XAIKIT_DOMAIN: ${XAIKIT_DOMAIN:?set the domain pointing at this host}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+
+volumes:
+  study_data:
+  caddy_data:
+  caddy_config:
