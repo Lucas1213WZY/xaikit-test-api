@@ -1,0 +1,16 @@
+# Minimal dependency set for building the docs with `build_docs.py --mock`.
+#
+# The heavy runtime libraries (torch, shap, captum, stable-baselines3, ...) are
+# stubbed during the docs build, so they are deliberately absent here. Verified
+# to produce byte-identical output to a build against the full requirements.txt.
+#
+# numpy/pandas and the lighter scientific packages stay real: they appear in
+# type annotations and default values that the reference renders.
+
+pdoc>=15,<17
+numpy>=1.26,<3
+pandas>=2.2,<3
+scipy>=1.13,<2
+scikit-learn>=1.6,<2
+statsmodels>=0.14,<0.15
+matplotlib>=3.9,<4

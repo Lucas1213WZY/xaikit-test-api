@@ -1,0 +1,52 @@
+name: Docs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Allow one concurrent deployment, and let a queued run supersede an older one.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 3.10 renders annotations as `pathlib.Path`; 3.13 exposes the private
+      # `pathlib._local.Path` alias in signatures instead.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: docs/requirements-docs.txt
+
+      - name: Install docs dependencies
+        run: pip install -r docs/requirements-docs.txt
+
+      # --mock stubs torch/shap/captum/... so this job stays small. Verified to
+      # produce the same output as a build against the full requirements.txt.
+      - name: Build site
+        run: python docs/build_docs.py --mock -o site
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

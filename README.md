@@ -1,6 +1,17 @@
 # xaikit-test
 XAI Interpretation Simulator Toolkit
 
+## 📖 Documentation
+
+**<https://lucas1213wzy.github.io/xaikit-test-api/>** — user guide and full API
+reference, rebuilt automatically on every push to `main`.
+
+To build it locally, see [docs/README.md](docs/README.md):
+
+```bash
+python docs/build_docs.py && python -m http.server -d site 8000
+```
+
 ## 🛖Project  Architecture
 
 ```markdown
