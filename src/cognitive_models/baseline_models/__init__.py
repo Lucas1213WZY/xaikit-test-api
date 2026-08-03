@@ -22,19 +22,33 @@ _BASELINE_ALIASES = {
 
 
 def normalize_baseline_model_id(model_id: str) -> str:
-    """Return the canonical baseline id, or the normalized input if unknown."""
+    """Return the canonical baseline id, or the normalized input if unknown.
+
+    Args:
+        model_id: Id or alias to canonicalize.
+    """
     normalized = model_id.lower().strip().replace("-", "_")
     return _BASELINE_ALIASES.get(normalized, normalized)
 
 
 def is_baseline_model_id(model_id: str) -> bool:
-    """Whether an id or alias refers to a registered machine proxy."""
+    """Whether an id or alias refers to a registered machine proxy.
+
+    Args:
+        model_id: Id or alias to check.
+    """
     normalized = model_id.lower().strip().replace("-", "_")
     return normalized in _BASELINE_ALIASES
 
 
 def create_baseline_model(model_id: str, **kwargs):
-    """Create a registered baseline cognitive model by API id."""
+    """Create a registered baseline cognitive model by API id.
+
+    Args:
+        model_id: Baseline to build -- ``knn``, ``decision_tree``,
+            ``logistic_regression`` or ``mlp``. Aliases are accepted.
+        **kwargs: Constructor arguments for the chosen baseline.
+    """
     normalized = normalize_baseline_model_id(model_id)
     if normalized == "knn":
         return KNNBaseline(**kwargs)

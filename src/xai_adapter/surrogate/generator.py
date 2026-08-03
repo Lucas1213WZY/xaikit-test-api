@@ -105,7 +105,18 @@ def generate_decision_tree_table(
     class_labels: Optional[Sequence[Any]] = None,
     **kwargs,
 ) -> pd.DataFrame:
-    """Train decision-tree surrogates and return CoXAM-style explanation rows."""
+    """Train decision-tree surrogates and return CoXAM-style explanation rows.
+
+    Args:
+        X: Feature rows the surrogate is fitted on.
+        y: AI predictions the surrogate is fitted to.
+        app_id: Dataset identifier recorded on the rows.
+        model_name: Model name recorded on the rows.
+        depths: Tree depths to fit, one variant per depth.
+        random_state: Seed for tree fitting.
+        class_labels: Display names for the classes.
+        **kwargs: Passed through to the surrogate.
+    """
     from sklearn.metrics import accuracy_score
     from sklearn.tree import DecisionTreeClassifier
 
@@ -155,7 +166,21 @@ def generate_logistic_regression_table(
     max_iter: int = 1000,
     **kwargs,
 ) -> pd.DataFrame:
-    """Train logistic-regression surrogates and return CoXAM-style explanation rows."""
+    """Train logistic-regression surrogates and return CoXAM-style explanation rows.
+
+    Args:
+        X: Feature rows the surrogate is fitted on.
+        y: AI predictions the surrogate is fitted to.
+        app_id: Dataset identifier recorded on the rows.
+        model_name: Model name recorded on the rows.
+        variants: Which variants to fit -- ``dense`` keeps every coefficient,
+            ``sparse`` keeps only the strongest ``top_k``.
+        top_k: Features kept in the sparse variant.
+        C: Inverse regularization strength.
+        random_state: Seed for fitting.
+        max_iter: Maximum solver iterations.
+        **kwargs: Passed through to the surrogate.
+    """
     from sklearn.linear_model import LogisticRegression
     from sklearn.metrics import accuracy_score
 
@@ -213,7 +238,24 @@ def generate_surrogate_tables(
     top_k: int = 3,
     random_state: int = 0,
 ) -> Tuple[Optional[pd.DataFrame], Optional[pd.DataFrame], pd.DataFrame]:
-    """Generate surrogate explanation tables from feature rows and AI predictions."""
+    """Generate surrogate explanation tables from feature rows and AI predictions.
+
+    Args:
+        X: Feature rows the surrogates are fitted on.
+        y: AI predictions the surrogates are fitted to.
+        app_id: Dataset identifier recorded on the rows.
+        model_name: Model name recorded on the rows.
+        feature_names: Display names for the features.
+        methods: Which surrogates to generate.
+        depths: Tree depths for the decision-tree surrogate.
+        variants: Variants for the logistic-regression surrogate.
+        top_k: Features kept in the sparse variant.
+        random_state: Seed for fitting.
+
+    Returns:
+        The decision-tree table, the logistic-regression table (either None if
+        not requested), and the combined metadata table.
+    """
     X_array = np.asarray(X, dtype=float)
     y_array = np.asarray(y)
     metadata_df = _metadata_from_data(X_array, app_id=app_id, feature_names=feature_names)
@@ -255,6 +297,10 @@ def extract_tree_rules(
     order.  Each condition is ``(feat_idx, threshold, is_leq)`` where
     ``is_leq=True`` means the condition fires on the left branch
     (``value <= threshold``).
+
+    Args:
+        tree: A fitted sklearn ``tree_`` structure.
+        n_classes: Number of classes the tree predicts.
     """
     from sklearn.tree import _tree
 
@@ -292,6 +338,14 @@ def rule_list_to_tree_structure(
     That node id is shared by all fail-branches in the current rule, which the
     dict-keyed ``nodes_by_id`` in ``DecisionTreeSurrogateMethod`` supports.
     Node 0 is always the root.
+
+    Args:
+        rules: The ordered rule list to convert.
+        default_class_idx: Class predicted when no rule fires.
+        n_classes: Number of classes represented in the nodes.
+
+    Returns:
+        The nodes, with node 0 as the root.
     """
     pending: List[Optional[Dict[str, Any]]] = []
 

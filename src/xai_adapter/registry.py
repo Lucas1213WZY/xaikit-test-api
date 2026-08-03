@@ -12,13 +12,25 @@ class XAIAdapterRegistry:
         self._registry: Dict[str, Any] = {}
 
     def register(self, name: str, adapter_class: Type, *aliases: str) -> None:
-        """Register an adapter class."""
+        """Register an adapter class.
+
+        Args:
+            name: Name the adapter is registered under; matched case-insensitively.
+            adapter_class: The adapter class, or a factory returning one.
+            *aliases: Additional names resolving to the same adapter.
+        """
         self._registry[name.lower()] = adapter_class
         for alias in aliases:
             self._registry[alias.lower()] = adapter_class
 
     def register_custom(self, name: str, algorithm: Any, *aliases: str) -> None:
-        """Register a user-provided function or object as an XAI method."""
+        """Register a user-provided function or object as an XAI method.
+
+        Args:
+            name: Name the method is registered under.
+            algorithm: The callable or object to wrap in an attribution adapter.
+            *aliases: Additional names resolving to the same method.
+        """
         from .attribution import CustomAttribution
 
         def factory(**kwargs):
@@ -27,14 +39,26 @@ class XAIAdapterRegistry:
         self.register(name, factory, *aliases)
 
     def get_class(self, name: str) -> Any:
-        """Return the adapter class or factory for a registered name."""
+        """Return the adapter class or factory for a registered name.
+
+        Args:
+            name: Registered name or alias.
+
+        Raises:
+            ValueError: If the name is not registered.
+        """
         key = name.lower()
         if key not in self._registry:
             raise ValueError(f"Unknown XAI adapter '{name}'. Available: {self.list_available()}")
         return self._registry[key]
 
     def create(self, name: str, **kwargs):
-        """Instantiate a registered adapter."""
+        """Instantiate a registered adapter.
+
+        Args:
+            name: Registered name or alias.
+            **kwargs: Passed to the adapter's constructor.
+        """
         return self.get_class(name)(**kwargs)
 
     def list_available(self) -> list[str]:
@@ -42,7 +66,11 @@ class XAIAdapterRegistry:
         return sorted(self._registry.keys())
 
     def is_registered(self, name: str) -> bool:
-        """Check whether a method name or alias is registered."""
+        """Check whether a method name or alias is registered.
+
+        Args:
+            name: Name or alias to look up.
+        """
         return name.lower() in self._registry
 
 
@@ -265,6 +293,11 @@ def register_xai_method(name: str, adapter: Any, *aliases: str) -> None:
 
     `adapter` can be an adapter class/factory that returns an XAIAdapter-like
     object, or a plain function/object to be wrapped as a CustomAttribution.
+
+    Args:
+        name: Name the method is registered under.
+        adapter: An adapter class, or an algorithm to wrap automatically.
+        *aliases: Additional names resolving to the same method.
     """
     if isinstance(adapter, type):
         get_adapter_registry().register(name, adapter, *aliases)

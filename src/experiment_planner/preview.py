@@ -102,6 +102,19 @@ def preview_participant_trials(
 
     Trials with `tested_w_xai=False` or a no-XAI method show the raw instance.
     Training trials show prediction feedback; testing trials hide it.
+
+    Args:
+        data: The prepared dataset supplying instance attributes.
+        trials: The generated trial rows.
+        combined_df: Explanations to draw from.
+        participant_id: Which participant's sequence to walk through.
+        visualization: Plot style used for each explanation.
+        top_n: Number of features to display.
+        class_labels: Display names for the classes.
+        fallback: What to show when a trial has no explanation.
+
+    Raises:
+        ValueError: If no trials exist for ``participant_id``.
     """
     participant_trials = select_trial_rows(
         pd.DataFrame(trials),
@@ -180,7 +193,16 @@ def build_walkthrough_pages(
     *,
     max_trials: Optional[int] = None,
 ) -> list[dict[str, Any]]:
-    """Build ordered researcher-review, procedure, and trial preview pages."""
+    """Build ordered researcher-review, procedure, and trial preview pages.
+
+    Args:
+        protocol: The study protocol supplying titles and procedure steps.
+        participant_trials: One participant's trial rows.
+        max_trials: Stop after this many trial pages; None includes all.
+
+    Returns:
+        The pages in the order a participant would see them.
+    """
     protocol = normalize_study_protocol(protocol)
     trial_rows = participant_trials
     if max_trials is not None:
@@ -238,7 +260,24 @@ def preview_experiment_walkthrough(
     on_approve: Optional[Callable[[], None]] = None,
     fallback: str = "auto",
 ) -> list[dict[str, Any]]:
-    """Preview the complete session and require an explicit final approval click."""
+    """Preview the complete session and require an explicit final approval click.
+
+    Args:
+        protocol: The study protocol supplying titles and procedure steps.
+        data: The prepared dataset supplying instance attributes.
+        trials: The generated trial rows.
+        combined_df: Explanations to draw from.
+        participant_id: Which participant's journey to walk through.
+        visualization: Plot style used for each explanation.
+        top_n: Number of features to display.
+        class_labels: Display names for the classes.
+        max_trials: Stop after this many trials; None shows all.
+        on_approve: Called when the approval button is clicked.
+        fallback: What to show when a trial has no explanation.
+
+    Returns:
+        The pages that were previewed.
+    """
     problems = validate_study_protocol(protocol)
     if problems:
         raise ValueError("Study setup is incomplete: " + " ".join(problems))

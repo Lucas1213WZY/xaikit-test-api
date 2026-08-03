@@ -70,7 +70,16 @@ def _finish_trial(
 
 
 def explanation_property_simulator(cognitive_params, dvs, trial_data):
-    """Virtual participant for the four explanation-property conditions."""
+    """Virtual participant for the four explanation-property conditions.
+
+    Args:
+        cognitive_params: Agent parameters.
+        dvs: Dependent variables the response must supply.
+        trial_data: The trial input, read for its explanation property.
+
+    Returns:
+        One simulated response per DV.
+    """
     trial = trial_data.get("trial_info", {})
     condition = str(trial.get("validation_condition", ""))
     property_name = str(trial.get("explanation_property", "faithful"))
@@ -91,7 +100,16 @@ def explanation_property_simulator(cognitive_params, dvs, trial_data):
 
 
 def feature_explanation_simulator(cognitive_params, dvs, trial_data):
-    """Virtual participant for none/importance/attribution prediction studies."""
+    """Virtual participant for none/importance/attribution prediction studies.
+
+    Args:
+        cognitive_params: Agent parameters.
+        dvs: Dependent variables the response must supply.
+        trial_data: The trial input, read for its XAI type and dataset.
+
+    Returns:
+        One simulated response per DV.
+    """
     trial = trial_data.get("trial_info", {})
     xai_type = str(trial.get("xai_type", "none")).lower()
     tested_with_xai = bool(trial.get("tested_w_xai", False))
@@ -111,7 +129,16 @@ def feature_explanation_simulator(cognitive_params, dvs, trial_data):
 
 
 def rules_weights_simulator(cognitive_params, dvs, trial_data):
-    """Virtual participant for Rules, Weights, and Hybrid study conditions."""
+    """Virtual participant for Rules, Weights, and Hybrid study conditions.
+
+    Args:
+        cognitive_params: Agent parameters.
+        dvs: Dependent variables the response must supply.
+        trial_data: The trial input, read for its XAI type and user task.
+
+    Returns:
+        One simulated response per DV.
+    """
     trial = trial_data.get("trial_info", {})
     xai_type = str(trial.get("xai_type", "decision_tree")).lower()
     shown_type = str(trial.get("shown_xai_type", xai_type)).lower()

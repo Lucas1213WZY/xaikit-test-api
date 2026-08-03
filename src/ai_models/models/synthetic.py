@@ -227,7 +227,12 @@ _FUNCTIONS = {
 
 
 def create_sim2real_function(function_name: str) -> BaseSim2RealFunction:
-    """Create a deterministic sim2real function by name."""
+    """Create a deterministic sim2real function by name.
+
+    Args:
+        function_name: Which synthetic function to build, e.g. ``sparse``,
+            ``wiggle`` or ``trend_wiggle``.
+    """
     key = function_name.lower().strip()
     if key not in _FUNCTIONS:
         raise ValueError(f"Unknown sim2real function '{function_name}'. Choose from {sorted(_FUNCTIONS)}")

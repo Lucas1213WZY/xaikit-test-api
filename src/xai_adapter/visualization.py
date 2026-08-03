@@ -13,7 +13,14 @@ from src.plotting import _patch_matplotlib_inline_rcparams
 
 
 def explanation_value_columns(explanation_df: pd.DataFrame) -> List[str]:
-    """Return attribution/importance columns in a0_i, a1_i, ... order."""
+    """Return attribution/importance columns in a0_i, a1_i, ... order.
+
+    Args:
+        explanation_df: Table to inspect.
+
+    Returns:
+        The value column names, in feature index order.
+    """
     value_cols = [
         col for col in explanation_df.columns
         if col.startswith("a") and col.endswith("_i") and col[1:-2].isdigit()
@@ -382,6 +389,18 @@ def plot_explanation_visual(
     predicted class: negative attributions for prediction 0, positive
     attributions for prediction 1. Other attributions are set to 0.
     Feature rows preserve the predefined order from `feature_names` / aN_i.
+
+    Args:
+        explanation_df: Explanations to draw from.
+        data: Prepared dataset supplying raw attribute values.
+        visualization: ``influence`` or ``importance``.
+        instance_id: Instance to show; the first available if None.
+        method: XAI method to show; the first available if None.
+        feature_names: Display names for the features.
+        top_n: Number of features to display.
+        class_labels: Display names for the classes.
+        title: Figure title.
+        show_ai_prediction: Show the AI's prediction alongside the explanation.
     """
     import matplotlib
 
@@ -554,6 +573,19 @@ def plot_logistic_regression_instance_view(
 
     The displayed rows come from the surrogate's learned coefficients, so sparse
     variants naturally show fewer factors while dense variants show all factors.
+
+    Args:
+        surrogate: A fitted logistic-regression surrogate.
+        instance: The instance to explain.
+        data: Prepared dataset supplying raw attribute values.
+        instance_id: Instance identifier shown in the title.
+        feature_names: Display names for the features.
+        class_labels: Display names for the classes.
+        top_n: Number of factors to display; all by default.
+        title: Figure title.
+
+    Raises:
+        RuntimeError: If the surrogate has not been fitted.
     """
     import matplotlib
 
@@ -756,6 +788,19 @@ def plot_decision_tree_instance_view(
 
     The tree layout is built from the loaded surrogate tree structure, so both the
     displayed depth and split labels adapt to the fitted decision-tree settings.
+
+    Args:
+        surrogate: A fitted decision-tree surrogate.
+        instance: The instance to explain.
+        data: Prepared dataset supplying raw attribute values.
+        instance_id: Instance identifier shown in the title.
+        feature_names: Display names for the features.
+        class_labels: Display names for the classes.
+        title: Figure title.
+
+    Raises:
+        RuntimeError: If the surrogate has not been fitted.
+        TypeError: If it does not expose ``get_tree_structure`` and ``apply``.
     """
     import matplotlib
 
@@ -876,7 +921,17 @@ def plot_instance_explanation(
     top_n: int = 5,
     title: Optional[str] = None,
 ):
-    """Plot the default local influence visualization for one explanation row."""
+    """Plot the default local influence visualization for one explanation row.
+
+    Args:
+        explanation_df: Explanations to draw from.
+        data: Prepared dataset supplying raw attribute values.
+        instance_id: Instance to show; the first available if None.
+        method: XAI method to show; the first available if None.
+        feature_names: Display names for the features.
+        top_n: Number of features to display.
+        title: Figure title.
+    """
     return plot_explanation_visual(
         explanation_df,
         data,
@@ -897,7 +952,15 @@ def plot_global_explanation_importance(
     top_n: Optional[int] = None,
     title: Optional[str] = None,
 ):
-    """Plot mean class-supporting importance by feature across explanation rows."""
+    """Plot mean class-supporting importance by feature across explanation rows.
+
+    Args:
+        explanation_df: Explanations to aggregate over.
+        method: XAI method to show; the first available if None.
+        feature_names: Display names for the features.
+        top_n: Number of features to display; all by default.
+        title: Figure title.
+    """
     import matplotlib
 
     _patch_matplotlib_inline_rcparams(matplotlib)

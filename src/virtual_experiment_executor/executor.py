@@ -31,7 +31,27 @@ def run_experiment_executor(
     explanation_prefix: str = "exp_",
     cognitive_param_prefix: str = "cog_param_",
 ) -> pd.DataFrame:
-    """Run cognitive agents over selected trials and append results."""
+    """Run cognitive agents over selected trials and append results.
+
+    Args:
+        trials: The generated trial rows.
+        cognitive_params: Parameters passed to the cognitive model.
+        dvs: Dependent variables each response must supply.
+        raw_dataset: Raw feature values for the instances shown.
+        explanation_pool: Explanations and AI predictions to draw from.
+        mode: Selection scope, e.g. ``whole_experiment`` or
+            ``participant_by_participant``.
+        participant_id: Which participant to run in per-participant mode.
+        condition_filter: Restrict to trials matching these IV values.
+        condition_columns: Columns treated as the condition identity.
+        cognitive_model: The callable standing in for a participant.
+        label_column: Target column name in ``raw_dataset``.
+        explanation_prefix: Prefix for explanation columns in the output.
+        cognitive_param_prefix: Prefix for parameter columns in the output.
+
+    Returns:
+        The selected trials with simulated responses appended.
+    """
     trials_df = pd.DataFrame(trials).copy()
     selected = select_trial_rows(
         trials_df,
@@ -240,7 +260,15 @@ def save_simulated_results(
     *,
     out_dir: str | Path = "experiment_output",
 ) -> tuple[str, str]:
-    """Save simulated experiment results as CSV and JSON."""
+    """Save simulated experiment results as CSV and JSON.
+
+    Args:
+        simulated_results: The responses to save.
+        out_dir: Directory the two files are written to.
+
+    Returns:
+        The CSV and JSON paths.
+    """
     os.makedirs(out_dir, exist_ok=True)
     csv_path = str(Path(out_dir) / "simulated_results.csv")
     json_path = str(Path(out_dir) / "simulated_results.json")
@@ -274,7 +302,25 @@ def run_virtual_experiment(
     participant_id: Optional[int] = None,
     condition_filter: Optional[dict[str, Any]] = None,
 ) -> VirtualExperimentResult:
-    """Run and save a baseline separately for every participant-condition."""
+    """Run and save a baseline separately for every participant-condition.
+
+    Args:
+        participant_arrangement: The participant/condition assignment to run.
+        cognitive_params: Parameters passed to the cognitive model.
+        dvs: Dependent variables each response must supply.
+        raw_dataset: Raw feature values for the instances shown.
+        explanation_pool: Explanations and AI predictions to draw from.
+        cognitive_model: The callable standing in for a participant.
+        label_column: Target column name in ``raw_dataset``.
+        condition_columns: Columns treated as the condition identity.
+        output_dir: Directory the per-condition results are written to.
+        mode: Selection scope for the underlying executor.
+        participant_id: Which participant to run in per-participant mode.
+        condition_filter: Restrict to trials matching these IV values.
+
+    Returns:
+        The combined results and the paths they were written to.
+    """
     trials = getattr(participant_arrangement, "trials", participant_arrangement)
     responses = run_experiment_executor(
         trials=trials,

@@ -28,7 +28,20 @@ def pairwise_condition_tests(
     participant_col: str = "participantId",
     correction: Optional[str] = "holm",
 ) -> PostHocResult:
-    """Compare every condition cell, pairing observations when participants overlap."""
+    """Compare every condition cell, pairing observations when participants overlap.
+
+    Args:
+        data: Responses to compare.
+        value_col: The measure being compared.
+        condition_cols: Columns whose crossed values define the cells.
+        participant_col: Column identifying participants; overlapping
+            participants make a comparison paired.
+        correction: Multiple-comparison correction, e.g. ``holm``; None applies
+            no correction.
+
+    Returns:
+        One test per pair of condition cells.
+    """
     condition_cols = list(condition_cols)
     required = [participant_col, value_col, *condition_cols]
     missing = [column for column in required if column not in data]

@@ -70,27 +70,59 @@ def aggregate(
 
 
 def mean(data: pd.DataFrame, value_cols: ColumnSpec, group_cols: Optional[ColumnSpec] = None):
-    """Mean of ``value_cols``, optionally grouped by ``group_cols``."""
+    """Mean of ``value_cols``, optionally grouped by ``group_cols``.
+
+    Args:
+        data: Table to summarize.
+        value_cols: Column or columns to aggregate.
+        group_cols: Column or columns to group by; None aggregates everything.
+    """
     return _reduce(data, value_cols, group_cols, "mean")
 
 
 def median(data: pd.DataFrame, value_cols: ColumnSpec, group_cols: Optional[ColumnSpec] = None):
-    """Median of ``value_cols``, optionally grouped by ``group_cols``."""
+    """Median of ``value_cols``, optionally grouped by ``group_cols``.
+
+    Args:
+        data: Table to summarize.
+        value_cols: Column or columns to aggregate.
+        group_cols: Column or columns to group by; None aggregates everything.
+    """
     return _reduce(data, value_cols, group_cols, "median")
 
 
 def std(data: pd.DataFrame, value_cols: ColumnSpec, group_cols: Optional[ColumnSpec] = None, ddof: int = 1):
-    """Sample standard deviation of ``value_cols``, optionally grouped."""
+    """Sample standard deviation of ``value_cols``, optionally grouped.
+
+    Args:
+        data: Table to summarize.
+        value_cols: Column or columns to aggregate.
+        group_cols: Column or columns to group by; None aggregates everything.
+        ddof: Delta degrees of freedom; 1 gives the sample estimate.
+    """
     return _reduce(data, value_cols, group_cols, "std", ddof=ddof)
 
 
 def variance(data: pd.DataFrame, value_cols: ColumnSpec, group_cols: Optional[ColumnSpec] = None, ddof: int = 1):
-    """Sample variance of ``value_cols``, optionally grouped."""
+    """Sample variance of ``value_cols``, optionally grouped.
+
+    Args:
+        data: Table to summarize.
+        value_cols: Column or columns to aggregate.
+        group_cols: Column or columns to group by; None aggregates everything.
+        ddof: Delta degrees of freedom; 1 gives the sample estimate.
+    """
     return _reduce(data, value_cols, group_cols, "var", ddof=ddof)
 
 
 def sem(data: pd.DataFrame, value_cols: ColumnSpec, group_cols: Optional[ColumnSpec] = None):
-    """Standard error of the mean of ``value_cols``, optionally grouped."""
+    """Standard error of the mean of ``value_cols``, optionally grouped.
+
+    Args:
+        data: Table to summarize.
+        value_cols: Column or columns to aggregate.
+        group_cols: Column or columns to group by; None aggregates everything.
+    """
     return _reduce(data, value_cols, group_cols, "sem")
 
 

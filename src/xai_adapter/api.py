@@ -62,7 +62,26 @@ def init_explanation_run(
     instance_ids_by_method: Optional[dict[str, Sequence[Any]]] = None,
     predictions_by_instance: Optional[dict[int, Any]] = None,
 ) -> ExplanationRunConfig:
-    """Collect all shared XAI-generation settings in one object."""
+    """Collect all shared XAI-generation settings in one object.
+
+    Args:
+        data: The prepared dataset explanations are generated over.
+        iv_config: Design IVs supplying the XAI method levels.
+        trained_ai_model: The model being explained.
+        model_name: Name used in the output filenames.
+        output_dir: Directory the explanation tables are written to.
+        target: Class index explanations are generated for.
+        method_kwargs: Per-method options, keyed by method name.
+        max_test_instances: Cap on test instances explained.
+        instance_ids: Explain only these instances.
+        instance_ids_by_method: Per-method instance restriction, overriding
+            ``instance_ids`` for the methods it names.
+        predictions_by_instance: Precomputed AI predictions, to avoid
+            recomputing them.
+
+    Returns:
+        The assembled config, ready for the generate functions.
+    """
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
     return ExplanationRunConfig(
@@ -93,6 +112,12 @@ def get_xai_methods_from_design(iv_config: dict[str, dict[str, Any]]) -> list[An
     `xai_method` wins when a design names both, matching how instance selection and
     per-trial explanation lookup resolve the method. Preferring `xai_type` here
     made those disagree, and a design declaring both IVs generated an empty pool.
+
+    Args:
+        iv_config: The design's independent variables.
+
+    Returns:
+        The XAI method levels, or an empty list if neither IV is present.
     """
     xai_iv_name = "xai_method" if "xai_method" in iv_config else "xai_type"
     if xai_iv_name not in iv_config:
@@ -101,14 +126,29 @@ def get_xai_methods_from_design(iv_config: dict[str, dict[str, Any]]) -> list[An
 
 
 def predict_labels(trained_ai_model: Any, X: np.ndarray) -> np.ndarray:
-    """Convert model predictions/probabilities into integer labels."""
+    """Convert model predictions/probabilities into integer labels.
+
+    Args:
+        trained_ai_model: The model to predict with.
+        X: Model-ready feature rows.
+
+    Returns:
+        One integer class label per row.
+    """
     return prediction_labels(trained_ai_model.predict(X))
 
 
 def generate_ai_prediction_table(
     config: ExplanationRunConfig,
 ) -> tuple[Path, pd.DataFrame]:
-    """Predict every train/test instance and save a complete prediction table."""
+    """Predict every train/test instance and save a complete prediction table.
+
+    Args:
+        config: Settings from ``init_explanation_run``.
+
+    Returns:
+        The written path and the prediction table.
+    """
     instance_ids = np.asarray(
         list(dict.fromkeys([
             *map(int, config.data.train_instance_ids),
@@ -163,7 +203,14 @@ def generate_ai_prediction_table(
 def generate_xai_explanation_tables(
     config: ExplanationRunConfig,
 ) -> tuple[list[Path], list[pd.DataFrame]]:
-    """Generate one explanation CSV per non-control XAI method."""
+    """Generate one explanation CSV per non-control XAI method.
+
+    Args:
+        config: Settings from ``init_explanation_run``.
+
+    Returns:
+        The written paths and the tables themselves, in matching order.
+    """
     train_data_for_xai = make_train_data_for_xai(config.data.split, config.data.y_train)
     saved_paths: list[Path] = []
     explanation_dfs: list[pd.DataFrame] = []
@@ -309,7 +356,18 @@ def generate_sim2real_explanations(
     properties: Sequence[str] = ("faithful", "sparse", "robust", "sparse_robust"),
     **kwargs,
 ) -> dict[str, Any]:
-    """Generate property-optimized XAIsim2real explanations for one input set."""
+    """Generate property-optimized XAIsim2real explanations for one input set.
+
+    Args:
+        model: The model being explained.
+        X: Feature rows to explain.
+        properties: Explanation properties to optimize for, e.g. ``faithful``
+            or ``sparse_robust``.
+        **kwargs: Passed through to the generator.
+
+    Returns:
+        The explanations, keyed by property.
+    """
     results = {}
     for property_name in properties:
         explainer = create_xai_method(
@@ -326,7 +384,15 @@ def combine_explanation_tables(
     explanation_dfs: list[pd.DataFrame],
     config: ExplanationRunConfig,
 ) -> tuple[Optional[Path], Optional[pd.DataFrame]]:
-    """Combine generated method-level explanations into one design-engine table."""
+    """Combine generated method-level explanations into one design-engine table.
+
+    Args:
+        explanation_dfs: The per-method tables to merge.
+        config: Settings from ``init_explanation_run``.
+
+    Returns:
+        The written path and the combined table.
+    """
     if not explanation_dfs:
         print("\nNo explanation CSVs were generated. Check installed XAI dependencies.")
         return None, None
@@ -350,6 +416,11 @@ def create_custom_xai_method(
     The algorithm can be a callable, or an object exposing `fit` and `explain`.
     Legacy objects exposing `attribute` are still accepted for compatibility,
     but `explain` is the canonical public method.
+
+    Args:
+        algorithm: The callable or object implementing the method.
+        method_name: Name the method is recorded under.
+        **kwargs: Passed through to the adapter.
     """
     return make_attribution(algorithm, method_name=method_name, **kwargs)
 
@@ -365,6 +436,11 @@ def create_custom_surrogate_method(
 
     The returned method implements the `SurrogateMethod` interface and supports
     sklearn-style `fit(...).explain(...)` chaining.
+
+    Args:
+        fit_fn: Fits the surrogate to features and predictions.
+        explain_fn: Produces explanations from the fitted surrogate.
+        method_name: Name the method is recorded under.
     """
     return make_surrogate(fit_fn, explain_fn, name=method_name)
 
@@ -377,7 +453,19 @@ def get_coxam_xai_predictions(
     model_name: str,
     **kwargs,
 ) -> List[Any]:
-    """Apply a CoXAM XAI method to raw features from a data loader."""
+    """Apply a CoXAM XAI method to raw features from a data loader.
+
+    Args:
+        loader: Data loader supplying the raw feature rows.
+        instance_ids: Instances to explain.
+        method_type: CoXAM method to apply, e.g. ``decision_tree``.
+        app_id: Dataset identifier recorded on the rows.
+        model_name: Model name recorded on the rows.
+        **kwargs: Passed through to the method.
+
+    Returns:
+        One explanation per requested instance.
+    """
     method = create_xai_method(
         method_type,
         loader=loader,
@@ -410,6 +498,28 @@ def generate_surrogate_xai_methods(
 
     Use this path when the user provides new feature rows and AI predictions
     instead of precomputed `assets/explanations/coxam` surrogate tables.
+
+    Args:
+        dataset: An already-parsed dataset; alternative to the two below.
+        csv_path: Path to a dataset CSV to parse.
+        dataframe: An in-memory dataframe to use directly.
+        instance_ids: Restrict generation to these instances; all by default.
+        app_id: Dataset identifier recorded on the rows.
+        model_name: Model name recorded on the rows.
+        methods: Surrogate methods to generate.
+        depths: Tree depths to fit for the decision-tree surrogate.
+        variants: Logistic-regression variants to fit.
+        variant: Which fitted variant to return as the method; must be one of
+            ``variants``.
+        top_k: Features kept in the sparse variant.
+        random_state: Seed for surrogate fitting.
+        **dataset_kwargs: Passed through to the dataset parser.
+
+    Returns:
+        The generated surrogate methods and their tables.
+
+    Raises:
+        ValueError: If ``variant`` is not among ``variants``.
     """
     requested = {method.lower() for method in methods}
     if requested & {"logistic_regression", "lr", "weights"}:

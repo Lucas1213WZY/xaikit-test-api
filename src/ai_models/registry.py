@@ -105,11 +105,19 @@ class ModelRegistry:
         return list(self.MODEL_AGENTS)
     
     def filter_by_dataset(self, dataset: str) -> Dict:
-        """Get all model variants for a dataset."""
+        """Get all model variants for a dataset.
+
+        Args:
+            dataset: Dataset identifier to filter by.
+        """
         return {k: v for k, v in self.available_models.items() if v['dataset'] == dataset}
     
     def filter_by_model_type(self, model_type: str) -> Dict:
-        """Get all models of a specific type."""
+        """Get all models of a specific type.
+
+        Args:
+            model_type: Architecture to filter by, e.g. ``mlp``.
+        """
         return {k: v for k, v in self.available_models.items() if v['model_type'] == model_type}
     
     def to_dict(self) -> Dict:

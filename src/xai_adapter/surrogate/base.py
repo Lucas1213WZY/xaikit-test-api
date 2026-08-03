@@ -92,5 +92,11 @@ def make_surrogate(
     explain_fn: Callable[..., Any],
     name: str = "custom",
 ) -> CustomSurrogate:
-    """Wrap any surrogate-like callable pair in the SurrogateMethod interface."""
+    """Wrap any surrogate-like callable pair in the SurrogateMethod interface.
+
+    Args:
+        fit_fn: Fits the surrogate to features and predictions.
+        explain_fn: Produces explanations from the fitted surrogate.
+        name: Name the method is recorded under.
+    """
     return CustomSurrogate(fit_fn, explain_fn, method_name=name)

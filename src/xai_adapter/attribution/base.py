@@ -143,5 +143,11 @@ def make_attribution(
     method_name: str = "custom",
     **kwargs,
 ) -> CustomAttribution:
-    """Create a normalized adapter from a user-defined attribution algorithm."""
+    """Create a normalized adapter from a user-defined attribution algorithm.
+
+    Args:
+        algorithm: A callable, or an object exposing ``fit``/``explain``.
+        method_name: Name the method is recorded under.
+        **kwargs: Passed to the adapter.
+    """
     return CustomAttribution(algorithm, method_name=method_name, **kwargs)

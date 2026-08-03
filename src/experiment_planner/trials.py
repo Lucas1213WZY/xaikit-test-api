@@ -96,7 +96,34 @@ def init_trial_build_config(
     trials_json: str = "trials.json",
     summary_json: str = "design_summary.json",
 ) -> TrialBuildConfig:
-    """Collect trial-generation settings in one notebook-friendly config object."""
+    """Collect trial-generation settings in one notebook-friendly config object.
+
+    Args:
+        data: The prepared dataset trials are sampled from.
+        iv_config: Independent variables defining the conditions.
+        cvs: Control variables recorded on each trial.
+        model_name: Name recorded on the trials.
+        participants_per_between_condition: Participants per between-subjects cell.
+        num_training: Instances shown in the training phase.
+        num_testing: Held-out instances shown in the testing phase.
+        ai_predictions_by_instance: Predicted label per instance, required for
+            prediction-balanced sampling.
+        counterbalancing_strategy: How conditions are ordered across
+            participants; ``auto`` picks from the design.
+        trial_randomization_strategy: How trials are ordered within a participant.
+        instance_wise_explanation: Give each instance its own explanation.
+        shuffle_instances: Shuffle the instance pool before sampling.
+        max_trial_instances: Cap on distinct instances used.
+        allowed_instance_ids: Restrict sampling to these instances.
+        seed: Seed for sampling and ordering.
+        output_dir: Directory the artifacts are written to.
+        trials_csv: Filename for the trial table.
+        trials_json: Filename for the trial JSON.
+        summary_json: Filename for the design summary.
+
+    Returns:
+        The assembled config, ready for ``generate_experimental_trials``.
+    """
     if num_training < 0:
         raise ValueError("num_training cannot be negative.")
     if num_testing < 1:
@@ -130,7 +157,16 @@ def generate_experimental_trials(
     show: bool = True,
     preview_rows: int = 10,
 ) -> TrialGenerationResult:
-    """Build and export experimental trials from a notebook trial config."""
+    """Build and export experimental trials from a notebook trial config.
+
+    Args:
+        config: Settings from ``init_trial_build_config``.
+        show: Print a preview of the generated trials.
+        preview_rows: Rows to print when ``show`` is True.
+
+    Returns:
+        The generated trials and the paths they were written to.
+    """
     experiment_structure = inspect_experiment_structure(config.iv_config, show=False)
     within_labels = make_within_condition_order_labels(experiment_structure.block_within_ivs)
     orders, strategy = choose_counterbalancing(
@@ -484,7 +520,13 @@ def preview_trial_rows(
     *,
     n: int = 10,
 ) -> None:
-    """Print a compact preview of trial assignment, condition, and instance ids."""
+    """Print a compact preview of trial assignment, condition, and instance ids.
+
+    Args:
+        trials: The generated trial rows.
+        experiment_structure: IVs split by design role, used for the headings.
+        n: How many rows to print.
+    """
     key_cols = [
         "participantId",
         "trialId",
@@ -513,7 +555,17 @@ def generate_trials_from_ui_config(
     strict: bool = False,
     show: bool = True,
 ) -> TrialGenerationResult:
-    """Generate trial CSV/JSON/summary artifacts from a UI-exported config."""
+    """Generate trial CSV/JSON/summary artifacts from a UI-exported config.
+
+    Args:
+        config: The UI-exported configuration dict.
+        validate_support: Check the config against the support standard first.
+        strict: Treat support warnings as failures.
+        show: Print the validation report and trial preview.
+
+    Returns:
+        The generated trials and the paths they were written to.
+    """
     if validate_support:
         validate_ui_config_support(
             config,
@@ -607,7 +659,15 @@ def generate_trials_from_ui_json(
     *,
     show: bool = True,
 ) -> Optional[TrialGenerationResult]:
-    """Load a UI-exported JSON file and generate trial artifacts from it."""
+    """Load a UI-exported JSON file and generate trial artifacts from it.
+
+    Args:
+        config_path: Path to the exported JSON.
+        show: Print the validation report and trial preview.
+
+    Returns:
+        The generated trials, or None if the config could not be used.
+    """
     config_path = Path(config_path)
     if not config_path.exists():
         print(f"UI config not found: {config_path}")

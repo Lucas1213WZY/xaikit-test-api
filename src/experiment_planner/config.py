@@ -47,7 +47,16 @@ class DesignRoles:
 
 
 def validate_iv_config(config: dict[str, dict[str, Any]]) -> None:
-    """Validate independent-variable type, randomization, and level settings."""
+    """Validate independent-variable type, randomization, and level settings.
+
+    Args:
+        config: IV specs keyed by name, each with ``type``, ``levels`` and, for
+            within-subjects IVs, ``randomization``.
+
+    Raises:
+        ValueError: On an unknown type, a randomization that does not suit the
+            type, or levels that are empty or duplicated.
+    """
     for name, cfg in config.items():
         iv_type = cfg.get("type")
         if iv_type not in ("within", "between"):
@@ -67,7 +76,14 @@ def validate_iv_config(config: dict[str, dict[str, Any]]) -> None:
 
 
 def validate_factors(factors: dict[str, list[Any]]) -> None:
-    """Validate control/dependent variable dictionaries."""
+    """Validate control/dependent variable dictionaries.
+
+    Args:
+        factors: CV or DV levels keyed by name.
+
+    Raises:
+        ValueError: If any factor has empty or duplicated levels.
+    """
     for name, levels in factors.items():
         if not isinstance(levels, list) or not levels:
             raise ValueError(f"Factor {name!r} must map to a non-empty list.")
@@ -82,7 +98,18 @@ def set_iv(
     levels: list[Any],
     randomization: str = "block",
 ) -> dict[str, dict[str, Any]]:
-    """Add or replace one IV after validating the requested configuration."""
+    """Add or replace one IV after validating the requested configuration.
+
+    Args:
+        iv_config: IV dictionary to update in place.
+        name: IV name, e.g. ``xai_method``.
+        iv_type: ``within`` or ``between``.
+        levels: The values to manipulate.
+        randomization: ``block`` or ``trial``; ignored for between-subjects IVs.
+
+    Returns:
+        The same dictionary, updated.
+    """
     cfg = {"type": iv_type, "levels": levels}
     if iv_type == "within":
         cfg["randomization"] = randomization
@@ -92,7 +119,16 @@ def set_iv(
 
 
 def set_factor(factors: dict[str, list[Any]], name: str, levels: list[Any]) -> dict[str, list[Any]]:
-    """Add or replace one CV/DV factor after validating its levels."""
+    """Add or replace one CV/DV factor after validating its levels.
+
+    Args:
+        factors: CV or DV dictionary to update in place.
+        name: Factor name.
+        levels: The values it can take.
+
+    Returns:
+        The same dictionary, updated.
+    """
     validate_factors({name: levels})
     factors[name] = levels
     return factors
@@ -104,12 +140,22 @@ def init_experiment_config() -> tuple[dict[str, dict[str, Any]], dict[str, list[
 
 
 def between_iv(levels: list[Any]) -> dict[str, Any]:
-    """Create a between-subjects IV spec."""
+    """Create a between-subjects IV spec.
+
+    Args:
+        levels: The values to manipulate, one per participant group.
+    """
     return {"type": "between", "levels": levels}
 
 
 def within_iv(levels: list[Any], randomization: str = "block") -> dict[str, Any]:
-    """Create a within-subjects IV spec."""
+    """Create a within-subjects IV spec.
+
+    Args:
+        levels: The values every participant sees.
+        randomization: ``block`` varies between blocks of trials, ``trial``
+            varies trial by trial.
+    """
     return {"type": "within", "randomization": randomization, "levels": levels}
 
 
@@ -123,7 +169,20 @@ def configure_experiment(
     strict: bool = False,
     show: bool = True,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, list[Any]], dict[str, list[Any]]]:
-    """Build, validate, and optionally summarize IV/CV/DV configuration."""
+    """Build, validate, and optionally summarize IV/CV/DV configuration.
+
+    Args:
+        ivs: Independent variables; the built-in defaults are used if None.
+        cvs: Control variables; the built-in defaults are used if None.
+        dvs: Dependent variables; the built-in defaults are used if None.
+        available_datasets: Datasets to list in the printed summary.
+        support_check: Also check the design against the support standard.
+        strict: Treat support warnings as failures.
+        show: Print the summary and support report.
+
+    Returns:
+        The validated ``(iv_config, cvs, dvs)`` dictionaries.
+    """
     iv_config = deepcopy(ivs if ivs is not None else DEFAULT_IV_CONFIG)
     control_vars = deepcopy(cvs if cvs is not None else DEFAULT_CVS)
     dependent_vars = deepcopy(dvs if dvs is not None else DEFAULT_DVS)
@@ -164,7 +223,20 @@ def validate_experiment_config(
     strict: bool = False,
     show: bool = True,
 ) -> tuple[dict[str, dict[str, Any]], dict[str, list[Any]], dict[str, list[Any]]]:
-    """Validate and optionally summarize an iteratively-built experiment config."""
+    """Validate and optionally summarize an iteratively-built experiment config.
+
+    Args:
+        iv_config: Independent variables to validate.
+        cvs: Control variables to validate.
+        dvs: Dependent variables to validate.
+        available_datasets: Datasets to list in the printed summary.
+        support_check: Also check the design against the support standard.
+        strict: Treat support warnings as failures.
+        show: Print the summary and support report.
+
+    Returns:
+        The validated ``(iv_config, cvs, dvs)`` dictionaries.
+    """
     validate_iv_config(iv_config)
     validate_factors(cvs)
     validate_factors(dvs)
@@ -198,7 +270,14 @@ def print_experiment_config(
     *,
     available_datasets: Optional[list[str]] = None,
 ) -> None:
-    """Print a compact summary of IV/CV/DV settings."""
+    """Print a compact summary of IV/CV/DV settings.
+
+    Args:
+        iv_config: Independent variables to summarize.
+        cvs: Control variables to summarize.
+        dvs: Dependent variables to summarize.
+        available_datasets: Datasets to list above the summary.
+    """
     if available_datasets is not None:
         print("Available training datasets:", available_datasets)
 
@@ -218,7 +297,16 @@ def inspect_design_roles(
     *,
     show: bool = True,
 ) -> DesignRoles:
-    """Split IVs by design role and optionally print a compact summary."""
+    """Split IVs by design role and optionally print a compact summary.
+
+    Args:
+        iv_config: Independent variables to split.
+        show: Print the split and every factorial condition.
+
+    Returns:
+        The IVs grouped into between-subjects, block-counterbalanced and
+        trial-randomized, plus the full condition list.
+    """
     between_ivs, block_within_ivs, trial_within_ivs = split_ivs_by_design_role(iv_config)
     within_ivs = {**block_within_ivs, **trial_within_ivs}
     all_conditions = factorial_conditions({k: v["levels"] for k, v in iv_config.items()})
@@ -246,12 +334,25 @@ def inspect_experiment_structure(
     *,
     show: bool = True,
 ) -> DesignRoles:
-    """Experiment-facing alias for `inspect_design_roles`."""
+    """Experiment-facing alias for `inspect_design_roles`.
+
+    Args:
+        iv_config: Independent variables to split.
+        show: Print the split and every factorial condition.
+    """
     return inspect_design_roles(iv_config, show=show)
 
 
 def build_controlled_vars(model_type: Optional[str], cvs: dict[str, list[Any]]) -> dict[str, str]:
-    """Encode control-variable levels as trial-table metadata columns."""
+    """Encode control-variable levels as trial-table metadata columns.
+
+    Args:
+        model_type: AI model recorded alongside the CVs, if any.
+        cvs: Control variables to encode.
+
+    Returns:
+        Metadata columns, with each CV's levels joined by ``|``.
+    """
     controlled_vars = {
         **{f"CV_{k}_levels": "|".join(str(v) for v in vals) for k, vals in cvs.items()},
     }
@@ -267,7 +368,18 @@ def select_trial_rows(
     participant_id: Optional[int] = None,
     condition_filter: Optional[dict[str, Any]] = None,
 ) -> pd.DataFrame:
-    """Select trial rows for one trial, participant, condition, or experiment."""
+    """Select trial rows for one trial, participant, condition, or experiment.
+
+    Args:
+        trials_df: All generated trials.
+        mode: Selection scope, e.g. ``participant_by_participant`` for one
+            participant or a whole-experiment mode for everything.
+        participant_id: Which participant to select in per-participant mode.
+        condition_filter: Keep only rows matching these IV values.
+
+    Returns:
+        The matching subset of ``trials_df``.
+    """
     mode = mode.lower()
     selected = trials_df.copy()
 

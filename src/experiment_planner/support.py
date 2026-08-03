@@ -117,7 +117,14 @@ class ValidationReport:
 
 
 def load_support_matrix(path: str | Path | None = None) -> dict[str, Any]:
-    """Load and compile the single support standard used by validation."""
+    """Load and compile the single support standard used by validation.
+
+    Args:
+        path: Support matrix JSON to load; the bundled standard if None.
+
+    Returns:
+        The matrix with its ``$groups.*`` references resolved.
+    """
     matrix_path = Path(path) if path is not None else DEFAULT_SUPPORT_MATRIX
     return deepcopy(_load_support_matrix_cached(str(matrix_path)))
 
@@ -138,7 +145,20 @@ def validate_design_support(
     strict: bool = False,
     show: bool = False,
 ) -> ValidationReport:
-    """Validate IV/DV names plus supported semantic CVs against the support matrix."""
+    """Validate IV/DV names plus supported semantic CVs against the support matrix.
+
+    Args:
+        iv_config: Independent variables to check.
+        cvs: Control variables to check.
+        dvs: Dependent variables to check.
+        stage: Stage to validate for, e.g. ``design``.
+        support: Support matrix to check against; the bundled one if None.
+        strict: Treat warnings as failures.
+        show: Print the rendered report.
+
+    Returns:
+        The validation report.
+    """
     support = support or load_support_matrix()
     report = ValidationReport(stage=normalize_stage(stage))
     supported_ivs = support["global"]["ivs"]
@@ -231,7 +251,18 @@ def validate_ui_config_support(
     strict: bool = False,
     show: bool = True,
 ) -> ValidationReport:
-    """Validate a UI-exported config before trial generation consumes it."""
+    """Validate a UI-exported config before trial generation consumes it.
+
+    Args:
+        config: The UI-exported configuration dict.
+        stage: Stage to validate for, e.g. ``trial_generation``.
+        support: Support matrix to check against; the bundled one if None.
+        strict: Treat warnings as failures.
+        show: Print the rendered report.
+
+    Returns:
+        The validation report.
+    """
     support = support or load_support_matrix()
     report = validate_design_support(
         config.get("ivs", {}),
@@ -267,7 +298,18 @@ def validate_xaikit_test(
     strict: bool = False,
     show: bool = True,
 ) -> ValidationReport:
-    """Validate the full xaikitTest workflow object for a given stage."""
+    """Validate the full xaikitTest workflow object for a given stage.
+
+    Args:
+        test: The ``xaikitTest`` workflow to inspect.
+        stage: Stage to validate for; each also re-checks earlier stages.
+        support: Support matrix to check against; the bundled one if None.
+        strict: Treat warnings as failures.
+        show: Print the rendered report.
+
+    Returns:
+        The validation report.
+    """
     support = support or load_support_matrix()
     stage = normalize_stage(stage)
     report = validate_design_support(
@@ -288,7 +330,14 @@ def validate_xaikit_test(
 
 
 def normalize_stage(stage: str) -> str:
-    """Return the canonical validation stage."""
+    """Return the canonical validation stage.
+
+    Args:
+        stage: Stage name, e.g. ``design`` or ``trial_generation``.
+
+    Raises:
+        ValueError: If the stage is not recognised.
+    """
     key = _slug(stage)
     if key not in SUPPORTED_STAGES:
         raise ValueError(f"Unknown validation stage {stage!r}. Supported stages: {_format_values(SUPPORTED_STAGES)}.")
@@ -296,12 +345,28 @@ def normalize_stage(stage: str) -> str:
 
 
 def normalize_iv_name(name: Any, support: Optional[dict[str, Any]] = None) -> str:
-    """Normalize a UI/display IV name to the canonical support key."""
+    """Normalize a UI/display IV name to the canonical support key.
+
+    Args:
+        name: IV name as typed or exported, e.g. ``xai methods``.
+        support: Support matrix supplying the aliases; the bundled one if None.
+
+    Returns:
+        The canonical key, e.g. ``xai_method``.
+    """
     return _aliases(support or load_support_matrix(), "iv").get(_slug(name), _slug(name))
 
 
 def normalize_value(value: Any, aliases: Optional[dict[str, Any]] = None) -> Any:
-    """Normalize user-facing labels while preserving booleans and numbers."""
+    """Normalize user-facing labels while preserving booleans and numbers.
+
+    Args:
+        value: A level as typed or exported, e.g. ``"wine quality"``.
+        aliases: Value aliases to apply; the bundled ones if None.
+
+    Returns:
+        The canonical value; booleans and numbers pass through untouched.
+    """
     if isinstance(value, bool) or value is None or isinstance(value, (int, float)):
         return value
     flat_aliases = _aliases(aliases or load_support_matrix(), "value")
@@ -310,7 +375,16 @@ def normalize_value(value: Any, aliases: Optional[dict[str, Any]] = None) -> Any
 
 
 def format_validation_report(report: ValidationReport, *, include_normalized: bool = False) -> str:
-    """Render a friendly validation report."""
+    """Render a friendly validation report.
+
+    Args:
+        report: The report to render.
+        include_normalized: Also show the canonical names and values the
+            validator resolved the design to.
+
+    Returns:
+        The report as printable text.
+    """
     has_messages = bool(report.errors or report.warnings or report.reminders)
     if not has_messages and not (include_normalized and report.normalized):
         return ""
@@ -332,7 +406,11 @@ def format_validation_report(report: ValidationReport, *, include_normalized: bo
 
 
 def print_validation_report(report: ValidationReport) -> None:
-    """Print a rendered validation report."""
+    """Print a rendered validation report.
+
+    Args:
+        report: The report to print.
+    """
     text = format_validation_report(report)
     if text:
         print(text)

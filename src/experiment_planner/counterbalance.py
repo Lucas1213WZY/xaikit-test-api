@@ -102,6 +102,13 @@ def make_within_condition_order_labels(within_ivs: dict[str, list]) -> list:
 
     Returns dict conditions instead of flattened strings so build_trial_sequence()
     can write named IV columns such as xai_method='shap'.
+
+    Args:
+        within_ivs: Within-subjects IVs, keyed by name. Empty yields a single
+            placeholder condition.
+
+    Returns:
+        One dict per crossed combination of the within-subjects levels.
     """
     if not within_ivs:
         return [{"withinCondition": "single_condition"}]
@@ -222,7 +229,15 @@ def _condition_key(condition: Any) -> str:
 
 
 def counterbalancing_diagnostics(orders: list[list]) -> dict[str, Any]:
-    """Return position and immediate-pair balance diagnostics for condition orders."""
+    """Return position and immediate-pair balance diagnostics for condition orders.
+
+    Args:
+        orders: One condition sequence per participant.
+
+    Returns:
+        How often each condition lands in each position, and how often each
+        ordered pair occurs back to back.
+    """
     if not orders:
         return {
             "n_conditions": 0,
@@ -290,6 +305,12 @@ def to_psychopy_trial_list(order: list) -> list[dict[str, Any]]:
     The generated list can be passed to psychopy.data.TrialHandler with
     method='sequential'. PsychoPy stays optional; the Bradley order generation
     remains local and testable.
+
+    Args:
+        order: One participant's condition sequence, as dicts or bare labels.
+
+    Returns:
+        One dict per trial, ready for PsychoPy.
     """
     trial_list = []
     for condition in order:
@@ -301,7 +322,17 @@ def to_psychopy_trial_list(order: list) -> list[dict[str, Any]]:
 
 
 def make_psychopy_trial_handler(order: list, *, n_reps: int = 1, seed: int | None = None):
-    """Create a PsychoPy TrialHandler for an already-counterbalanced order."""
+    """Create a PsychoPy TrialHandler for an already-counterbalanced order.
+
+    Args:
+        order: One participant's condition sequence.
+        n_reps: How many times the sequence repeats.
+        seed: Seed passed to the handler.
+
+    Raises:
+        ImportError: If PsychoPy is not installed. Use
+            ``to_psychopy_trial_list`` instead when it is unavailable.
+    """
     try:
         from psychopy import data
     except ImportError as exc:
@@ -600,7 +631,15 @@ def build_trial_sequence(
 # ── 5. EXPORT ──────────────────────────────────────────────────────────────────
 
 def export_trials_csv(trials: list[dict], path: str | Path) -> Path:
-    """Export trial list to CSV. Returns the written path."""
+    """Export trial list to CSV.
+
+    Args:
+        trials: Trial rows to write.
+        path: Destination file.
+
+    Returns:
+        The written path.
+    """
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     if not trials:
@@ -618,7 +657,15 @@ def export_trials_csv(trials: list[dict], path: str | Path) -> Path:
 
 
 def export_trials_json(trials: list[dict], path: str | Path) -> Path:
-    """Export trial list to JSON. Returns the written path."""
+    """Export trial list to JSON.
+
+    Args:
+        trials: Trial rows to write.
+        path: Destination file.
+
+    Returns:
+        The written path.
+    """
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
@@ -647,7 +694,26 @@ def export_design_summary(
     trials_per_condition: int | None = None,
     trials_per_participant: int | None = None,
 ) -> Path:
-    """Export a human-readable design summary JSON alongside the trial CSV."""
+    """Export a human-readable design summary JSON alongside the trial CSV.
+
+    Args:
+        iv_config: The full independent-variable configuration.
+        between_ivs: IVs varied between participants.
+        within_ivs: IVs varied within a participant.
+        strategy: Counterbalancing strategy actually applied.
+        orders: The condition sequence generated per participant.
+        assignments: Which participant received which condition.
+        path: Destination file.
+        block_within_ivs: Within-subjects IVs counterbalanced by block.
+        trial_within_ivs: Within-subjects IVs randomized trial by trial.
+        counterbalancing_strategy: Requested strategy, before resolution.
+        trial_randomization_strategy: How trials were ordered within a block.
+        trials_per_condition: Trials generated for each condition.
+        trials_per_participant: Trials each participant sees in total.
+
+    Returns:
+        The written path.
+    """
     path = Path(path)
     diagnostics = counterbalancing_diagnostics(orders)
     summary = {

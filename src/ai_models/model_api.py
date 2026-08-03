@@ -60,7 +60,15 @@ def classification_metrics(
     threshold: float = 0.5,
     include_report: bool = False,
 ) -> Dict[str, Any]:
-    """Compute common classification metrics from model predictions."""
+    """Compute common classification metrics from model predictions.
+
+    Args:
+        y_true: True labels.
+        predictions: Raw model outputs, labels or per-class probabilities.
+        positive_label: Class treated as positive.
+        threshold: Probability cutoff for the positive class.
+        include_report: Also include the per-class precision/recall report.
+    """
     from sklearn.metrics import (
         accuracy_score,
         average_precision_score,
@@ -464,7 +472,11 @@ MODEL_REQUIRES_ONE_HOT_ENCODING = {
 
 
 def requires_one_hot_encoding(model_type: str) -> bool:
-    """Return whether the model family expects one-hot encoded categorical features."""
+    """Return whether the model family expects one-hot encoded categorical features.
+
+    Args:
+        model_type: Architecture to check, e.g. ``mlp`` or ``xgboost``.
+    """
     model_key = model_type.lower().strip()
     if model_key not in MODEL_REQUIRES_ONE_HOT_ENCODING:
         raise ValueError(
@@ -775,5 +787,11 @@ def _shape_from_checkpoint(weight_path: str) -> Dict[str, int]:
 
 def load_pretrained_model(dataset: str, model_type: str = 'mlp',
                           source: str = 'coxam') -> UnifiedModel:
-    """Quick helper to load a pre-trained model."""
+    """Quick helper to load a pre-trained model.
+
+    Args:
+        dataset: Dataset the checkpoint was trained on.
+        model_type: Architecture to load, e.g. ``mlp`` or ``xgboost``.
+        source: Study the weights came from, e.g. ``coax`` or ``coxam``.
+    """
     return ModelManager().load_model(dataset, model_type, source)

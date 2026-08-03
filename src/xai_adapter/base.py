@@ -23,17 +23,30 @@ PostprocessFn = Callable[[ArrayLike, np.ndarray], np.ndarray]
 
 
 def identity_preprocess(x: ArrayLike) -> np.ndarray:
-    """Default preprocessing: coerce input to a numpy array."""
+    """Default preprocessing: coerce input to a numpy array.
+
+    Args:
+        x: The instances to convert.
+    """
     return np.asarray(x)
 
 
 def identity_postprocess(_raw_instances: ArrayLike, attributions: np.ndarray) -> np.ndarray:
-    """Default postprocessing: leave attributions unchanged."""
+    """Default postprocessing: leave attributions unchanged.
+
+    Args:
+        _raw_instances: The instances explained; unused by this default.
+        attributions: The attributions to return.
+    """
     return np.asarray(attributions)
 
 
 def ensure_2d(values: ArrayLike) -> np.ndarray:
-    """Return values as a 2D numpy array."""
+    """Return values as a 2D numpy array.
+
+    Args:
+        values: Array-like input; a single row is promoted to shape ``(1, n)``.
+    """
     array = np.asarray(values)
     if array.ndim == 1:
         return array.reshape(1, -1)
@@ -46,6 +59,10 @@ def select_target(values: ArrayLike, target: Optional[int] = 1) -> np.ndarray:
 
     If outputs are already 1D, they are returned as-is. For 2D outputs and a
     target, the selected column is returned.
+
+    Args:
+        values: Model outputs, per class when 2D.
+        target: Class column to select; None leaves 2D outputs untouched.
     """
     array = np.asarray(values)
     if array.ndim == 2 and target is not None:
@@ -54,7 +71,16 @@ def select_target(values: ArrayLike, target: Optional[int] = 1) -> np.ndarray:
 
 
 def baseline_from_data(data: ArrayLike, baseline: str = "mean") -> np.ndarray:
-    """Compute a baseline vector from reference data."""
+    """Compute a baseline vector from reference data.
+
+    Args:
+        data: Reference rows the baseline is summarized from.
+        baseline: Summary to use -- ``mean``, or ``zeros`` for an all-zero
+            reference.
+
+    Returns:
+        One baseline value per feature.
+    """
     data_array = ensure_2d(data)
     if baseline == "mean":
         return np.mean(data_array, axis=0)

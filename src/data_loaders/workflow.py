@@ -34,7 +34,14 @@ DEFAULT_DATASET_FEATURES: dict[str, list[str]] = {
 
 
 def get_default_feature_cols(dataset_id: str) -> Optional[list[str]]:
-    """Return the default tutorial feature subset for a dataset, if configured."""
+    """Return the default tutorial feature subset for a dataset, if configured.
+
+    Args:
+        dataset_id: Dataset to look up.
+
+    Returns:
+        The curated feature list, or None when the dataset has no default.
+    """
     features = DEFAULT_DATASET_FEATURES.get(dataset_id.lower().strip())
     return list(features) if features is not None else None
 
@@ -145,7 +152,26 @@ def prepare_dataset(
     show_available: bool = True,
     show_summary: bool = True,
 ) -> PreparedDataset:
-    """Load a dataset through `src.data_loaders`, split it, and return one wrapper."""
+    """Load a dataset through `src.data_loaders`, split it, and return one wrapper.
+
+    Args:
+        dataset_id: Dataset to load, e.g. ``wine_quality``.
+        model_type: Model the encoding should suit, e.g. ``mlp``.
+        feature_cols: Use exactly these columns, skipping selection.
+        num_features: Keep this many features when selecting.
+        rank_features_by_target: Rank candidates by association with the target
+            before taking ``num_features``.
+        use_default_features: Fall back to the dataset's curated default set.
+        requires_one_hot_encoding: Force one-hot encoding on or off; None
+            decides from the model type.
+        test_size: Fraction held out for testing.
+        random_state: Seed for the split.
+        show_available: Print the datasets that can be loaded.
+        show_summary: Print a summary of the prepared dataset.
+
+    Returns:
+        The dataset with both display and model-ready views.
+    """
     if show_available:
         print("Available training datasets:", list_original_datasets())
 
@@ -241,7 +267,14 @@ def load_dataset_and_split(
     test_size: float = 0.2,
     random_state: int = 42,
 ) -> DatasetSplit:
-    """Load a tabular training dataset through `src.data_loaders` and split it."""
+    """Load a tabular training dataset through `src.data_loaders` and split it.
+
+    Args:
+        dataset_id: Dataset to load.
+        one_hot_encode: One-hot encode categorical features.
+        test_size: Fraction held out for testing.
+        random_state: Seed for the split.
+    """
     dataset = load_original_dataset(dataset_id)
     return split_loaded_dataset(
         dataset_id,
@@ -260,7 +293,15 @@ def split_loaded_dataset(
     test_size: float = 0.2,
     random_state: int = 42,
 ) -> DatasetSplit:
-    """Split an already-loaded `src.data_loaders` dataset object."""
+    """Split an already-loaded `src.data_loaders` dataset object.
+
+    Args:
+        dataset_id: Identifier recorded on the split.
+        dataset: The loaded dataset object.
+        one_hot_encode: One-hot encode categorical features.
+        test_size: Fraction held out for testing.
+        random_state: Seed for the split.
+    """
     X_model, y = dataset.prepare_data_for_model(one_hot_encode=one_hot_encode)
     X_raw = np.asarray(dataset.X, dtype=np.float32)
     X_model = np.asarray(X_model, dtype=np.float32)
@@ -317,6 +358,13 @@ def reencode_prepared_dataset(
     This lets a workflow choose the dataset before choosing the AI model. Raw
     rows, labels, and instance IDs remain fixed; only X_train/X_test change to
     match the encoding required by the selected model.
+
+    Args:
+        prepared: The dataset to re-encode.
+        model_type: Model the new encoding should suit.
+        requires_one_hot_encoding: Force one-hot encoding on or off; None
+            decides from the model type.
+        show_summary: Print a summary of the re-encoded dataset.
     """
     if requires_one_hot_encoding is None:
         from src.ai_models import requires_one_hot_encoding as model_requires_one_hot_encoding
@@ -366,7 +414,11 @@ def _model_feature_names(dataset: Any, one_hot_encode: bool) -> list[str]:
 
 
 def print_dataset_split_summary(split: DatasetSplit) -> None:
-    """Print a compact check of the selected dataset and split."""
+    """Print a compact check of the selected dataset and split.
+
+    Args:
+        split: The split to summarize.
+    """
     print(f"Dataset   : {split.dataset_id}  ({split.X_model.shape[0]} rows, {split.X_model.shape[1]} model features)")
     print(f"Features  : {split.feature_names}")
     print(f"Encoding  : {'one-hot' if split.one_hot_encode else 'native'}")
@@ -378,7 +430,12 @@ def print_dataset_split_summary(split: DatasetSplit) -> None:
 
 
 def make_train_data_for_xai(split: DatasetSplit, y_train: np.ndarray) -> SimpleNamespace:
-    """Package model-training data in the shape expected by XAI adapters."""
+    """Package model-training data in the shape expected by XAI adapters.
+
+    Args:
+        split: The dataset split supplying the feature matrix.
+        y_train: Training labels to pair with it.
+    """
     return SimpleNamespace(
         X=split.X_train,
         y=y_train,
@@ -388,12 +445,20 @@ def make_train_data_for_xai(split: DatasetSplit, y_train: np.ndarray) -> SimpleN
 
 
 def load_csv_records(path: str | Path) -> list[dict[str, Any]]:
-    """Load a CSV as a list of dictionaries."""
+    """Load a CSV as a list of dictionaries.
+
+    Args:
+        path: CSV file to read.
+    """
     with open(path, newline="", encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
 
 def load_json_config(path: str | Path) -> dict[str, Any]:
-    """Load a JSON config exported by the UI."""
+    """Load a JSON config exported by the UI.
+
+    Args:
+        path: JSON file to read.
+    """
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)

@@ -39,7 +39,19 @@ def plot_iv_dv_grid(
     title: Optional[str] = "Experiment results",
     value_labels: bool = True,
 ) -> ResultGrid:
-    """Plot participant-level mean DV bars for every DV × IV combination."""
+    """Plot participant-level mean DV bars for every DV × IV combination.
+
+    Args:
+        responses: Responses to plot.
+        ivs: Independent variables, one column of panels each.
+        dvs: Dependent variables, one row of panels each.
+        participant_column: Column identifying participants.
+        phase: Restrict to one trial phase, e.g. ``testing``.
+        errorbar: Error bar statistic, e.g. ``sem``; None hides them.
+        iv_levels: Level order per IV.
+        title: Figure title.
+        value_labels: Print the value above each bar.
+    """
     import matplotlib.pyplot as plt
 
     ivs = list(dict.fromkeys(ivs))
@@ -173,7 +185,23 @@ def plot_dv_by_two_ivs(
     title: Optional[str] = None,
     value_labels: bool = True,
 ) -> InteractionPlot:
-    """Plot participant-level mean DV bars using one IV for x and one for color."""
+    """Plot participant-level mean DV bars using one IV for x and one for color.
+
+    Args:
+        responses: Responses to plot.
+        x_iv: IV placed on the x axis.
+        hue_iv: IV distinguished by colour within each x group.
+        dv: Dependent variable to plot.
+        participant_column: Column identifying participants.
+        phase: Restrict to one trial phase, e.g. ``testing``.
+        errorbar: Error bar statistic, e.g. ``sem``; None hides them.
+        x_levels: Order of x-axis levels.
+        hue_levels: Order of colour levels.
+        x_labels: Display names for x-axis levels.
+        hue_labels: Display names for colour levels.
+        title: Figure title.
+        value_labels: Print the value above each bar.
+    """
     import matplotlib.pyplot as plt
 
     required = [participant_column, x_iv, hue_iv, dv]

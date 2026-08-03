@@ -30,7 +30,18 @@ def analyze_iv_dv(
     dv: str,
     participant_column: str = "participantId",
 ) -> IVDVAnalysisResult:
-    """Analyze one DV by one IV, accounting for repeated participants."""
+    """Analyze one DV by one IV, accounting for repeated participants.
+
+    Args:
+        responses: Simulated or collected trial responses.
+        iv: Independent variable to group by.
+        dv: Dependent variable to test.
+        participant_column: Column identifying participants, used to aggregate
+            within participant before testing.
+
+    Returns:
+        Descriptives and the test appropriate to the design.
+    """
     required = [iv, dv, participant_column]
     missing = [column for column in required if column not in responses]
     if missing:

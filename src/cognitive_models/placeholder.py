@@ -21,7 +21,13 @@ def get_trial_instance_attributes(
     *,
     label_column: str,
 ) -> dict[str, float]:
-    """Extract raw feature values for the trial's original dataset row id."""
+    """Extract raw feature values for the trial's original dataset row id.
+
+    Args:
+        trial_info: The trial row, supplying the instance id.
+        raw_dataset: Raw feature values to look the instance up in.
+        label_column: Target column name, excluded from the result.
+    """
     instance_id = int(trial_info[INSTANCE_ID_COL])
     row = raw_dataset.iloc[instance_id]
     feature_row = row.drop(labels=[label_column], errors="ignore")
@@ -32,7 +38,15 @@ def get_trial_ai_prediction(
     trial_info: dict[str, Any],
     explanation_pool: pd.DataFrame,
 ) -> Optional[int]:
-    """Return the trained AI model prediction stored in the explanation CSV."""
+    """Return the trained AI model prediction stored in the explanation CSV.
+
+    Args:
+        trial_info: The trial row, supplying the instance id.
+        explanation_pool: Table holding the stored predictions.
+
+    Returns:
+        The predicted label, or None when the instance has no stored prediction.
+    """
     if PREDICTION_COL not in explanation_pool.columns:
         return None
 
@@ -59,7 +73,15 @@ def get_trial_instance_explanation(
     trial_info: dict[str, Any],
     explanation_pool: pd.DataFrame,
 ) -> dict[str, float]:
-    """Select explanation values matching the trial's XAI method and instance."""
+    """Select explanation values matching the trial's XAI method and instance.
+
+    Args:
+        trial_info: The trial row, supplying the instance id and XAI method.
+        explanation_pool: Explanations to draw from.
+
+    Returns:
+        The explanation values, empty when the trial shows no explanation.
+    """
     xai_method = str(trial_info.get("xai_method", trial_info.get("xai_type", "none"))).lower()
     if xai_method in {"none", "no_xai", "control"}:
         return {}
@@ -96,7 +118,17 @@ def build_single_trial_cognitive_input(
     *,
     label_column: str,
 ) -> dict[str, Any]:
-    """Combine trial metadata, raw instance attributes, AI pred, and XAI values."""
+    """Combine trial metadata, raw instance attributes, AI pred, and XAI values.
+
+    Args:
+        trial_info: The trial row being run.
+        raw_dataset: Raw feature values, for the attributes shown.
+        explanation_pool: Explanations and AI predictions to draw from.
+        label_column: Target column name, excluded from the attributes.
+
+    Returns:
+        Everything a cognitive model needs to respond to one trial.
+    """
     return {
         "trial_info": dict(trial_info),
         "instance_attributes": get_trial_instance_attributes(
@@ -117,7 +149,16 @@ def dummy_cognitive_model(
     dvs: dict[str, list[Any]],
     trial_data: dict[str, Any],
 ) -> dict[str, Any]:
-    """Placeholder cognitive model using current CoXAM-style parameter names."""
+    """Placeholder cognitive model using current CoXAM-style parameter names.
+
+    Args:
+        cognitive_params: Agent parameters; accepted but not used by this stub.
+        dvs: Dependent variables the response must supply.
+        trial_data: The trial input from ``build_single_trial_cognitive_input``.
+
+    Returns:
+        One simulated response per DV.
+    """
     trial_info = trial_data.get("trial_info", {})
     explanation = trial_data.get("instance_explanation", {}) or {}
 

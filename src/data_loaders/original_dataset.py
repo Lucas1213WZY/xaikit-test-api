@@ -39,6 +39,13 @@ def load_original_dataset(dataset_id: str, **kwargs: Any) -> Any:
     The dataset modules under `assets/original_datasets` predate the current
     package layout and import `datasets.tabular_dataset`. This adapter keeps
     that legacy import working while exposing the loaders through `src`.
+
+    Args:
+        dataset_id: Dataset to load, e.g. ``wine_quality``.
+        **kwargs: Passed through to the dataset's own loader.
+
+    Raises:
+        ValueError: If the dataset id is not one of the bundled datasets.
     """
     dataset_key = dataset_id.lower().strip()
     if dataset_key not in _DATASET_MODULES:

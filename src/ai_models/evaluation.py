@@ -27,7 +27,16 @@ _PREFERRED_METRIC_COLUMNS = [
 
 
 def positive_class_scores(predictions: Any, y: Sequence[Any], *, positive_label: int = 1) -> np.ndarray:
-    """Reduce raw predictions/probabilities to positive-class scores."""
+    """Reduce raw predictions/probabilities to positive-class scores.
+
+    Args:
+        predictions: Raw model outputs, labels or per-class probabilities.
+        y: True labels, used to locate the positive class column.
+        positive_label: Class treated as positive.
+
+    Returns:
+        One positive-class score per row.
+    """
     preds = np.asarray(predictions)
     labels = np.unique(np.asarray(y))
 
@@ -50,7 +59,19 @@ def evaluate_model(
     threshold: float = 0.5,
     include_report: bool = False,
 ) -> dict[str, dict[str, Any]]:
-    """Evaluate a trained model with classic classification metrics per split."""
+    """Evaluate a trained model with classic classification metrics per split.
+
+    Args:
+        manager: The model manager holding the trained model.
+        data: The prepared dataset supplying the splits.
+        split: ``train``, ``test`` or ``both``.
+        positive_label: Class treated as positive.
+        threshold: Probability cutoff for the positive class.
+        include_report: Also include the per-class precision/recall report.
+
+    Returns:
+        Metrics keyed by split.
+    """
     split = split.lower()
     results: dict[str, dict[str, Any]] = {}
     if split in {"train", "both"}:
@@ -69,7 +90,13 @@ def evaluate_model(
 
 
 def training_summary_table(training_info: dict[str, Any], model_name: Any, dataset_id: Any) -> pd.DataFrame:
-    """Return a one-row summary of the latest training run."""
+    """Return a one-row summary of the latest training run.
+
+    Args:
+        training_info: The record returned by the training call.
+        model_name: Model name recorded in the row.
+        dataset_id: Dataset identifier recorded in the row.
+    """
     if training_info is None:
         raise RuntimeError("Train a model before requesting the training summary.")
     summary = {key: value for key, value in training_info.items() if key != "history"}
@@ -79,7 +106,13 @@ def training_summary_table(training_info: dict[str, Any], model_name: Any, datas
 
 
 def training_history_table(training_info: dict[str, Any], model_name: Any = None, dataset_id: Any = None) -> pd.DataFrame:
-    """Return the accuracy checkpoint history from the latest training run."""
+    """Return the accuracy checkpoint history from the latest training run.
+
+    Args:
+        training_info: The record returned by the training call.
+        model_name: Model name recorded on the rows.
+        dataset_id: Dataset identifier recorded on the rows.
+    """
     if training_info is None:
         raise RuntimeError("Train a model before requesting training history.")
     history = training_info.get("history", [])
@@ -99,7 +132,12 @@ def training_history_table(training_info: dict[str, Any], model_name: Any = None
 
 
 def plot_training_history(training_info: dict[str, Any], *, ax: Any = None) -> Any:
-    """Plot metric checkpoints from training with a target score."""
+    """Plot metric checkpoints from training with a target score.
+
+    Args:
+        training_info: The record returned by the training call.
+        ax: Existing matplotlib axes to draw on; a new figure is made if None.
+    """
     history_df = training_history_table(training_info)
     target_metric = training_info.get("target_metric", "accuracy") if training_info is not None else "accuracy"
     if "epochs" not in history_df or target_metric not in history_df:
@@ -126,7 +164,11 @@ def plot_training_history(training_info: dict[str, Any], *, ax: Any = None) -> A
 
 
 def metrics_table(metrics: dict[str, dict[str, Any]]) -> pd.DataFrame:
-    """Return scalar evaluation metrics as a compact split-by-metric table."""
+    """Return scalar evaluation metrics as a compact split-by-metric table.
+
+    Args:
+        metrics: Metrics keyed by split, as returned by ``evaluate_model``.
+    """
     if not metrics:
         raise RuntimeError("Evaluate the model before requesting the metrics table.")
     rows = {
@@ -147,7 +189,15 @@ def confusion_matrix_table(
     positive_label: int = 1,
     threshold: float = 0.5,
 ) -> pd.DataFrame:
-    """Return a labeled confusion matrix for the requested split."""
+    """Return a labeled confusion matrix for the requested split.
+
+    Args:
+        manager: The model manager holding the trained model.
+        data: The prepared dataset supplying the split.
+        split: ``train`` or ``test``.
+        positive_label: Class treated as positive.
+        threshold: Probability cutoff for the positive class.
+    """
     split = split.lower()
     if split == "train":
         X, y = data.X_train, data.y_train
@@ -174,7 +224,16 @@ def plot_confusion_matrix(
     threshold: float = 0.5,
     ax: Any = None,
 ) -> Any:
-    """Plot a labeled confusion matrix for the requested split."""
+    """Plot a labeled confusion matrix for the requested split.
+
+    Args:
+        manager: The model manager holding the trained model.
+        data: The prepared dataset supplying the split.
+        split: ``train`` or ``test``.
+        positive_label: Class treated as positive.
+        threshold: Probability cutoff for the positive class.
+        ax: Existing matplotlib axes to draw on; a new figure is made if None.
+    """
     import matplotlib
     _patch_matplotlib_inline_rcparams(matplotlib)
     import matplotlib.pyplot as plt
@@ -207,7 +266,15 @@ def plot_auc_curves(
     positive_label: int = 1,
     ax: Any = None,
 ) -> Any:
-    """Plot ROC curves and AUC values for train/test predictions."""
+    """Plot ROC curves and AUC values for train/test predictions.
+
+    Args:
+        manager: The model manager holding the trained model.
+        data: The prepared dataset supplying the splits.
+        split: ``train``, ``test`` or ``both``.
+        positive_label: Class treated as positive.
+        ax: Existing matplotlib axes to draw on; a new figure is made if None.
+    """
     from sklearn.metrics import auc, roc_curve
     import matplotlib
     _patch_matplotlib_inline_rcparams(matplotlib)

@@ -60,7 +60,14 @@ def default_study_protocol() -> dict[str, Any]:
 
 
 def normalize_study_protocol(protocol: Optional[dict[str, Any]]) -> dict[str, Any]:
-    """Normalize strings/lists and fill omitted protocol fields."""
+    """Normalize strings/lists and fill omitted protocol fields.
+
+    Args:
+        protocol: A partial protocol; None yields the default.
+
+    Returns:
+        A complete protocol with every field present and list fields as lists.
+    """
     normalized = default_study_protocol()
     if protocol:
         normalized.update(deepcopy(protocol))
@@ -87,7 +94,14 @@ def normalize_study_protocol(protocol: Optional[dict[str, Any]]) -> dict[str, An
 
 
 def validate_study_protocol(protocol: dict[str, Any]) -> list[str]:
-    """Return plain-language problems that must be resolved before approval."""
+    """Return plain-language problems that must be resolved before approval.
+
+    Args:
+        protocol: The protocol to check.
+
+    Returns:
+        One message per problem; empty means the protocol is complete.
+    """
     protocol = normalize_study_protocol(protocol)
     problems = []
     if not protocol["study_title"].strip():
@@ -108,7 +122,12 @@ def edit_study_protocol(
     *,
     on_save: Optional[Callable[[dict[str, Any]], None]] = None,
 ) -> Any:
-    """Display an ipywidgets form and save its values through ``on_save``."""
+    """Display an ipywidgets form and save its values through ``on_save``.
+
+    Args:
+        protocol: Values to prefill the form with; the default if None.
+        on_save: Called with the edited protocol when Save is clicked.
+    """
     try:
         import ipywidgets as widgets
         from IPython.display import display

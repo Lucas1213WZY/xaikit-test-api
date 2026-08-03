@@ -86,10 +86,13 @@ class xaikitTest:
     ) -> None:
         """Create a study workflow.
 
-        ``design`` accepts an experiment-design UI export -- a ``DesignExport``, a
-        path to the exported JSON, or the already-loaded dict -- and registers its
-        IVs, CVs, DVs and study protocol immediately, so the design never has to be
-        retyped as ``add_iv``/``add_cv``/``add_dv`` calls.
+        Args:
+            project_name: Study label, used in summaries and output filenames.
+            output_dir: Root that relative output paths resolve against.
+            auto_validate_design: Re-check the design after each change.
+            design: An experiment-design UI export (``DesignExport``, path to the
+                JSON, or loaded dict). Registers its IVs, CVs, DVs and protocol
+                at once, instead of retyping them as ``add_iv``/``add_cv`` calls.
         """
         self.project_name = project_name
         self.output_dir = Path(output_dir)
@@ -138,10 +141,13 @@ class xaikitTest:
     def set_design_export(self, design: Any, **apply_kwargs: Any) -> "xaikitTest":
         """Register an experiment-design UI export's variables and protocol.
 
-        ``design`` is a ``DesignExport``, a path to the exported JSON, or the
-        already-loaded dict. Remaining keyword arguments are passed through to
-        ``apply_design_export`` (``dv_names``, ``include_rvs``, ``show``,
-        ``report``).
+        Args:
+            design: A ``DesignExport``, a path to the exported JSON, or the
+                already-loaded dict.
+            **apply_kwargs: Passed through to ``apply_design_export``:
+                ``dv_names`` to restrict which DVs are taken from the export,
+                ``include_rvs`` to also register recorded variables, and
+                ``show``/``report`` to control the printed summary.
         """
         if isinstance(design, DesignExport):
             parsed = design
@@ -166,7 +172,21 @@ class xaikitTest:
         end_survey_questions: Sequence[str] | str = (),
         validate: bool = True,
     ) -> "xaikitTest":
-        """Store the researcher-authored, participant-facing study protocol."""
+        """Store the researcher-authored, participant-facing study protocol.
+
+        Args:
+            study_title: Title shown to participants.
+            research_questions: Questions the study asks; list or single string.
+            consent_text: Consent wording shown before the study begins.
+            procedure_steps: Ordered dicts describing what a participant does.
+            study_summary: Short plain-language description of the study.
+            start_survey_questions: Questions asked before the trials.
+            end_survey_questions: Questions asked after the trials.
+            validate: Raise if anything required is missing; False stores a draft.
+
+        Raises:
+            ValueError: If ``validate`` is True and the protocol is incomplete.
+        """
         protocol = normalize_study_protocol({
             "study_title": study_title,
             "research_questions": research_questions,
@@ -194,7 +214,17 @@ class xaikitTest:
         return edit_study_protocol(self.study_protocol, on_save=store)
 
     def save_study_protocol(self, path: str | Path = "study_protocol.json") -> str:
-        """Validate and export the study setup to JSON."""
+        """Validate and export the study setup to JSON.
+
+        Args:
+            path: Destination file, resolved against ``output_dir``.
+
+        Returns:
+            The path written.
+
+        Raises:
+            ValueError: If the protocol is incomplete.
+        """
         problems = validate_study_protocol(self.study_protocol)
         if problems:
             raise ValueError("Study setup is incomplete: " + " ".join(problems))
@@ -204,7 +234,15 @@ class xaikitTest:
         return str(output_path)
 
     def approve_walkthrough(self, *, confirmed: bool = False) -> "xaikitTest":
-        """Approve a completed walkthrough, with explicit confirmation required."""
+        """Approve a completed walkthrough, with explicit confirmation required.
+
+        Args:
+            confirmed: Must be True, and only after reviewing the walkthrough.
+
+        Raises:
+            ValueError: If ``confirmed`` is False or the protocol is incomplete.
+            RuntimeError: If the walkthrough has not been previewed.
+        """
         if not confirmed:
             raise ValueError("Pass confirmed=True only after reviewing the complete walkthrough.")
         if not self.walkthrough_previewed:
@@ -216,7 +254,21 @@ class xaikitTest:
         return self
 
     def guide(self, stage: str = "design") -> Optional[pd.DataFrame]:
-        """Print a concise guide for one workflow stage."""
+        """Print a concise guide for one workflow stage.
+
+        Args:
+            stage: Which stage to explain -- ``design``, ``dataset``,
+                ``trial_generation``, ``model_training``,
+                ``explanation_generation``, ``cognitive_models`` or
+                ``cognitive_simulation``. Common aliases such as ``xai``,
+                ``trials`` or ``agents`` are accepted.
+
+        Returns:
+            The agent-selection table for ``cognitive_models``, else None.
+
+        Raises:
+            ValueError: If ``stage`` is not a known stage or alias.
+        """
         key = stage.lower().strip().replace("-", "_").replace(" ", "_")
         aliases = {
             "iv": "design",
@@ -286,7 +338,14 @@ class xaikitTest:
         dvs: Optional[dict[str, list[Any]]] = None,
         show: bool = True,
     ) -> "xaikitTest":
-        """Replace the stored IV/CV/DV design dictionaries."""
+        """Replace the stored IV/CV/DV design dictionaries.
+
+        Args:
+            iv_config: Independent variables, keyed by name. Left alone if None.
+            cvs: Control variables, keyed by name. Left alone if None.
+            dvs: Dependent variables, keyed by name. Left alone if None.
+            show: Print the validation summary afterwards.
+        """
         if iv_config is not None:
             self.iv_config = deepcopy(iv_config)
         if cvs is not None:
@@ -306,28 +365,57 @@ class xaikitTest:
         randomization: str = "block",
         show: bool = False,
     ) -> "xaikitTest":
-        """Add or replace one independent variable."""
+        """Add or replace one independent variable.
+
+        Args:
+            name: IV name, e.g. ``xai_method``.
+            iv_type: ``within`` (every participant sees every level) or
+                ``between`` (each participant sees one level).
+            levels: The values to manipulate.
+            randomization: For within-subjects IVs, ``block`` or ``trial``.
+                Must be omitted for between-subjects IVs.
+            show: Print the validation summary afterwards.
+        """
         set_iv(self.iv_config, name, iv_type, levels, randomization=randomization)
         if show:
             self.validate_design(show=True)
         return self
 
     def add_cv(self, name: str, levels: list[Any], *, show: bool = False) -> "xaikitTest":
-        """Add or replace one control variable."""
+        """Add or replace one control variable.
+
+        Args:
+            name: CV name, e.g. ``user_task``.
+            levels: The values held constant or recorded.
+            show: Print the validation summary afterwards.
+        """
         set_factor(self.CVs, name, levels)
         if show:
             self.validate_design(show=True)
         return self
 
     def add_dv(self, name: str, levels: list[Any], *, show: bool = False) -> "xaikitTest":
-        """Add or replace one dependent variable."""
+        """Add or replace one dependent variable.
+
+        Args:
+            name: DV name, e.g. ``forward_accuracy``.
+            levels: The values the measure can take.
+            show: Print the validation summary afterwards.
+        """
         set_factor(self.DVs, name, levels)
         if show:
             self.validate_design(show=True)
         return self
 
     def validate_design(self, *, show: bool = True) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
-        """Validate and optionally print the current experimental design."""
+        """Validate and optionally print the current experimental design.
+
+        Args:
+            show: Print the design summary table.
+
+        Returns:
+            The validated ``(iv_config, CVs, DVs)`` dictionaries.
+        """
         return validate_experiment_config(self.iv_config, self.CVs, self.DVs, show=show)
 
     def validate(
@@ -337,7 +425,18 @@ class xaikitTest:
         strict: bool = False,
         show: bool = True,
     ) -> ValidationReport:
-        """Validate this workflow object against the XAIKit support standard."""
+        """Validate this workflow object against the XAIKit support standard.
+
+        Args:
+            stage: Which stage to check -- ``design``, ``trial_generation``,
+                ``explanation_generation`` or ``execution``. Each stage also
+                re-checks the ones before it.
+            strict: Treat warnings as failures.
+            show: Print the report.
+
+        Returns:
+            The report, also stored on ``validation_reports[stage]``.
+        """
         report = validate_xaikit_test(
             self,
             stage=stage,
@@ -362,7 +461,27 @@ class xaikitTest:
         show_available: bool = True,
         show_summary: bool = True,
     ) -> PreparedDataset:
-        """Load, optionally feature-select, and split the dataset."""
+        """Load, optionally feature-select, and split the dataset.
+
+        Args:
+            dataset_id: Dataset to load, e.g. ``wine_quality``.
+            model_type: Model the encoding should suit, e.g. ``mlp``.
+            feature_cols: Use exactly these columns, skipping selection.
+            num_features: Keep this many features when selecting.
+            rank_features_by_target: Rank candidates by association with the
+                target before taking ``num_features``.
+            use_default_features: Fall back to the dataset's curated default
+                feature set when no explicit choice is given.
+            requires_one_hot_encoding: Force one-hot encoding on or off;
+                None decides from the data.
+            test_size: Fraction held out for testing.
+            random_state: Seed for the split.
+            show_available: Print the datasets XAIKit can load.
+            show_summary: Print a summary of the prepared dataset.
+
+        Returns:
+            The prepared dataset, also stored on ``self.data``.
+        """
         self.data = prepare_dataset(
             dataset_id,
             model_type=model_type,
@@ -399,10 +518,34 @@ class xaikitTest:
     ) -> TrialGenerationResult:
         """Build training rows followed by held-out testing rows.
 
-        ``allowed_instance_ids`` restricts both phases to instances an external
-        corpus can serve -- pass ``CoAXAssetRepository.available_instance_ids()``
-        to keep trials runnable against a fixed study set. Leave it unset to
-        sample the dataset freely.
+        Args:
+            model_name: Name recorded on the trials; defaults to the trained model.
+            participants_per_between_condition: Simulated participants per
+                between-subjects cell.
+            num_training: Instances shown in the training phase.
+            num_testing: Held-out instances shown in the testing phase.
+            balance_by_ai_prediction: Draw each phase equally from both predicted
+                classes. Requires a trained or loaded AI model.
+            counterbalancing_strategy: How conditions are ordered across
+                participants; ``auto`` picks from the design.
+            trial_randomization_strategy: How trials are ordered within a
+                participant, e.g. ``balanced``.
+            instance_wise_explanation: Give each instance its own explanation
+                rather than reusing one per condition.
+            shuffle_instances: Shuffle the instance pool before sampling.
+            max_trial_instances: Cap on distinct instances explanations are
+                generated for.
+            allowed_instance_ids: Restrict both phases to instances an external
+                corpus can serve -- pass
+                ``CoAXAssetRepository.available_instance_ids()`` to keep trials
+                runnable against a fixed study set. Unset samples freely.
+            seed: Seed for sampling and ordering.
+            output_dir: Where the trial tables are written.
+            preview_rows: Rows to print when ``show`` is True.
+            show: Print a preview of the generated trials.
+
+        Returns:
+            The result, also stored on ``trial_result``/``trials``.
         """
         data = self._require_data()
         ai_predictions_by_instance = None
@@ -466,6 +609,16 @@ class xaikitTest:
         After this call the study behaves exactly as it would after
         ``train_AI_model``: ``generate_trials(balance_by_ai_prediction=True)`` and
         ``explanations()`` both read from the loaded model.
+
+        Args:
+            model_type: Architecture to load, e.g. ``mlp`` or ``xgboost``.
+            source: Study the weights came from, e.g. ``coax`` or ``coxam``.
+            dataset_id: Dataset the checkpoint was trained on; defaults to the
+                prepared dataset.
+
+        Raises:
+            ValueError: If the checkpoint's feature width does not match the
+                prepared data.
         """
         from src.ai_models import ModelManager
 
@@ -518,7 +671,31 @@ class xaikitTest:
         model_kwargs: Optional[dict[str, Any]] = None,
         train_kwargs: Optional[dict[str, Any]] = None,
     ) -> Any:
-        """Create and train the AI model used for predictions and explanations."""
+        """Create and train the AI model used for predictions and explanations.
+
+        Re-encodes the prepared dataset if ``model_type`` needs a different
+        one-hot setting than the one it was prepared with.
+
+        Args:
+            model_type: Architecture to train -- ``mlp``, ``xgboost`` or
+                ``sim2real``.
+            source: Study whose defaults to follow, e.g. ``coax`` or ``coxam``.
+            target_accuracy: Stop once training accuracy reaches this. Alias for
+                ``target_score`` kept for older notebooks.
+            target_metric: Metric that ``target_score`` refers to.
+            target_score: Stop once ``target_metric`` reaches this; takes
+                precedence over ``target_accuracy``. Unset trains a fixed run.
+            max_epochs: Upper bound on epochs when training to a target.
+            check_every_epochs: How often the target is re-checked.
+            batch_size: Training batch size.
+            verbose: Let training output print instead of capturing it to
+                ``training_stdout``.
+            model_kwargs: Extra arguments for model construction.
+            train_kwargs: Extra arguments for the training call.
+
+        Returns:
+            The trained model, also stored on ``model``/``trained_ai_model``.
+        """
         data = self._require_data()
         from src.ai_models import ModelManager, requires_one_hot_encoding
 
@@ -592,7 +769,11 @@ class xaikitTest:
         return ai_eval.training_history_table(self.training_info, self.model_name, self._dataset_id())
 
     def plot_training_history(self, *, ax: Any = None) -> Any:
-        """Plot metric checkpoints from training with a target score."""
+        """Plot metric checkpoints from training with a target score.
+
+        Args:
+            ax: Existing matplotlib axes to draw on; a new figure is made if None.
+        """
         return ai_eval.plot_training_history(self.training_info, ax=ax)
 
     def test_accuracy(self) -> float:
@@ -608,7 +789,13 @@ class xaikitTest:
         positive_label: int = 1,
         threshold: float = 0.5,
     ) -> pd.DataFrame:
-        """Return a labeled confusion matrix for the requested split."""
+        """Return a labeled confusion matrix for the requested split.
+
+        Args:
+            split: ``train`` or ``test``.
+            positive_label: Class treated as positive.
+            threshold: Probability cutoff for the positive class.
+        """
         return ai_eval.confusion_matrix_table(
             self._require_model_manager(), self._require_data(),
             split=split, positive_label=positive_label, threshold=threshold,
@@ -622,7 +809,14 @@ class xaikitTest:
         threshold: float = 0.5,
         ax: Any = None,
     ) -> Any:
-        """Plot a labeled confusion matrix for the requested split."""
+        """Plot a labeled confusion matrix for the requested split.
+
+        Args:
+            split: ``train`` or ``test``.
+            positive_label: Class treated as positive.
+            threshold: Probability cutoff for the positive class.
+            ax: Existing matplotlib axes to draw on; a new figure is made if None.
+        """
         return ai_eval.plot_confusion_matrix(
             self._require_model_manager(), self._require_data(),
             split=split, positive_label=positive_label, threshold=threshold, ax=ax,
@@ -636,7 +830,17 @@ class xaikitTest:
         threshold: float = 0.5,
         include_report: bool = False,
     ) -> dict[str, dict[str, Any]]:
-        """Evaluate the trained AI model with classic classification metrics."""
+        """Evaluate the trained AI model with classic classification metrics.
+
+        Args:
+            split: ``train``, ``test`` or ``both``.
+            positive_label: Class treated as positive.
+            threshold: Probability cutoff for the positive class.
+            include_report: Also return the per-class precision/recall report.
+
+        Returns:
+            Metrics keyed by split, also merged into ``self.metrics``.
+        """
         results = ai_eval.evaluate_model(
             self._require_model_manager(), self._require_data(),
             split=split, positive_label=positive_label,
@@ -656,7 +860,13 @@ class xaikitTest:
         positive_label: int = 1,
         ax: Any = None,
     ) -> Any:
-        """Plot ROC curves and AUC values for train/test predictions."""
+        """Plot ROC curves and AUC values for train/test predictions.
+
+        Args:
+            split: ``train``, ``test`` or ``both``.
+            positive_label: Class treated as positive.
+            ax: Existing matplotlib axes to draw on; a new figure is made if None.
+        """
         return ai_eval.plot_auc_curves(
             self._require_model_manager(), self._require_data(),
             split=split, positive_label=positive_label, ax=ax,
@@ -672,7 +882,25 @@ class xaikitTest:
         method_kwargs: Optional[dict[str, dict[str, Any]]] = None,
         show_checks: bool = True,
     ) -> tuple[Optional[Path], Optional[pd.DataFrame]]:
-        """Generate method-level XAI tables and combine them into one table."""
+        """Generate method-level XAI tables and combine them into one table.
+
+        Args:
+            methods: XAI methods to run. Defaults to the levels of the stored
+                ``xai_method``/``xai_type`` IV.
+            model_name: Name used in explanation filenames; defaults to the
+                trained model's.
+            output_dir: Where the per-method tables are written.
+            target: Class index explanations are generated for.
+            method_kwargs: Per-method options, keyed by method name, e.g.
+                ``{"shap": {"background_size": 100}}``.
+            show_checks: Print the resolved methods and validation output.
+
+        Returns:
+            Path to the combined table and the table itself.
+
+        Raises:
+            RuntimeError: If no methods are given and none are stored.
+        """
         explanation_iv_config = self._iv_config_for_explanations(methods)
         resolved_methods = self._xai_methods_from_iv_config(explanation_iv_config)
         if not resolved_methods:
@@ -749,7 +977,23 @@ class xaikitTest:
         show_ai_prediction: Optional[bool] = None,
         **kwargs: Any,
     ) -> Any:
-        """Visualize one local explanation using the XAI adapter plot helper."""
+        """Visualize one local explanation using the XAI adapter plot helper.
+
+        Args:
+            visualization: Plot style, e.g. ``influence`` or ``importance``.
+            method: XAI method to show; None picks the first with an explanation.
+            instance_id: Instance to show; None picks the first explained one.
+            top_n: Number of features to display.
+            class_labels: Display names for the classes.
+            phase: Trial phase being previewed; ``testing`` hides the AI
+                prediction by default.
+            show_ai_prediction: Force the AI prediction on or off, overriding
+                what ``phase`` implies.
+            **kwargs: Passed through to the underlying plot helper.
+
+        Raises:
+            ValueError: If no generated explanation matches the request.
+        """
         data = self._require_data()
         combined_df = self._require_combined_explanations()
         from src.xai_adapter import plot_explanation_visual
@@ -816,7 +1060,16 @@ class xaikitTest:
         class_labels: Optional[Sequence[str]] = None,
         fallback: str = "auto",
     ) -> Any:
-        """Interactively preview one participant's trials with Back/Next controls."""
+        """Interactively preview one participant's trials with Back/Next controls.
+
+        Args:
+            participant_id: Which participant's sequence to walk through.
+            visualization: Plot style used for each explanation.
+            top_n: Number of features to display.
+            class_labels: Display names for the classes.
+            fallback: What to show when a trial has no explanation; ``auto``
+                substitutes the prediction-only view.
+        """
         data = self._require_data()
         trials = self._require_trials()
         pool = ensure_prediction_coverage(
@@ -844,7 +1097,21 @@ class xaikitTest:
         max_trials: Optional[int] = None,
         fallback: str = "auto",
     ) -> list[dict[str, Any]]:
-        """Preview the full participant journey and expose final approval controls."""
+        """Preview the full participant journey and expose final approval controls.
+
+        Marks the walkthrough as previewed, which ``approve_walkthrough``
+        requires.
+
+        Args:
+            participant_id: Which participant's journey to walk through.
+            explanation_pool: Explanations to draw from; defaults to the
+                combined table.
+            visualization: Plot style used for each explanation.
+            top_n: Number of features to display.
+            class_labels: Display names for the classes.
+            max_trials: Stop after this many trials; None shows all.
+            fallback: What to show when a trial has no explanation.
+        """
         data = self._require_data()
         trials = self._require_trials()
         pool = explanation_pool if explanation_pool is not None else self._require_combined_explanations()
@@ -874,7 +1141,23 @@ class xaikitTest:
         cognitive_params: Optional[dict[str, float]] = None,
         model_kwargs: Optional[dict[str, Any]] = None,
     ) -> "xaikitTest":
-        """Store the cognitive model callable and parameter dictionary."""
+        """Store the cognitive model callable and parameter dictionary.
+
+        Args:
+            cognitive_model: A callable standing in for a participant. Omit when
+                selecting a built-in agent by id.
+            cognitive_model_id: Built-in agent to use -- a machine-proxy baseline
+                (``knn``, ``decision_tree``, ``logistic_regression``, ``mlp``) or
+                a cognitive agent (``coax``, ``coxam``, ``sim2real``).
+            cognitive_params: Parameters for a cognitive agent, e.g.
+                ``retrieval_threshold``. Defaults apply when omitted.
+            model_kwargs: Constructor arguments for a machine-proxy baseline.
+                Only valid alongside ``cognitive_model_id``.
+
+        Raises:
+            ValueError: If ``model_kwargs`` is combined with an explicit
+                ``cognitive_model``.
+        """
         model_id = str(cognitive_model_id or "").lower().strip().replace("-", "_")
         if cognitive_model is not None and model_kwargs:
             raise ValueError("model_kwargs can only be used with a cognitive_model_id.")
@@ -908,7 +1191,24 @@ class xaikitTest:
         explanation_pool: Optional[pd.DataFrame] = None,
         require_walkthrough_approval: bool = False,
     ) -> pd.DataFrame:
-        """Run the cognitive simulation over selected generated trial rows."""
+        """Run the cognitive simulation over selected generated trial rows.
+
+        Args:
+            mode: ``participant_by_participant`` runs one participant;
+                other modes run the whole set.
+            participant_id: Which participant to run in per-participant mode.
+            condition_filter: Restrict to trials matching these IV values.
+            explanation_pool: Explanations to draw from; defaults to the
+                combined table.
+            require_walkthrough_approval: Refuse to run until the walkthrough has
+                been previewed and approved.
+
+        Returns:
+            Simulated responses, also stored on ``simulated_results``.
+
+        Raises:
+            RuntimeError: If approval is required but has not been given.
+        """
         if require_walkthrough_approval and not self.walkthrough_approved:
             raise RuntimeError(
                 "Experiment execution is locked. Preview the complete walkthrough and "
@@ -953,7 +1253,17 @@ class xaikitTest:
         *,
         out_dir: str | Path = "experiment_output",
     ) -> tuple[str, str]:
-        """Save simulated experiment results as CSV and JSON."""
+        """Save simulated experiment results as CSV and JSON.
+
+        Args:
+            out_dir: Directory the two files are written to.
+
+        Returns:
+            The CSV and JSON paths.
+
+        Raises:
+            RuntimeError: If called before ``run_experiment``.
+        """
         if self.simulated_results is None:
             raise RuntimeError("Call run_experiment(...) before save_results(...).")
         self.simulated_csv_path, self.simulated_json_path = virtual_experiment_api.save_simulated_results(
@@ -969,7 +1279,17 @@ class xaikitTest:
         dv: str,
         participant_column: str = "participantId",
     ) -> Any:
-        """Analyze one stored DV against one IV using testing responses."""
+        """Analyze one stored DV against one IV using testing responses.
+
+        Args:
+            iv: Independent variable to group by.
+            dv: Dependent variable to test.
+            participant_column: Column identifying participants, used to
+                aggregate within participant before testing.
+
+        Raises:
+            RuntimeError: If called before ``run_experiment``.
+        """
         if self.simulated_results is None:
             raise RuntimeError("Call run_experiment(...) before analyze_iv_dv(...).")
         from src.statistical_analyst import analyze_iv_dv
@@ -993,7 +1313,21 @@ class xaikitTest:
         title: Optional[str] = "Experiment results",
         value_labels: bool = True,
     ) -> Any:
-        """Plot every requested dependent variable against every requested IV."""
+        """Plot every requested dependent variable against every requested IV.
+
+        Args:
+            responses: Results to plot; defaults to the stored simulation.
+            ivs: IVs to plot; defaults to every IV in the design.
+            dvs: DVs to plot; defaults to every DV in the design.
+            participant_column: Column identifying participants.
+            phase: Restrict to one trial phase, e.g. ``testing``.
+            errorbar: Error bar statistic, e.g. ``sem``; None hides them.
+            title: Figure title.
+            value_labels: Print the value above each bar.
+
+        Raises:
+            RuntimeError: If called before ``run_experiment``.
+        """
         result_data = responses if responses is not None else self.simulated_results
         if result_data is None:
             raise RuntimeError("Call run_experiment(...) before plot_results_grid(...).")
@@ -1034,7 +1368,26 @@ class xaikitTest:
         title: Optional[str] = None,
         value_labels: bool = True,
     ) -> Any:
-        """Plot one DV against two IVs as grouped participant-level means."""
+        """Plot one DV against two IVs as grouped participant-level means.
+
+        Args:
+            x_iv: IV placed on the x axis.
+            hue_iv: IV distinguished by colour within each x group.
+            dv: Dependent variable to plot.
+            responses: Results to plot; defaults to the stored simulation.
+            participant_column: Column identifying participants.
+            phase: Restrict to one trial phase, e.g. ``testing``.
+            errorbar: Error bar statistic, e.g. ``sem``; None hides them.
+            x_levels: Order of x-axis levels; defaults to the design's order.
+            hue_levels: Order of colour levels; defaults to the design's order.
+            x_labels: Display names for x-axis levels.
+            hue_labels: Display names for colour levels.
+            title: Figure title.
+            value_labels: Print the value above each bar.
+
+        Raises:
+            RuntimeError: If called before ``run_experiment``.
+        """
         result_data = responses if responses is not None else self.simulated_results
         if result_data is None:
             raise RuntimeError(
