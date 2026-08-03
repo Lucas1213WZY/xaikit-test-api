@@ -55,6 +55,9 @@ MOCK_PACKAGES = [
     "skopt", "numba", "ucimlrepo", "datasets", "plotly", "seaborn", "skimage",
 ]
 
+# Replaced in the narrative Markdown by tables generated from support_matrix.json.
+SUPPORT_MARKER = "<!--SUPPORT_MATRIX-->"
+
 # Narrative pages: (markdown source, output file, nav title).
 PAGES = [
     ("index.md", "index.html", "Home"),
@@ -176,6 +179,115 @@ def resolve_lazy_exports() -> None:
         print(f"  WARNING unresolved {line}")
 
 
+def _fmt_levels(values) -> str:
+    return ", ".join(f"`{v}`" for v in values)
+
+
+def _iv_domain(cfg: dict) -> str:
+    """Describe what an IV accepts: explicit levels, a range, or a type."""
+    levels = cfg.get("levels")
+    if levels:
+        return _fmt_levels(levels)
+    if cfg.get("type") == "boolean":
+        return "`True`, `False`"
+    lo_hi = cfg.get("numeric_range")
+    if lo_hi:
+        kind = "integer" if cfg.get("integer") else "numeric"
+        return f"{kind}, {lo_hi[0]}–{lo_hi[1]}"
+    if cfg.get("numeric"):
+        return "numeric (unbounded)"
+    return "—"
+
+
+def render_support_matrix() -> str:
+    """Build the "what's available" tables from ``support_matrix.json``.
+
+    Generated rather than hand-written so the guide cannot drift from what the
+    planner will actually accept: the matrix is the same file
+    ``validate(stage="design")`` checks against.
+    """
+    from src.experiment_planner import load_support_matrix
+
+    matrix = load_support_matrix()
+    ivs = matrix["ivs"]
+    groups = matrix["groups"]
+    cognitive = matrix["cognitive_models"]
+
+    # An IV is a "cognitive parameter" if some agent declares it as one; the
+    # rest are experiment factors you manipulate directly.
+    cog_param_names = {
+        name
+        for spec in cognitive.values()
+        for name in spec.get("cognitive_params", {})
+    }
+
+    out: list[str] = []
+    add = out.append
+
+    add("#### Experiment factors\n")
+    add("These are the IVs you manipulate. `levels` must be drawn from the")
+    add("values below; `validate(stage=\"design\")` rejects anything else.\n")
+    add("| IV | Accepted levels |")
+    add("| --- | --- |")
+    for name, cfg in ivs.items():
+        if name not in cog_param_names:
+            add(f"| `{name}` | {_iv_domain(cfg)} |")
+
+    add("\n#### Cognitive parameters\n")
+    add("Passed as `cognitive_params` to")
+    add("[`set_cognitive_model`](api/src/api.html#xaikitTest.set_cognitive_model)")
+    add("rather than added as IVs — though they can be swept like one.\n")
+    add("| Parameter | Range |")
+    add("| --- | --- |")
+    for name, cfg in ivs.items():
+        if name in cog_param_names:
+            add(f"| `{name}` | {_iv_domain(cfg)} |")
+
+    add("\n#### XAI methods by family\n")
+    add("| Family | `xai_type` | `xai_method` |")
+    add("| --- | --- | --- |")
+    for fam, label in [("coax", "CoAX"), ("coxam", "CoXAM"), ("sim2real", "sim2real")]:
+        types = _fmt_levels(groups["xai_types"].get(fam, []))
+        methods = _fmt_levels(groups["xai_methods"].get(fam, []))
+        add(f"| {label} | {types} | {methods} |")
+
+    add("\n#### Datasets\n")
+    add("*Tested* datasets are the ones with published results behind them;")
+    add("*supported* will run but is less well trodden.\n")
+    add("| Family | Tested | Also supported |")
+    add("| --- | --- | --- |")
+    for fam, label in [("coax", "CoAX"), ("coxam", "CoXAM")]:
+        tested = groups["datasets"].get(f"{fam}_tested", [])
+        supported = [
+            d for d in groups["datasets"].get(f"{fam}_supported", []) if d not in tested
+        ]
+        add(f"| {label} | {_fmt_levels(tested)} | {_fmt_levels(supported)} |")
+
+    add("\n#### Tasks, DVs, and the agents that support them\n")
+    add("A design is only simulatable if the chosen agent supports both the")
+    add("`user_task` and the DV. Machine-proxy baselines take `model_kwargs`;")
+    add("the cognitive agents take the `cognitive_params` listed above.\n")
+    add("| Agent | Tasks | DVs | Cognitive parameters |")
+    add("| --- | --- | --- | --- |")
+    for name, spec in cognitive.items():
+        params = spec.get("cognitive_params", {})
+        add(
+            f"| `{name}` | {_fmt_levels(spec.get('tasks', []))} "
+            f"| {_fmt_levels(spec.get('dvs', []))} "
+            f"| {_fmt_levels(params) if params else '— (uses `model_kwargs`)'} |"
+        )
+
+    add("\n#### Alternative names accepted\n")
+    add("The planner normalises these aliases, so a design exported from the UI")
+    add("does not have to match the canonical spelling.\n")
+    add("| Canonical | Also accepted |")
+    add("| --- | --- |")
+    for name, alts in matrix["aliases"]["iv"].items():
+        add(f"| `{name}` | {_fmt_levels(alts)} |")
+
+    return "\n".join(out)
+
+
 def render_api(out_dir: Path) -> None:
     import pdoc
     import pdoc.render
@@ -197,8 +309,13 @@ def render_narrative(out_dir: Path) -> None:
         f'        <a href="{href}">{title}</a>' for _, href, title in PAGES
     ) + '\n        <a href="api/index.html">API Reference</a>'
 
+    support_tables = render_support_matrix()
+
     for source, target, title in PAGES:
         md = (DOCS_DIR / source).read_text()
+        if SUPPORT_MARKER in md:
+            md = md.replace(SUPPORT_MARKER, support_tables)
+            print(f"  injected support matrix into {source}")
         body = markdown2.markdown(
             md,
             extras=["fenced-code-blocks", "tables", "header-ids", "code-friendly"],

@@ -46,9 +46,26 @@ perform:
 | **DV** | What you measure | `forward_accuracy` |
 | **User task** | What participants and cognitive agents actually do | `forward_simulation` — predict the AI output from the instance and its explanation |
 
-Each IV is either `"within"` (every participant sees every level) or
-`"between"` (each participant sees one level), which is what drives
-counterbalancing later.
+Each IV is also declared `"within"` or `"between"`, which is what drives
+counterbalancing later:
+
+| `iv_type` | Meaning | `randomization` |
+| --- | --- | --- |
+| `"within"` | Every participant sees every level | `"block"` (default) or `"trial"` |
+| `"between"` | Each participant sees one level | not allowed — omit it |
+
+### What's available
+
+Everything below is generated from `src/experiment_planner/support_matrix.json`
+at build time — the same file
+[`validate`](api/src/api.html#xaikitTest.validate) checks your design against,
+so this list cannot drift from what the planner will actually accept.
+
+Four of these IVs are *semantic*: `dataset`, `user_task`, `ai_model`, and
+`xai_faithfulness` describe the study rather than being manipulated within it,
+so they are usually added with `add_cv` rather than `add_iv`.
+
+<!--SUPPORT_MATRIX-->
 
 ```python
 from src import xaikitTest
