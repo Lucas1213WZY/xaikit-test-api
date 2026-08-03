@@ -56,12 +56,12 @@ counterbalancing later:
 
 ### What's available
 
-Everything below is generated from `src/experiment_planner/support_matrix.json`
-at build time — the same file
-[`validate`](api/src/api.html#xaikitTest.validate) checks your design against,
-so this list cannot drift from what the planner will actually accept.
+These are the values XAIKit accepts.
+[`validate`](api/src/api.html#xaikitTest.validate) rejects anything outside
+them, so it is worth checking here before building a design around a level that
+will not run.
 
-Four of these IVs are *semantic*: `dataset`, `user_task`, `ai_model`, and
+Four of these are *semantic*: `dataset`, `user_task`, `ai_model`, and
 `xai_faithfulness` describe the study rather than being manipulated within it,
 so they are usually added with `add_cv` rather than `add_iv`.
 
