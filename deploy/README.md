@@ -113,12 +113,63 @@ Deploy from a staged tree instead:
 
 ```bash
 ./deploy/stage_deploy.sh /tmp/xaikit-deploy
-rsync -av --delete /tmp/xaikit-deploy/ user@server:~/xaikit-api/
+rsync -av --delete \
+  --exclude='.env' --exclude='server_runs/' --exclude='deploy/' \
+  /tmp/xaikit-deploy/ user@server:~/xaikit-api/
 ```
 
 The script removes every human-data path and refuses to finish if any survive.
 The full pipeline was verified end to end against exactly this tree, so nothing
 the server does needs those files.
+
+**Those three excludes are not optional.** The staged tree holds only `src/`,
+`server/`, `assets/` and `requirements.txt`, so a bare `--delete` treats
+everything else on the server as extraneous and removes it: your `.env` with the
+API token, and every result under `server_runs/`. Verified -- without the
+excludes a redeploy deletes the token file and empties the runs directory.
+
+---
+
+## Updating a running deployment
+
+Same staging command, then restart the service. From your laptop:
+
+```bash
+cd <repo>
+git pull                                     # whatever you want to ship
+./deploy/stage_deploy.sh /tmp/xaikit-deploy
+rsync -av --delete \
+  --exclude='.env' --exclude='server_runs/' --exclude='deploy/' \
+  /tmp/xaikit-deploy/ user@server:~/xaikit-api/
+```
+
+On the server:
+
+```bash
+# only when requirements.txt changed
+conda activate xaikit-api && pip install -r ~/xaikit-api/requirements.txt
+
+systemctl --user restart xaikit-api
+systemctl --user status xaikit-api
+journalctl --user -u xaikit-api -n 50
+```
+
+**Restarting drops every in-memory study.** A study is a live `xaikitTest`
+object in the process; only the files already written under `server_runs/`
+survive. Study ids from before the restart return 404, so redeploy when nobody
+is mid-run, and tell whoever is testing the UI to re-create their study
+afterwards.
+
+To check what a redeploy would change before doing it, add `-n`:
+
+```bash
+rsync -avn --delete --exclude='.env' --exclude='server_runs/' --exclude='deploy/' \
+  /tmp/xaikit-deploy/ user@server:~/xaikit-api/
+```
+
+Rolling back is the same loop from an older commit -- `git checkout <sha>`,
+re-stage, re-sync, restart. Nothing on the server is versioned, so the repo is
+the only history there is.
 
 On the server, keep the tree to yourself:
 
