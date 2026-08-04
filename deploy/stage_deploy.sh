@@ -39,7 +39,17 @@ for pattern in "${SRC_EXCLUDES[@]}"; do src_args+=(--exclude="$pattern"); done
 asset_args=()
 for pattern in "${ASSET_EXCLUDES[@]}"; do asset_args+=(--exclude="$pattern"); done
 
-common=(--exclude='__pycache__' --exclude='*.pyc' --exclude='.DS_Store')
+# Notebooks are research artifacts the service never imports, and their saved
+# outputs can embed participant records even when the data directories beside
+# them were excluded (match_performance_to_participant_*.ipynb is 1.5 MB of
+# them). Drop them rather than audit 300+ output cells before every deploy.
+common=(
+  --exclude='__pycache__'
+  --exclude='*.pyc'
+  --exclude='.DS_Store'
+  --exclude='*.ipynb'
+  --exclude='.ipynb_checkpoints'
+)
 
 rsync -a "${common[@]}" "${src_args[@]}" "$REPO/src/" "$STAGE/src/"
 rsync -a "${common[@]}" "${asset_args[@]}" "$REPO/assets/" "$STAGE/assets/"
@@ -50,7 +60,8 @@ echo "Staged $(du -sh "$STAGE" | cut -f1) at $STAGE"
 
 # Fail loudly rather than shipping a tree that still holds participant records.
 leaked="$(find "$STAGE" \
-  \( -path '*human_data*' -o -path '*CoAX/results*' -o -path '*human_trials*' \) \
+  \( -path '*human_data*' -o -path '*CoAX/results*' -o -path '*human_trials*' \
+     -o -name '*.ipynb' \) \
   -print | head)"
 if [ -n "$leaked" ]; then
   echo "REFUSING: human data present in the staged tree:" >&2
