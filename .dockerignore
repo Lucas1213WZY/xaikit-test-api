@@ -6,6 +6,12 @@
 **/.DS_Store
 
 # Notebooks and their outputs are development material, not part of the service.
+# The glob matters as much as tutorials/: notebooks under src/ carry saved
+# output cells that can hold participant records even where the data directory
+# beside them is excluded below (match_performance_to_participant_v0.3.ipynb is
+# 1.5 MB of them). Nothing in the service imports a notebook.
+**/*.ipynb
+**/.ipynb_checkpoints
 tutorials/
 UI/
 tests/
