@@ -92,7 +92,10 @@ class SimulationRequest(BaseModel):
     coax_params: Optional[dict[str, dict[str, Any]]] = None
     baseline_model_id: Optional[str] = Field(
         None,
-        description="Non-CoAX designs only, e.g. 'knn_baseline'.",
+        description=(
+            "Non-CoAX designs only, e.g. 'knn'. Overrides the design's own "
+            "userModel selection; omit it to run whatever the design chose."
+        ),
     )
     baseline_model_kwargs: Optional[dict[str, Any]] = None
     preview_rows: int = 20

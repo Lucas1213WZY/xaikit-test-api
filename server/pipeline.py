@@ -15,6 +15,8 @@ from typing import Any, Optional, Sequence
 import pandas as pd
 
 from src.api import xaikitTest
+from src.cognitive_models import is_baseline_model_id, normalize_baseline_model_id
+from src.cognitive_models.baseline_models import BASELINE_MODEL_IDS
 from src.result_visualizer import plot_dv_by_two_ivs, plot_iv_dv_grid
 from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_study_runner import (
     coax_models_for_trials,
@@ -40,6 +42,56 @@ from .serialization import (
 #: Frameworks the ``userModel`` field of a design export can name, mapped to the
 #: participant runner that serves them.
 COAX_FRAMEWORKS = {"coax"}
+
+#: Frameworks the UI can select that have no runner yet. Named so the design is
+#: rejected outright rather than quietly falling through to the placeholder.
+UNSUPPORTED_FRAMEWORKS = {"coxam"}
+
+
+def design_framework(study: xaikitTest) -> str:
+    """The design's ``userModel`` value, normalized for lookup."""
+    raw = str(getattr(study.design_export, "model_framework", "") or "")
+    return raw.strip().lower().replace("-", "_").replace(" ", "_")
+
+
+def resolve_baseline_model_id(study: xaikitTest, requested: Optional[str]) -> Optional[str]:
+    """Decide which baseline the simulation should run.
+
+    An explicit ``baseline_model_id`` on the request wins, so a caller can still
+    override the design. Otherwise the design's own ``userModel`` selection is
+    used, which is what the experiment-design UI writes.
+
+    Args:
+        study: The study whose design export is consulted.
+        requested: The request's explicit override, if any.
+
+    Returns:
+        A canonical baseline id, or None to leave the study's model alone.
+
+    Raises:
+        ValueError: If the design names a framework with no runner behind it.
+            Returning None there would silently run the placeholder stub and
+            produce results that look real.
+    """
+    if requested:
+        return requested
+
+    framework = design_framework(study)
+    if not framework:
+        return None
+    if is_baseline_model_id(framework):
+        return framework
+    if framework in UNSUPPORTED_FRAMEWORKS:
+        raise ValueError(
+            f"The design selects userModel={framework!r}, which has no virtual-"
+            "participant runner yet. Choose a baseline model "
+            f"({', '.join(sorted(BASELINE_MODEL_IDS))}) or pass baseline_model_id "
+            "explicitly."
+        )
+    raise ValueError(
+        f"The design selects userModel={framework!r}, which is neither CoAX nor "
+        f"a known baseline model ({', '.join(sorted(BASELINE_MODEL_IDS))})."
+    )
 
 
 def build_study(design: dict[str, Any], *, project_name: str, output_dir: Path) -> xaikitTest:
@@ -254,9 +306,10 @@ def run_simulation_stage(
             store=True,
         )
     else:
-        if request.baseline_model_id:
+        baseline_model_id = resolve_baseline_model_id(study, request.baseline_model_id)
+        if baseline_model_id:
             study.set_cognitive_model(
-                cognitive_model_id=request.baseline_model_id,
+                cognitive_model_id=baseline_model_id,
                 model_kwargs=request.baseline_model_kwargs,
             )
         results = study.run_experiment(
@@ -275,6 +328,7 @@ def run_simulation_stage(
     testing = results[results["phase"].astype(str) == "testing"] if "phase" in results else results
     return {
         "runner": runner,
+        "cognitive_model_id": study.cognitive_model_id,
         "mode": request.mode,
         "participant_id": request.participant_id,
         "condition_filter": jsonable(request.condition_filter),

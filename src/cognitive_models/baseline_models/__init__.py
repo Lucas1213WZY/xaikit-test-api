@@ -20,6 +20,9 @@ _BASELINE_ALIASES = {
     "mlp_baseline": "mlp_baseline",
 }
 
+#: The canonical baseline ids, for callers that need to list or report them.
+BASELINE_MODEL_IDS = tuple(sorted(set(_BASELINE_ALIASES.values())))
+
 
 def normalize_baseline_model_id(model_id: str) -> str:
     """Return the canonical baseline id, or the normalized input if unknown.
@@ -65,6 +68,7 @@ def create_baseline_model(model_id: str, **kwargs):
 
 
 __all__ = [
+    "BASELINE_MODEL_IDS",
     "DecisionTreeBaseline",
     "KNNBaseline",
     "LogisticRegressionBaseline",
