@@ -22,6 +22,9 @@ from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_study_runne
     coax_models_for_trials,
     run_coax_study,
 )
+from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_study_runner import (
+    run_coxam_study,
+)
 
 from .schemas import (
     DatasetStageRequest,
@@ -42,10 +45,11 @@ from .serialization import (
 #: Frameworks the ``userModel`` field of a design export can name, mapped to the
 #: participant runner that serves them.
 COAX_FRAMEWORKS = {"coax"}
+COXAM_FRAMEWORKS = {"coxam"}
 
 #: Frameworks the UI can select that have no runner yet. Named so the design is
 #: rejected outright rather than quietly falling through to the placeholder.
-UNSUPPORTED_FRAMEWORKS = {"coxam"}
+UNSUPPORTED_FRAMEWORKS: set[str] = set()
 
 
 def design_framework(study: xaikitTest) -> str:
@@ -89,8 +93,9 @@ def resolve_baseline_model_id(study: xaikitTest, requested: Optional[str]) -> Op
             "explicitly."
         )
     raise ValueError(
-        f"The design selects userModel={framework!r}, which is neither CoAX nor "
-        f"a known baseline model ({', '.join(sorted(BASELINE_MODEL_IDS))})."
+        f"The design selects userModel={framework!r}, which is neither CoAX, "
+        f"CoXAM, nor a known baseline model "
+        f"({', '.join(sorted(BASELINE_MODEL_IDS))})."
     )
 
 
@@ -122,7 +127,11 @@ def study_design_payload(study: xaikitTest) -> dict[str, Any]:
 def participant_runner(study: xaikitTest) -> str:
     """Which virtual-participant runner this design's ``userModel`` selects."""
     framework = str(getattr(study.design_export, "model_framework", "") or "").strip().lower()
-    return "coax" if framework in COAX_FRAMEWORKS else "baseline"
+    if framework in COAX_FRAMEWORKS:
+        return "coax"
+    if framework in COXAM_FRAMEWORKS:
+        return "coxam"
+    return "baseline"
 
 
 # -- stage 1: dataset + AI model -----------------------------------------
@@ -303,6 +312,17 @@ def run_simulation_stage(
                 strategies=request.coax_strategies,
                 params=request.coax_params,
             ),
+            store=True,
+        )
+    elif runner == "coxam":
+        results = run_coxam_study(
+            study,
+            mode=request.mode,
+            participant_id=request.participant_id,
+            condition_filter=request.condition_filter,
+            source=request.coxam_source,
+            policy_override=request.coxam_policy,
+            eval_params=request.coxam_eval_params,
             store=True,
         )
     else:

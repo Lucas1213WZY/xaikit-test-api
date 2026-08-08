@@ -90,6 +90,33 @@ class SimulationRequest(BaseModel):
     condition_filter: Optional[dict[str, Any]] = None
     coax_strategies: Optional[dict[str, str]] = None
     coax_params: Optional[dict[str, dict[str, Any]]] = None
+    coxam_policy: Optional[str] = Field(
+        None,
+        description=(
+            "CoXAM designs only. One of 'lr_calculation' | 'lr_heuristic' | "
+            "'dt_traversal' to force that one sub-strategy for every trial "
+            "instead of letting the trained meta-policy choose. Omit to use the "
+            "meta-policy."
+        ),
+    )
+    coxam_eval_params: Optional[dict[str, float]] = Field(
+        None,
+        description=(
+            "CoXAM designs only. Fixed values for the three parameters that are "
+            "free at evaluation time -- decision_noise [0.3, 0.7], "
+            "memory_recall_threshold [-1.0, 2.0] and opportunity_cost "
+            "[0.0, 0.02]. Omit to let the environment sample them."
+        ),
+    )
+    coxam_source: str = Field(
+        "fit",
+        description=(
+            "CoXAM designs only. 'fit' fits decision-tree and logistic-regression "
+            "surrogates against this study's own trained model; 'assets' loads the "
+            "pre-generated tables from assets/explanations/CoXAM instead, which "
+            "requires trials constrained to that corpus' instance ids."
+        ),
+    )
     baseline_model_id: Optional[str] = Field(
         None,
         description=(

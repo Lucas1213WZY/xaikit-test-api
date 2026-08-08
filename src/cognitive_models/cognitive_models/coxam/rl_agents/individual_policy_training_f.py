@@ -18,11 +18,11 @@ from stable_baselines3.common.callbacks import EvalCallback
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv
 
-from src.dt_memory import add_dt_to_memory, dt_traverse
-from src.heuristic_lr_model import add_lr_heuristic_to_memory, lr_heuristic, refresh_lr_heuristic_in_memory
-from src.lr_memory import add_lr_calculation_to_memory, lr_calculation
-from src.memory import CombinedMemory, DeclarativeMemory
-from src.utils import AIDatasetLoader, DecisionTreeInterpreter, LogisticRegressionInterpreter, filter_by_app_and_model
+from ..dt_memory import add_dt_to_memory, dt_traverse
+from ..heuristic_lr_model import add_lr_heuristic_to_memory, lr_heuristic, refresh_lr_heuristic_in_memory
+from ..lr_memory import add_lr_calculation_to_memory, lr_calculation
+from ..memory import CombinedMemory, DeclarativeMemory
+from ..utils import AIDatasetLoader, DecisionTreeInterpreter, LogisticRegressionInterpreter, filter_by_app_and_model
 
 
 ACCESS_MODES = {0: "retrieve", 1: "read"}

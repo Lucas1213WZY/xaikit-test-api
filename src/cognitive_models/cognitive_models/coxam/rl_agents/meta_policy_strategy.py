@@ -20,7 +20,7 @@ from stable_baselines3 import PPO
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv
 
-from rl_agents.individual_policy_training_f import (
+from .individual_policy_training_f import (
     StrategyTrainingConfig,
     _contribution_by_base_feature,
     _feature_base_index,
@@ -28,10 +28,10 @@ from rl_agents.individual_policy_training_f import (
     _safe_probabilities,
     make_memory,
 )
-from src.dt_memory import add_dt_to_memory, dt_traverse
-from src.heuristic_lr_model import add_lr_heuristic_to_memory, lr_heuristic, refresh_lr_heuristic_in_memory
-from src.lr_memory import add_lr_calculation_to_memory, lr_calculation
-from src.utils import AIDatasetLoader, DecisionTreeInterpreter, LogisticRegressionInterpreter, filter_by_app_and_model
+from ..dt_memory import add_dt_to_memory, dt_traverse
+from ..heuristic_lr_model import add_lr_heuristic_to_memory, lr_heuristic, refresh_lr_heuristic_in_memory
+from ..lr_memory import add_lr_calculation_to_memory, lr_calculation
+from ..utils import AIDatasetLoader, DecisionTreeInterpreter, LogisticRegressionInterpreter, filter_by_app_and_model
 
 
 META_STRATEGIES = ("lr_calculation", "lr_heuristic", "dt_traversal")

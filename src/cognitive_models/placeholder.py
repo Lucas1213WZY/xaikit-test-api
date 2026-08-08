@@ -220,8 +220,100 @@ def dummy_cognitive_model(
     return outputs
 
 
-def default_cognitive_params() -> dict[str, float]:
-    """Return placeholder parameters named like current `src/cognitive_models` artifacts."""
+#: CoXAM's own parameter names and operating values. The names and ranges come
+#: from ``CombinedPolicyConfig`` (``src/cognitive_models/cognitive_models/coxam/
+#: rl_agents/meta_policy_strategy.py``) and are corroborated by the published
+#: parameter sweeps in ``src/cognitive_models/CoXAM/outputs/
+#: parameter_effect_sweeps/{forward,counterfactual}_results.csv``, whose swept
+#: values sit exactly on those bounds.
+#:
+#: These share no names with the CoAX-shaped defaults below except a
+#: conceptually-similar recall threshold, which uses a different name *and* a
+#: different range -- so CoAX's defaults are invalid for CoXAM and vice versa.
+#: CoXAM's free cognitive parameters, exactly as the reference driver exposes
+#: them (``CoXAM/rl_agents/meta_policy_strategy_dashboard.py``'s
+#: ``fixed_eval_params``) and as ``CombinedStrategyPolicyEnv._sample_episode_params``
+#: samples them. Values are the dashboard's own defaults.
+#:
+#: These three are the *only* parameters free at evaluation time. Every other
+#: knob is either chosen by the sub-policy's own RL action
+#: (``decision_boundary`` via ``_decision_boundary_from_bin``,
+#: ``selected_feature_count`` via ``_parse_feature_action``) or is structural
+#: run configuration (``instances_per_episode``, ``explanation_shown_ratio``,
+#: ``target_xai_fidelity``, ``simulation_sample_count``,
+#: ``retrieval_candidate_count``, ``seed``) rather than a cognitive parameter.
+#:
+#: Ranges come from the run config of the checkpoint actually loaded
+#: (``outputs/combined_strategy_meta_policy/
+#: meta_policy_strategy_masked_explanation_history_demo/mixed/config.json``),
+#: not from ``CombinedPolicyConfig``'s dataclass defaults -- no run used those
+#: (``memory_recall_threshold`` is [-1.0, 2.0] in every run config vs. [-5.0,
+#: 2.0] in the dataclass).
+#:
+#: Scope note: the meta-policy and its dashboard are **forward-simulation
+#: only** -- neither mentions counterfactual strategies. The counterfactual
+#: strategies (``cf_lr_calculation``, ``recall_change_dt``, ...) and their
+#: parameters (``counterfactual_overshoot_fraction``,
+#: ``counterfactual_tree_depth``, ``max_memory_refresh_probability``) live in
+#: ``CoXAM/scripts/parameter_effect_sweep.py``, which drives strategies
+#: directly and bypasses the meta-policy. They are therefore not reachable
+#: through this runner and are deliberately absent here.
+COXAM_FORWARD_PARAMS: dict[str, float] = {
+    "decision_noise": 0.4,
+    "memory_recall_threshold": 0.5,
+    "opportunity_cost": 0.01,
+}
+
+#: CoXAM's counterfactual policy is a separate trained agent with its own
+#: parameters, taken from the ranges its checkpoint was trained on (see
+#: ``coxam/counterfactual_env.py``). ``time_penalty_weight`` uses the
+#: checkpoint's ``[0, 0.02]``, not the notebook's later ``[0, 0.05]``.
+COXAM_COUNTERFACTUAL_PARAMS: dict[str, float] = {
+    "memory_recall_threshold": -0.75,
+    "random_response_rate": 0.3,
+    "counterfactual_overshoot_fraction": 0.25,
+    "time_penalty_weight": 0.01,
+}
+
+#: Every CoXAM parameter, for a design that runs both tasks.
+COXAM_COGNITIVE_PARAMS: dict[str, float] = {
+    **COXAM_FORWARD_PARAMS,
+    **COXAM_COUNTERFACTUAL_PARAMS,
+}
+
+
+def default_cognitive_params(
+    cognitive_model_id: Optional[str] = None,
+    *,
+    tasks: Optional[Any] = None,
+) -> dict[str, float]:
+    """Return default parameters for a cognitive agent.
+
+    Args:
+        cognitive_model_id: Agent the defaults are for. ``coxam`` returns
+            CoXAM's own parameters; anything else (including ``None``) returns
+            the CoAX-shaped placeholder set, which is what the placeholder/CoAX
+            paths have always used.
+        tasks: User tasks the design runs, e.g. ``["forward_simulation"]``.
+            CoXAM runs forward and counterfactual simulation as two separate
+            trained agents with different parameters, so this trims the result
+            to the ones that apply. Omit for both sets.
+
+    CoAX and CoXAM take disjoint parameters, so one shared default dict cannot
+    be valid for both -- the CoAX-shaped ``cog_retrieval_threshold=-0.3`` sits
+    outside CoXAM's supported range and used to make every coxam design report
+    a validation error.
+    """
+    if str(cognitive_model_id or "").strip().lower().replace("-", "_") == "coxam":
+        requested = {str(task).strip().lower() for task in (tasks or [])}
+        if not requested:
+            return dict(COXAM_COGNITIVE_PARAMS)
+        params: dict[str, float] = {}
+        if any("forward" in task for task in requested):
+            params.update(COXAM_FORWARD_PARAMS)
+        if any("counterfactual" in task for task in requested):
+            params.update(COXAM_COUNTERFACTUAL_PARAMS)
+        return params or dict(COXAM_COGNITIVE_PARAMS)
     return {
         "cog_retrieval_threshold": -0.3,
         "cog_latency_factor": 0.2,

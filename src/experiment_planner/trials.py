@@ -246,6 +246,7 @@ def generate_experimental_trials(
             predictions_by_instance=config.ai_predictions_by_instance,
             seed=config.seed,
         )
+    trials = _assign_shown_xai_type(trials, seed=config.seed)
 
     output_dir = config.output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -413,6 +414,61 @@ def _add_training_and_testing_phases(
             phased_trials.append(trial)
 
     return phased_trials
+
+
+#: Condition levels that show more than one explanation family, mapped to the
+#: families a trial in that condition alternates between. A condition naming a
+#: single family (``decision_tree``, ``logistic_regression``) needs no entry --
+#: every one of its trials shows that family.
+MULTI_FAMILY_XAI_TYPES: dict[str, tuple[str, ...]] = {
+    "hybrid": ("decision_tree", "logistic_regression"),
+}
+
+
+def _assign_shown_xai_type(
+    trials: list[dict[str, Any]],
+    *,
+    seed: int,
+) -> list[dict[str, Any]]:
+    """Record which explanation family each trial actually shows.
+
+    For a single-family condition (``xai_type='decision_tree'``) this just
+    echoes the condition. For a multi-family condition (``xai_type='hybrid'``,
+    which shows both) the family alternates randomly per trial, balanced as
+    evenly as the trial count allows and shuffled with the study's own seed, so
+    the assignment is reproducible and auditable from the exported trial table
+    rather than being re-drawn at simulation time.
+
+    Alternation is assigned independently per participant and phase, so a
+    participant's training trials and testing trials are each balanced in their
+    own right.
+    """
+    if not any("xai_type" in trial for trial in trials):
+        return trials
+
+    rng = random.Random(seed)
+    groups: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+    for trial in trials:
+        xai_type = str(trial.get("xai_type", "")).strip().lower()
+        families = MULTI_FAMILY_XAI_TYPES.get(xai_type)
+        if families is None:
+            # Single-family (or non-CoXAM) condition: the shown family is the
+            # condition itself, with no alternation to schedule.
+            if "xai_type" in trial:
+                trial["shown_xai_type"] = trial["xai_type"]
+            continue
+        key = (trial.get("participantId"), trial.get("phase"), xai_type)
+        groups.setdefault(key, []).append(trial)
+
+    for (_participant_id, _phase, xai_type), group_trials in groups.items():
+        families = MULTI_FAMILY_XAI_TYPES[xai_type]
+        repeats, remainder = divmod(len(group_trials), len(families))
+        schedule = list(families) * repeats + list(families[:remainder])
+        rng.shuffle(schedule)
+        for trial, family in zip(group_trials, schedule):
+            trial["shown_xai_type"] = family
+
+    return trials
 
 
 def _balance_phase_instances_by_ai_prediction(

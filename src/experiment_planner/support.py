@@ -567,9 +567,26 @@ def _validate_model_specific(
     _check_allowed(report, "xai_type", context.get("xai_types", []), model_spec["xai_types"], model_id, "XAI types", skip={"none"})
     _check_allowed(report, "xai_method", context.get("xai_methods", []), model_spec["xai_methods"], model_id, "XAI methods", skip={"none"})
 
-    _validate_cognitive_params(report, support, model_id, model_spec, cognitive_params)
+    _validate_cognitive_params(
+        report, support, model_id, model_spec, cognitive_params, tasks=task_values
+    )
     if stage == "explanation_generation" and model_id == "coxam":
         report.add_reminder("xai_adapter", "CoXAM explanations are surrogate-style methods.", "Use decision-tree/logistic-regression adapters or precomputed CoXAM explanation tables.")
+    if model_id == "coxam" and context.get("xai_methods") and not context.get("xai_types"):
+        # CoXAM has one condition axis, not two: xai_type is the design's
+        # condition IV (decision_tree/logistic_regression/hybrid), matching
+        # how CoAX designs use xai_type. xai_method stays the internal
+        # explanation-generation vocabulary xai_adapter.create_xai_method(...)
+        # reads, not something a coxam design should vary as its own IV --
+        # unlike CoAX, where xai_type (how) and xai_method (which algorithm)
+        # are genuinely independent axes.
+        report.add_reminder(
+            "xai_type",
+            "CoXAM designs should use `xai_type` (decision_tree/logistic_regression/hybrid) as "
+            "the condition IV, not `xai_method`.",
+            "Rename the IV to `xai_type` with the same levels; `xai_method` stays available for "
+            "explanation-generation calls, but isn't the condition a coxam design should vary.",
+        )
 
 
 def _check_allowed(
@@ -618,16 +635,41 @@ def _validate_dataset(report: ValidationReport, support: dict[str, Any], dataset
         report.add_warning("dataset", f"`{dataset_key}` is available for `{model_id}`, but it is not one of the paper-tested datasets in the support matrix.", f"Paper-tested datasets for `{model_id}`: {_format_values(tested)}.")
 
 
+def _scope_params_to_tasks(
+    param_spec: dict[str, Any],
+    tasks: Iterable[Any],
+) -> dict[str, Any]:
+    """Drop parameters that only apply to a task this design does not run.
+
+    CoXAM runs forward and counterfactual simulation as two different trained
+    agents with different parameters: ``decision_noise``/``opportunity_cost``
+    are the forward meta-policy's, while ``random_response_rate``,
+    ``counterfactual_overshoot_fraction`` and ``time_penalty_weight`` belong to
+    the counterfactual policy. A spec with no ``tasks`` key applies to both.
+    """
+    requested = {str(task).strip().lower() for task in tasks}
+    if not requested:
+        return param_spec
+    scoped = {}
+    for name, spec in param_spec.items():
+        allowed = spec.get("tasks") if isinstance(spec, dict) else None
+        if allowed is None or requested & {str(task).strip().lower() for task in allowed}:
+            scoped[name] = spec
+    return scoped
+
+
 def _validate_cognitive_params(
     report: ValidationReport,
     support: dict[str, Any],
     model_id: str,
     model_spec: dict[str, Any],
     cognitive_params: dict[str, Any],
+    tasks: Optional[Iterable[Any]] = None,
 ) -> None:
     param_spec = model_spec.get("cognitive_params", {})
     if not param_spec:
         return
+    param_spec = _scope_params_to_tasks(param_spec, tasks or [])
     if not cognitive_params:
         report.add_warning("cognitive_params", f"No cognitive parameters were found for `{model_id}`.", f"Supported parameters: {_format_values(param_spec)}.")
         return
