@@ -114,8 +114,8 @@ class XAIDatasetParser:
 
     def _infer_feature_columns(self) -> List[str]:
         return _sort_feature_like_columns(
-            [col for col in self.df.columns if re.match(r"^v\d+$", col)],
-            prefixes=("v",),
+            [col for col in self.df.columns if re.match(r"^[vx]\d+$", col)],
+            prefixes=("v", "x"),
         )
 
     def _infer_explanation_columns(self) -> List[str]:
@@ -145,7 +145,10 @@ class XAIDatasetParser:
         if self.prediction_col not in self.df.columns:
             raise ValueError(f"CSV must include prediction column '{self.prediction_col}'")
         if not self.feature_columns:
-            raise ValueError("No feature columns found. Pass feature_columns or include x0, x1, ... columns")
+            raise ValueError(
+                "No feature columns found. Pass feature_columns or include v0, v1, ... "
+                "or x0, x1, ... columns"
+            )
         if not self.explanation_columns and self.missing_explanation_strategy == "error":
             raise ValueError(
                 "No explanation columns found. Pass explanation_columns or include a0_i, a1_i, ... columns"

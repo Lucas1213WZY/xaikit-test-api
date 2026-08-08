@@ -326,3 +326,51 @@ optional; when it is absent, adapter result `base_values` default to `0.0`.
 For a prediction-only CSV, set `missing_explanation_strategy="zeros"` on
 `XAIDatasetParser` to produce control/no-XAI explanation vectors with the same
 length as the feature vector.
+
+To load the repository's sim-to-real corpus and join its separate feature and
+explanation tables automatically:
+
+```python
+from src.data_loaders import UnifiedDataLoader
+from src.xai_adapter import create_xai_method
+
+loader = UnifiedDataLoader.from_sim2real(
+    dataset_dir="assets/ai_dataset/sim2real",
+    explanations_dir="assets/explanations/xai_desiderata",
+)
+
+faithful = create_xai_method(
+    "precomputed_csv",
+    loader=loader,
+    explanation_type="attribution",
+    exp_property="faithful",
+    model_name="synthetic_ai",
+)
+result = faithful.explain([0, 1, 2])
+
+# With no exp_property, Sim2Real selects the ordinary LIME baseline.
+lime_baseline = create_xai_method(
+    "csv",
+    loader=loader,
+    explanation_type="attribution",
+    model_name="synthetic_ai",
+)
+
+# Optional display-style scaling by each row's i_max.
+scaled_importance = create_xai_method(
+    "csv",
+    loader=loader,
+    explanation_type="importance",
+    exp_property="robust",
+    normalize_explanations_by="i_max",
+)
+```
+
+For Sim2Real, `exp_method` defaults to `lime`. Use the Sim2Real-only
+`exp_property` argument to select one of `faithful`, `robust`, `sparse`, or
+`sparse_robust`. Omitting `exp_property` selects the ordinary LIME baseline.
+Passing `exp_property` with another data-source loader raises `ValueError`.
+Use `explanation_type="counterfactuals_fake"` for the counterfactual vectors or
+`explanation_type="none"` for zero-valued control explanations. The `deltas`
+table is accessed with `loader.get_explanation_table("deltas")`; it is trial
+metadata rather than an XAI vector table.

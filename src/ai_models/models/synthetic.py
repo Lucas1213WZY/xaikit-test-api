@@ -18,6 +18,82 @@ from typing import Dict
 import numpy as np
 
 
+# Fixed Adult one-hot schema used by the local sim2real corpus.  The order is
+# part of the model contract: attribution/importance columns a0-a66 and value
+# columns v0-v66 use these exact dimensions.
+ADULT_SIM2REAL_FEATURE_NAMES = (
+    "age",
+    "capital-gain",
+    "capital-loss",
+    "hours-per-week",
+    "education_10th",
+    "education_11th",
+    "education_12th",
+    "education_1st-4th",
+    "education_5th-6th",
+    "education_7th-8th",
+    "education_9th",
+    "education_Assoc-acdm",
+    "education_Assoc-voc",
+    "education_Bachelors",
+    "education_Doctorate",
+    "education_HS-grad",
+    "education_Masters",
+    "education_Preschool",
+    "education_Prof-school",
+    "education_Some-college",
+    "marital_Divorced",
+    "marital_Married-AF-spouse",
+    "marital_Married-civ-spouse",
+    "marital_Married-spouse-absent",
+    "marital_Never-married",
+    "marital_Separated",
+    "marital_Widowed",
+    "native-country_United-States",
+    "native-country_other",
+    "native-country_unknown",
+    "occupation_Adm-clerical",
+    "occupation_Armed-Forces",
+    "occupation_Craft-repair",
+    "occupation_Exec-managerial",
+    "occupation_Farming-fishing",
+    "occupation_Handlers-cleaners",
+    "occupation_Machine-op-inspct",
+    "occupation_Other-service",
+    "occupation_Priv-house-serv",
+    "occupation_Prof-specialty",
+    "occupation_Protective-serv",
+    "occupation_Sales",
+    "occupation_Tech-support",
+    "occupation_Transport-moving",
+    "occupation_unknown",
+    "race_Amer-Indian-Eskimo",
+    "race_Asian-Pac-Islander",
+    "race_Black",
+    "race_Other",
+    "race_White",
+    "relationship_Husband",
+    "relationship_Not-in-family",
+    "relationship_Other-relative",
+    "relationship_Own-child",
+    "relationship_Unmarried",
+    "relationship_Wife",
+    "sex_Female",
+    "sex_Male",
+    "workclass_Federal-gov",
+    "workclass_Local-gov",
+    "workclass_Never-worked",
+    "workclass_Private",
+    "workclass_Self-emp-inc",
+    "workclass_Self-emp-not-inc",
+    "workclass_State-gov",
+    "workclass_Without-pay",
+    "workclass_unknown",
+)
+ADULT_SIM2REAL_NUMERIC_FEATURE_INDICES = (0, 1, 2, 3)
+ADULT_SIM2REAL_CATEGORICAL_FEATURE_INDICES = tuple(range(4, 67))
+
+
 def _ensure_2d(values) -> np.ndarray:
     array = np.asarray(values, dtype=float)
     if array.ndim == 1:
@@ -39,6 +115,7 @@ class BaseSim2RealFunction:
     """Base class for deterministic sim2real functions."""
 
     spec: Sim2RealSpec
+    model_name = "synthetic_ai"
 
     @property
     def function_name(self) -> str:
@@ -56,6 +133,20 @@ class BaseSim2RealFunction:
     def feature_names(self) -> tuple[str, ...]:
         return self.spec.feature_names
 
+    def _validated_input(self, X) -> np.ndarray:
+        array = _ensure_2d(X)
+        if array.ndim != 2:
+            raise ValueError(
+                f"{self.__class__.__name__} expects a 1D row or 2D matrix; "
+                f"received shape {array.shape}"
+            )
+        if array.shape[1] != self.input_dim:
+            raise ValueError(
+                f"{self.__class__.__name__} expects {self.input_dim} features "
+                f"in its declared order; received {array.shape[1]}"
+            )
+        return array
+
     def predict(self, X) -> np.ndarray:
         raise NotImplementedError
 
@@ -63,7 +154,18 @@ class BaseSim2RealFunction:
         raise NotImplementedError(f"{self.function_name} does not expose ground-truth weights")
 
     def ground_truth_base_values(self, X) -> np.ndarray:
-        return np.zeros(_ensure_2d(X).shape[0], dtype=float)
+        return np.zeros(self._validated_input(X).shape[0], dtype=float)
+
+    def predict_proba(self, X) -> np.ndarray:
+        """Return two-class probabilities for LIME-compatible classifiers.
+
+        These deterministic classifiers produce hard probabilities because the
+        paper functions are closed-form decision rules, not calibrated models.
+        """
+        if self.output_type != "classification":
+            raise ValueError(f"{self.function_name} is a regression function")
+        labels = self.predict(X).reshape(-1).astype(int)
+        return np.column_stack((1 - labels, labels)).astype(float)
 
     def trend_weights(self) -> np.ndarray:
         raise NotImplementedError(f"{self.function_name} does not expose global trend weights")
@@ -76,14 +178,26 @@ class BaseSim2RealFunction:
         return float(np.mean(preds.reshape(-1).astype(int) == y_arr.reshape(-1).astype(int)))
 
     def get_info(self) -> Dict:
-        return {
+        info = {
             "model_type": "sim2real",
+            "model_name": self.model_name,
             "function_name": self.function_name,
             "input_dim": self.input_dim,
             "output_type": self.output_type,
             "feature_names": list(self.feature_names),
             "is_trained": True,
         }
+        if hasattr(self, "variant_name"):
+            info["variant_name"] = self.variant_name
+        if hasattr(self, "active_feature_indices"):
+            active = list(self.active_feature_indices)
+            info["active_feature_indices"] = active
+            info["active_feature_names"] = [self.feature_names[index] for index in active]
+        if hasattr(self, "numeric_feature_indices"):
+            info["numeric_feature_indices"] = list(self.numeric_feature_indices)
+        if hasattr(self, "categorical_feature_indices"):
+            info["categorical_feature_indices"] = list(self.categorical_feature_indices)
+        return info
 
 
 class SparseFunction(BaseSim2RealFunction):
@@ -102,26 +216,26 @@ class SparseFunction(BaseSim2RealFunction):
     )
 
     def _active_feature_indices(self, X: np.ndarray) -> np.ndarray:
-        X = _ensure_2d(X)
+        X = self._validated_input(X)
         x3 = X[:, 2]
         use_x2 = (x3 <= 0.25) | ((x3 > 0.5) & (x3 <= 0.75))
         return np.where(use_x2, 1, 0)
 
     def predict(self, X) -> np.ndarray:
-        X = _ensure_2d(X)
+        X = self._validated_input(X)
         active = self._active_feature_indices(X)
         values = X[np.arange(X.shape[0]), active]
         return (values > 0.5).astype(int)
 
     def ground_truth_weights(self, X) -> np.ndarray:
-        X = _ensure_2d(X)
+        X = self._validated_input(X)
         weights = np.zeros((X.shape[0], self.input_dim), dtype=float)
         active = self._active_feature_indices(X)
         weights[np.arange(X.shape[0]), active] = 1.0
         return weights
 
     def ground_truth_base_values(self, X) -> np.ndarray:
-        return np.full(_ensure_2d(X).shape[0], -0.5, dtype=float)
+        return np.full(self._validated_input(X).shape[0], -0.5, dtype=float)
 
 
 class TrendWiggleFunction(BaseSim2RealFunction):
@@ -149,14 +263,14 @@ class TrendWiggleFunction(BaseSim2RealFunction):
     _trend = np.array([20.0, -1.0, -20.0, 1.0, 0.0, 0.0, 0.0], dtype=float)
 
     def predict(self, X) -> np.ndarray:
-        X = _ensure_2d(X)
+        X = self._validated_input(X)
         return np.sum(5.0 * np.sin(20.0 * X) + self._trend * X, axis=1)
 
     def trend_weights(self) -> np.ndarray:
         return self._trend.copy()
 
     def ground_truth_weights(self, X) -> np.ndarray:
-        X = _ensure_2d(X)
+        X = self._validated_input(X)
         return 100.0 * np.cos(20.0 * X) + self._trend
 
 
@@ -192,7 +306,7 @@ class WiggleFunction(BaseSim2RealFunction):
     )
 
     def _row_indices(self, X: np.ndarray) -> np.ndarray:
-        X = _ensure_2d(X)
+        X = self._validated_input(X)
         x1 = X[:, 0]
         return np.select(
             [x1 <= 0.25, (x1 > 0.25) & (x1 <= 0.5), (x1 > 0.5) & (x1 <= 0.75)],
@@ -201,13 +315,93 @@ class WiggleFunction(BaseSim2RealFunction):
         )
 
     def predict(self, X) -> np.ndarray:
-        X = _ensure_2d(X)
+        X = self._validated_input(X)
         weights = self.ground_truth_weights(X)
         return (np.sum(X * weights, axis=1) > 0.0).astype(int)
 
     def ground_truth_weights(self, X) -> np.ndarray:
-        rows = self._row_indices(_ensure_2d(X))
+        rows = self._row_indices(self._validated_input(X))
         return self.weight_matrix[rows].copy()
+
+
+class AdultSparseFunction(SparseFunction):
+    """Sparse paper function embedded in the 67D Adult sim2real schema.
+
+    The original rule is preserved on the first three normalized numeric
+    dimensions: capital-loss selects whether age or capital-gain is active.
+    All one-hot dimensions are valid model inputs and receive zero analytical
+    weight when inactive.
+    """
+
+    spec = Sim2RealSpec(
+        "sparse",
+        len(ADULT_SIM2REAL_FEATURE_NAMES),
+        "classification",
+        ADULT_SIM2REAL_FEATURE_NAMES,
+    )
+    variant_name = "adult_income"
+    active_feature_indices = (0, 1, 2)
+    numeric_feature_indices = ADULT_SIM2REAL_NUMERIC_FEATURE_INDICES
+    categorical_feature_indices = ADULT_SIM2REAL_CATEGORICAL_FEATURE_INDICES
+
+
+class AdultTrendWiggleFunction(TrendWiggleFunction):
+    """Trend-and-wiggle function embedded in selected Adult dimensions."""
+
+    spec = Sim2RealSpec(
+        "trend_wiggle",
+        len(ADULT_SIM2REAL_FEATURE_NAMES),
+        "regression",
+        ADULT_SIM2REAL_FEATURE_NAMES,
+    )
+    variant_name = "adult_income"
+    active_feature_indices = (0, 1, 2, 3, 13, 22, 56)
+    numeric_feature_indices = ADULT_SIM2REAL_NUMERIC_FEATURE_INDICES
+    categorical_feature_indices = ADULT_SIM2REAL_CATEGORICAL_FEATURE_INDICES
+
+    def predict(self, X) -> np.ndarray:
+        X = self._validated_input(X)
+        active_values = X[:, self.active_feature_indices]
+        return np.sum(5.0 * np.sin(20.0 * active_values) + self._trend * active_values, axis=1)
+
+    def trend_weights(self) -> np.ndarray:
+        trend = np.zeros(self.input_dim, dtype=float)
+        trend[list(self.active_feature_indices)] = self._trend
+        return trend
+
+    def ground_truth_weights(self, X) -> np.ndarray:
+        X = self._validated_input(X)
+        active_values = X[:, self.active_feature_indices]
+        weights = np.zeros((X.shape[0], self.input_dim), dtype=float)
+        weights[:, self.active_feature_indices] = 100.0 * np.cos(20.0 * active_values) + self._trend
+        return weights
+
+
+class AdultWiggleFunction(WiggleFunction):
+    """Piecewise wiggle classifier embedded in selected Adult dimensions."""
+
+    spec = Sim2RealSpec(
+        "wiggle",
+        len(ADULT_SIM2REAL_FEATURE_NAMES),
+        "classification",
+        ADULT_SIM2REAL_FEATURE_NAMES,
+    )
+    variant_name = "adult_income"
+    active_feature_indices = (0, 1, 2, 3, 13, 15, 22, 33, 39, 49, 56)
+    numeric_feature_indices = ADULT_SIM2REAL_NUMERIC_FEATURE_INDICES
+    categorical_feature_indices = ADULT_SIM2REAL_CATEGORICAL_FEATURE_INDICES
+
+    def predict(self, X) -> np.ndarray:
+        X = self._validated_input(X)
+        weights = self.ground_truth_weights(X)
+        return (np.sum(X * weights, axis=1) > 0.0).astype(int)
+
+    def ground_truth_weights(self, X) -> np.ndarray:
+        X = self._validated_input(X)
+        rows = self._row_indices(X)
+        weights = np.zeros((X.shape[0], self.input_dim), dtype=float)
+        weights[:, self.active_feature_indices] = self.weight_matrix[rows]
+        return weights
 
 
 _FUNCTIONS = {
@@ -223,6 +417,13 @@ _FUNCTIONS = {
     "fpiece": WiggleFunction,
     "wiggle": WiggleFunction,
     "fwiggle": WiggleFunction,
+    "adult": AdultSparseFunction,
+    "adult_income": AdultSparseFunction,
+    "adult_sparse": AdultSparseFunction,
+    "adult_trend_wiggle": AdultTrendWiggleFunction,
+    "adult_trend+wiggle": AdultTrendWiggleFunction,
+    "adult_wiggle": AdultWiggleFunction,
+    "adult_piecewise": AdultWiggleFunction,
 }
 
 
@@ -231,7 +432,8 @@ def create_sim2real_function(function_name: str) -> BaseSim2RealFunction:
 
     Args:
         function_name: Which synthetic function to build, e.g. ``sparse``,
-            ``wiggle`` or ``trend_wiggle``.
+            ``wiggle``, ``trend_wiggle`` or their 67D Adult variants
+            ``adult_sparse``, ``adult_wiggle`` and ``adult_trend_wiggle``.
     """
     key = function_name.lower().strip()
     if key not in _FUNCTIONS:

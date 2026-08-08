@@ -13,6 +13,19 @@ from ..normalizers.minmax import MinMaxNormalizer
 # is detected per table rather than hardcoded.
 CANONICAL_FEATURE_PREFIX = "x"
 LEGACY_FEATURE_PREFIX = "v"
+APP_ID_COLUMNS = ("dataId", "appId", "app_id")
+
+
+def app_id_column(df: pd.DataFrame) -> str:
+    """Return the application/dataset identifier column used by ``df``."""
+    if df is not None:
+        for column in APP_ID_COLUMNS:
+            if column in df.columns:
+                return column
+    raise ValueError(
+        "DataFrame must include an application id column: "
+        f"one of {APP_ID_COLUMNS}"
+    )
 
 
 def feature_prefix(df: pd.DataFrame) -> str:
@@ -84,8 +97,8 @@ class CoAXDataSource(BaseDataSource):
             raise ValueError("metadata_df must be loaded")
         if 'instanceId' not in self.feature_values_df.columns:
             raise ValueError("feature_values_df must have 'instanceId' column")
-        if 'dataId' not in self.feature_values_df.columns:
-            raise ValueError("feature_values_df must have 'dataId' column")
+        app_id_column(self.feature_values_df)
+        app_id_column(self.metadata_df)
 
     def get_features(self, instance_ids: List[int], normalize: bool = True) -> List[List[float]]:
         """
@@ -108,10 +121,12 @@ class CoAXDataSource(BaseDataSource):
                 raise ValueError(f"Instance {instance_id} not found")
             
             feature_row = feature_row.iloc[0]
-            app_id = feature_row['dataId']
+            feature_app_col = app_id_column(self.feature_values_df)
+            metadata_app_col = app_id_column(self.metadata_df)
+            app_id = feature_row[feature_app_col]
 
             # Get metadata for this app
-            app_metadata = self.metadata_df[self.metadata_df['dataId'] == app_id]
+            app_metadata = self.metadata_df[self.metadata_df[metadata_app_col] == app_id]
             if app_metadata.empty:
                 raise ValueError(f"No metadata for dataId: {app_id}")
             app_metadata = app_metadata.iloc[0]
@@ -216,9 +231,11 @@ class CoAXDataSource(BaseDataSource):
         self.feature_values_df = self.feature_values_df[mask]
         
         # Filter metadata based on remaining app IDs
-        remaining_app_ids = self.feature_values_df['dataId'].unique()
+        feature_app_col = app_id_column(self.feature_values_df)
+        metadata_app_col = app_id_column(self.metadata_df)
+        remaining_app_ids = self.feature_values_df[feature_app_col].unique()
         self.metadata_df = self.metadata_df[
-            self.metadata_df['dataId'].isin(remaining_app_ids)
+            self.metadata_df[metadata_app_col].isin(remaining_app_ids)
         ]
         
         # Filter predictions if present
@@ -234,12 +251,13 @@ class CoAXDataSource(BaseDataSource):
 
     def get_summary(self) -> Dict[str, Any]:
         """Get summary of loaded data."""
+        metadata_app_col = app_id_column(self.metadata_df)
         return {
             'source_type': self.source_type,
             'n_instances': len(self.feature_values_df),
             'n_features': self._count_features(),
             'n_apps': len(self.metadata_df),
-            'app_ids': self.metadata_df['dataId'].unique().tolist(),
+            'app_ids': self.metadata_df[metadata_app_col].unique().tolist(),
             'has_predictions': self.ai_predictions_df is not None,
             'n_explanation_columns': len(self.explanation_columns),
             'filters_applied': len(self._filters)
@@ -251,6 +269,7 @@ class CoAXDataSource(BaseDataSource):
             return 0
         sample_row = self.feature_values_df.iloc[0]
         i = 0
-        while f'v{i}' in sample_row.index and pd.notna(sample_row[f'v{i}']):
+        prefix = feature_prefix(self.feature_values_df)
+        while f'{prefix}{i}' in sample_row.index and pd.notna(sample_row[f'{prefix}{i}']):
             i += 1
         return i

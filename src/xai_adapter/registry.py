@@ -142,6 +142,11 @@ _COXAM_METHOD_KEYS = {
     "decision_tree", "dt", "rules",
     "logistic_regression", "lr", "weights",
 }
+_PRECOMPUTED_METHOD_KEYS = {
+    "precomputed_csv", "csv", "csv_dataset", "dataset_csv",
+}
+_APP_ID_COLUMNS = ("dataId", "appId", "app_id")
+_SIM2REAL_PROPERTIES = {"faithful", "robust", "sparse", "sparse_robust"}
 
 
 def _train_x(train_data: Any) -> Any:
@@ -219,6 +224,186 @@ def _apply_coxam_loader(key: str, loader: Any, kwargs: Dict[str, Any]) -> tuple[
     return factory_name, kwargs
 
 
+def _numbered_columns(table: Any, prefixes: tuple[str, ...], suffix: str = "") -> list[str]:
+    """Return numbered columns in numeric order, e.g. v0..v10 or a0_i..a10_i."""
+    matches = []
+    for column in table.columns:
+        if not isinstance(column, str):
+            continue
+        for prefix_index, prefix in enumerate(prefixes):
+            if not column.startswith(prefix) or (suffix and not column.endswith(suffix)):
+                continue
+            stem = column[len(prefix):-len(suffix) if suffix else None]
+            if stem.isdigit():
+                matches.append((prefix_index, int(stem), column))
+                break
+    return [column for _, _, column in sorted(matches)]
+
+
+def _filter_precomputed_table(
+    table: Any,
+    *,
+    app_id: Any = None,
+    model_name: Any = None,
+    exp_method: Any = None,
+    exp_property: Any = None,
+    baseline_property: bool = False,
+) -> Any:
+    """Filter a loaded precomputed table without mutating the loader."""
+    result = table.copy()
+    if app_id is not None:
+        app_column = next((column for column in _APP_ID_COLUMNS if column in result.columns), None)
+        if app_column is not None:
+            result = result[result[app_column] == app_id]
+    if model_name is not None:
+        model_column = next((column for column in ("modelName", "model") if column in result.columns), None)
+        if model_column is not None:
+            result = result[result[model_column] == model_name]
+    if exp_method is not None:
+        if "expMethod" not in result.columns:
+            raise ValueError("The selected explanation table has no 'expMethod' column")
+        result = result[result["expMethod"] == exp_method]
+    if exp_property is not None:
+        if "expProperty" not in result.columns:
+            raise ValueError("The selected explanation table has no 'expProperty' column")
+        result = result[result["expProperty"] == exp_property]
+    elif baseline_property and "expProperty" in result.columns:
+        properties = result["expProperty"].fillna("").astype(str).str.strip()
+        result = result[properties == ""]
+    return result.copy()
+
+
+def _merge_precomputed_features(explanation_df: Any, feature_df: Any) -> Any:
+    """Join separate explanation and feature assets into one parser-ready table."""
+    if _numbered_columns(explanation_df, ("v", "x")):
+        return explanation_df.copy()
+
+    feature_columns = _numbered_columns(feature_df, ("v", "x"))
+    if not feature_columns:
+        raise ValueError("The loader's feature table has no numbered vN/xN columns")
+    if "instanceId" not in explanation_df.columns or "instanceId" not in feature_df.columns:
+        raise ValueError("Feature and explanation tables must both include 'instanceId'")
+
+    explanation = explanation_df.copy()
+    features = feature_df.copy()
+    explanation_app = next((col for col in _APP_ID_COLUMNS if col in explanation.columns), None)
+    feature_app = next((col for col in _APP_ID_COLUMNS if col in features.columns), None)
+    merge_keys = ["instanceId"]
+    restore_app_column = explanation_app or feature_app
+    if explanation_app is not None and feature_app is not None:
+        internal_app_column = "__xai_adapter_app_id"
+        explanation = explanation.rename(columns={explanation_app: internal_app_column})
+        features = features.rename(columns={feature_app: internal_app_column})
+        merge_keys.insert(0, internal_app_column)
+
+    feature_subset = features[[*merge_keys, *feature_columns]]
+    if feature_subset.duplicated(merge_keys).any():
+        raise ValueError("The loader's feature table has duplicate instance keys")
+    merged = explanation.merge(
+        feature_subset,
+        on=merge_keys,
+        how="inner",
+        validate="many_to_one",
+    )
+    if merged.empty and not explanation.empty:
+        raise ValueError("No explanation rows matched the loader's feature rows")
+    if "__xai_adapter_app_id" in merged.columns and restore_app_column is not None:
+        merged = merged.rename(columns={"__xai_adapter_app_id": restore_app_column})
+    return merged
+
+
+def _apply_precomputed_loader(loader: Any, kwargs: Dict[str, Any]) -> Dict[str, Any]:
+    """Build parser-ready precomputed explanations from a unified data loader."""
+    if "dataset" in kwargs or "csv_path" in kwargs or "dataframe" in kwargs:
+        raise ValueError(
+            "Pass either loader= or dataset=/csv_path=/dataframe= for precomputed CSV explanations, not both"
+        )
+
+    table_name = kwargs.pop("explanation_type", "attribution")
+    exp_method = kwargs.pop("exp_method", None)
+    exp_property = kwargs.pop("exp_property", None)
+    app_id = kwargs.pop("app_id", None)
+    model_name = kwargs.pop("model_name", None)
+    source_type = getattr(getattr(loader, "data_source", None), "source_type", None)
+    is_sim2real = source_type == "sim2real"
+
+    if exp_property is not None and not is_sim2real:
+        raise ValueError("exp_property is supported only for Sim2Real data loaders")
+
+    uses_explanation_variants = is_sim2real and table_name not in {"none", "deltas"}
+    if uses_explanation_variants:
+        exp_method = "lime" if exp_method is None else str(exp_method).strip().lower()
+        if exp_method != "lime":
+            raise ValueError("Sim2Real precomputed explanations use exp_method='lime'")
+        if exp_property is not None:
+            exp_property = str(exp_property).strip().lower()
+            if exp_property not in _SIM2REAL_PROPERTIES:
+                raise ValueError(
+                    "Sim2Real exp_property must be one of: "
+                    + ", ".join(sorted(_SIM2REAL_PROPERTIES))
+                )
+    elif exp_property is not None:
+        raise ValueError(
+            f"exp_property is not available for Sim2Real explanation_type={table_name!r}"
+        )
+
+    try:
+        explanation_df = loader.get_explanation_table(table_name)
+        feature_df = loader.get_feature_values()
+    except AttributeError as exc:
+        raise TypeError(
+            "loader= for precomputed CSV explanations requires a UnifiedDataLoader-like object"
+        ) from exc
+
+    explanation_df = _filter_precomputed_table(
+        explanation_df,
+        app_id=app_id,
+        model_name=model_name,
+        exp_method=exp_method,
+        exp_property=exp_property,
+        baseline_property=uses_explanation_variants and exp_property is None,
+    )
+    if explanation_df.empty:
+        raise ValueError(
+            f"No rows found in explanation table {table_name!r} for "
+            f"app_id={app_id!r}, model_name={model_name!r}, "
+            f"exp_method={exp_method!r}, exp_property={exp_property!r}"
+        )
+
+    if "expMethod" in explanation_df.columns:
+        available_methods = explanation_df["expMethod"].dropna().unique().tolist()
+        if exp_method is None and len(available_methods) > 1:
+            raise ValueError(
+                f"Explanation table {table_name!r} contains multiple expMethod values "
+                f"{sorted(available_methods)}; pass exp_method= to select one"
+            )
+
+    explanation_columns = _numbered_columns(explanation_df, ("a",), suffix="_i")
+    if not explanation_columns and table_name != "none":
+        raise ValueError(
+            f"Explanation table {table_name!r} has no numbered aN_i explanation columns"
+        )
+    if "pred" not in explanation_df.columns:
+        raise ValueError(f"Explanation table {table_name!r} has no 'pred' column")
+
+    merged = _merge_precomputed_features(explanation_df, feature_df)
+    duplicate_keys = ["instanceId"]
+    app_column = next((col for col in _APP_ID_COLUMNS if col in merged.columns), None)
+    if app_column is not None:
+        duplicate_keys.insert(0, app_column)
+    if merged.duplicated(duplicate_keys).any():
+        raise ValueError(
+            f"Explanation table {table_name!r} has multiple rows per instance after filtering"
+        )
+
+    kwargs["dataframe"] = merged
+    kwargs.setdefault("feature_columns", _numbered_columns(merged, ("v", "x")))
+    kwargs.setdefault("explanation_columns", explanation_columns)
+    if table_name == "none":
+        kwargs.setdefault("missing_explanation_strategy", "zeros")
+    return kwargs
+
+
 def create_xai_method(name: str, *, ai_model: Any = None, train_data: Any = None, loader: Any = None, **kwargs):
     """Create an XAI method adapter from the global registry.
 
@@ -231,9 +416,13 @@ def create_xai_method(name: str, *, ai_model: Any = None, train_data: Any = None
             such wiring.
         train_data: Optional training data used with ``ai_model`` (exposing
             ``X``/``y``/``feature_names``/``categorical_feature_indices``).
-        loader: Optional CoXAM data loader. When provided for a rules/weights
-            method, the surrogate's explanation and metadata tables are read from
-            it instead of being passed explicitly.
+        loader: Optional unified data loader. For rules/weights, the CoXAM
+            surrogate tables are read from it. For ``precomputed_csv``/``csv``,
+            pass ``explanation_type`` and optionally ``exp_method``, ``app_id``,
+            and ``model_name`` to join a loaded explanation table with its
+            feature rows. Sim2Real loaders default ``exp_method`` to ``"lime"``
+            and additionally accept ``exp_property`` as one of ``faithful``,
+            ``robust``, ``sparse``, or ``sparse_robust``.
         **kwargs: Adapter-specific keyword arguments (e.g. ``predict_fn``,
             ``background_data``, ``explanation_df``, ``target``, ``depth``,
             ``variant``). Pass ``target=None`` or ``target`` in
@@ -241,8 +430,11 @@ def create_xai_method(name: str, *, ai_model: Any = None, train_data: Any = None
     """
     key = name.lower()
 
+    # Dataset-backed explanations: join the loader's explanation and feature tables.
+    if loader is not None and key in _PRECOMPUTED_METHOD_KEYS:
+        kwargs = _apply_precomputed_loader(loader, kwargs)
     # CoXAM surrogate identified by its method string; tables read from a loader.
-    if loader is not None and key in _COXAM_METHOD_KEYS:
+    elif loader is not None and key in _COXAM_METHOD_KEYS:
         name, kwargs = _apply_coxam_loader(key, loader, kwargs)
     # Trained AI model: wire the model and training data into the kwargs.
     elif ai_model is not None:

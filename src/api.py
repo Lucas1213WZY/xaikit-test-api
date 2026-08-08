@@ -1176,7 +1176,7 @@ class xaikitTest:
         elif cognitive_model is not None and self.cognitive_model_id == "placeholder":
             self.cognitive_model_id = "custom"
         self.cognitive_params = (
-            ({} if is_baseline else default_cognitive_params())
+            ({} if is_baseline else default_cognitive_params(self.cognitive_model_id))
             if cognitive_params is None
             else deepcopy(cognitive_params)
         )

@@ -36,8 +36,15 @@ const urlParams = new URLSearchParams(url);
 
 const appId = urlParams.get("appId");
 const modelName = urlParams.get("modelName");
-const expMethod = urlParams.get("expMethod");
+const isSim2Real = appId === "adult_sim2real" || modelName === "synthetic_ai";
+const expMethod = urlParams.get("expMethod") || (isSim2Real ? "lime" : null);
+const expProperty = urlParams.get("expProperty");
 const instanceId = Number(urlParams.get("instanceId"));
+
+if (isSim2Real) {
+  document.body.classList.add("sim2real-iframe");
+}
+
 const xaiType =
   urlParams.get("xaiType") === "none" ? null : urlParams.get("xaiType");
 // const tutorial = Number(urlParams.get("tutorial"));
@@ -413,12 +420,16 @@ function extractDataInstance(data) {
       sameValue(d.appId, appId) &&
       Number(d.instanceId) === instanceId &&
       (!d.modelName || sameValue(d.modelName, modelName)) &&
-      (!d.expMethod || sameValue(d.expMethod, expMethod))
+      (!d.expMethod || sameValue(d.expMethod, expMethod)) &&
+      (!("expProperty" in d) ||
+        (expProperty
+          ? sameValue(d.expProperty, expProperty)
+          : !d.expProperty))
   );
 
   if (!instance) {
     throw new Error(
-      `No data row found for appId=${appId}, modelName=${modelName}, expMethod=${expMethod}, instanceId=${instanceId}`
+      `No data row found for appId=${appId}, modelName=${modelName}, expMethod=${expMethod}, expProperty=${expProperty}, instanceId=${instanceId}`
     );
   }
 

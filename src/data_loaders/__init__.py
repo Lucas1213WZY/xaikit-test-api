@@ -54,7 +54,7 @@ from .workflow import (
 )
 
 # Data sources
-from .sources import CoAXDataSource, CoXAMDataSource
+from .sources import CoAXDataSource, CoXAMDataSource, Sim2RealDataSource
 
 # Normalizers
 from .normalizers import MinMaxNormalizer, ZScoreNormalizer
@@ -89,6 +89,7 @@ __all__ = [
     # Data sources
     "CoAXDataSource",
     "CoXAMDataSource",
+    "Sim2RealDataSource",
     
     # Normalizers
     "MinMaxNormalizer",

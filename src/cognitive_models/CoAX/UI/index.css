@@ -21,6 +21,27 @@ body {
   overflow: auto;
 }
 
+/* Keep every Sim2Real rendering mode centered, including the block-based
+   counterfactual/similar layouts and the no-XAI fallback. */
+body.sim2real-iframe > #feature-weights-table,
+body.sim2real-iframe > #counterfactual-div,
+body.sim2real-iframe > #similar-div,
+body.sim2real-iframe > #feature-importance-div,
+body.sim2real-iframe > #feature-attribution-div,
+body.sim2real-iframe > #toggleContainer {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
+}
+
+body.sim2real-iframe #counterfactual-div > table,
+body.sim2real-iframe #similar-div > table,
+body.sim2real-iframe #feature-importance-table,
+body.sim2real-iframe #feature-attribution-table {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .container {
   padding: 40px;
   height: 100%;

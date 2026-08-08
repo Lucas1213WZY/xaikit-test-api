@@ -71,7 +71,21 @@ loader = UnifiedDataLoader.from_coxam(
     metadata_file="assets/data/coxam/metadata.csv",
     prediction_file="assets/data/coxam/none.csv"
 )
+
+# Sim-to-real study corpus plus XAI desiderata explanations
+loader = UnifiedDataLoader.from_sim2real(
+    dataset_dir="assets/ai_dataset/sim2real",
+    explanations_dir="assets/explanations/xai_desiderata",
+)
+
+# Equivalent standardized-assets shortcut
+loader = UnifiedDataLoader.from_assets("sim2real", assets_root="assets")
 ```
+
+The sim-to-real loader exposes 67-dimensional feature rows and the tables
+`attribution`, `importance`, `counterfactuals_fake`, `deltas`, and `none`.
+`deltas` is auxiliary trial metadata; the other vector tables can be adapted
+through `src.xai_adapter`.
 
 ### 3. Access Data
 
