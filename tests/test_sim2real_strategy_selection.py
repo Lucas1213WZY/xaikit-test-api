@@ -25,7 +25,7 @@ from src.cognitive_models.cognitive_models.fit_sim2real_attribution_sum_to_parti
     candidate_grid,
     count_free_parameters,
 )
-from src.cognitive_models.cognitive_models.sim2real import (
+from src.cognitive_models.cognitive_models.Sim2Real import (
     Sim2RealAttributionProjector,
     Sim2RealFittedAttributionSum,
     Sim2RealFittedSalientFeatures,

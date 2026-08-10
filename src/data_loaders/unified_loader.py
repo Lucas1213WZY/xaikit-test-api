@@ -233,9 +233,9 @@ class UnifiedDataLoader:
 
         Expected layout:
             assets/
-              ai_dataset/{coax|coxam|sim2real}/{values.csv,metadata.csv,none.csv}
-              explanations/coax/{attribution.csv,importance.csv}
-              explanations/coxam/{decision_tree.csv,logistic_regression.csv}
+              ai_dataset/{CoAX|CoXAM}/{values.csv,metadata.csv,none.csv}, or ai_dataset/sim2real/
+              explanations/CoAX/{attribution.csv,importance.csv}
+              explanations/CoXAM/{decision_tree.csv,logistic_regression.csv}
               explanations/xai_desiderata/{attribution.csv,importance.csv,...}
 
         Args:
@@ -272,10 +272,13 @@ class UnifiedDataLoader:
                 normalizer=normalizer,
             )
 
-        data_dir = os.path.join(assets_root, "ai_dataset", source)
+        dir_name = {"coax": "CoAX", "coxam": "CoXAM"}[source]
+        data_dir = os.path.join(assets_root, "ai_dataset", dir_name)
+        if not os.path.isdir(data_dir):
+            data_dir = os.path.join(assets_root, "ai_dataset", source)
         if not os.path.isdir(data_dir):
             data_dir = os.path.join(assets_root, "data", source)
-        exp_name = explanation_source or {"coax": "CoAX", "coxam": "CoXAM"}[source]
+        exp_name = explanation_source or dir_name
         exp_dir = os.path.join(assets_root, "explanations", exp_name)
         if not os.path.isdir(exp_dir):
             exp_dir = os.path.join(assets_root, "explanations", source)

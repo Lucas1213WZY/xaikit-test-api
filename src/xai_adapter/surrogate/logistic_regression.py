@@ -16,7 +16,7 @@ class LogisticRegressionSurrogateMethod(SurrogateMethod):
     """
     Logistic-regression surrogate method for rules-vs-weights comparisons.
 
-    The expected explanation table matches `assets/explanations/coxam/logistic_regression.csv`.
+    The expected explanation table matches `assets/explanations/CoXAM/logistic_regression.csv`.
     """
 
     method_name = "logistic_regression"

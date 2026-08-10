@@ -66,7 +66,7 @@ CORPUS_DIR = STUDY_CORPUS_DIR
 #: :data:`STUDY_CORPUS_DIR` for every row it carries -- and is what the CoAX and
 #: CoXAM trial executors already read, so all three now agree on one source.
 ASSET_TABLE_FILES: dict[str, Path] = {
-    "features": REPO_ROOT / "assets" / "ai_dataset" / "coax" / "values.csv",
+    "features": REPO_ROOT / "assets" / "ai_dataset" / "CoAX" / "values.csv",
     "predictions": REPO_ROOT / "assets" / "explanations" / "CoAX" / "none.csv",
     "attribution": REPO_ROOT / "assets" / "explanations" / "CoAX" / "attribution.csv",
     "importance": REPO_ROOT / "assets" / "explanations" / "CoAX" / "importance.csv",

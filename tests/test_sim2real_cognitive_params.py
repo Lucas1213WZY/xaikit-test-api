@@ -82,7 +82,7 @@ def test_defaults_come_from_the_fitted_population_not_the_constructor():
     """Same choice FITTED_COAX_PARAMS makes: fitted values, not arbitrary ones."""
     import inspect
 
-    from src.cognitive_models.cognitive_models.sim2real.gcm_strategies import (
+    from src.cognitive_models.cognitive_models.Sim2Real.gcm_strategies import (
         Sim2RealFittedAttributionSum,
     )
 

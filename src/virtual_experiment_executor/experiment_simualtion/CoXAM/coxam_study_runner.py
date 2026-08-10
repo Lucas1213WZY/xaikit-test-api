@@ -354,7 +354,7 @@ def run_coxam_study(
       surrogates against this study's own trained model. Works for any dataset
       and any AI model.
     * ``"assets"`` loads the pre-generated tables from
-      ``assets/ai_dataset/coxam`` and ``assets/explanations/CoXAM``. Faster and
+      ``assets/ai_dataset/CoXAM`` and ``assets/explanations/CoXAM``. Faster and
       exactly reproduces the published corpus, but only covers the datasets the
       rules-vs-weights tutorial has been run against, each against an ``mlp``.
       Trials must reference instance ids that corpus actually carries.

@@ -14,7 +14,7 @@ os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 import numpy as np
 import pytest
 
-from src.cognitive_models.cognitive_models.coxam.counterfactual_env import (
+from src.cognitive_models.cognitive_models.CoXAM.counterfactual_env import (
     DEFAULT_TIME_PENALTY_WEIGHT_RANGE,
     STRATEGIES,
     XAI_TYPES,

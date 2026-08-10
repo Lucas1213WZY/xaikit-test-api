@@ -53,16 +53,16 @@ VERBATIM_ROOT = ASSETS / "apparatus"
 #: ``ai_dataset/``.
 SYNC_PLAN: list[tuple[str, str, list[str]]] = [
     # -- CoAX: three datasets, one XAI method each; keys are preserved --------
-    ("local/xai_methods/values.csv", "ai_dataset/coax/values.csv", ["dataId", "instanceId"]),
-    ("local/xai_methods/none.csv", "ai_dataset/coax/none.csv", ["dataId", "instanceId", "modelName"]),
+    ("local/xai_methods/values.csv", "ai_dataset/CoAX/values.csv", ["dataId", "instanceId"]),
+    ("local/xai_methods/none.csv", "ai_dataset/CoAX/none.csv", ["dataId", "instanceId", "modelName"]),
     ("local/xai_methods/none.csv", "explanations/CoAX/none.csv", ["dataId", "instanceId", "modelName"]),
     ("local/xai_methods/attribution.csv", "explanations/CoAX/attribution.csv",
      ["dataId", "instanceId", "expMethod"]),
     ("local/xai_methods/importance.csv", "explanations/CoAX/importance.csv",
      ["dataId", "instanceId", "expMethod"]),
     # -- CoXAM: trimmed to the six datasets the apparatus serves --------------
-    ("global/xai_methods/values.csv", "ai_dataset/coxam/values.csv", ["dataId", "instanceId"]),
-    ("global/xai_methods/none.csv", "ai_dataset/coxam/none.csv", ["dataId", "instanceId", "modelName"]),
+    ("global/xai_methods/values.csv", "ai_dataset/CoXAM/values.csv", ["dataId", "instanceId"]),
+    ("global/xai_methods/none.csv", "ai_dataset/CoXAM/none.csv", ["dataId", "instanceId", "modelName"]),
     ("global/xai_methods/none.csv", "explanations/CoXAM/none.csv", ["dataId", "instanceId", "modelName"]),
     ("global/xai_methods/decision_tree.csv", "explanations/CoXAM/decision_tree.csv",
      ["dataId", "model", "depth"]),
@@ -75,8 +75,8 @@ SYNC_PLAN: list[tuple[str, str, list[str]]] = [
 #: the apparatus's six datasets, so its tables are replaced outright.
 REBUILD_WHOLE: frozenset[str] = frozenset(
     {
-        "ai_dataset/coxam/values.csv",
-        "ai_dataset/coxam/none.csv",
+        "ai_dataset/CoXAM/values.csv",
+        "ai_dataset/CoXAM/none.csv",
         "explanations/CoXAM/none.csv",
         "explanations/CoXAM/decision_tree.csv",
         "explanations/CoXAM/logistic_regression.csv",
@@ -210,8 +210,8 @@ def extend_coax_for_human_study(apparatus_root: Path, *, check: bool) -> list[di
     }
 
     targets = [
-        ("local/xai_methods/values.csv", "ai_dataset/coax/values.csv", False),
-        ("local/xai_methods/none.csv", "ai_dataset/coax/none.csv", False),
+        ("local/xai_methods/values.csv", "ai_dataset/CoAX/values.csv", False),
+        ("local/xai_methods/none.csv", "ai_dataset/CoAX/none.csv", False),
         ("local/xai_methods/attribution.csv", "explanations/CoAX/attribution.csv", True),
         ("local/xai_methods/importance.csv", "explanations/CoAX/importance.csv", True),
     ]

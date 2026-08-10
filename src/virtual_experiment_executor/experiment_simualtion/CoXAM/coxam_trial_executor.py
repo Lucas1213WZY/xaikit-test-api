@@ -30,14 +30,14 @@ import pandas as pd
 os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 
 from src.ai_models.model_api import _labels_and_scores_from_predictions  # noqa: E402
-from src.cognitive_models.cognitive_models.coxam.rl_agents.meta_policy_strategy import (  # noqa: E402
+from src.cognitive_models.cognitive_models.CoXAM.rl_agents.meta_policy_strategy import (  # noqa: E402
     CONDITIONS,
     CombinedBundle,
     CombinedPolicyConfig,
     CombinedStrategyPolicyEnv,
     load_sub_policies,
 )
-from src.cognitive_models.cognitive_models.coxam.utils import (  # noqa: E402
+from src.cognitive_models.cognitive_models.CoXAM.utils import (  # noqa: E402
     AIDatasetLoader,
     DecisionTreeInterpreter,
     LogisticRegressionInterpreter,
@@ -46,10 +46,10 @@ from src.cognitive_models.cognitive_models.coxam.utils import (  # noqa: E402
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
-COXAM_DATA_DIR = REPO_ROOT / "assets" / "ai_dataset" / "coxam"
+COXAM_DATA_DIR = REPO_ROOT / "assets" / "ai_dataset" / "CoXAM"
 COXAM_EXPLANATIONS_DIR = REPO_ROOT / "assets" / "explanations" / "CoXAM"
 TRAINED_POLICIES_ROOT = (
-    REPO_ROOT / "src" / "cognitive_models" / "cognitive_models" / "coxam" / "trained_policies"
+    REPO_ROOT / "src" / "cognitive_models" / "cognitive_models" / "CoXAM" / "trained_policies"
 )
 UNIFIED_STRATEGY_ROOT = TRAINED_POLICIES_ROOT / "unified_strategy_policy"
 META_POLICY_PATH = (
@@ -61,7 +61,7 @@ PREDICTION_ONLY_METHOD = "__prediction_only__"
 
 #: Feature order of the published CoXAM corpus, per dataset -- i.e. what
 #: ``a0..a5`` mean in ``assets/explanations/CoXAM/*.csv``. Read out of
-#: ``assets/ai_dataset/coxam/metadata.csv`` and pinned here because the corpus
+#: ``assets/ai_dataset/CoXAM/metadata.csv`` and pinned here because the corpus
 #: is a fixed published artefact while the loaders are not.
 #:
 #: These are the two datasets CoXAM's own studies and parameter sweeps ran
@@ -403,7 +403,7 @@ def load_coxam_surrogates_from_assets(
 
     Same return shape as :func:`fit_coxam_surrogates`, but reads the tables
     ``tutorials/decision_tree_logistic_regression_experiment_workflow.ipynb``
-    already produced and saved under ``assets/ai_dataset/coxam`` and
+    already produced and saved under ``assets/ai_dataset/CoXAM`` and
     ``assets/explanations/CoXAM``, instead of fitting fresh ones. Faster, but
     only covers the datasets that tutorial has been run against so far
     (confirmed: adult, diabetes, forest_cover, german_credit, loan_approval,
@@ -456,7 +456,7 @@ def coxam_available_instance_ids(
 
 
 #: Instances per predicted class in CoXAM's own published corpus.
-#: ``assets/ai_dataset/coxam/none.csv`` carries 400 instances per dataset at
+#: ``assets/ai_dataset/CoXAM/none.csv`` carries 400 instances per dataset at
 #: 200/200 for wine_quality and 209/191 for mushrooms -- balanced on purpose.
 COXAM_CORPUS_INSTANCES_PER_CLASS = 200
 

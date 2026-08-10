@@ -8,10 +8,10 @@ import sys
 
 
 def test_meta_policy_strategy_imports_without_sys_path_hacks():
-    module_name = "src.cognitive_models.cognitive_models.coxam.rl_agents.meta_policy_strategy"
+    module_name = "src.cognitive_models.cognitive_models.CoXAM.rl_agents.meta_policy_strategy"
     sys.modules.pop(module_name, None)
 
-    import src.cognitive_models.cognitive_models.coxam.rl_agents.meta_policy_strategy as mps
+    import src.cognitive_models.cognitive_models.CoXAM.rl_agents.meta_policy_strategy as mps
 
     assert mps.META_STRATEGIES == ("lr_calculation", "lr_heuristic", "dt_traversal")
     assert mps.CONDITIONS == ("linear_regression", "decision_tree", "hybrid")
@@ -19,11 +19,11 @@ def test_meta_policy_strategy_imports_without_sys_path_hacks():
 
 def test_individual_policy_training_f_imports_without_sys_path_hacks():
     module_name = (
-        "src.cognitive_models.cognitive_models.coxam.rl_agents.individual_policy_training_f"
+        "src.cognitive_models.cognitive_models.CoXAM.rl_agents.individual_policy_training_f"
     )
     sys.modules.pop(module_name, None)
 
-    import src.cognitive_models.cognitive_models.coxam.rl_agents.individual_policy_training_f as ipt
+    import src.cognitive_models.cognitive_models.CoXAM.rl_agents.individual_policy_training_f as ipt
 
     assert ipt.STRATEGIES == ("lr_calculation", "lr_heuristic", "dt_traversal")
 

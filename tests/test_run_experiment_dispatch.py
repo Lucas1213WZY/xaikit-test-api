@@ -203,7 +203,7 @@ def test_stored_cognitive_params_are_routed_to_the_runner():
 
 
 def test_the_three_ui_controls_reach_the_sim2real_model():
-    from src.cognitive_models.cognitive_models.sim2real.gcm_strategies import (
+    from src.cognitive_models.cognitive_models.Sim2Real.gcm_strategies import (
         Sim2RealAttributionProjector,
     )
     from src.experiment_planner.design_export import normalize_cognitive_params

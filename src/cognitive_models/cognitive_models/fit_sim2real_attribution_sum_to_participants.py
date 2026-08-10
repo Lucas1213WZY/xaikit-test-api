@@ -27,7 +27,7 @@ from typing import Iterable, Mapping, Optional, Sequence
 import numpy as np
 import pandas as pd
 
-from .sim2real.gcm_strategies import (
+from .Sim2Real.gcm_strategies import (
     REPO_ROOT,
     Sim2RealAttributionProjector,
     Sim2RealFittedAttributionSum,

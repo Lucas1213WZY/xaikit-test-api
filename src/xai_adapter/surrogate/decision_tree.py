@@ -16,7 +16,7 @@ class DecisionTreeSurrogateMethod(SurrogateMethod):
     """
     Decision-tree surrogate method for rules-vs-weights comparisons.
 
-    The expected explanation table matches `assets/explanations/coxam/decision_tree.csv`.
+    The expected explanation table matches `assets/explanations/CoXAM/decision_tree.csv`.
     """
 
     method_name = "decision_tree"

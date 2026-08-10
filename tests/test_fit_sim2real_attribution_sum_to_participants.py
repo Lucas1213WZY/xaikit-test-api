@@ -14,7 +14,7 @@ from src.cognitive_models.cognitive_models.fit_sim2real_attribution_sum_to_parti
     count_free_parameters,
     _binary_metrics,
 )
-from src.cognitive_models.cognitive_models.sim2real.gcm_strategies import (
+from src.cognitive_models.cognitive_models.Sim2Real.gcm_strategies import (
     Sim2RealAttributionProjector,
 )
 
@@ -309,7 +309,7 @@ def test_condition_specific_grids_restrict_guessing_to_sparse():
 
 def test_lapse_variants_reuse_the_base_fit_exactly():
     """The shared-base shortcut must match a directly fitted lapse model."""
-    from src.cognitive_models.cognitive_models.sim2real.gcm_strategies import (
+    from src.cognitive_models.cognitive_models.Sim2Real.gcm_strategies import (
         Sim2RealFittedAttributionSum,
     )
 

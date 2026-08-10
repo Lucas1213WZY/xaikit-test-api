@@ -567,7 +567,7 @@ def generate_surrogate_xai_methods(
     Generate rules-vs-weights XAI methods from a dataset CSV.
 
     Use this path when the user provides new feature rows and AI predictions
-    instead of precomputed `assets/explanations/coxam` surrogate tables.
+    instead of precomputed `assets/explanations/CoXAM` surrogate tables.
 
     Args:
         dataset: An already-parsed dataset; alternative to the two below.

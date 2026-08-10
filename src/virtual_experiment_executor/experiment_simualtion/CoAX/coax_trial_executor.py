@@ -18,9 +18,9 @@ from src.experiment_planner import select_trial_rows
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
-COAX_DATA_DIR = REPO_ROOT / "assets" / "ai_dataset" / "coax"
+COAX_DATA_DIR = REPO_ROOT / "assets" / "ai_dataset" / "CoAX"
 COAX_EXPLANATIONS_DIR = REPO_ROOT / "assets" / "explanations" / "CoAX"
-COAX_MODEL_FILE = REPO_ROOT / "src" / "cognitive_models" / "cognitive_models" / "coax" / "coax_gcm_multiple_strategies.py"
+COAX_MODEL_FILE = REPO_ROOT / "src" / "cognitive_models" / "cognitive_models" / "CoAX" / "coax_gcm_multiple_strategies.py"
 
 
 def _coerce_bool(value: Any) -> bool:
@@ -255,7 +255,7 @@ class CoAXAssetRepository:
     Two sources are supported, because the same schema can come from either:
 
     * ``from_assets`` (the default) reads the fixed CoAX study files under
-      ``assets/ai_dataset/coax`` and ``assets/explanations/CoAX``.
+      ``assets/ai_dataset/CoAX`` and ``assets/explanations/CoAX``.
     * ``from_tables`` takes DataFrames, so tables produced by ``xai_adapter`` for
       any dataset can drive the same executor. Those tables already share the
       CoAX schema, ``pred`` column included, so no conversion is needed.

@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from src.cognitive_models.cognitive_models.sim2real.gcm_strategies import (
+from src.cognitive_models.cognitive_models.Sim2Real.gcm_strategies import (
     SIM2REAL_RAW_FEATURE_ORDER,
     Sim2RealAttributionProjector,
     Sim2RealFittedAttributionSum,

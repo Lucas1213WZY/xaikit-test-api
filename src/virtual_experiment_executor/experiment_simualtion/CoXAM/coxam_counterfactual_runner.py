@@ -24,7 +24,7 @@ import pandas as pd
 
 os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 
-from src.cognitive_models.cognitive_models.coxam.counterfactual_env import (  # noqa: E402
+from src.cognitive_models.cognitive_models.CoXAM.counterfactual_env import (  # noqa: E402
     STRATEGIES,
     XAI_TYPES,
     CounterfactualPolicyEnv,

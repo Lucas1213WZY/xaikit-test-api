@@ -29,7 +29,7 @@ DEFAULT_OUTPUT = (
     / "consolidated.sqlite3"
 )
 
-COAX_ROOT = Path("src/cognitive_models/coax")
+COAX_ROOT = Path("src/cognitive_models/CoAX")
 COXAM_ROOT = Path("src/cognitive_models/CoXAM")
 
 

@@ -25,7 +25,7 @@ from typing import Any, Mapping, Optional, Sequence
 import numpy as np
 import pandas as pd
 
-from src.cognitive_models.cognitive_models.sim2real.gcm_strategies import (
+from src.cognitive_models.cognitive_models.Sim2Real.gcm_strategies import (
     Sim2RealAttributionProjector,
     Sim2RealFittedAttributionSum,
 )
@@ -244,7 +244,7 @@ def build_sim2real_model(
         )
 
     if strategy != "attribution_sum":
-        from src.cognitive_models.cognitive_models.sim2real import (
+        from src.cognitive_models.cognitive_models.Sim2Real import (
             Sim2RealFittedSalientFeatures,
             Sim2RealFittedSensitiveFeatures,
         )

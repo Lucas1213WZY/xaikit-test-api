@@ -9,7 +9,7 @@ from ..normalizers.minmax import MinMaxNormalizer
 
 
 # CoAX names feature columns x0, x1, ... in the canonical export under
-# assets/ai_dataset/coax. An older export names them v0, v1, ..., so the prefix
+# assets/ai_dataset/CoAX. An older export names them v0, v1, ..., so the prefix
 # is detected per table rather than hardcoded.
 CANONICAL_FEATURE_PREFIX = "x"
 LEGACY_FEATURE_PREFIX = "v"

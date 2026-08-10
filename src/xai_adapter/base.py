@@ -147,9 +147,9 @@ class XAIAdapterResult:
             dataset_id:   Value written to the ``dataId`` column.
             model_name:   Value written to the ``modelName`` column.
             importance:   If True, ``aN_i`` values are absolute (non-negative),
-                          matching ``assets/explanations/coax/importance.csv``.
+                          matching ``assets/explanations/CoAX/importance.csv``.
                           If False (default), values are signed, matching
-                          ``assets/explanations/coax/attribution.csv``.
+                          ``assets/explanations/CoAX/attribution.csv``.
 
         Returns:
             pandas.DataFrame in the standard explanation schema.
