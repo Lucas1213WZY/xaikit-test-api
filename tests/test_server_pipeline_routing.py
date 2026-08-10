@@ -16,7 +16,13 @@ from dataclasses import dataclass
 import pandas as pd
 import pytest
 
-from server.pipeline import design_framework, participant_runner, resolve_baseline_model_id
+from server.pipeline import (
+    design_framework,
+    participant_runner,
+    resolve_baseline_model_id,
+    run_explanations_stage,
+)
+from server.schemas import ExplanationStageRequest
 from src.experiment_planner.design_export import DesignExport
 
 
@@ -516,3 +522,117 @@ def test_an_explicit_num_training_is_never_overridden():
         pass
 
     assert study.generate_trials.call_args.kwargs["num_training"] == 2
+
+
+# -- explanations stage is a no-op for CoXAM and Sim2Real -------------------
+
+
+def test_explanations_stage_is_a_noop_for_sim2real():
+    """Sim2Real always skips AI training (run_dataset_stage) and reads a fixed
+    published corpus (Sim2RealAttributionProjector.from_assets), never
+    study.combined_explanations -- so calling study.explanations() here would
+    only raise "Call train_AI_model(...) before generating explanations."
+    for no reason. Regression: this no-op used to cover CoXAM only."""
+    study = _study("CoAX", xai_property=True)
+    result = run_explanations_stage(study, ExplanationStageRequest())
+    assert result["rows"] == 0
+    assert "skipped_reason" in result
+
+
+def test_explanations_stage_is_a_noop_for_coxam():
+    study = _study("CoXAM")
+    result = run_explanations_stage(study, ExplanationStageRequest())
+    assert result["rows"] == 0
+    assert "skipped_reason" in result
+
+
+# -- CoAX also skips training for datasets its own published corpus covers --
+
+
+def test_run_dataset_stage_skips_training_for_a_corpus_covered_coax_dataset():
+    """adult/forest_cover/wine_quality: run_coax_study(source='corpus') reads
+    its own AI predictions and explanation vectors, so training a fresh model
+    here would be spent on something nothing downstream reads -- and was the
+    root cause of a real bug: the freshly trained model's predictions,
+    restricted to an apparatus's declared instance range, happened to
+    collapse to one class, crashing balance_by_ai_prediction sampling."""
+    from unittest.mock import MagicMock
+
+    from server.pipeline import run_dataset_stage
+    from server.schemas import DatasetStageRequest
+
+    study = MagicMock()
+    study.design_export = DesignExport(
+        raw={}, study_title="", research_questions=[], consent_text="",
+        procedure_steps=[], ivs=[], model_framework="CoAX", dataset_id="wine_quality",
+    )
+    fake_data = MagicMock(
+        dataset_id="wine_quality", feature_names=["a"], model_feature_names=["a"],
+        y_train=[0, 1], y_test=[0],
+    )
+    study.prepare_dataset.return_value = fake_data
+
+    result = run_dataset_stage(study, DatasetStageRequest())
+
+    study.train_AI_model.assert_not_called()
+    assert result["model"] is None
+    assert "coax" in result["model_skipped_reason"].lower()
+
+
+def test_run_dataset_stage_still_trains_coax_for_an_uncovered_dataset():
+    from unittest.mock import MagicMock
+
+    from server.pipeline import run_dataset_stage
+    from server.schemas import DatasetStageRequest
+
+    study = MagicMock()
+    study.design_export = DesignExport(
+        raw={}, study_title="", research_questions=[], consent_text="",
+        procedure_steps=[], ivs=[], model_framework="CoAX", dataset_id="mushrooms",
+    )
+    fake_data = MagicMock(
+        dataset_id="mushrooms", feature_names=["a"], model_feature_names=["a"],
+        y_train=[0, 1], y_test=[0],
+    )
+    study.prepare_dataset.return_value = fake_data
+    study.model_name = "mlp"
+    study.test_accuracy.return_value = 0.9
+    study.training_summary_table.return_value.to_dict.return_value = []
+    study.training_history_table.return_value.to_dict.return_value = []
+    study.metrics_table.return_value.reset_index.return_value.to_dict.return_value = []
+    study.confusion_matrix_table.return_value.reset_index.return_value.to_dict.return_value = []
+
+    run_dataset_stage(study, DatasetStageRequest())
+    study.train_AI_model.assert_called_once()
+
+
+def test_explanations_stage_is_a_noop_for_coax_when_training_was_skipped():
+    from unittest.mock import MagicMock
+
+    study = MagicMock()
+    study.design_export = DesignExport(
+        raw={}, study_title="", research_questions=[], consent_text="",
+        procedure_steps=[], ivs=[], model_framework="CoAX",
+    )
+    study.trained_ai_model = None
+    result = run_explanations_stage(study, ExplanationStageRequest())
+    assert result["rows"] == 0
+    assert "skipped_reason" in result
+
+
+def test_explanations_stage_still_runs_for_coax_when_a_model_was_trained():
+    from unittest.mock import MagicMock
+
+    study = MagicMock()
+    study.design_export = DesignExport(
+        raw={}, study_title="", research_questions=[], consent_text="",
+        procedure_steps=[], ivs=[], model_framework="CoAX",
+    )
+    study.trained_ai_model = object()
+    pool = pd.DataFrame({"expMethod": ["lime", "lime"]})
+    study.explanations.return_value = ("path.csv", pool)
+
+    result = run_explanations_stage(study, ExplanationStageRequest())
+
+    study.explanations.assert_called_once()
+    assert result["rows"] == 2

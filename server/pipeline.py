@@ -169,6 +169,18 @@ def _coxam_corpus_covers(dataset_id: str) -> bool:
     return dataset_id in COXAM_CORPUS_FEATURES
 
 
+#: Datasets CoAX's published user-study corpus (assets/ai_dataset/CoAX/none.csv)
+#: carries AI predictions for -- confirmed against the corpus file itself, and
+#: matching coax_human_replay.FITTED_DATA_IDS for the same underlying reason:
+#: mushrooms was collected but never trained/fitted for CoAX.
+COAX_CORPUS_DATA_IDS = frozenset({"adult", "forest_cover", "wine_quality"})
+
+
+def _coax_corpus_covers(dataset_id: str) -> bool:
+    """Whether CoAX shipped a published corpus for this dataset."""
+    return dataset_id in COAX_CORPUS_DATA_IDS
+
+
 def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[str, Any]:
     """Prepare the dataset and, where a published corpus makes it unnecessary,
     skip training the AI model it would otherwise explain.
@@ -232,6 +244,13 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
             "DT/LR surrogates, never trained_ai_model, so no AI model is "
             "trained here. Pass a dataset the corpus does not cover, or use a "
             "different agent, to train one."
+        )
+    elif framework == "coax" and _coax_corpus_covers(data.dataset_id):
+        skip_reason = (
+            f"CoAX's published corpus covers {data.dataset_id!r}: "
+            "run_coax_study(source='corpus') reads its own AI predictions and "
+            "explanation vectors, never trained_ai_model, so no AI model is "
+            "trained here. Pass a dataset the corpus does not cover to train one."
         )
 
     if skip_reason:
@@ -425,16 +444,29 @@ def run_trials_stage(study: xaikitTest, request: TrialsStageRequest) -> dict[str
 def run_explanations_stage(study: xaikitTest, request: ExplanationStageRequest) -> dict[str, Any]:
     """Generate one XAI table per method in the design, plus AI predictions.
 
-    A no-op for CoXAM: ``run_coxam_study`` builds its own DT/LR surrogates
-    internally (from a trained model, or from the published corpus) and never
-    reads what this produces (``study.combined_explanations``). Calling
-    ``study.explanations()`` needs LIME/SHAP to explain a real
-    ``trained_ai_model``, so for a design whose dataset stage skipped training
-    (see ``run_dataset_stage``) it always raised -- a UI that calls every
-    stage in sequence regardless of agent should not have to know CoXAM is the
-    one agent to skip this one for.
+    A no-op for CoXAM and Sim2Real: neither ever reads what this stage
+    produces (``study.combined_explanations``). CoXAM's ``run_coxam_study``
+    builds its own DT/LR surrogates internally (from a trained model, or from
+    the published corpus); Sim2Real's ``run_sim2real_study`` reads a fixed
+    published corpus via ``Sim2RealAttributionProjector.from_assets()`` and
+    never fits anything from a study's own data. Calling ``study.explanations()``
+    needs LIME/SHAP to explain a real ``trained_ai_model``, so for a design
+    whose dataset stage skipped training (see ``run_dataset_stage`` --
+    Sim2Real always skips it, CoXAM skips it for a corpus-covered dataset) it
+    always raised -- a UI that calls every stage in sequence regardless of
+    agent should not have to know which agents to skip this one for.
+
+    Also a no-op for CoAX specifically when its dataset stage skipped training
+    (a corpus-covered dataset -- see ``_coax_corpus_covers``):
+    ``run_coax_study(source='corpus')`` reads the published CoAX corpus's own
+    explanation vectors directly and never touches ``combined_explanations``
+    either. A CoAX dataset the corpus does *not* cover still needs this stage,
+    since only ``source='study'`` can serve it.
     """
-    if design_framework(study) == "coxam":
+    framework = design_framework(study)
+    if framework in {"coxam", "sim2real"} or (
+        framework == "coax" and getattr(study, "trained_ai_model", None) is None
+    ):
         return {
             "combined_table": None,
             "rows": 0,
@@ -442,8 +474,10 @@ def run_explanations_stage(study: xaikitTest, request: ExplanationStageRequest) 
             "methods": [],
             "files": [],
             "skipped_reason": (
-                "CoXAM builds its own DT/LR surrogates inside run_coxam_study and never "
-                "reads this stage's output, so nothing is generated here."
+                "CoXAM builds its own DT/LR surrogates inside run_coxam_study, "
+                "Sim2Real reads a fixed published corpus inside run_sim2real_study, "
+                "and this CoAX dataset is served by run_coax_study(source='corpus') -- "
+                "none of these read this stage's output, so nothing is generated here."
             ),
         }
 
@@ -486,6 +520,13 @@ def run_simulation_stage(
     """
     runner = participant_runner(study)
     if runner == "coax":
+        coax_source = request.coax_source
+        if coax_source is None:
+            # source="study" needs trained_ai_model; the dataset stage only
+            # trains one when the corpus does not already cover this dataset
+            # (see run_dataset_stage), so this follows what actually happened
+            # rather than assuming every design trained a model.
+            coax_source = "study" if getattr(study, "trained_ai_model", None) is not None else "corpus"
         results = run_coax_study(
             study,
             mode=request.mode,
@@ -496,6 +537,7 @@ def run_simulation_stage(
                 strategies=request.coax_strategies,
                 params=request.coax_params,
             ),
+            source=coax_source,
             store=True,
         )
     elif runner == "coxam":

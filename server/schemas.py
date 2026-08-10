@@ -118,6 +118,16 @@ class SimulationRequest(BaseModel):
     condition_filter: Optional[dict[str, Any]] = None
     coax_strategies: Optional[dict[str, str]] = None
     coax_params: Optional[dict[str, dict[str, Any]]] = None
+    coax_source: Optional[str] = Field(
+        None,
+        description=(
+            "CoAX designs only. 'study' scores against this study's own trained "
+            "model and explanation table; 'corpus' reads the published CoAX "
+            "user-study corpus instead, needing neither. Defaults to 'study' "
+            "when the dataset stage trained a model and 'corpus' when it didn't "
+            "(a corpus-covered dataset -- see /dataset's model_skipped_reason)."
+        ),
+    )
     coxam_policy: Optional[str] = Field(
         None,
         description=(
