@@ -291,10 +291,10 @@ def test_coxam_still_trains_for_a_dataset_outside_the_corpus():
     study = MagicMock()
     study.design_export = DesignExport(
         raw={}, study_title="", research_questions=[], consent_text="",
-        procedure_steps=[], ivs=[], model_framework="CoXAM", dataset_id="adult",
+        procedure_steps=[], ivs=[], model_framework="CoXAM", dataset_id="prima_diabetes",
     )
     study.prepare_dataset.return_value = MagicMock(
-        dataset_id="adult", feature_names=["a"], model_feature_names=["a"],
+        dataset_id="prima_diabetes", feature_names=["a"], model_feature_names=["a"],
         y_train=[0, 1], y_test=[0],
     )
     study.model_name = "mlp"

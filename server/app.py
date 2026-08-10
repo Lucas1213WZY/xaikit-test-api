@@ -118,7 +118,14 @@ def _session(study_id: str) -> StudySession:
     try:
         return registry.get(study_id)
     except KeyError:
-        raise HTTPException(status_code=404, detail=f"Unknown study {study_id!r}.")
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"Unknown study {study_id!r}. Studies live only in memory and do "
+                "not survive a server restart or redeploy -- if this id worked "
+                "before, POST /api/studies again to create a new one."
+            ),
+        )
 
 
 def _job_response(job: Job) -> dict[str, Any]:
@@ -258,7 +265,14 @@ def get_job(job_id: str, log_tail: int = Query(40, ge=0, le=5000)) -> dict[str, 
     try:
         job = registry.job(job_id)
     except KeyError:
-        raise HTTPException(status_code=404, detail=f"Unknown job {job_id!r}.")
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"Unknown job {job_id!r}. Jobs live only in memory and do not "
+                "survive a server restart or redeploy -- the study that owned "
+                "this job is gone too; POST /api/studies again to start over."
+            ),
+        )
     return job.payload(log_tail=log_tail or None)
 
 

@@ -487,9 +487,13 @@ class xaikitTest:
                 ``"coxam"`` here, or having already called
                 ``set_cognitive_model``/a design export that selected it,
                 routes to that set automatically instead of silently
-                preparing a dataset ``source="assets"`` cannot use. Has no
-                effect when ``feature_cols`` is given explicitly, or for any
-                other agent.
+                preparing a dataset ``source="assets"`` cannot use. For a
+                dataset the corpus does *not* cover, the top 6 features by
+                target correlation are selected instead of that dataset's own
+                curated default (which can be a different count) -- CoXAM's
+                own datasets are always 6 features, so a freshly trained one
+                matches that shape. Has no effect when ``feature_cols`` is
+                given explicitly, or for any other agent.
 
         Returns:
             The prepared dataset, also stored on ``self.data``.
@@ -504,7 +508,19 @@ class xaikitTest:
                 feature_cols = coxam_loader_feature_cols(dataset_id)
                 rank_features_by_target = False
             except KeyError:
-                pass  # not a dataset the CoXAM corpus covers; ordinary defaulting applies
+                # Not a dataset CoXAM's published corpus covers -- no fixed
+                # feature set to route to, so a fresh model gets trained on
+                # this dataset instead. CoXAM's own datasets are always
+                # 6-feature (COXAM_CORPUS_FEATURES), so match that: rank the
+                # full available feature pool by target correlation and keep
+                # the top 6, rather than each dataset's own curated default
+                # (which can carry a different count, e.g. 5 for
+                # wine_quality -- the exact mismatch that made the corpus
+                # need its own feature list in the first place).
+                if num_features is None:
+                    num_features = 6
+                rank_features_by_target = True
+                use_default_features = False
 
         self.data = prepare_dataset(
             dataset_id,

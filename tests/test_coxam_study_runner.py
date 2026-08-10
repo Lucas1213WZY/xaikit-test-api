@@ -487,9 +487,16 @@ def test_corpus_feature_order_matches_the_published_metadata():
         assert published == expected, f"{app_id} corpus feature order drifted"
 
 
-def test_corpus_covers_exactly_the_two_datasets_coxam_ran():
-    """CoXAM's own studies and sweeps used wine_quality and mushrooms only."""
-    assert set(COXAM_CORPUS_FEATURES) == {"wine_quality", "mushrooms"}
+def test_corpus_covers_every_dataset_with_both_predictions_and_surrogates():
+    """assets/ai_dataset/CoXAM/none.csv also carries predictions for
+    german_credit and diabetes, but neither has any decision_tree/
+    logistic_regression rows to pair with them -- predictions alone cannot
+    serve source="assets", so only these four are covered."""
+    assert set(COXAM_CORPUS_FEATURES) == {
+        "wine_quality", "mushrooms", "forest_cover", "adult",
+    }
+    assert len(COXAM_CORPUS_FEATURES["forest_cover"]) == 6
+    assert len(COXAM_CORPUS_FEATURES["adult"]) == 6
 
 
 def test_asset_source_rejects_a_study_whose_features_differ():
@@ -723,3 +730,51 @@ def test_every_alias_target_is_a_real_corpus_feature():
         for loader_name, corpus_name in aliases.items():
             assert corpus_name in corpus, f"{app_id}: {corpus_name} is not a corpus feature"
             assert loader_name not in corpus, f"{app_id}: {loader_name} needs no alias"
+
+
+# -- prepare_dataset picks the top 6 by correlation for an uncovered dataset --
+
+
+def test_an_uncovered_coxam_dataset_gets_the_top_6_features_by_correlation():
+    """A dataset outside COXAM_CORPUS_FEATURES has no fixed feature set to
+    route to, so a fresh model gets trained -- CoXAM's own datasets are
+    always 6 features, so match that instead of silently taking whatever
+    count the dataset's own curated default happens to carry.
+
+    ``prima_diabetes`` is a real, loadable dataset (unlike the corpus's own
+    ``german_credit``/``diabetes`` dataIds, which have predictions in
+    assets/ai_dataset/CoXAM/none.csv but no loader in this repo at all) that
+    genuinely is not one of the four COXAM_CORPUS_FEATURES cover.
+    """
+    import tempfile
+
+    from src.api import xaikitTest
+
+    with tempfile.TemporaryDirectory() as tmp:
+        study = xaikitTest("test", output_dir=tmp)
+        data = study.prepare_dataset(
+            "prima_diabetes",
+            cognitive_model_id="coxam",
+            show_available=False,
+            show_summary=False,
+        )
+    assert len(data.feature_names) == 6
+
+
+def test_a_covered_coxam_dataset_still_uses_its_fixed_corpus_features():
+    import tempfile
+
+    from src.api import xaikitTest
+    from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_trial_executor import (
+        coxam_loader_feature_cols,
+    )
+
+    with tempfile.TemporaryDirectory() as tmp:
+        study = xaikitTest("test", output_dir=tmp)
+        data = study.prepare_dataset(
+            "wine_quality", cognitive_model_id="coxam", show_available=False, show_summary=False,
+        )
+    # coxam_loader_feature_cols, not COXAM_CORPUS_FEATURES directly: the
+    # corpus and the loader spell some features differently (e.g.
+    # "Chlorides" vs "chlorides"), and feature_names is always loader-spelled.
+    assert set(data.feature_names) == set(coxam_loader_feature_cols("wine_quality"))

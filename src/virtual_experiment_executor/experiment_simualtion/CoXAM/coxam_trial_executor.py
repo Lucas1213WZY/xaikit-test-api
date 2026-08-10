@@ -80,21 +80,35 @@ PREDICTION_ONLY_METHOD = "__prediction_only__"
 #: which is why ``source="assets"`` is validated against this table rather than
 #: trusted. ``source="fit"`` is unaffected: it derives everything from the
 #: study's own dataset.
+#: assets/ai_dataset/CoXAM/none.csv also carries predictions for
+#: ``german_credit`` and ``diabetes``, but neither has any rows in
+#: assets/explanations/CoXAM/{decision_tree,logistic_regression}.csv (0 vs.
+#: ~2-3 for each dataset below) -- predictions with no surrogate to pair them
+#: with, so ``source="assets"`` cannot serve those two; they still need
+#: ``source="fit"``.
 COXAM_CORPUS_FEATURES: dict[str, tuple[str, ...]] = {
     "wine_quality": ("Alcohol", "Sulphates", "SO2", "Vinegar Taint", "pH", "Chlorides"),
     "mushrooms": ("Bruises", "Height", "Width", "Shape", "Cap Diameter", "Gill"),
+    "forest_cover": (
+        "Elevation", "Aspect", "Slope",
+        "Horizontal_Distance_To_Hydrology", "Horizontal_Distance_To_Roadways",
+        "Hillshade_9am",
+    ),
+    "adult": ("Age", "Capital Gain", "Married", "Years of Education", "Sex", "Capital Loss"),
 }
 
 #: Features the dataset loader names differently from the published corpus.
 #:
 #: These are **confirmed equivalences, not guesses**: the corpus abbreviates the
-#: loader's ``Gill Spacing`` to ``Gill`` and capitalises ``chlorides``. Anything
-#: not listed here is treated as a genuinely different feature, because the
-#: corpus's ``a0..a5`` are positional -- quietly accepting a near-match would
-#: attach coefficients and tree thresholds to the wrong column.
+#: loader's ``Gill Spacing`` to ``Gill``, capitalises ``chlorides``, and shortens
+#: ``Marital Status`` to ``Married``. Anything not listed here is treated as a
+#: genuinely different feature, because the corpus's ``a0..a5`` are positional
+#: -- quietly accepting a near-match would attach coefficients and tree
+#: thresholds to the wrong column.
 COXAM_CORPUS_FEATURE_ALIASES: dict[str, dict[str, str]] = {
     "wine_quality": {"chlorides": "Chlorides"},
     "mushrooms": {"Gill Spacing": "Gill"},
+    "adult": {"Marital Status": "Married"},
 }
 
 
