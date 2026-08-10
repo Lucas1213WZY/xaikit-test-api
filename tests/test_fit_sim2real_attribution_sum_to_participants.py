@@ -14,7 +14,7 @@ from src.cognitive_models.cognitive_models.fit_sim2real_attribution_sum_to_parti
     count_free_parameters,
     _binary_metrics,
 )
-from src.cognitive_models.cognitive_models.sim2real_fitted_attribution_sum import (
+from src.cognitive_models.cognitive_models.sim2real.gcm_strategies import (
     Sim2RealAttributionProjector,
 )
 
@@ -207,6 +207,9 @@ def test_run_fitting_can_restrict_candidates_by_explanation_property(tmp_path):
 def test_candidate_grid_collapses_duplicate_memory_off_candidates():
     """Memory settings must not multiply candidates that never use memory."""
     candidates = candidate_grid(
+        aggregations=("attribution",),
+        normalize_options=(False,),
+        comparison_cs=(1e6,),
         confidence_scales=(1.0,),
         confidence_intercepts=(0.0,),
         max_features_attended_options=(12,),
@@ -224,6 +227,9 @@ def test_candidate_grid_collapses_duplicate_memory_off_candidates():
 
 def test_memory_only_parameters_are_charged_only_when_memory_is_on():
     candidates = candidate_grid(
+        aggregations=("attribution",),
+        normalize_options=(False,),
+        comparison_cs=(1e6,),
         confidence_scales=(1.0,),
         confidence_intercepts=(0.0,),
         max_features_attended_options=(12,),
@@ -242,6 +248,9 @@ def test_memory_only_parameters_are_charged_only_when_memory_is_on():
 
 def test_pinned_parameters_are_not_charged():
     candidates = candidate_grid(
+        aggregations=("attribution",),
+        normalize_options=(False,),
+        comparison_cs=(1e6,),
         confidence_scales=(1.0,),
         confidence_intercepts=(0.0,),
         max_features_attended_options=(12,),
@@ -252,7 +261,10 @@ def test_pinned_parameters_are_not_charged():
     assert count_free_parameters(candidates[0], candidates) == 2
 
 
-def test_bic_uses_the_coax_formula():
+def test_bic_is_the_standard_penalised_likelihood():
+    """k*ln(n) - 2*LL. Not inherited from CoAX -- that repo ships fitted
+    outputs but no fitting code, and CoXAM's notebook selects on NLL.
+    """
     import numpy as np
 
     labels = np.array([1, 0, 1, 0])
@@ -297,7 +309,7 @@ def test_condition_specific_grids_restrict_guessing_to_sparse():
 
 def test_lapse_variants_reuse_the_base_fit_exactly():
     """The shared-base shortcut must match a directly fitted lapse model."""
-    from src.cognitive_models.cognitive_models.sim2real_fitted_attribution_sum import (
+    from src.cognitive_models.cognitive_models.sim2real.gcm_strategies import (
         Sim2RealFittedAttributionSum,
     )
 
@@ -343,3 +355,39 @@ def test_lapse_variants_reuse_the_base_fit_exactly():
         pytest.approx(expected)
     )
     assert inference.comparison_scale == pytest.approx(direct.comparison_scale)
+
+
+def test_goodness_of_fit_leads_the_selection_key():
+    """NLL decides, because the search is the maximum-likelihood estimation.
+
+    BIC is defined as -2 ln(L-hat) + k ln(n) against the *maximised*
+    likelihood, so it cannot also be what picks the parameterization. It is
+    computed from the winning fit and reported for comparing whole models
+    (different strategies) on the same data.
+    """
+    from src.cognitive_models.cognitive_models.fit_sim2real_attribution_sum_to_participants import (
+        _candidate_sort_key,
+        candidate_grid,
+    )
+
+    candidate = candidate_grid(
+        aggregations=("attribution",),
+        normalize_options=(False,),
+        comparison_cs=(1e6,),
+        confidence_scales=(1.0,),
+        confidence_intercepts=(0.0,),
+        max_features_attended_options=(12,),
+        memory_options=(False,),
+    )[0]
+
+    base = {"nll": 0.50, "bic": 100.0, "accuracy": 0.7, "brier": 0.2}
+    better_fit_pricier = {**base, "nll": 0.40, "bic": 200.0}
+    worse_fit_cheaper = {**base, "nll": 0.60, "bic": 10.0}
+    tie_on_fit_cheaper = {**base, "bic": 10.0}
+
+    assert _candidate_sort_key(better_fit_pricier, candidate) < _candidate_sort_key(
+        worse_fit_cheaper, candidate
+    ), "a better-fitting candidate must win even when its BIC is worse"
+    assert _candidate_sort_key(tie_on_fit_cheaper, candidate) < _candidate_sort_key(
+        base, candidate
+    ), "on an NLL tie the lower-BIC candidate must win"

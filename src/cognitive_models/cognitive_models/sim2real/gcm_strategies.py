@@ -22,16 +22,17 @@ the Sim2Real asset directories.
 
 from __future__ import annotations
 
+import importlib.util
 import math
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Optional, Sequence
+from typing import Any, Iterable, Optional, Sequence
 
 import numpy as np
 import pandas as pd
 
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = Path(__file__).resolve().parents[4]
 DEFAULT_SIM2REAL_DATA_DIR = REPO_ROOT / "assets" / "ai_dataset" / "sim2real"
 DEFAULT_SIM2REAL_EXPLANATIONS_DIR = (
     REPO_ROOT / "assets" / "explanations" / "xai_desiderata"
@@ -1149,15 +1150,479 @@ class Sim2RealFittedAttributionSum:
         )
         return tuple(sorted(selected))
 
+# ---------------------------------------------------------------------------
+# Exemplar-similarity strategies
+#
+# The attribution-sum model above reads the explanation as its evidence, so a
+# trial whose changed feature carries no visible attribution gives it a
+# confidence_delta of exactly zero and it answers at chance. The two strategies
+# below get their evidence from the feature values instead, and share the same
+# fit/compare surface so one grid and one BIC can compare all three.
+# ---------------------------------------------------------------------------
+_COAX_MODEL_FILE = (
+    Path(__file__).resolve().parents[1] / "coax" / "coax_gcm_multiple_strategies.py"
+)
+
+
+def _load_coax():
+    """CoAX's own GCM helpers, loaded rather than reimplemented.
+
+    ``euclidean_distance`` ignores ``None`` dimensions, clips element-wise
+    differences to [-1, 1] and normalizes by the square root of the valid
+    dimension count; ``compute_similarity`` and ``normalize_label_strengths``
+    complete the GCM. Re-deriving any of them would be a second, subtly
+    different model.
+    """
+    spec = importlib.util.spec_from_file_location(
+        "coax_gcm_multiple_strategies", _COAX_MODEL_FILE
+    )
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Could not load CoAX strategies from {_COAX_MODEL_FILE}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+#: Label the GCM votes on: the AI's own prediction, as CoAX's ``feedback`` stores it.
+HIGH_INCOME_LABEL = 1
+
+
+class Sim2RealValueEncoder:
+    """Turn a pair's displayed feature values into a vector a GCM can compare.
+
+    ``*_value_multipliers`` cannot be used for this. It encodes a categorical
+    feature as ``1.0`` whichever category is present, so 26 of the 29 test
+    counterfactuals -- every one that changes a categorical, e.g. education
+    ``Bachelors -> Preschool`` -- produce an *identical* original and changed
+    vector, a zero delta, and a model at chance. Exactly the failure this port
+    exists to remove.
+
+    So numeric features keep their multiplier (already scaled to [0, 1]) and
+    categorical features become integer codes. Integer codes work because
+    CoAX's ``euclidean_distance`` clips each element-wise difference to
+    [-1, 1]: two different categories are at least one code apart and so
+    contribute exactly 1, two equal categories contribute 0. That is the
+    standard overlap metric for nominal features, and it falls out of CoAX's
+    own clipping rather than needing a second distance function.
+
+    Codes come from the categories seen at fit time, sorted for determinism.
+    A category never seen in training collapses onto a single "unseen" code:
+    it is correctly *different* from every training category, though two
+    distinct unseen categories are not distinguished from each other.
+    """
+
+    def __init__(self, categories: dict[int, list[str]], numeric: set[int]) -> None:
+        self.categories = categories
+        self.numeric = numeric
+
+    @classmethod
+    def from_pairs(
+        cls, pairs: Sequence[ProjectedAttributionPair]
+    ) -> "Sim2RealValueEncoder":
+        observed: dict[int, set[str]] = {}
+        numeric: set[int] = set()
+        for pair in pairs:
+            for values in (pair.original_feature_values, pair.changed_feature_values):
+                for index, value in enumerate(values):
+                    text = str(value)
+                    try:
+                        float(text)
+                    except ValueError:
+                        observed.setdefault(index, set()).add(text)
+                    else:
+                        numeric.add(index)
+        return cls(
+            categories={index: sorted(values) for index, values in observed.items()},
+            numeric=numeric - set(observed),
+        )
+
+    def encode(
+        self,
+        feature_values: Sequence[object],
+        multipliers: Sequence[float],
+    ) -> list[float]:
+        vector: list[float] = []
+        for index, value in enumerate(feature_values):
+            if index in self.numeric:
+                vector.append(float(multipliers[index]))
+                continue
+            known = self.categories.get(index, [])
+            text = str(value)
+            vector.append(
+                float(known.index(text)) if text in known else float(len(known))
+            )
+        return vector
+
+
+class _Sim2RealGCMStrategy:
+    """Shared machinery: exemplar memory, GCM confidence, counterfactual compare."""
+
+    def __init__(
+        self,
+        *,
+        k: int = 3,
+        sensitivity: float = 10.0,
+        memory_decay: float = 0.5,
+        retrieval_threshold: Optional[float] = None,
+        comparison_scale: float = 1.0,
+        comparison_intercept: float = 0.0,
+        comparison_C: float = 1e6,
+        guess_bias: float = 0.0,
+        lapse_rate: float = 0.0,
+        always_attend_changed: bool = True,
+        random_seed: int = 0,
+    ) -> None:
+        if int(k) < 1:
+            raise ValueError("k must be a positive integer")
+        if not np.isfinite(sensitivity) or float(sensitivity) <= 0.0:
+            raise ValueError("sensitivity must be a finite positive number")
+        if not np.isfinite(comparison_C) or float(comparison_C) <= 0.0:
+            raise ValueError("comparison_C must be a finite positive number")
+        if not 0.0 <= float(lapse_rate) <= 1.0:
+            raise ValueError("lapse_rate must be between 0 and 1")
+
+        self.k = int(k)
+        self.sensitivity = float(sensitivity)
+        self.memory_decay = float(memory_decay)
+        self.retrieval_threshold = (
+            None if retrieval_threshold is None else float(retrieval_threshold)
+        )
+        self.comparison_scale = float(comparison_scale)
+        self.comparison_intercept = float(comparison_intercept)
+        self.comparison_C = float(comparison_C)
+        self.guess_bias = float(guess_bias)
+        self.lapse_rate = float(lapse_rate)
+        # Defaults to True, and the fitter only ever searched True. With it off,
+        # a counterfactual on a feature outside the attended set masks
+        # identically in both vectors, so the delta is zero and the model
+        # answers 0.5 -- measured at 0.21 non-zero deltas against 0.86 with it
+        # on. The UI names the changed feature, so attending it is what the
+        # participant does.
+        self.always_attend_changed = bool(always_attend_changed)
+        self.random_seed = int(random_seed)
+        self.encoder: Optional[Sim2RealValueEncoder] = None
+
+        self._coax = _load_coax()
+        self.memory = self._coax.MemoryBase(
+            decay_param=self.memory_decay, retrieval_threshold=self.retrieval_threshold
+        )
+        self.exemplar_count_ = 0
+        self.fit_instance_ids_: tuple[int, ...] = ()
+        self.training_accuracy_: Optional[float] = None
+        self.is_fitted = False
+
+    # -- memory ------------------------------------------------------------
+
+    def store_exemplars(self, pairs: Sequence[ProjectedAttributionPair]) -> None:
+        """One exemplar per training instance, labelled by the AI's prediction.
+
+        This is CoAX's ``feedback``: the participant is shown the AI's answer
+        during training, so the stored label is the AI's, not the ground truth.
+        Times are the instance's position in the sequence so that activation
+        ``-decay * ln(elapsed)`` is well defined when queried afterwards.
+        """
+        self.memory = self._coax.MemoryBase(
+            decay_param=self.memory_decay, retrieval_threshold=self.retrieval_threshold
+        )
+        for position, pair in enumerate(pairs):
+            self.memory.store_exemplar(
+                label_probs={int(pair.ai_prediction): 1.0},
+                features=self._vector(pair, changed=False),
+                explanation=list(np.asarray(pair.original_attributions, dtype=float)),
+                time_stored=float(position),
+            )
+        self.exemplar_count_ = len(pairs)
+
+    def _vector(self, pair: ProjectedAttributionPair, *, changed: bool) -> list[float]:
+        """The instance as the GCM sees it, categoricals included."""
+        if self.encoder is None:
+            self.encoder = Sim2RealValueEncoder.from_pairs([pair])
+        values = pair.changed_feature_values if changed else pair.original_feature_values
+        multipliers = (
+            pair.changed_value_multipliers if changed else pair.original_value_multipliers
+        )
+        return self.encoder.encode(values, multipliers)
+
+    def _retrieve(self) -> list[tuple[dict, float]]:
+        # Queried one step past the last stored exemplar, so every elapsed time
+        # is >= 1 and no activation is produced by the 1e-12 floor.
+        return self.memory.retrieve_exemplars(current_time=float(self.exemplar_count_))
+
+    # -- attention ---------------------------------------------------------
+
+    def _focus_indices(self, pair: ProjectedAttributionPair) -> list[int]:
+        raise NotImplementedError
+
+    def _changed_indices(self, pair: ProjectedAttributionPair) -> list[int]:
+        names = list(pair.feature_names)
+        return [
+            names.index(name) for name in pair.changed_feature_names if name in names
+        ]
+
+    def _random_focus(self, n_features: int) -> list[int]:
+        rng = np.random.default_rng(self.random_seed)
+        return list(rng.permutation(n_features)[: max(1, self.k)])
+
+    def _attended(self, pair: ProjectedAttributionPair) -> list[int]:
+        focus = list(self._focus_indices(pair))
+        if self.always_attend_changed:
+            # Without this, a counterfactual on an unattended feature masks
+            # identically in both vectors, delta is 0, and the model is back at
+            # chance -- the failure this port exists to fix. The UI names the
+            # changed feature, so attending it is what the participant does.
+            for index in self._changed_indices(pair):
+                if index not in focus:
+                    focus.append(index)
+        return sorted(set(focus))
+
+    # -- confidence --------------------------------------------------------
+
+    def _mask(self, vector: Sequence[float], focus: Sequence[int]) -> list:
+        focus_set = set(int(index) for index in focus)
+        return [
+            float(value) if index in focus_set else None
+            for index, value in enumerate(vector)
+        ]
+
+    def _exemplar_vector(self, exemplar: dict, focus: Sequence[int]) -> list:
+        """Subclasses that mask exemplars by their own explanation override this."""
+        return self._mask(exemplar["features"], focus)
+
+    def confidence(
+        self, vector: Sequence[float], focus: Sequence[int]
+    ) -> tuple[float, int]:
+        """P(high income) for one instance, plus how many exemplars were read."""
+        stored = self._retrieve()
+        if not stored:
+            return 0.5, 0
+        test_vector = np.array(self._mask(vector, focus), dtype=float)
+        label_strengths: dict[Any, float] = {}
+        for exemplar, activation in stored:
+            distance = self._coax.euclidean_distance(
+                test_vector, np.array(self._exemplar_vector(exemplar, focus), dtype=float)
+            )
+            if distance is None:
+                continue
+            similarity = self._coax.compute_similarity(
+                distance, activation, self.sensitivity, 1.0
+            )
+            for label, probability in exemplar["label_probs"].items():
+                label_strengths[label] = (
+                    label_strengths.get(label, 0.0) + similarity * probability
+                )
+        probabilities = self._coax.normalize_label_strengths(label_strengths)
+        if not probabilities:
+            return 0.5, len(stored)
+        return float(probabilities.get(HIGH_INCOME_LABEL, 0.0)), len(stored)
+
+    # -- the counterfactual wrapper ---------------------------------------
+
+    @staticmethod
+    def _changed_feature_visible(pair: ProjectedAttributionPair) -> bool:
+        names = list(pair.feature_names)
+        attributions = np.asarray(pair.original_attributions, dtype=float)
+        for name in pair.changed_feature_names:
+            if name in names and float(attributions[names.index(name)]) != 0.0:
+                return True
+        return False
+
+    def compare(self, pair: ProjectedAttributionPair) -> AttributionSumComparison:
+        focus = self._attended(pair)
+        p_original, retrieved = self.confidence(self._vector(pair, changed=False), focus)
+        p_new, _ = self.confidence(self._vector(pair, changed=True), focus)
+        delta = p_new - p_original
+
+        pre_lapse = _sigmoid(self.comparison_intercept + self.comparison_scale * delta)
+        guess_probability = _sigmoid(self.guess_bias)
+        changed_visible = self._changed_feature_visible(pair)
+        effective_lapse = 0.0 if changed_visible else self.lapse_rate
+        probability = (
+            1.0 - effective_lapse
+        ) * pre_lapse + effective_lapse * guess_probability
+
+        return AttributionSumComparison(
+            instance_id=pair.instance_id,
+            qid=pair.qid,
+            exp_property=pair.exp_property,
+            # These two carry the strategy's confidence rather than a sum of
+            # attributions; the column names are kept so every downstream
+            # reader of a comparison keeps working.
+            original_attribution_sum=p_original,
+            changed_attribution_sum=p_new,
+            p_original_high_income=p_original,
+            p_new_high_income=p_new,
+            confidence_delta=delta,
+            pre_lapse_probability_income_increases=pre_lapse,
+            guess_probability_income_increases=guess_probability,
+            probability_income_increases=probability,
+            memory_imputed_weight_change=None,
+            retrieved_exemplar_count=retrieved,
+            lapse_rate=self.lapse_rate,
+            effective_lapse_rate=effective_lapse,
+            changed_feature_visible=changed_visible,
+            changed_feature_names=pair.changed_feature_names,
+            attended_feature_names=tuple(pair.feature_names[index] for index in focus),
+        )
+
+    def compare_many(
+        self, pairs: Iterable[ProjectedAttributionPair]
+    ) -> list[AttributionSumComparison]:
+        return [self.compare(pair) for pair in pairs]
+
+    # -- fitting -----------------------------------------------------------
+
+    def fit(
+        self,
+        pairs: Sequence[ProjectedAttributionPair],
+        increase_labels: Optional[Sequence[int]] = None,
+    ) -> "_Sim2RealGCMStrategy":
+        """Store the training exemplars, then learn the comparison transform.
+
+        Identical in shape to ``Sim2RealFittedAttributionSum.fit``, so the two
+        model families are fitted and scored the same way and their likelihoods
+        are comparable.
+        """
+        from sklearn.linear_model import LogisticRegression
+
+        if increase_labels is None:
+            embedded = [pair.correct_increase_label for pair in pairs]
+            if any(label is None for label in embedded):
+                raise ValueError(
+                    "increase_labels were not passed and projected pairs do not "
+                    "contain deltas.csv answer labels"
+                )
+            increase_labels = embedded
+        labels = np.asarray(increase_labels, dtype=int).reshape(-1)
+        if len(pairs) != labels.size:
+            raise ValueError("pairs and increase_labels must have the same length")
+        if len(np.unique(labels)) != 2:
+            raise ValueError("increase_labels must contain both binary classes 0 and 1")
+
+        if self.encoder is None:
+            self.encoder = Sim2RealValueEncoder.from_pairs(pairs)
+        self.store_exemplars(pairs)
+        self.fit_instance_ids_ = tuple(pair.instance_id for pair in pairs)
+
+        deltas = np.asarray(
+            [self.compare(pair).confidence_delta for pair in pairs], dtype=float
+        ).reshape(-1, 1)
+        estimator = LogisticRegression(
+            C=self.comparison_C, solver="lbfgs", max_iter=1000
+        )
+        estimator.fit(deltas, labels)
+        self.comparison_scale = float(estimator.coef_[0, 0])
+        self.comparison_intercept = float(estimator.intercept_[0])
+        self.is_fitted = True
+
+        fitted = np.asarray(
+            [self.compare(pair).probability_income_increases for pair in pairs]
+        )
+        self.training_accuracy_ = float(
+            np.mean((fitted >= 0.5).astype(int) == labels)
+        )
+        return self
+
+    def predict_proba(
+        self, pairs: Sequence[ProjectedAttributionPair]
+    ) -> np.ndarray:
+        probabilities = np.asarray(
+            [self.compare(pair).probability_income_increases for pair in pairs],
+            dtype=float,
+        )
+        return np.column_stack([1.0 - probabilities, probabilities])
+
+    def predict(self, pairs: Sequence[ProjectedAttributionPair]) -> np.ndarray:
+        return (self.predict_proba(pairs)[:, 1] >= 0.5).astype(int)
+
+
+class Sim2RealFittedSensitiveFeatures(_Sim2RealGCMStrategy):
+    """Attend the features that best separate the AI's two classes in memory.
+
+    CoAX's ``none``-condition strategy. It never reads the explanation, so an
+    invisible attribution costs it nothing -- the original and counterfactual
+    instances still differ in the changed feature's *value*.
+    """
+
+    def _focus_indices(self, pair: ProjectedAttributionPair) -> list[int]:
+        n_features = len(pair.feature_names)
+        active = [exemplar for exemplar, _activation in self._retrieve()]
+        if not active:
+            return self._random_focus(n_features)
+
+        groups: dict[Any, list] = {}
+        for exemplar in active:
+            label = max(exemplar["label_probs"], key=exemplar["label_probs"].get)
+            groups.setdefault(label, []).append(exemplar["features"])
+        if len(groups) != 2:
+            return self._random_focus(n_features)
+
+        first, second = (np.asarray(group, dtype=float) for group in groups.values())
+        if first.shape[0] <= 1 or second.shape[0] <= 1:
+            return self._random_focus(n_features)
+
+        variance_floor = 1e-8
+        standard_error = np.sqrt(
+            np.maximum(np.nanvar(first, axis=0, ddof=1), variance_floor) / first.shape[0]
+            + np.maximum(np.nanvar(second, axis=0, ddof=1), variance_floor)
+            / second.shape[0]
+        )
+        standard_error[standard_error == 0] = 1e-12
+        t_statistics = np.abs(
+            np.nanmean(first, axis=0) - np.nanmean(second, axis=0)
+        ) / standard_error
+        return list(np.argsort(t_statistics)[::-1][: max(1, self.k)])
+
+
+class Sim2RealFittedSalientFeatures(_Sim2RealGCMStrategy):
+    """Attend where the explanation points, then reason over values.
+
+    Degrades gracefully as visibility falls: it still classifies by feature
+    values, so it keeps working when the explanation is uninformative -- it
+    just stops aiming attention usefully.
+    """
+
+    def __init__(self, *, rank_signed_attributions: bool = False, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.rank_signed_attributions = bool(rank_signed_attributions)
+
+    def _rank(self, attributions: Sequence[float]) -> np.ndarray:
+        values = np.asarray(attributions, dtype=float)
+        # CoAX ranks signed values, which is right for importance (already
+        # absolute) but drops strongly negative Sim2Real attributions.
+        return values if self.rank_signed_attributions else np.abs(values)
+
+    def _focus_indices(self, pair: ProjectedAttributionPair) -> list[int]:
+        ranked = self._rank(pair.original_attributions)
+        if not np.any(np.isfinite(ranked)) or float(np.nanmax(ranked)) == 0.0:
+            # Nothing to aim at -- every attribution is zero, which is the
+            # sparse condition. Attend everything rather than an arbitrary k.
+            return list(range(len(pair.feature_names)))
+        return list(np.argsort(ranked)[::-1][: max(1, self.k)])
+
+    def _exemplar_vector(self, exemplar: dict, focus: Sequence[int]) -> list:
+        """Mask each exemplar by *its own* explanation, as CoAX does."""
+        explanation = exemplar.get("explanation")
+        if explanation is None:
+            return self._mask(exemplar["features"], focus)
+        ranked = self._rank(explanation)
+        if float(np.nanmax(ranked)) == 0.0:
+            return self._mask(exemplar["features"], focus)
+        exemplar_focus = np.argsort(ranked)[::-1][: max(1, self.k)]
+        return self._mask(exemplar["features"], exemplar_focus)
+
 
 __all__ = [
+    "AttributionSumComparison",
     "DEFAULT_SIM2REAL_DATA_DIR",
     "DEFAULT_SIM2REAL_EXPLANATIONS_DIR",
-    "SIM2REAL_RAW_FEATURE_ORDER",
+    "HIGH_INCOME_LABEL",
+    "ProjectedAttributionPair",
     "SIM2REAL_FEATURE_DIMENSIONS",
     "SIM2REAL_NUMERIC_FEATURES",
-    "ProjectedAttributionPair",
-    "AttributionSumComparison",
+    "SIM2REAL_RAW_FEATURE_ORDER",
     "Sim2RealAttributionProjector",
     "Sim2RealFittedAttributionSum",
+    "Sim2RealFittedSalientFeatures",
+    "Sim2RealFittedSensitiveFeatures",
+    "Sim2RealValueEncoder",
 ]

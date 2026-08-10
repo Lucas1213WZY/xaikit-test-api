@@ -20,19 +20,31 @@ file_formats/
 server_runs/
 
 # ---------------------------------------------------------------------------
-# Human participant data -- must NOT enter the image.
+# Raw human participant data -- must NOT enter the image.
 #
 # An image layer travels wherever the image goes: a registry, a teammate's
 # laptop, the deploy host's disk. Anyone who can pull it can read every file in
-# it, whether or not the API ever serves that file. The study pipeline does not
-# read any of these paths, so they are excluded rather than trusted to stay
-# unserved. Verified by building the copy set without them and running the full
-# pipeline (see server/README.md, "What is not in the image").
+# it, whether or not the API ever serves that file.
+#
+# assets/human_data/ is deliberately NOT listed here: it is the anonymised,
+# consolidated output of assets/build_human_data.py (participants renumbered
+# 1..N per study, every Prolific/session id stripped -- see its own README),
+# and the pipeline genuinely reads it now
+# (src/result_visualizer/study_comparisons.py, the human-vs-model report).
+# Everything below this line is still raw and keyed by real participant or
+# Prolific id, so it stays excluded.
 # ---------------------------------------------------------------------------
 
-# Raw participant responses from the CoAX and CoXAM studies.
-assets/human_data/
 assets/human_trials_and_cognitive_parameters/
+
+# Raw pre-anonymization sources (and the de-anonymization key itself) that
+# live inside the otherwise-anonymized assets/human_data/ tree -- see
+# .gitignore for why these specific files, and not the rest of the
+# directory, are excluded.
+assets/human_data/participant_id_map.csv
+assets/human_data/CoAX/coax-3-datasets-user-responses.csv
+assets/human_data/CoXAM/coxam-mushrooms-wine-quality-user-responses.csv
+assets/human_data/CoXAM/overall_counterfactual_resultsv0.2.xlsx
 
 # Per-participant fitted parameters and trial-by-trial records, keyed by
 # Prolific participant id. The runner's FITTED_COAX_PARAMS holds the aggregate

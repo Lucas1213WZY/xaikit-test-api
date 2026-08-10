@@ -42,14 +42,42 @@ class TrialsStageRequest(BaseModel):
     participants_per_between_condition: Optional[int] = Field(
         None, description="Defaults to the export's participants per condition."
     )
-    num_training: int = 4
+    num_training: Optional[int] = Field(
+        None,
+        description=(
+            "Defaults to trials_per_participant minus the apparatus's declared "
+            "testing instance count when the design has one (so a design with "
+            "30 trials/participant and 20 apparatus testing instances defaults "
+            "to 10, not an arbitrary flat number), else 4."
+        ),
+    )
     num_testing: Optional[int] = Field(
         None,
         description=(
             "Defaults to the export's trials per participant minus num_training."
         ),
     )
-    balance_by_ai_prediction: bool = True
+    allowed_instance_ids: Optional[list[int]] = Field(
+        None,
+        description=(
+            "Restrict trials to these instances. Defaults to the union of "
+            "every apparatus[].params.instanceIds / trainingInstanceIds the "
+            "design export declared, so simulated trials reference exactly "
+            "the instances the human-study UI showed participants -- pass an "
+            "explicit list (or [] for no restriction) to override."
+        ),
+    )
+    balance_by_ai_prediction: Optional[bool] = Field(
+        None,
+        description=(
+            "Draw each phase equally from both predicted classes. Requires a "
+            "trained AI model, so the default is True when the dataset stage "
+            "trained one and False otherwise -- Sim2Real designs skip training "
+            "(see the /dataset endpoint), so their default is False. Pass "
+            "True explicitly to require balancing and get a clear error if no "
+            "model was trained, rather than picking a value silently."
+        ),
+    )
     seed: int = 42
     output_dir: str = "trials"
     preview_rows: int = 20
@@ -108,13 +136,43 @@ class SimulationRequest(BaseModel):
             "[0.0, 0.02]. Omit to let the environment sample them."
         ),
     )
-    coxam_source: str = Field(
-        "fit",
+    coxam_source: Optional[str] = Field(
+        None,
         description=(
             "CoXAM designs only. 'fit' fits decision-tree and logistic-regression "
             "surrogates against this study's own trained model; 'assets' loads the "
             "pre-generated tables from assets/explanations/CoXAM instead, which "
-            "requires trials constrained to that corpus' instance ids."
+            "requires trials constrained to that corpus' instance ids. Defaults to "
+            "'assets' when the dataset stage skipped training (a corpus-covered "
+            "dataset -- see /dataset's model_skipped_reason) and 'fit' otherwise, "
+            "since 'fit' would simply fail with no trained_ai_model to fit against."
+        ),
+    )
+    sim2real_strategy: str = Field(
+        "attribution_sum",
+        description=(
+            "Sim2Real designs only. Which cognitive model simulates a participant: "
+            "'attribution_sum' reads the explanation's attributions and is the best "
+            "fit wherever the changed feature has a visible attribution; "
+            "'sensitive_features' and 'salient_features' classify by exemplar "
+            "similarity over feature values and fit better where it does not, which "
+            "is most of the sparse condition. Defaults to attribution_sum so an "
+            "unset request behaves as before."
+        ),
+    )
+    sim2real_params: Optional[dict] = Field(
+        None,
+        description=(
+            "Sim2Real designs only. Overrides for the cognitive parameters, applied "
+            "on top of the per-condition fitted population. Anything omitted keeps "
+            "its fitted value, so passing one field does not reset the rest."
+        ),
+    )
+    sim2real_normalize_by_i_max: bool = Field(
+        True,
+        description=(
+            "Sim2Real designs only. Rescale each condition's attributions by its "
+            "i_max before the model reads them."
         ),
     )
     baseline_model_id: Optional[str] = Field(
@@ -133,6 +191,19 @@ class AnalysisRequest(BaseModel):
 
     ivs: Optional[list[str]] = None
     dvs: Optional[list[str]] = None
+
+
+class PostHocRequest(BaseModel):
+    """Pairwise condition comparisons for one DV, with corrected p-values."""
+
+    dv: str
+    condition_cols: Optional[list[str]] = Field(
+        None, description="Defaults to every IV the design declares."
+    )
+    correction: Optional[str] = Field(
+        "holm", description="Multiple-comparison correction; pass null for raw p-values."
+    )
+    phase: str = "testing"
 
 
 class InteractionPlotRequest(BaseModel):

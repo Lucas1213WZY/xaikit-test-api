@@ -460,6 +460,7 @@ class xaikitTest:
         random_state: int = 42,
         show_available: bool = True,
         show_summary: bool = True,
+        cognitive_model_id: Optional[str] = None,
     ) -> PreparedDataset:
         """Load, optionally feature-select, and split the dataset.
 
@@ -478,10 +479,33 @@ class xaikitTest:
             random_state: Seed for the split.
             show_available: Print the datasets XAIKit can load.
             show_summary: Print a summary of the prepared dataset.
+            cognitive_model_id: Which agent this dataset is for; defaults to
+                ``self.cognitive_model_id``. CoXAM's published corpus was fit
+                against its own feature set, which differs from this
+                dataset's ordinary default (e.g. wine_quality: 6 features
+                including Chlorides, not the loader's usual 5) -- passing
+                ``"coxam"`` here, or having already called
+                ``set_cognitive_model``/a design export that selected it,
+                routes to that set automatically instead of silently
+                preparing a dataset ``source="assets"`` cannot use. Has no
+                effect when ``feature_cols`` is given explicitly, or for any
+                other agent.
 
         Returns:
             The prepared dataset, also stored on ``self.data``.
         """
+        resolved_agent = str(cognitive_model_id or self.cognitive_model_id or "").lower().strip()
+        if feature_cols is None and use_default_features and resolved_agent == "coxam":
+            try:
+                from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_trial_executor import (
+                    coxam_loader_feature_cols,
+                )
+
+                feature_cols = coxam_loader_feature_cols(dataset_id)
+                rank_features_by_target = False
+            except KeyError:
+                pass  # not a dataset the CoXAM corpus covers; ordinary defaulting applies
+
         self.data = prepare_dataset(
             dataset_id,
             model_type=model_type,
@@ -656,6 +680,67 @@ class xaikitTest:
         self.prediction_table = None
         return self.model
 
+    #: Which named ``train_AI_model`` parameters each model type accepts, split
+    #: by where they go: ``build`` reaches the constructor, ``train`` reaches the
+    #: training call. Anything named but not listed for the chosen type is a
+    #: mistake worth raising on rather than dropping silently.
+    _TRAINING_OPTIONS: dict[str, dict[str, tuple[str, ...]]] = {
+        "mlp": {
+            "build": ("hidden_dimension", "dropout_rate", "device_id"),
+            "train": ("epochs",),
+        },
+        "mlp_tf": {
+            "build": ("hidden_dimension", "dropout_rate", "device_id"),
+            "train": ("epochs",),
+        },
+        "xgboost": {"build": ("learning_rate", "num_boost_round"), "train": ()},
+        "xgboost_tf": {"build": ("learning_rate", "num_boost_round"), "train": ()},
+        "sim2real": {"build": ("function_name",), "train": ()},
+    }
+
+    def _split_training_options(
+        self, model_type: str, **options: Any
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
+        """Route the named training parameters to the constructor or the trainer.
+
+        Args:
+            model_type: The architecture being trained.
+            **options: The named parameters, ``None`` where the caller left them
+                unset.
+
+        Returns:
+            ``(build_options, train_options)``, each holding only the values the
+            caller actually set.
+
+        Raises:
+            TypeError: If a set parameter does not belong to ``model_type``.
+        """
+        allowed = self._TRAINING_OPTIONS.get(model_type)
+        if allowed is None:
+            known = ", ".join(sorted(self._TRAINING_OPTIONS))
+            raise TypeError(f"Unknown model_type {model_type!r}. Use one of: {known}.")
+
+        given = {name: value for name, value in options.items() if value is not None}
+        unusable = sorted(set(given) - set(allowed["build"]) - set(allowed["train"]))
+        if unusable:
+            owners = {
+                name: sorted(
+                    other
+                    for other, groups in self._TRAINING_OPTIONS.items()
+                    if name in groups["build"] or name in groups["train"]
+                )
+                for name in unusable
+            }
+            detail = "; ".join(f"{name} belongs to {'/'.join(owners[name])}" for name in unusable)
+            raise TypeError(
+                f"train_AI_model() got {unusable} which model_type={model_type!r} "
+                f"cannot use ({detail})."
+            )
+        return (
+            {name: given[name] for name in allowed["build"] if name in given},
+            {name: given[name] for name in allowed["train"] if name in given},
+        )
+
     def train_AI_model(
         self,
         *,
@@ -668,17 +753,33 @@ class xaikitTest:
         check_every_epochs: int = 10,
         batch_size: int = 1000,
         verbose: bool = False,
+        epochs: Optional[int] = None,
+        hidden_dimension: Optional[int] = None,
+        dropout_rate: Optional[float] = None,
+        device_id: Optional[int] = None,
+        learning_rate: Optional[float] = None,
+        num_boost_round: Optional[int] = None,
+        function_name: Optional[str] = None,
         model_kwargs: Optional[dict[str, Any]] = None,
         train_kwargs: Optional[dict[str, Any]] = None,
     ) -> Any:
         """Create and train the AI model used for predictions and explanations.
 
+        Every input has its own named parameter. Architecture parameters only
+        apply to the model type that owns them, and passing one to a different
+        type raises rather than being silently dropped.
+
+        ``model_kwargs`` and ``train_kwargs`` are the older escape hatch and
+        still work -- shipped tutorials use ``train_kwargs={"epochs": 100}`` --
+        but the named parameters are the supported way, and anything named
+        wins over the same key inside a dict.
+
         Re-encodes the prepared dataset if ``model_type`` needs a different
         one-hot setting than the one it was prepared with.
 
         Args:
-            model_type: Architecture to train -- ``mlp``, ``xgboost`` or
-                ``sim2real``.
+            model_type: Architecture to train -- ``mlp``, ``mlp_tf``,
+                ``xgboost``, ``xgboost_tf`` or ``sim2real``.
             source: Study whose defaults to follow, e.g. ``coax`` or ``coxam``.
             target_accuracy: Stop once training accuracy reaches this. Alias for
                 ``target_score`` kept for older notebooks.
@@ -690,12 +791,35 @@ class xaikitTest:
             batch_size: Training batch size.
             verbose: Let training output print instead of capturing it to
                 ``training_stdout``.
-            model_kwargs: Extra arguments for model construction.
-            train_kwargs: Extra arguments for the training call.
+            epochs: Training epochs for a fixed run. MLP only.
+            hidden_dimension: Width of the MLP's hidden layer. MLP only.
+            dropout_rate: MLP dropout. MLP only.
+            device_id: CUDA device index, ``-1`` for CPU. MLP only.
+            learning_rate: XGBoost learning rate. XGBoost only.
+            num_boost_round: XGBoost boosting rounds. XGBoost only.
+            function_name: Which analytical function to use. sim2real only.
+            model_kwargs: Legacy escape hatch for constructor arguments.
+            train_kwargs: Legacy escape hatch for training arguments.
 
         Returns:
             The trained model, also stored on ``model``/``trained_ai_model``.
+
+        Raises:
+            TypeError: If a parameter is given that ``model_type`` cannot use.
         """
+        build_options, train_options = self._split_training_options(
+            model_type,
+            epochs=epochs,
+            hidden_dimension=hidden_dimension,
+            dropout_rate=dropout_rate,
+            device_id=device_id,
+            learning_rate=learning_rate,
+            num_boost_round=num_boost_round,
+            function_name=function_name,
+        )
+        # Named parameters win over the same key inside the legacy dicts.
+        build_options = {**(model_kwargs or {}), **build_options}
+        train_options = {**(train_kwargs or {}), **train_options}
         data = self._require_data()
         from src.ai_models import ModelManager, requires_one_hot_encoding
 
@@ -718,7 +842,7 @@ class xaikitTest:
                 input_dim=data.X_train.shape[1],
                 num_classes=len(set(data.y_train.tolist())),
                 source=source,
-                **(model_kwargs or {}),
+                **build_options,
             )
 
             stop_score = target_score if target_score is not None else target_accuracy
@@ -727,7 +851,7 @@ class xaikitTest:
                     data.X_train,
                     data.y_train,
                     batch_size=batch_size,
-                    **(train_kwargs or {}),
+                    **train_options,
                 )
             else:
                 self.training_info = self.model_manager.train_until_accuracy(
@@ -738,7 +862,7 @@ class xaikitTest:
                     max_epochs=max_epochs,
                     check_every_epochs=check_every_epochs,
                     batch_size=batch_size,
-                    **(train_kwargs or {}),
+                    **train_options,
                 )
 
         if verbose:
@@ -775,6 +899,34 @@ class xaikitTest:
             ax: Existing matplotlib axes to draw on; a new figure is made if None.
         """
         return ai_eval.plot_training_history(self.training_info, ax=ax)
+
+    def predict_labels(self, X: Any, *, threshold: float = 0.5) -> Any:
+        """Predicted class labels as ``(n,)`` integers, whatever the model type.
+
+        ``trained_ai_model.predict(X)`` returns each engine's own raw output --
+        ``(n, n_classes)`` probabilities from an MLP, ``(n, 2)`` from a binary
+        XGBoost objective, ``(n,)`` from the analytical sim2real functions -- so
+        calling it directly forces every caller to branch on ``ndim``. This
+        resolves that once.
+
+        Args:
+            X: Instances to predict.
+            threshold: Cutoff for the positive class when the model emits one
+                probability per row rather than one per class.
+
+        Raises:
+            RuntimeError: If called before ``train_AI_model``.
+        """
+        return self._require_model_manager().predict_labels(X, threshold=threshold)
+
+    def predict_proba(self, X: Any) -> Any:
+        """Class probabilities as ``(n, n_classes)`` floats.
+
+        Raises:
+            RuntimeError: If called before ``train_AI_model``.
+            ValueError: If the model emits hard labels or continuous values.
+        """
+        return self._require_model_manager().predict_proba(X)
 
     def test_accuracy(self) -> float:
         """Return held-out test accuracy for the trained AI model."""
@@ -901,6 +1053,19 @@ class xaikitTest:
         Raises:
             RuntimeError: If no methods are given and none are stored.
         """
+        # A design that names an explanation family (xai_type) or a property
+        # (xai_property) but no xai_method is complete -- infer the methods the
+        # framework generates rather than leaving the run with nothing to do.
+        if methods is None and "xai_method" not in self.iv_config:
+            inferred = self._inferred_xai_methods()
+            if inferred:
+                methods = inferred
+                if show_checks:
+                    print(
+                        f"No xai_method IV; using {self._resolved_framework()}'s methods: "
+                        f"{inferred}"
+                    )
+
         explanation_iv_config = self._iv_config_for_explanations(methods)
         resolved_methods = self._xai_methods_from_iv_config(explanation_iv_config)
         if not resolved_methods:
@@ -1182,6 +1347,105 @@ class xaikitTest:
         )
         return self
 
+    #: Agents whose simulation lives in a dedicated runner rather than in the
+    #: generic executor. ``set_cognitive_model`` leaves ``cognitive_model`` as
+    #: the placeholder for these, because the runner owns the model.
+    _AGENT_RUNNERS = ("coax", "coxam", "sim2real")
+
+    #: What each agent's runner calls its flat cognitive-parameter argument.
+    #: CoAX is absent on purpose -- its parameters are nested per condition
+    #: (``{(xai_type, tested): {...}}``) rather than one flat mapping, so a flat
+    #: ``cognitive_params`` cannot be routed there without inventing a key.
+    _COGNITIVE_PARAM_KEYWORDS = {"coxam": "eval_params", "sim2real": "cognitive_params"}
+
+    def _run_agent_experiment(
+        self,
+        *,
+        mode: str,
+        participant_id: Optional[int],
+        condition_filter: Optional[dict[str, Any]],
+        explanation_pool: Optional[pd.DataFrame],
+        runner_kwargs: dict[str, Any],
+    ) -> Optional[pd.DataFrame]:
+        """Dispatch to a research agent's runner, or return None for the generic path.
+
+        Kept separate from ``run_experiment`` so the generic executor's own
+        preparation -- ``ensure_prediction_coverage`` in particular -- is not
+        run for agents that do not use it.
+        """
+        agent = (self.cognitive_model_id or "").lower().strip()
+        if agent not in self._AGENT_RUNNERS:
+            if runner_kwargs:
+                raise TypeError(
+                    f"run_experiment() got unexpected keyword argument(s) "
+                    f"{sorted(runner_kwargs)!r}. These are runner options for "
+                    f"{' or '.join(self._AGENT_RUNNERS)}; the current cognitive model is "
+                    f"{self.cognitive_model_id!r}."
+                )
+            return None
+
+        self._require_data()
+        self._require_trials()
+
+        # Carry the stored cognitive parameters into the runner. Without this
+        # `set_cognitive_model(cognitive_params=...)` is parsed and dropped: the
+        # run succeeds using the agent's defaults, so a UI-configured parameter
+        # silently has no effect. Each runner names the argument differently,
+        # and an explicit runner_kwargs value still wins.
+        parameter_keyword = self._COGNITIVE_PARAM_KEYWORDS.get(agent)
+        if parameter_keyword and self.cognitive_params and parameter_keyword not in runner_kwargs:
+            runner_kwargs[parameter_keyword] = dict(self.cognitive_params)
+
+        if agent == "sim2real":
+            from src.virtual_experiment_executor.experiment_simualtion.Sim2Real.sim2real_study_runner import (
+                run_sim2real_study,
+            )
+
+            # No explanation_pool and no trained model: Sim2Real's stimuli,
+            # explanations and counterfactual ground truth are a fixed corpus.
+            self.simulated_results = run_sim2real_study(
+                self,
+                mode=mode,
+                participant_id=participant_id,
+                condition_filter=condition_filter,
+                store=True,
+                **runner_kwargs,
+            )
+            return self.simulated_results
+
+        if agent == "coxam":
+            from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_study_runner import (
+                run_coxam_study,
+            )
+
+            # No explanation_pool: coxam fits its own DT/LR surrogates, because
+            # the combined table carries the generic a{i}_i attribution schema
+            # rather than the coef_a{i}/tree_structure its interpreters need.
+            self.simulated_results = run_coxam_study(
+                self,
+                mode=mode,
+                participant_id=participant_id,
+                condition_filter=condition_filter,
+                store=True,
+                **runner_kwargs,
+            )
+            return self.simulated_results
+
+        from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_study_runner import (
+            run_coax_study,
+        )
+
+        self.simulated_results = run_coax_study(
+            self,
+            mode=mode,
+            participant_id=participant_id,
+            condition_filter=condition_filter,
+            explanation_pool=explanation_pool,
+            store=True,
+            **runner_kwargs,
+        )
+        return self.simulated_results
+
     def run_experiment(
         self,
         *,
@@ -1190,8 +1454,20 @@ class xaikitTest:
         condition_filter: Optional[dict[str, Any]] = None,
         explanation_pool: Optional[pd.DataFrame] = None,
         require_walkthrough_approval: bool = False,
+        **runner_kwargs: Any,
     ) -> pd.DataFrame:
         """Run the cognitive simulation over selected generated trial rows.
+
+        Which simulation runs is decided by ``cognitive_model_id``. The three
+        research agents have their own runners and are dispatched to here, so
+        that selecting one and calling this method actually runs it:
+
+        * ``coax``     -> :func:`run_coax_study`
+        * ``coxam``    -> :func:`run_coxam_study`
+        * ``sim2real`` -> :func:`run_sim2real_study`
+
+        Everything else -- the baseline models and any explicitly supplied
+        ``cognitive_model`` -- runs through the generic executor as before.
 
         Args:
             mode: ``participant_by_participant`` runs one participant;
@@ -1199,21 +1475,39 @@ class xaikitTest:
             participant_id: Which participant to run in per-participant mode.
             condition_filter: Restrict to trials matching these IV values.
             explanation_pool: Explanations to draw from; defaults to the
-                combined table.
+                combined table. Ignored by ``coxam``, which fits its own
+                surrogates rather than reading the combined table.
             require_walkthrough_approval: Refuse to run until the walkthrough has
                 been previewed and approved.
+            **runner_kwargs: Passed to the selected agent's runner, e.g.
+                ``user_task="counterfactual_simulation"``, ``source=``,
+                ``policy_override=`` or ``eval_params=`` for coxam, and
+                ``cognitive_model=`` or ``train_with_explanation=`` for coax.
+                Rejected for the baseline path, which takes no such options.
 
         Returns:
             Simulated responses, also stored on ``simulated_results``.
 
         Raises:
             RuntimeError: If approval is required but has not been given.
+            TypeError: If ``runner_kwargs`` is passed without an agent selected.
         """
         if require_walkthrough_approval and not self.walkthrough_approved:
             raise RuntimeError(
                 "Experiment execution is locked. Preview the complete walkthrough and "
                 "click 'Approve walkthrough' first."
             )
+
+        agent_results = self._run_agent_experiment(
+            mode=mode,
+            participant_id=participant_id,
+            condition_filter=condition_filter,
+            explanation_pool=explanation_pool,
+            runner_kwargs=runner_kwargs,
+        )
+        if agent_results is not None:
+            return agent_results
+
         data = self._require_data()
         trials = self._require_trials()
         explanation_pool = (
@@ -1299,6 +1593,45 @@ class xaikitTest:
             iv=iv,
             dv=dv,
             participant_column=participant_column,
+        )
+
+    def pairwise_condition_tests(
+        self,
+        *,
+        dv: str,
+        condition_cols: Sequence[str],
+        participant_column: str = "participantId",
+        correction: Optional[str] = "holm",
+        phase: str = "testing",
+    ) -> Any:
+        """Pairwise t-tests (paired where participants overlap) between every
+        crossed condition cell, e.g. xai_type x tested_w_xai.
+
+        Args:
+            dv: Dependent variable to compare.
+            condition_cols: Columns whose crossed values define the cells
+                being compared, e.g. ``["xai_type", "tested_w_xai"]``.
+            participant_column: Column identifying participants.
+            correction: Multiple-comparison correction (``"holm"`` etc.);
+                None reports raw p-values only.
+            phase: Restrict to one trial phase before comparing.
+
+        Raises:
+            RuntimeError: If called before ``run_experiment``.
+        """
+        if self.simulated_results is None:
+            raise RuntimeError("Call run_experiment(...) before pairwise_condition_tests(...).")
+        from src.statistical_analyst import pairwise_condition_tests
+
+        data = self.simulated_results
+        if phase and "phase" in data:
+            data = data[data["phase"].astype(str).str.lower() == phase.lower()]
+        return pairwise_condition_tests(
+            data,
+            value_col=dv,
+            condition_cols=condition_cols,
+            participant_col=participant_column,
+            correction=correction,
         )
 
     def plot_results_grid(
@@ -1421,11 +1754,210 @@ class xaikitTest:
             value_labels=value_labels,
         )
 
+    def compare_to_human_data(
+        self,
+        human_responses: pd.DataFrame,
+        *,
+        group_column: str,
+        human_column: str,
+        model_column: str,
+        responses: Optional[pd.DataFrame] = None,
+        on: Optional[Sequence[str]] = None,
+        participant_column: str = "participantId",
+        model_name: Optional[str] = None,
+        dv: str = "Agreement with the AI",
+        title: Optional[str] = None,
+        note: str = "",
+        order: Optional[Sequence[Any]] = None,
+        group_labels: Optional[dict[Any, str]] = None,
+    ) -> Any:
+        """Compare the simulation against the humans it is meant to reproduce.
+
+        This is the evidence step after ``run_experiment``: one grouped-bar panel
+        per grouping level, human beside cognitive model. Bars are the mean over
+        *participant* means -- never over trials -- so a participant with more
+        trials does not count for more, and the error bar is the SEM of those
+        participant means.
+
+        ``human_responses`` and the simulation are joined on ``on`` when given;
+        pass a single already-aligned frame as ``human_responses`` and leave
+        ``on=None`` to skip the join, which is what the published fit tables
+        (already carrying both a human and a model column) need.
+
+        Args:
+            human_responses: Human trials, or an already-aligned frame.
+            group_column: Column whose values become the category axis.
+            human_column: Column holding the human measure.
+            model_column: Column holding the cognitive model's measure.
+            responses: Simulation to compare; defaults to the stored one. Unused
+                when ``on`` is None.
+            on: Columns to join the human and simulated frames on. None means
+                ``human_responses`` already carries both measures.
+            participant_column: Column identifying participants.
+            model_name: Series label for the model; defaults to
+                ``cognitive_model_id`` or ``"Cognitive model"``.
+            dv: What the numbers measure; becomes the y-axis label.
+            title: Panel heading; defaults to naming the grouping column.
+            note: Caveat shown under the heading.
+            order: Category order; defaults to sorted.
+            group_labels: Display labels for category values.
+
+        Returns:
+            A :class:`~src.result_visualizer.ComparisonPanel`. Call
+            ``.to_frame()`` for the numbers, or pass it to
+            ``render_human_vs_model_report`` for the interactive page.
+
+        Raises:
+            RuntimeError: If ``on`` is given and no simulation is available.
+        """
+        from src.result_visualizer import comparison_panel
+
+        frame = human_responses
+        if on is not None:
+            simulated = responses if responses is not None else self.simulated_results
+            if simulated is None:
+                raise RuntimeError(
+                    "Call run_experiment(...) before compare_to_human_data(..., on=...), "
+                    "or pass an already-aligned frame with on=None."
+                )
+            frame = human_responses.merge(simulated, on=list(on), how="inner")
+            if frame.empty:
+                raise ValueError(
+                    f"Joining human responses to the simulation on {list(on)} matched no rows."
+                )
+
+        label = model_name or (self.cognitive_model_id or "Cognitive model")
+        return comparison_panel(
+            frame,
+            participant_column=participant_column,
+            group_column=group_column,
+            series={"Human": human_column, str(label): model_column},
+            title=title or f"Human vs {label}, by {group_column}",
+            dv=dv,
+            note=note,
+            order=order,
+            group_labels=group_labels,
+        )
+
+    def render_human_vs_model_report(
+        self,
+        panels: Any,
+        path: str | Path = "human_vs_model_report.html",
+        *,
+        study_name: Optional[str] = None,
+        task: str = "",
+        participants: Optional[int] = None,
+        title: str = "Human vs cognitive model",
+    ) -> Path:
+        """Write comparison panels to one self-contained interactive HTML page.
+
+        Args:
+            panels: One panel from :meth:`compare_to_human_data`, a list of them,
+                or a list of ``ComparisonStudy`` to render several studies.
+            path: Output path; relative paths land in ``output_dir``.
+            study_name: Study heading; defaults to ``cognitive_model_id``.
+            task: Sub-heading describing what participants were asked.
+            participants: Participant count shown beside the heading.
+            title: Page title.
+
+        Returns:
+            The path written.
+        """
+        from src.result_visualizer import (
+            ComparisonPanel,
+            ComparisonStudy,
+            render_comparison_report,
+        )
+
+        if isinstance(panels, ComparisonPanel):
+            panels = [panels]
+        if all(isinstance(item, ComparisonStudy) for item in panels):
+            studies = list(panels)
+        else:
+            studies = [
+                ComparisonStudy(
+                    name=study_name or (self.cognitive_model_id or "Cognitive model"),
+                    task=task,
+                    participants=participants,
+                    panels=list(panels),
+                )
+            ]
+        return render_comparison_report(
+            studies, self._resolve_output_path(path), title=title
+        )
+
     def _resolve_output_path(self, path: str | Path) -> Path:
         path = Path(path)
         if path.is_absolute():
             return path
         return self.output_dir / path
+
+    #: Which XAI methods generate each framework's explanations, when the design
+    #: names an explanation family but no ``xai_method`` IV. A design that does
+    #: declare ``xai_method`` always wins over these.
+    XAI_METHODS_BY_FRAMEWORK: dict[str, tuple[str, ...]] = {
+        "coax": ("lime", "shap"),
+        # Sim2Real's corpus is built from LIME attributions; the study varies
+        # which property the explanation was optimized for, not the method.
+        "sim2real": ("lime",),
+        # CoXAM's xai_type names the surrogate family directly, so the method
+        # follows from the level -- see _COXAM_METHODS_BY_XAI_TYPE.
+        "coxam": ("decision_tree", "logistic_regression"),
+    }
+
+    #: A CoXAM ``xai_type`` level and the surrogate(s) it displays. ``hybrid``
+    #: shows both families, so it needs both generated.
+    _COXAM_METHODS_BY_XAI_TYPE: dict[str, tuple[str, ...]] = {
+        "decision_tree": ("decision_tree",),
+        "logistic_regression": ("logistic_regression",),
+        "hybrid": ("decision_tree", "logistic_regression"),
+    }
+
+    def _resolved_framework(self) -> str:
+        """The agent this design runs, inferring Sim2Real from its IV.
+
+        Mirrors ``DesignExport.resolved_framework``: a design that varies
+        ``xai_property`` is a Sim2Real study even when the cognitive model id
+        says ``coax``, because Sim2Real's model is CoAX-derived.
+        """
+        if "xai_property" in self.iv_config:
+            return "sim2real"
+        return str(self.cognitive_model_id or "").lower().strip()
+
+    def _methods_for_explanation_family(self, family: Any) -> tuple[str, ...]:
+        """The XAI method(s) that generate one explanation-family level.
+
+        For CoXAM the level names the family, so ``hybrid`` needs both
+        surrogates. Every other framework generates the same methods whatever
+        the level, so the level only decides *whether* an explanation is shown.
+        """
+        framework = self._resolved_framework()
+        level = str(family).lower().strip().replace(" ", "_").replace("-", "_")
+        if level in {"none", "no_xai", "control"}:
+            return ()
+        if framework == "coxam":
+            return self._COXAM_METHODS_BY_XAI_TYPE.get(level, ())
+        return self.XAI_METHODS_BY_FRAMEWORK.get(framework, ())
+
+    def _inferred_xai_methods(self) -> list[str]:
+        """XAI methods this design needs, when it declares no ``xai_method`` IV.
+
+        A design can name the explanation *family* it shows (``xai_type``) or
+        the *property* it varies (``xai_property``) without naming a method --
+        both are complete designs. Previously that combination generated no
+        explanations at all and raised nothing, because the per-method instance
+        map was keyed by family while generation ran by method name.
+        """
+        framework = self._resolved_framework()
+        if framework == "coxam":
+            levels = self.iv_config.get("xai_type", {}).get("levels", [])
+            methods: list[str] = []
+            for level in levels:
+                for method in self._methods_for_explanation_family(level):
+                    if method not in methods:
+                        methods.append(method)
+            return methods
+        return list(self.XAI_METHODS_BY_FRAMEWORK.get(framework, ()))
 
     def _iv_config_for_explanations(
         self,
@@ -1532,10 +2064,25 @@ class xaikitTest:
 
         required = trials[method_has_xai & (training | tested_with_xai)].copy()
         required["_method_key"] = methods.loc[required.index]
-        return {
-            method: list(dict.fromkeys(group["instanceId"].astype(int).tolist()))
-            for method, group in required.groupby("_method_key", sort=False)
+        by_key = {
+            key: list(dict.fromkeys(group["instanceId"].astype(int).tolist()))
+            for key, group in required.groupby("_method_key", sort=False)
         }
+        if method_column == "xai_method":
+            return by_key
+
+        # The trials carry an explanation *family*, not a method name, so the
+        # keys have to be translated -- generation runs by method, and a map
+        # keyed "attribution" would leave method "shap" with no instances and
+        # silently produce no explanations at all.
+        by_method: dict[str, list[int]] = {}
+        for family, instance_ids in by_key.items():
+            for method in self._methods_for_explanation_family(family):
+                merged = by_method.setdefault(method, [])
+                merged.extend(
+                    instance_id for instance_id in instance_ids if instance_id not in merged
+                )
+        return by_method or by_key
 
     def _require_data(self) -> PreparedDataset:
         if self.data is None:

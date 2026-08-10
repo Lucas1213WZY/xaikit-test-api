@@ -20,13 +20,14 @@ levels alphabetical within a block). ONE_HOT below reproduces it; it was verifie
 against the source study's own explanation table, dimension by dimension.
 
 The raw ``delta`` sometimes declares a source value that is not the value in
-``observations``.  The generated counterfactual always starts from the actual
-observation.  If the declared target is already the observed value, the
-direction is reversed so the declaration's source becomes the counterfactual
-target instead of producing a no-op. ``deltas.csv`` records the intended
-suggested transition in ``valueFrom``/``dimFrom``, the untouched UI value in
-``observedValueFrom``/``observedDimFrom``, and the literal declaration in
-``sourceValueFrom``/``sourceDimFrom``/``rawDelta``.
+``observations``.  Both the counterfactual and the label the participant reads
+follow the observation: ``valueFrom``/``dimFrom`` are the value actually in
+``values.csv``, so the suggested change always starts from what is on screen.
+If the declared target is already the observed value, the direction is reversed
+so the declaration's source becomes the counterfactual target instead of
+producing a no-op. The literal declaration survives in
+``sourceValueFrom``/``sourceValueTo``/``sourceDimFrom``/``rawDelta``, and
+``mappingStatus`` records where the two disagree.
 
 Run from the repository root:
     python3 assets/ai_dataset/sim2real/build_corpus.py
@@ -210,10 +211,13 @@ def resolve_delta(case):
         not source_matches
         and _values_equal(feature, observed_value_from, declared_value_to)
     )
-    value_from = _coerce_delta_value(
-        feature,
-        observed_value_from if direction_reversed else source_value_from,
-    )
+    # The suggested transition always starts from the value the participant can
+    # see. Three raw declarations name a source the case does not have
+    # (instances 2, 8 and 9), and labelling the change "capital-gain: 500 ->
+    # 1205" beside a case reading 0 would ask the participant to reason from a
+    # value that is not there. The declaration is kept verbatim in
+    # source_value_from for audit; only the label follows the observation.
+    value_from = _coerce_delta_value(feature, observed_value_from)
     value_to = _coerce_delta_value(
         feature,
         source_value_from if direction_reversed else source_value_to,
@@ -294,10 +298,12 @@ def main(dataset_out_dir=DATASET_OUT_DIR,
             cases.append((split, name, case))
 
     # ---- metadata.csv -----------------------------------------------------
-    # One app-level row, so it deliberately has no instance-level qid. Numeric
-    # dimensions get v{i}_min/v{i}_max so the renderer draws a meter; one-hot
-    # dimensions get a 2-option categorical so it draws no/yes.
+    # One row. Numeric dimensions get v{i}_min/v{i}_max so the renderer draws a
+    # meter; one-hot dimensions get a 2-option categorical so it draws no/yes.
     encoded = [encode(case["observations"]) for _, _, case in cases]
+    # The source study's own question id, carried through so a response logged
+    # by the real study can be joined back to the instance it came from.
+    # metadata.csv is one app-level row and deliberately has none.
     qids = [case["qid"] for _, _, case in cases]
     header, row = ["appId"], [APP_ID]
     for i, name in enumerate(ONE_HOT):
@@ -332,22 +338,13 @@ def main(dataset_out_dir=DATASET_OUT_DIR,
     # ---- none.csv ---------------------------------------------------------
     preds = [1 if "above" in case["original_model_prediction"] else 0
              for _, _, case in cases]
-    write(
-        os.path.join(dataset_out_dir, "none.csv"),
-        ["appId", "modelName", "instanceId", "qid", "pred", "i_max"],
-        [
-            [APP_ID, MODEL_NAME, i, qids[i], pred, 0]
-            for i, pred in enumerate(preds)
-        ],
-    )
-    write(
-        os.path.join(explanations_out_dir, "none.csv"),
-        ["appId", "modelName", "instanceId", "qid", "pred", "i_max"],
-        [
-            [APP_ID, MODEL_NAME, i, qids[i], pred, 0]
-            for i, pred in enumerate(preds)
-        ],
-    )
+    none_header = ["appId", "modelName", "instanceId", "qid", "pred", "i_max"]
+    none_rows = [
+        [APP_ID, MODEL_NAME, i, qids[i], pred, 0]
+        for i, pred in enumerate(preds)
+    ]
+    write(os.path.join(dataset_out_dir, "none.csv"), none_header, none_rows)
+    write(os.path.join(explanations_out_dir, "none.csv"), none_header, none_rows)
 
     # ---- attribution.csv / importance.csv ---------------------------------
     # The renderer draws each bar as a{i}_i / i_max, so i_max sets the full-scale
@@ -519,20 +516,20 @@ def main(dataset_out_dir=DATASET_OUT_DIR,
     for instance_id, resolved in enumerate(resolved_deltas):
         if not resolved["source_matches"]:
             print(
-                f"  raw delta source mismatch: instanceId={instance_id} "
+                f"  audit: declared source differs from observation — instanceId={instance_id} "
                 f"feature={resolved['feature']} "
                 f"declared={resolved['source_value_from']!r} "
                 f"observed={resolved['observed_value_from']!r}"
             )
         if resolved["direction_reversed"]:
             print(
-                f"  reversed no-op declaration: instanceId={instance_id} "
+                f"  audit: reversed no-op declaration — instanceId={instance_id} "
                 f"effective={resolved['value_from']!r} -> "
                 f"{resolved['value_to']!r}"
             )
         if not resolved["has_change"]:
             print(
-                f"  source-data no-op: instanceId={instance_id} "
+                f"  audit: source-data no-op — instanceId={instance_id} "
                 f"feature={resolved['feature']} value={resolved['value_from']!r}"
             )
     for instance_id, exp_property, length in truncated:

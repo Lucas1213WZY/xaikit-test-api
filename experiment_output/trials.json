@@ -1,0 +1,54 @@
+[
+  {
+    "participantId": 1,
+    "trialId": 1,
+    "block": 1,
+    "trialWithinBlock": 1,
+    "withinCondition": "single_condition",
+    "xai_type": "decision_tree",
+    "dataId": "wine_quality",
+    "instanceId": "19",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "decision_tree"
+  },
+  {
+    "participantId": 1,
+    "trialId": 2,
+    "block": 1,
+    "trialWithinBlock": 2,
+    "withinCondition": "single_condition",
+    "xai_type": "decision_tree",
+    "dataId": "wine_quality",
+    "instanceId": "231",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "decision_tree"
+  },
+  {
+    "participantId": 1,
+    "trialId": 3,
+    "block": 1,
+    "trialWithinBlock": 3,
+    "withinCondition": "single_condition",
+    "xai_type": "decision_tree",
+    "dataId": "wine_quality",
+    "instanceId": "1130",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "decision_tree"
+  },
+  {
+    "participantId": 1,
+    "trialId": 4,
+    "block": 1,
+    "trialWithinBlock": 4,
+    "withinCondition": "single_condition",
+    "xai_type": "decision_tree",
+    "dataId": "wine_quality",
+    "instanceId": "451",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "decision_tree"
+  }
+]

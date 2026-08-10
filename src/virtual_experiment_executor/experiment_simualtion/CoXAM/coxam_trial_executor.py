@@ -85,6 +85,48 @@ COXAM_CORPUS_FEATURES: dict[str, tuple[str, ...]] = {
     "mushrooms": ("Bruises", "Height", "Width", "Shape", "Cap Diameter", "Gill"),
 }
 
+#: Features the dataset loader names differently from the published corpus.
+#:
+#: These are **confirmed equivalences, not guesses**: the corpus abbreviates the
+#: loader's ``Gill Spacing`` to ``Gill`` and capitalises ``chlorides``. Anything
+#: not listed here is treated as a genuinely different feature, because the
+#: corpus's ``a0..a5`` are positional -- quietly accepting a near-match would
+#: attach coefficients and tree thresholds to the wrong column.
+COXAM_CORPUS_FEATURE_ALIASES: dict[str, dict[str, str]] = {
+    "wine_quality": {"chlorides": "Chlorides"},
+    "mushrooms": {"Gill Spacing": "Gill"},
+}
+
+
+def coxam_loader_feature_cols(app_id: str) -> list[str]:
+    """The corpus's feature set, spelled the way ``prepare_dataset`` needs.
+
+    The inverse of :func:`corpus_feature_names`: given the corpus's own
+    spelling and order (``COXAM_CORPUS_FEATURES``), returns what to pass as
+    ``feature_cols`` so the prepared dataset matches the corpus exactly --
+    which is what lets ``source="assets"`` run with no AI training. Order
+    matters as much as spelling, since the corpus's ``a0..a5`` are positional;
+    pass this together with ``rank_features_by_target=False``, or
+    ``prepare_dataset`` will reorder it by target correlation.
+
+    Raises:
+        KeyError: If ``app_id`` is not in the published corpus.
+    """
+    corpus = COXAM_CORPUS_FEATURES[app_id]
+    reverse = {corpus_name: loader_name for loader_name, corpus_name in
+               COXAM_CORPUS_FEATURE_ALIASES.get(app_id, {}).items()}
+    return [reverse.get(name, name) for name in corpus]
+
+
+def corpus_feature_names(app_id: str, study_feature_names: Sequence[str]) -> tuple[str, ...]:
+    """The study's feature names in the corpus's own spelling.
+
+    Names with no alias are returned unchanged, so a real mismatch still shows
+    up as a mismatch rather than being silently renamed.
+    """
+    aliases = COXAM_CORPUS_FEATURE_ALIASES.get(app_id, {})
+    return tuple(aliases.get(str(name), str(name)) for name in study_feature_names)
+
 #: How the design's xai_type vocabulary maps onto CoXAM's own CONDITIONS
 #: vocabulary (support_matrix.json declares "decision_tree" |
 #: "logistic_regression" | "hybrid"; CoXAM's CONDITIONS uses
@@ -323,7 +365,10 @@ def _check_corpus_features_match(app_id: str, study_feature_names: Sequence[str]
     if corpus is None:
         return
 
-    study = tuple(str(name) for name in study_feature_names)
+    # Compare in the corpus's spelling: the loader names a few features
+    # differently (see COXAM_CORPUS_FEATURE_ALIASES) without them being
+    # different features.
+    study = corpus_feature_names(app_id, study_feature_names)
     if study == corpus:
         return
 

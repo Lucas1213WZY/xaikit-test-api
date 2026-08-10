@@ -1,0 +1,155 @@
+{
+  "researchQuestions": "",
+  "studyDesign": {
+    "dependentVariables": [
+      {
+        "measure": "counterfactual_sim",
+        "name": "",
+        "formula": ""
+      }
+    ],
+    "modelFramework": "",
+    "independentVariables": [
+      {
+        "factor": "XAI Type",
+        "levelsOrRange": "Decision Tree | Logistic Regression | Hybrid",
+        "allocation": "Between-subjects",
+        "counterbalancing": ""
+      }
+    ],
+    "controlVariablesCV": [],
+    "randomVariablesRV": [],
+    "design": "between-subjects",
+    "dataset": "Mushroom",
+    "totalConditions": 3,
+    "betweenSubjectsCells": 3,
+    "participantsPerCondition": 20,
+    "totalParticipants": 60,
+    "trialsPerParticipant": 30,
+    "trainingTrialsPerParticipant": 0,
+    "testingTrialsPerParticipant": 30,
+    "totalTrials": 1800
+  },
+  "apparatus": [
+    {
+      "id": "ap_msnbn2ep_1",
+      "label": "Configuration 1",
+      "group": "All participants",
+      "mode": "ours",
+      "params": {
+        "elements": "instance,xai",
+        "appId": "mushrooms",
+        "showPrediction": "1",
+        "form": "LR",
+        "trainingInstanceIds": "0-9",
+        "instanceIds": "10-29"
+      },
+      "url": ""
+    },
+    {
+      "id": "ap_msnca1ag_0",
+      "label": "Configuration 2",
+      "group": "All participants",
+      "mode": "ours",
+      "params": {
+        "appId": "mushrooms",
+        "form": "DT",
+        "trainingInstanceIds": "0-9",
+        "instanceIds": "10-29",
+        "showExplanationPrediction": "1",
+        "elements": "instance,xai"
+      },
+      "url": ""
+    }
+  ],
+  "procedure": [
+    {
+      "title": "Welcome & consent",
+      "note": "Greet the participant, explain the study, and collect informed consent."
+    },
+    {
+      "title": "Demographics questionnaire",
+      "note": "Short background questions (e.g. age range, AI familiarity)."
+    },
+    {
+      "title": "Training / practice",
+      "note": "Walk through the interface with a few practice trials so the task is understood before it counts."
+    },
+    {
+      "title": "Main task (trials)",
+      "note": "The core trials where your dependent variables are collected, in the counterbalanced order from Study Design."
+    },
+    {
+      "title": "Post-task questionnaire",
+      "note": "Self-report measures (e.g. trust, workload, satisfaction)."
+    },
+    {
+      "title": "Debrief",
+      "note": "Explain the study's purpose, answer questions, and thank the participant."
+    }
+  ],
+  "userModel": "CoXAM",
+  "cognitiveAgent": "CoXAM",
+  "mlProxyBaselines": [],
+  "cognitiveConfig": {},
+  "cognitiveParameters": [
+    {
+      "key": "memory_recall_threshold",
+      "label": "Retrieval Threshold",
+      "type": "float",
+      "min": -2,
+      "max": 2,
+      "step": 0.05,
+      "note": "How easily info is retrieved from memory. Valid range depends on the task — forward simulation: -1.0 to 2.0 (default 0.5); counterfactual simulation: -2.0 to 0.5 (default -0.75).",
+      "value": null,
+      "source": "model default"
+    },
+    {
+      "key": "opportunity_cost",
+      "label": "Opportunity Cost",
+      "type": "float",
+      "min": 0,
+      "max": 0.02,
+      "step": 0.001,
+      "recommendedDefault": 0.01,
+      "note": "Accuracy-time tradeoff (computational rationality / RL). Forward simulation only.",
+      "value": null,
+      "source": "model default"
+    },
+    {
+      "key": "decision_noise",
+      "label": "Diffusion Noise",
+      "type": "float",
+      "min": 0.3,
+      "max": 0.7,
+      "step": 0.01,
+      "recommendedDefault": 0.4,
+      "note": "Stochasticity during forward simulation. Forward simulation only.",
+      "value": null,
+      "source": "model default"
+    },
+    {
+      "key": "counterfactual_overshoot_fraction",
+      "label": "Counterfactual Margin",
+      "type": "float",
+      "min": 0,
+      "max": 0.5,
+      "step": 0.01,
+      "recommendedDefault": 0.25,
+      "note": "Margin when evaluating counterfactual changes. Counterfactual simulation only.",
+      "value": null,
+      "source": "model default"
+    }
+  ],
+  "_rawAnswers": {
+    "sd_dv": "[{\"measure\":\"counterfactual_sim\",\"name\":\"\",\"formula\":\"\"}]",
+    "sd_ivs": "[{\"factor\":\"xai_type\",\"label\":\"XAI Type\",\"levels\":\"Decision Tree | Logistic Regression | Hybrid\",\"alloc\":\"Between-subjects\",\"cogParam\":\"\",\"min\":\"\",\"max\":\"\"}]",
+    "sd_conditions": "3",
+    "sd_participants": "20",
+    "sd_trials": "30",
+    "apparatus_list": "[{\"id\":\"ap_msnbn2ep_1\",\"label\":\"Configuration 1\",\"group\":\"All participants\",\"mode\":\"ours\",\"params\":{\"elements\":\"instance,xai\",\"appId\":\"mushrooms\",\"showPrediction\":\"1\",\"form\":\"LR\",\"trainingInstanceIds\":\"0-9\",\"instanceIds\":\"10-29\"},\"url\":\"\"},{\"id\":\"ap_msnca1ag_0\",\"label\":\"Configuration 2\",\"group\":\"All participants\",\"mode\":\"ours\",\"params\":{\"appId\":\"mushrooms\",\"form\":\"DT\",\"trainingInstanceIds\":\"0-9\",\"instanceIds\":\"10-29\",\"showExplanationPrediction\":\"1\",\"elements\":\"instance,xai\"},\"url\":\"\"}]",
+    "ds_dataset": "Mushroom",
+    "proc_steps": "[{\"title\":\"Welcome & consent\",\"note\":\"Greet the participant, explain the study, and collect informed consent.\"},{\"title\":\"Demographics questionnaire\",\"note\":\"Short background questions (e.g. age range, AI familiarity).\"},{\"title\":\"Training / practice\",\"note\":\"Walk through the interface with a few practice trials so the task is understood before it counts.\"},{\"title\":\"Main task (trials)\",\"note\":\"The core trials where your dependent variables are collected, in the counterbalanced order from Study Design.\"},{\"title\":\"Post-task questionnaire\",\"note\":\"Self-report measures (e.g. trust, workload, satisfaction).\"},{\"title\":\"Debrief\",\"note\":\"Explain the study's purpose, answer questions, and thank the participant.\"}]",
+    "user_model": "CoXAM"
+  }
+}

@@ -223,11 +223,15 @@ def validate_design_support(
             )
             report.add_error(raw_name, message, suggestion)
 
+    # Sim2Real varies explanation properties as one factor (xai_property), whose
+    # levels combine sparsity and robustness -- "sparse_robust" is both at once.
+    # Those combinations are only interpretable against a controlled
+    # faithfulness, so remind when the design varies properties without fixing it.
     has_faithfulness = "xai_faithfulness" in normalized_ivs or "xai_faithfulness" in normalized_semantic_cvs
-    if {"xai_robustness", "xai_sparsity"} & normalized_ivs.keys() and not has_faithfulness:
+    if "xai_property" in normalized_ivs and not has_faithfulness:
         report.add_reminder(
             "xai_faithfulness",
-            "Robustness and sparsity settings usually assume faithfulness is controlled.",
+            "Explanation-property conditions usually assume faithfulness is controlled.",
             "If you follow the Sim2Real convention, set faithfulness to 0.8 or keep it fixed outside the IV list.",
         )
 

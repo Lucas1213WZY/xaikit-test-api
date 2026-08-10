@@ -1,6 +1,6 @@
 {
   "iv_config": {
-    "xai_method": [
+    "xai_type": [
       "decision_tree",
       "logistic_regression"
     ],
@@ -11,7 +11,7 @@
   },
   "between_subjects_ivs": {},
   "within_subjects_ivs": {
-    "xai_method": [
+    "xai_type": [
       "decision_tree",
       "logistic_regression"
     ],
@@ -21,7 +21,7 @@
     ]
   },
   "block_counterbalanced_within_ivs": {
-    "xai_method": [
+    "xai_type": [
       "decision_tree",
       "logistic_regression"
     ]
@@ -48,17 +48,17 @@
     "immediate_pair_balanced": true,
     "position_counts": {
       "1": {
-        "{\"xai_method\": \"decision_tree\"}": 1,
-        "{\"xai_method\": \"logistic_regression\"}": 1
+        "{\"xai_type\": \"decision_tree\"}": 1,
+        "{\"xai_type\": \"logistic_regression\"}": 1
       },
       "2": {
-        "{\"xai_method\": \"logistic_regression\"}": 1,
-        "{\"xai_method\": \"decision_tree\"}": 1
+        "{\"xai_type\": \"logistic_regression\"}": 1,
+        "{\"xai_type\": \"decision_tree\"}": 1
       }
     },
     "immediate_pair_counts": {
-      "{\"xai_method\": \"decision_tree\"} -> {\"xai_method\": \"logistic_regression\"}": 1,
-      "{\"xai_method\": \"logistic_regression\"} -> {\"xai_method\": \"decision_tree\"}": 1
+      "{\"xai_type\": \"decision_tree\"} -> {\"xai_type\": \"logistic_regression\"}": 1,
+      "{\"xai_type\": \"logistic_regression\"} -> {\"xai_type\": \"decision_tree\"}": 1
     }
   },
   "orders": [
@@ -66,10 +66,10 @@
       "order_id": 1,
       "sequence": [
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         },
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         }
       ]
     },
@@ -77,10 +77,10 @@
       "order_id": 2,
       "sequence": [
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         },
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         }
       ]
     }
@@ -91,10 +91,10 @@
       "participantId": 1,
       "within_order": [
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         },
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         }
       ]
     },
@@ -102,10 +102,10 @@
       "participantId": 2,
       "within_order": [
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         },
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         }
       ]
     },
@@ -113,10 +113,10 @@
       "participantId": 3,
       "within_order": [
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         },
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         }
       ]
     },
@@ -124,10 +124,10 @@
       "participantId": 4,
       "within_order": [
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         },
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         }
       ]
     },
@@ -135,10 +135,10 @@
       "participantId": 5,
       "within_order": [
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         },
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         }
       ]
     },
@@ -146,10 +146,10 @@
       "participantId": 6,
       "within_order": [
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         },
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         }
       ]
     },
@@ -157,10 +157,10 @@
       "participantId": 7,
       "within_order": [
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         },
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         }
       ]
     },
@@ -168,10 +168,10 @@
       "participantId": 8,
       "within_order": [
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         },
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         }
       ]
     },
@@ -179,10 +179,10 @@
       "participantId": 9,
       "within_order": [
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         },
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         }
       ]
     },
@@ -190,10 +190,10 @@
       "participantId": 10,
       "within_order": [
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         },
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         }
       ]
     },
@@ -201,10 +201,10 @@
       "participantId": 11,
       "within_order": [
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         },
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         }
       ]
     },
@@ -212,10 +212,10 @@
       "participantId": 12,
       "within_order": [
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         },
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         }
       ]
     },
@@ -223,10 +223,10 @@
       "participantId": 13,
       "within_order": [
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         },
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         }
       ]
     },
@@ -234,10 +234,10 @@
       "participantId": 14,
       "within_order": [
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         },
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         }
       ]
     },
@@ -245,10 +245,10 @@
       "participantId": 15,
       "within_order": [
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         },
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         }
       ]
     },
@@ -256,10 +256,10 @@
       "participantId": 16,
       "within_order": [
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         },
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         }
       ]
     },
@@ -267,10 +267,10 @@
       "participantId": 17,
       "within_order": [
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         },
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         }
       ]
     },
@@ -278,10 +278,10 @@
       "participantId": 18,
       "within_order": [
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         },
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         }
       ]
     },
@@ -289,10 +289,10 @@
       "participantId": 19,
       "within_order": [
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         },
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         }
       ]
     },
@@ -300,10 +300,10 @@
       "participantId": 20,
       "within_order": [
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         },
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         }
       ]
     },
@@ -311,10 +311,10 @@
       "participantId": 21,
       "within_order": [
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         },
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         }
       ]
     },
@@ -322,10 +322,10 @@
       "participantId": 22,
       "within_order": [
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         },
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         }
       ]
     },
@@ -333,10 +333,10 @@
       "participantId": 23,
       "within_order": [
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         },
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         }
       ]
     },
@@ -344,10 +344,10 @@
       "participantId": 24,
       "within_order": [
         {
-          "xai_method": "logistic_regression"
+          "xai_type": "logistic_regression"
         },
         {
-          "xai_method": "decision_tree"
+          "xai_type": "decision_tree"
         }
       ]
     }

@@ -282,6 +282,43 @@ COXAM_COGNITIVE_PARAMS: dict[str, float] = {
 }
 
 
+#: Sim2Real's own cognitive parameters, taken from the population fitted to the
+#: study participants (``server_runs/sim2real_refit_nll``, n = 46) rather than
+#: from the model's constructor defaults -- the same choice
+#: ``FITTED_COAX_PARAMS`` makes, so an unconfigured run starts from fitted
+#: values instead of arbitrary ones.
+#:
+#: Deliberately only the *condition-agnostic* half. The other six --
+#: ``confidence_scale``, ``confidence_intercept``, ``comparison_scale``,
+#: ``comparison_intercept``, ``aggregation`` and ``max_features_attended`` --
+#: were fitted separately for each explanation property and live in
+#: ``FITTED_SIM2REAL_PARAMS``. Returning them here would *overwrite* that fit:
+#: ``fitted_sim2real_params(exp_property, **overrides)`` lets overrides win, so
+#: a "default" carrying a pooled ``comparison_scale`` would replace each
+#: condition's own fitted scale with an average across conditions whose fitted
+#: scales range from 2.7 to 3975.
+SIM2REAL_COGNITIVE_PARAMS: dict[str, Any] = {
+    # Not fitted: the run these came from pinned both to 0, because the
+    # guessing grid is a separate question about the sparse condition and an
+    # 18x multiplier on the search. Treat as unset, not as estimated.
+    "guess_bias": 0.0,
+    "lapse_rate": 0.0,
+    # 32 of 46 participants fit better without memory, so the population
+    # default is off -- but this is the parameter that varies most by
+    # condition (robust 0%, faithful 42%, sparse 58%), and a per-condition
+    # value beats this one wherever the condition is known.
+    "use_exemplar_memory": False,
+    # Only value searched.
+    "retrieval_threshold": None,
+    # Mean over the 14 participants whose fit switched memory on; the 32 with
+    # memory off never read it. Pooling all 46 would drag it toward the 1.0
+    # that memory-off candidates carry as a placeholder.
+    "memory_sensitivity": 3.2143,
+    # Only value searched.
+    "memory_decay": 0.5,
+}
+
+
 def default_cognitive_params(
     cognitive_model_id: Optional[str] = None,
     *,
@@ -291,20 +328,29 @@ def default_cognitive_params(
 
     Args:
         cognitive_model_id: Agent the defaults are for. ``coxam`` returns
-            CoXAM's own parameters; anything else (including ``None``) returns
-            the CoAX-shaped placeholder set, which is what the placeholder/CoAX
-            paths have always used.
+            CoXAM's own parameters and ``sim2real`` returns
+            :data:`SIM2REAL_COGNITIVE_PARAMS`; anything else (including
+            ``None``) returns the CoAX-shaped placeholder set, which is what
+            the placeholder/CoAX paths have always used.
         tasks: User tasks the design runs, e.g. ``["forward_simulation"]``.
             CoXAM runs forward and counterfactual simulation as two separate
             trained agents with different parameters, so this trims the result
-            to the ones that apply. Omit for both sets.
+            to the ones that apply. Omit for both sets. Sim2Real is
+            counterfactual-only and ignores it.
 
-    CoAX and CoXAM take disjoint parameters, so one shared default dict cannot
-    be valid for both -- the CoAX-shaped ``cog_retrieval_threshold=-0.3`` sits
-    outside CoXAM's supported range and used to make every coxam design report
-    a validation error.
+    The three agents take disjoint parameters, so one shared default dict
+    cannot be valid for any two of them. The CoAX-shaped
+    ``cog_retrieval_threshold=-0.3`` sits outside CoXAM's supported range and
+    used to make every coxam design report a validation error; the same set
+    reaching a sim2real design was worse than a range error, because
+    ``Sim2RealFittedAttributionSum`` accepts none of those names at all -- they
+    are ACT-R encoding and drift-diffusion *timing* parameters, and its model
+    has no timing component.
     """
-    if str(cognitive_model_id or "").strip().lower().replace("-", "_") == "coxam":
+    normalized = str(cognitive_model_id or "").strip().lower().replace("-", "_")
+    if normalized == "sim2real":
+        return dict(SIM2REAL_COGNITIVE_PARAMS)
+    if normalized == "coxam":
         requested = {str(task).strip().lower() for task in (tasks or [])}
         if not requested:
             return dict(COXAM_COGNITIVE_PARAMS)

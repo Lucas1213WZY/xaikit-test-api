@@ -27,10 +27,12 @@ from typing import Iterable, Mapping, Optional, Sequence
 import numpy as np
 import pandas as pd
 
-from .sim2real_fitted_attribution_sum import (
+from .sim2real.gcm_strategies import (
     REPO_ROOT,
     Sim2RealAttributionProjector,
     Sim2RealFittedAttributionSum,
+    Sim2RealFittedSalientFeatures,
+    Sim2RealFittedSensitiveFeatures,
 )
 
 
@@ -44,9 +46,27 @@ EXP_PROPERTY_BY_EXPLANATION_TYPE = {
 HUMAN_TEST_QUESTION_TYPE = "our_prop_good_under_model"
 
 
+#: The strategies a candidate can name, and the class each builds.
+STRATEGY_CLASSES = {
+    "attribution_sum": Sim2RealFittedAttributionSum,
+    "sensitive_features": Sim2RealFittedSensitiveFeatures,
+    "salient_features": Sim2RealFittedSalientFeatures,
+}
+
+#: Strategies that classify by exemplar similarity over feature values.
+GCM_STRATEGIES = ("sensitive_features", "salient_features")
+
+
 @dataclass(frozen=True)
 class AttributionSumCandidate:
-    """One discrete/continuous cognitive-model parameter candidate."""
+    """One cognitive-model parameter candidate, for any of the strategies.
+
+    One dataclass covers all three so that a single grid can be searched and a
+    single BIC compares them. Fields belonging to a strategy the candidate does
+    not name are pinned to their defaults by :func:`candidate_grid`, so the
+    space holds no duplicates and ``count_free_parameters`` never charges a
+    candidate for a parameter its own model cannot read.
+    """
 
     aggregation: str
     normalize_by_i_max: bool
@@ -60,10 +80,27 @@ class AttributionSumCandidate:
     memory_sensitivity: float = 1.0
     memory_decay: float = 0.5
     retrieval_threshold: Optional[float] = None
+    strategy: str = "attribution_sum"
+    k: int = 3
+    sensitivity: float = 10.0
+    always_attend_changed: bool = True
 
 
 #: Fields that only affect a candidate when its exemplar memory is switched on.
 MEMORY_ONLY_FIELDS = ("memory_sensitivity", "memory_decay", "retrieval_threshold")
+
+#: Fields only the attribution-sum model reads.
+ATTRIBUTION_ONLY_FIELDS = (
+    "aggregation",
+    "normalize_by_i_max",
+    "confidence_scale",
+    "confidence_intercept",
+    "max_features_attended",
+    "use_exemplar_memory",
+) + MEMORY_ONLY_FIELDS
+
+#: Fields only the exemplar-similarity strategies read.
+GCM_ONLY_FIELDS = ("k", "sensitivity", "always_attend_changed")
 
 #: Parameters the training-case logistic learns for every candidate.
 LEARNED_PARAMETER_NAMES = ("comparison_scale", "comparison_intercept")
@@ -248,11 +285,11 @@ def attach_test_instances(
 
 def candidate_grid(
     *,
-    aggregations: Sequence[str] = ("attribution",),
-    normalize_options: Sequence[bool] = (False,),
-    confidence_scales: Sequence[float] = (0.25, 0.5, 1.0, 2.0, 4.0, 8.0),
-    confidence_intercepts: Sequence[float] = (-2.0, -1.0, 0.0, 1.0, 2.0),
-    comparison_cs: Sequence[float] = (1e6,),
+    aggregations: Sequence[str] = ("attribution", "value_weighted"),
+    normalize_options: Sequence[bool] = (False, True),
+    confidence_scales: Sequence[float] = (0.5, 2.0, 8.0, 32.0, 128.0),
+    confidence_intercepts: Sequence[float] = (-1.0, 0.0, 1.0),
+    comparison_cs: Sequence[float] = (1e2, 1e4, 1e6, 1e8),
     max_features_attended_options: Sequence[int] = (4, 12),
     guess_biases: Sequence[float] = (0.0,),
     lapse_rates: Sequence[float] = (0.0,),
@@ -260,15 +297,31 @@ def candidate_grid(
     memory_sensitivities: Sequence[float] = (1.0, 2.0, 4.0),
     memory_decays: Sequence[float] = (0.5,),
     retrieval_thresholds: Sequence[Optional[float]] = (None,),
+    strategies: Sequence[str] = ("attribution_sum",),
+    ks: Sequence[int] = (2, 3, 5, 8),
+    sensitivities: Sequence[float] = (1.0, 4.0, 10.0, 20.0),
+    always_attend_changed_options: Sequence[bool] = (True,),
 ) -> list[AttributionSumCandidate]:
     """Construct the deterministic candidate space used for fitting.
 
-    The defaults are the trimmed space: ``aggregation``, ``normalize_by_i_max``
-    and ``comparison_C`` are pinned because a full sweep showed they never buy
-    enough negative log likelihood to pay for themselves under BIC, while
-    ``max_features_attended`` is kept at two values because it also decides
-    which features get stored as exemplars.  Candidates whose memory is off are
-    collapsed onto the default memory settings so the grid holds no duplicates.
+    ``aggregation``, ``normalize_by_i_max`` and ``comparison_C`` used to be
+    pinned here on the grounds that they never bought enough negative log
+    likelihood to pay for themselves under BIC.  A later refit contradicted
+    that -- pinning them made NLL worse in all four conditions -- so they are
+    searched again.
+
+    ``confidence_scale`` and ``comparison_C`` both reach further than the
+    values that produced the earlier fits, which pinned 72% of participants at
+    the top ``confidence_scale`` and 74% at the top ``comparison_C``.  A fit
+    sitting on a grid boundary is a fit the grid cut off, so the boundary has
+    to sit past where participants actually land.
+
+    Cost is roughly 0.2 s per (property, candidate); the evaluator caches on
+    that pair, so a run costs ``4 x len(grid)`` evaluations regardless of how
+    many participants share a condition.  ``condition_specific_candidate_grids``
+    multiplies the sparse condition by 18, so check the arithmetic before
+    combining the two.  Candidates whose memory is off are collapsed onto the
+    default memory settings so the grid holds no duplicates.
     """
     candidates = [
         AttributionSumCandidate(
@@ -305,6 +358,54 @@ def candidate_grid(
             retrieval_thresholds,
         )
     ]
+
+    # The exemplar-similarity strategies read none of the attribution fields, so
+    # those stay at their defaults rather than multiplying the space with
+    # duplicates. ``guess_bias``/``lapse_rate``/memory settings are shared, so
+    # they keep sweeping across every strategy and remain comparable.
+    for strategy in strategies:
+        if strategy == "attribution_sum":
+            continue
+        if strategy not in STRATEGY_CLASSES:
+            raise ValueError(
+                f"Unknown strategy {strategy!r}. Known: {sorted(STRATEGY_CLASSES)}."
+            )
+        candidates.extend(
+            AttributionSumCandidate(
+                aggregation="attribution",
+                normalize_by_i_max=False,
+                confidence_scale=1.0,
+                confidence_intercept=0.0,
+                comparison_C=float(comparison_c),
+                max_features_attended=12,
+                guess_bias=float(guess_bias),
+                lapse_rate=float(lapse_rate),
+                use_exemplar_memory=False,
+                memory_sensitivity=1.0,
+                memory_decay=float(memory_decay),
+                retrieval_threshold=(
+                    None if retrieval_threshold is None else float(retrieval_threshold)
+                ),
+                strategy=strategy,
+                k=int(k),
+                sensitivity=float(sensitivity),
+                always_attend_changed=bool(always_attend),
+            )
+            for comparison_c, guess_bias, lapse_rate, memory_decay, retrieval_threshold, k, sensitivity, always_attend
+            in product(
+                comparison_cs,
+                guess_biases,
+                lapse_rates,
+                memory_decays,
+                retrieval_thresholds,
+                ks,
+                sensitivities,
+                always_attend_changed_options,
+            )
+        )
+
+    if "attribution_sum" not in strategies:
+        candidates = [c for c in candidates if c.strategy != "attribution_sum"]
     return list(dict.fromkeys(candidates))
 
 
@@ -350,11 +451,19 @@ def count_free_parameters(
         for field in asdict(candidate)
         if len({getattr(item, field) for item in candidates}) > 1
     }
+    unreadable = (
+        set(ATTRIBUTION_ONLY_FIELDS)
+        if candidate.strategy in GCM_STRATEGIES
+        else set(GCM_ONLY_FIELDS)
+    )
     charged = {
         field
         for field in varying
-        if field not in MEMORY_ONLY_FIELDS or candidate.use_exemplar_memory
+        if field not in unreadable
+        and (field not in MEMORY_ONLY_FIELDS or candidate.use_exemplar_memory)
     }
+    # ``strategy`` itself is charged when more than one competes, because
+    # picking the strategy per participant is a fitted choice like any other.
     return len(LEARNED_PARAMETER_NAMES) + len(charged)
 
 
@@ -385,6 +494,45 @@ class TrainedCandidateEvaluator:
             )
         return self._pair_cache[key]
 
+    def _build_model(self, candidate: AttributionSumCandidate):
+        """Instantiate the strategy this candidate names.
+
+        The exemplar-similarity strategies take a different constructor from
+        the attribution-sum model -- they never see an explanation weight, and
+        they need ``k``/``sensitivity`` for the GCM -- so the shared candidate
+        is unpacked per strategy rather than splatted.
+        """
+        if candidate.strategy in GCM_STRATEGIES:
+            return STRATEGY_CLASSES[candidate.strategy](
+                k=candidate.k,
+                sensitivity=candidate.sensitivity,
+                always_attend_changed=candidate.always_attend_changed,
+                comparison_C=candidate.comparison_C,
+                guess_bias=candidate.guess_bias,
+                lapse_rate=candidate.lapse_rate,
+                memory_decay=candidate.memory_decay,
+                retrieval_threshold=candidate.retrieval_threshold,
+            )
+        if candidate.strategy != "attribution_sum":
+            raise ValueError(
+                f"Unknown strategy {candidate.strategy!r}. "
+                f"Known: {sorted(STRATEGY_CLASSES)}."
+            )
+        return Sim2RealFittedAttributionSum(
+            confidence_scale=candidate.confidence_scale,
+            confidence_intercept=candidate.confidence_intercept,
+            comparison_C=candidate.comparison_C,
+            guess_bias=candidate.guess_bias,
+            lapse_rate=candidate.lapse_rate,
+            aggregation=candidate.aggregation,
+            max_features_attended=candidate.max_features_attended,
+            use_exemplar_memory=candidate.use_exemplar_memory,
+            memory_sensitivity=candidate.memory_sensitivity,
+            memory_decay=candidate.memory_decay,
+            retrieval_threshold=candidate.retrieval_threshold,
+            missing_attributions=self.missing_attributions,
+        )
+
     def evaluate(
         self,
         exp_property: str,
@@ -410,20 +558,7 @@ class TrainedCandidateEvaluator:
             self._inference_cache[key] = inference
             return inference
 
-        model = Sim2RealFittedAttributionSum(
-            confidence_scale=candidate.confidence_scale,
-            confidence_intercept=candidate.confidence_intercept,
-            comparison_C=candidate.comparison_C,
-            guess_bias=candidate.guess_bias,
-            lapse_rate=candidate.lapse_rate,
-            aggregation=candidate.aggregation,
-            max_features_attended=candidate.max_features_attended,
-            use_exemplar_memory=candidate.use_exemplar_memory,
-            memory_sensitivity=candidate.memory_sensitivity,
-            memory_decay=candidate.memory_decay,
-            retrieval_threshold=candidate.retrieval_threshold,
-            missing_attributions=self.missing_attributions,
-        )
+        model = self._build_model(candidate)
         training_pairs = self._pairs(
             exp_property,
             candidate.normalize_by_i_max,
@@ -531,6 +666,13 @@ def _binary_metrics(
     probabilities = np.clip(np.asarray(probabilities, dtype=float), 1e-12, 1 - 1e-12)
     labels = np.asarray(labels, dtype=int)
     predictions = (probabilities >= 0.5).astype(int)
+    # Bernoulli NLL of the *participant's response*, never of correctness --
+    # the same quantity CoXAM's fit_rl_agent_to_participant notebook computes in
+    # ``_bernoulli_nll_from_response_probs``, which likewise scores
+    # ``_select_prob_of_response`` and states that ground-truth labels are not
+    # used anywhere in the likelihood. CoXAM reports the sum; both are returned
+    # here because BIC needs the sum and cross-participant comparison needs the
+    # per-trial mean.
     total_nll = float(-np.sum(
         labels * np.log(probabilities)
         + (1 - labels) * np.log(1 - probabilities)
@@ -539,7 +681,11 @@ def _binary_metrics(
         "nll": total_nll / len(labels),
         "total_nll": total_nll,
         "n_parameters": float(n_parameters),
-        # CoAX's evaluator formula: n_parameters * log(n) + 2 * total_nll.
+        # Standard BIC, k*ln(n) - 2*LL with LL = -total_nll. Neither CoAX nor
+        # CoXAM ships a BIC: CoXAM's notebook selects on NLL (plus an optional
+        # timing term) via GP-BO, and the repo holds only CoAX's fitted output
+        # CSV, not its fitting code. So this penalty is local to this fitter --
+        # see _candidate_sort_key, which selects on it.
         "bic": float(n_parameters * np.log(len(labels)) + 2.0 * total_nll),
         "accuracy": float(np.mean(predictions == labels)),
         "brier": float(np.mean((probabilities - labels) ** 2)),
@@ -572,9 +718,31 @@ def _candidate_sort_key(
     metrics: dict[str, float],
     candidate: AttributionSumCandidate,
 ) -> tuple:
+    """Rank candidates by goodness of fit, i.e. maximum likelihood.
+
+    NLL leads because this search *is* the parameter estimation: the candidate
+    it picks is the maximum-likelihood parameterization, the ``L-hat`` that
+    ``BIC = -2 ln(L-hat) + k ln(n)`` is defined in terms of. It is also what
+    CoXAM's own participant fits select on -- ``bernoulli_nll`` over the
+    probability assigned to the participant's response, in all three of its
+    fitting notebooks.
+
+    BIC is therefore *not* a selection criterion here and must not be used as
+    one: ranking parameterizations by BIC would evaluate it away from the
+    likelihood maximum, which is not the quantity the formula defines. It is
+    computed from the winning fit and reported, and its job is comparing whole
+    *models* -- different strategies, with different parameter counts -- on the
+    same data. The remaining entries only order candidates that tie on
+    likelihood, preferring the cheaper and more canonical one.
+
+    Worth knowing when reading the numbers: the grid is selected against the
+    same test trials it is scored on, so the winning NLL is a selection score
+    rather than a held-out one. Only ``comparison_scale`` and
+    ``comparison_intercept`` are learned on the training cases.
+    """
     return (
-        metrics["bic"],
         metrics["nll"],
+        metrics["bic"],
         -metrics["accuracy"],
         metrics["brier"],
         candidate.aggregation != "attribution",
@@ -873,6 +1041,28 @@ def build_argument_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--assets-root", default=None)
     parser.add_argument(
+        "--strategies",
+        default="attribution_sum",
+        help=(
+            "Comma-separated subset of attribution_sum,sensitive_features,"
+            "salient_features. The exemplar-similarity strategies read feature "
+            "values instead of the explanation, so they still separate the "
+            "original from the counterfactual when the changed feature has no "
+            "visible attribution. Each participant is fitted to whichever "
+            "strategy reaches the lowest NLL."
+        ),
+    )
+    parser.add_argument(
+        "--ks",
+        default="2,3,5,8",
+        help="Attended-feature counts searched by the exemplar strategies",
+    )
+    parser.add_argument(
+        "--sensitivities",
+        default="1,4,10,20",
+        help="GCM similarity sensitivities searched by the exemplar strategies",
+    )
+    parser.add_argument(
         "--aggregations",
         default="attribution",
     )
@@ -1002,7 +1192,14 @@ def main(argv: Iterable[str] | None = None) -> int:
             for item in args.retrieval_thresholds.split(",")
             if item.strip()
         ),
+        strategies=tuple(
+            item.strip() for item in args.strategies.split(",") if item.strip()
+        ),
+        ks=tuple(int(item.strip()) for item in args.ks.split(",") if item.strip()),
+        sensitivities=_parse_float_list(args.sensitivities),
     )
+    if not grid_options["strategies"]:
+        raise ValueError("--strategies must name at least one strategy")
     if not grid_options["memory_options"]:
         raise ValueError("--memory-options must include off and/or on")
     candidates = candidate_grid(**grid_options)

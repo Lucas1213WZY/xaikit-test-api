@@ -1,0 +1,5 @@
+dataId,modelName,expMethod,instanceId,pred,i_max,a0_i,a1_i,a2_i,a3_i,a4_i,intercept
+wine_quality,mlp,decision_tree,19,0,1.0,1.0,1.0,0.0,0.0,0.0,0.0
+wine_quality,mlp,decision_tree,231,0,1.0,1.0,1.0,0.0,0.0,0.0,0.0
+wine_quality,mlp,decision_tree,1130,0,1.0,1.0,1.0,0.0,0.0,0.0,0.0
+wine_quality,mlp,decision_tree,451,0,1.0,1.0,1.0,0.0,0.0,0.0,0.0

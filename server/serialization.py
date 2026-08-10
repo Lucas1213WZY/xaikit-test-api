@@ -78,12 +78,20 @@ def frame_payload(
 
 def analysis_payload(result: Any) -> dict[str, Any]:
     """One ``IVDVAnalysisResult`` as descriptives plus the inferential test."""
+    from src.result_visualizer import pretty
+
     inferential = result.inferential
+    descriptives = frame_records(result.descriptives)
+    for row in descriptives:
+        if result.iv in row:
+            row["level_label"] = pretty(row[result.iv])
     payload: dict[str, Any] = {
         "iv": result.iv,
+        "iv_label": pretty(result.iv),
         "dv": result.dv,
+        "dv_label": pretty(result.dv),
         "method": result.method,
-        "descriptives": frame_records(result.descriptives),
+        "descriptives": descriptives,
         "participant_level_data": frame_records(result.participant_level_data),
         "inferential": {"formula": getattr(inferential, "formula", None)},
     }
@@ -98,6 +106,22 @@ def analysis_payload(result: Any) -> dict[str, Any]:
     if groups is not None:
         payload["inferential"]["groups"] = str(groups)
     return payload
+
+
+def posthoc_payload(result: Any) -> dict[str, Any]:
+    """One ``PostHocResult`` as a table of pairwise condition comparisons."""
+    from src.result_visualizer import prettify_condition_label
+
+    comparisons = frame_records(result.table)
+    for row in comparisons:
+        if "condition_a" in row:
+            row["condition_a_label"] = prettify_condition_label(row["condition_a"])
+        if "condition_b" in row:
+            row["condition_b_label"] = prettify_condition_label(row["condition_b"])
+    return {
+        "method": result.method,
+        "comparisons": comparisons,
+    }
 
 
 def report_payload(report: Any) -> dict[str, Any]:

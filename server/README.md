@@ -41,7 +41,8 @@ POST /api/studies/{id}/simulate       virtual participants               -> job
 GET  /api/jobs/{job_id}               state, elapsed, captured log, result
 GET  /api/studies/{id}/results        step rows as JSON (phase/participant/limit/offset)
 GET  /api/studies/{id}/results.csv    the same rows as a CSV attachment
-POST /api/studies/{id}/analysis       analyze_iv_dv per IV x DV
+POST /api/studies/{id}/analysis       analyze_iv_dv per IV x DV -- condition means + omnibus p-value
+POST /api/studies/{id}/posthoc        pairwise_condition_tests -- pairwise condition means + corrected p-values
 POST /api/studies/{id}/plots/interaction   one DV by two IVs
 POST /api/studies/{id}/plots/grid          every DV by every IV
 ```
@@ -53,9 +54,25 @@ LIME/SHAP generation outlast any sensible request timeout — so poll
 
 Anything the design export already answers can be omitted from a request body:
 dataset id, participants per condition, XAI methods and DVs are read from the
-export. `userModel` in the export selects the participant runner — `"CoAX"`
-routes to `run_coax_study`, anything else to `study.run_experiment` with a
-baseline model.
+export. `userModel` in the export selects the participant runner:
+
+| `userModel` | runner |
+| --- | --- |
+| `"CoAX"` **without** an `xai_property` IV | `run_coax_study` |
+| `"CoAX"` **with** an `xai_property` IV, or `"CoAX (XAI Property)"` | `run_sim2real_study` |
+| `"CoXAM"` | `run_coxam_study` |
+| `"Sim2Real"` | `run_sim2real_study` |
+| anything else, e.g. `"KNN"` | `study.run_experiment` with that baseline model |
+
+The first row is not a typo: a Sim2Real design's cognitive model is a
+CoAX-derived attribution sum, so the UI genuinely exports `userModel: "CoAX"`
+for it — the `xai_property` IV (faithful/sparse/robust/sparse_robust) is what
+tells the two apart. `"CoAX (XAI Property)"` is the UI's own disambiguated
+label for the same thing and resolves the same way, whether or not the IV
+itself parsed. Routing lives in `DesignExport.resolved_framework`
+(`src/experiment_planner/design_export.py`) — call that directly rather than
+inspecting `userModel` yourself if you need to know which runner a design will
+use.
 
 ## Case-by-case simulation
 
@@ -83,7 +100,80 @@ The plot endpoints return the participant-level aggregate the plot helpers drew
 (`mean`, `std`, `sem`, `count` per cell), so the UI can render it with its own
 chart library. Pass `"include_png": true` to also get a base64 PNG.
 
-## CoAX parameters
+## Matching the apparatus: instance ids and existing corpora
+
+A design export's `apparatus[]` array declares which instances the
+participant-facing UI actually showed people, one entry per configuration
+(e.g. one per condition):
+
+```jsonc
+"apparatus": [
+  {"params": {"form": "LR", "instanceIds": "1-20"}},
+  {"params": {"form": "DT", "instanceIds": "1-20", "trainingInstanceIds": "0-9"}}
+]
+```
+
+`DesignExport.apparatus_instance_ids` / `apparatus_training_instance_ids` parse
+every entry's `instanceIds` / `trainingInstanceIds` (`"10-19"` or `"1,3,5-9"`,
+both ends inclusive) and union them across entries — an entry with no `params`
+contributes nothing rather than erroring. `POST /trials` defaults
+`allowed_instance_ids` to the union of both, so simulated trials reference
+exactly the instances a human participant was shown, without the caller
+repeating that JSON. Pass an explicit list (or `[]`) to override.
+
+**`/dataset` skips AI training whenever a published corpus already covers the
+design**, so the whole run — dataset through simulate — uses zero training
+compute and reads only what already exists in `assets/`:
+
+* **Sim2Real, always.** Its simulation reads a fixed corpus, never
+  `trained_ai_model`.
+* **CoXAM, when the dataset is one its corpus covers** (`wine_quality`,
+  `mushrooms`, …, `COXAM_CORPUS_FEATURES`). `prepare_dataset` is also routed
+  onto that corpus's own feature set automatically — see the next section —
+  so `run_coxam_study(source="assets")` can read its predictions and DT/LR
+  surrogates with nothing trained. A CoXAM dataset the corpus does *not* cover
+  still trains, since only `source="fit"` can serve it.
+
+When training is skipped, `/dataset`'s response has `"model": null` and
+`"model_skipped_reason"` explaining why — check that field rather than
+assuming; a dataset just outside the corpus trains normally. `POST /simulate`'s
+`coxam_source` follows the same signal: unset, it resolves to `"assets"` when
+no model was trained and `"fit"` when one was, so a plain `{"mode":
+"whole_experiment"}` body works either way without the caller tracking what
+`/dataset` did.
+
+**CoXAM never needs `POST /explanations`.** `run_coxam_study` builds its own
+DT/LR surrogates internally (from a trained model, or from the corpus) and
+never reads `study.combined_explanations` — the table that endpoint produces.
+Calling it for a CoXAM design when training was skipped will fail outright (no
+model for LIME/SHAP to explain); for CoAX or a baseline it is still required,
+since those runners do read that table.
+
+**CoXAM's feature-set trap.** `prepare_dataset`'s ordinary default and the
+published corpus disagree — for `wine_quality`, the loader's usual 5-feature
+default omits `Chlorides`, which the corpus needs as its 6th, positional
+feature (`a0..a5`). Passing `cognitive_model_id="coxam"` to `prepare_dataset`
+(which `/dataset` does automatically from the design's resolved framework)
+routes onto the corpus's exact feature set and disables target-ranking, which
+would otherwise reorder them. CoAX has its own, separately-fixed 5-feature
+corpus for the same datasets — this defaulting is CoXAM-specific and does not
+touch CoAX.
+
+## Cognitive parameters
+
+**Every design needs `/dataset` called before `/trials`**, including CoXAM and
+Sim2Real: `generate_trials()` requires a prepared dataset regardless of which
+participant runner ends up simulating.
+
+A design export uses one of two shapes for parameter overrides, and both are
+read: the older `cognitiveConfig: {"Display Label": "string value"}` map, and
+a newer `cognitiveParameters: [{key, label, min, max, value, source, ...}]`
+list where `key` is already the agent's own parameter name and `value: null`
+means "use the model default." Both can be present; a shared key in
+`cognitiveParameters` wins, since it is the more specific, already-resolved
+source.
+
+### CoAX
 
 Left unset, strategies are built from `FITTED_COAX_PARAMS` in
 `src/virtual_experiment_executor/experiment_simualtion/CoAX/coax_study_runner.py`
@@ -102,7 +192,66 @@ through:
 }
 ```
 
-`coax_strategies` overrides which strategy serves an `xai_type` at all.
+`coax_strategies` overrides which strategy serves an `xai_type` at all. CoAX's
+parameters are nested per `(xai_type, tested_w_xai)` condition, so — unlike
+CoXAM and Sim2Real below — a design export's flat `cognitiveConfig` is **not**
+applied to CoAX; `coax_params`/`coax_strategies` on the `/simulate` request
+body are the only way to set them.
+
+### CoXAM (`coxam_eval_params`) and Sim2Real (`sim2real_params`)
+
+Both take a flat `{name: value}` map, and both accept **either** the agent's
+own parameter name or the design-export UI's display label — the same
+resolver the design export itself uses
+(`src.experiment_planner.design_export.normalize_cognitive_params`), so a
+`cognitiveConfig` block from the UI and a request body built by hand behave
+identically:
+
+```jsonc
+// equivalent
+{"sim2real_params": {"Max Features Attended": "4", "Aggregation Strategy": "value_weighted"}}
+{"sim2real_params": {"max_features_attended": 4, "aggregation": "value_weighted"}}
+```
+
+String values are coerced to numbers/bools; a label that resolves to a name
+the agent does not read is passed through with a warning in the design's
+validation report rather than being dropped, so a typo does not silently
+disappear.
+
+If a design was created via `POST /api/studies` with a `cognitiveConfig`
+block, that already resolved and coerced the values onto the study
+(`study.cognitive_params`) — **but `/simulate` does not read them
+automatically**; the same values (or your own overrides) must be repeated in
+`coxam_eval_params` / `sim2real_params` on the `/simulate` request body, or the
+agent runs on its defaults with no error.
+
+CoXAM's evaluation-time parameters:
+
+| parameter | UI label | range | default |
+| --- | --- | --- | --- |
+| `decision_noise` | Diffusion Noise | 0.3 – 0.7 | 0.4 |
+| `memory_recall_threshold` | Retrieval Threshold | −1.0 – 2.0 (forward) / −2.0 – 0.5 (counterfactual) | 0.5 / −0.75 |
+| `opportunity_cost` | Opportunity Cost | 0.0 – 0.02 | 0.01 |
+| `random_response_rate` | — | 0.1 – 0.5 | 0.3 |
+| `counterfactual_overshoot_fraction` | Counterfactual Margin | 0.0 – 0.5 | 0.25 |
+| `time_penalty_weight` | — | 0.0 – 0.02 | 0.01 |
+
+`memory_recall_threshold`'s range depends on the task (forward vs.
+counterfactual) — there is no one bound that is safe for both. None of these
+are clamped server-side today; an out-of-range value is passed straight to the
+environment.
+
+Sim2Real's three UI-exposed parameters (population-fitted, n = 46):
+
+| parameter | UI label | evidence-supported range | default |
+| --- | --- | --- | --- |
+| `max_features_attended` | Max Features Attended | 1 – 12 (hard bound) | 4 |
+| `aggregation` | Aggregation Strategy | `attribution` \| `value_weighted` | `value_weighted` |
+| `confidence_intercept` | Confidence Responsiveness | −3.0 – 1.0 (no hard bound) | −1.5 |
+
+`confidence_intercept` is presented as "responsiveness" for what it does, not
+its name: more negative moves the model onto the steep part of its own
+confidence curve, so it reacts *more*, not less, to a changed feature.
 
 ## Authentication
 

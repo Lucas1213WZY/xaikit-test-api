@@ -12,10 +12,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Optional, Sequence
 
+import numpy as np
 import pandas as pd
 
 from src.api import xaikitTest
 from src.cognitive_models import is_baseline_model_id, normalize_baseline_model_id
+from src.experiment_planner.design_export import normalize_cognitive_params
 from src.cognitive_models.baseline_models import BASELINE_MODEL_IDS
 from src.result_visualizer import plot_dv_by_two_ivs, plot_iv_dv_grid
 from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_study_runner import (
@@ -24,6 +26,9 @@ from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_study_runne
 )
 from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_study_runner import (
     run_coxam_study,
+)
+from src.virtual_experiment_executor.experiment_simualtion.Sim2Real.sim2real_study_runner import (
+    run_sim2real_study,
 )
 
 from .schemas import (
@@ -39,6 +44,7 @@ from .serialization import (
     frame_payload,
     frame_records,
     jsonable,
+    posthoc_payload,
     report_payload,
 )
 
@@ -46,6 +52,7 @@ from .serialization import (
 #: participant runner that serves them.
 COAX_FRAMEWORKS = {"coax"}
 COXAM_FRAMEWORKS = {"coxam"}
+SIM2REAL_FRAMEWORKS = {"sim2real"}
 
 #: Frameworks the UI can select that have no runner yet. Named so the design is
 #: rejected outright rather than quietly falling through to the placeholder.
@@ -53,8 +60,21 @@ UNSUPPORTED_FRAMEWORKS: set[str] = set()
 
 
 def design_framework(study: xaikitTest) -> str:
-    """The design's ``userModel`` value, normalized for lookup."""
-    raw = str(getattr(study.design_export, "model_framework", "") or "")
+    """Which agent this design actually runs, as a canonical id.
+
+    Delegates to ``DesignExport.resolved_framework`` rather than re-deriving it
+    from the raw ``userModel`` string. That matters for two real UI values:
+    ``userModel: "CoAX"`` on a design that varies ``xai_property`` is a Sim2Real
+    study (its cognitive model is a CoAX-derived attribution sum, but it runs
+    the Sim2Real fitted model), and ``userModel: "CoAX (XAI Property)"`` slugifies
+    to ``coax_xai_property`` -- matching neither "coax" nor "sim2real" -- so both
+    would silently fall through to the generic baseline runner without this.
+    """
+    design = getattr(study, "design_export", None)
+    resolved = getattr(design, "resolved_framework", "") if design is not None else ""
+    if resolved:
+        return str(resolved)
+    raw = str(getattr(design, "model_framework", "") or "")
     return raw.strip().lower().replace("-", "_").replace(" ", "_")
 
 
@@ -81,7 +101,8 @@ def resolve_baseline_model_id(study: xaikitTest, requested: Optional[str]) -> Op
         return requested
 
     framework = design_framework(study)
-    if not framework:
+    if not framework or framework in COAX_FRAMEWORKS | COXAM_FRAMEWORKS | SIM2REAL_FRAMEWORKS:
+        # Has a real participant runner; nothing for the baseline path to resolve.
         return None
     if is_baseline_model_id(framework):
         return framework
@@ -126,19 +147,47 @@ def study_design_payload(study: xaikitTest) -> dict[str, Any]:
 
 def participant_runner(study: xaikitTest) -> str:
     """Which virtual-participant runner this design's ``userModel`` selects."""
-    framework = str(getattr(study.design_export, "model_framework", "") or "").strip().lower()
+    framework = design_framework(study)
     if framework in COAX_FRAMEWORKS:
         return "coax"
     if framework in COXAM_FRAMEWORKS:
         return "coxam"
+    if framework in SIM2REAL_FRAMEWORKS:
+        return "sim2real"
     return "baseline"
 
 
 # -- stage 1: dataset + AI model -----------------------------------------
 
 
+def _coxam_corpus_covers(dataset_id: str) -> bool:
+    """Whether CoXAM shipped a published corpus for this dataset."""
+    from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_trial_executor import (
+        COXAM_CORPUS_FEATURES,
+    )
+
+    return dataset_id in COXAM_CORPUS_FEATURES
+
+
 def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[str, Any]:
-    """Prepare the dataset and train the AI model that will be explained."""
+    """Prepare the dataset and, where a published corpus makes it unnecessary,
+    skip training the AI model it would otherwise explain.
+
+    ``generate_trials()`` needs a prepared dataset regardless of participant
+    runner, so this always calls ``prepare_dataset``. Training is skipped for:
+
+    * **Sim2Real**, always -- its simulation reads a fixed published corpus,
+      not ``study.trained_ai_model`` (see ``run_sim2real_study``'s own
+      docstring).
+    * **CoXAM**, when the dataset is one its corpus covers -- ``prepare_dataset``
+      already routed onto that corpus's own feature set (see
+      ``xaikitTest.prepare_dataset``'s ``cognitive_model_id``), and
+      ``run_coxam_study(source="assets")`` reads the corpus's own AI
+      predictions and DT/LR surrogates, never ``trained_ai_model``. Training
+      here would be a full MLP run spent on a model nothing downstream reads.
+      A CoXAM dataset the corpus does *not* cover still trains, since only
+      ``source="fit"`` can serve it.
+    """
     design = study.design_export
     dataset_id = request.dataset_id or getattr(design, "dataset_id", None)
     if not dataset_id:
@@ -146,6 +195,7 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
             "No dataset_id given and the design export does not name one."
         )
 
+    framework = design_framework(study)
     data = study.prepare_dataset(
         dataset_id,
         model_type=request.model_type,
@@ -156,7 +206,44 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
         random_state=request.random_state,
         show_available=False,
         show_summary=True,
+        cognitive_model_id=framework,
     )
+
+    dataset_payload = {
+        "dataset": {
+            "dataset_id": data.dataset_id,
+            "feature_names": list(data.feature_names),
+            "model_feature_names": list(data.model_feature_names),
+            "n_train": int(len(data.y_train)),
+            "n_test": int(len(data.y_test)),
+        }
+    }
+
+    skip_reason = None
+    if framework == "sim2real":
+        skip_reason = (
+            "Sim2Real simulates from a fixed published corpus and never reads "
+            "trained_ai_model, so no AI model is trained here."
+        )
+    elif framework == "coxam" and _coxam_corpus_covers(data.dataset_id):
+        skip_reason = (
+            f"CoXAM's published corpus covers {data.dataset_id!r}: "
+            "run_coxam_study(source='assets') reads its own AI predictions and "
+            "DT/LR surrogates, never trained_ai_model, so no AI model is "
+            "trained here. Pass a dataset the corpus does not cover, or use a "
+            "different agent, to train one."
+        )
+
+    if skip_reason:
+        # train_AI_model would normally set this; run_coxam_study(source="assets")
+        # looks the corpus's AI predictions up by model_name, so a request for
+        # instances "with a labelled AI prediction" would otherwise search for
+        # None/a model that was never trained instead of the corpus's own "mlp".
+        study.model_name = request.model_type
+        dataset_payload["model"] = None
+        dataset_payload["model_skipped_reason"] = skip_reason
+        return dataset_payload
+
     study.train_AI_model(
         model_type=request.model_type,
         target_metric=request.target_metric,
@@ -168,23 +255,15 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
     )
     study.evaluate(split="both")
 
-    return {
-        "dataset": {
-            "dataset_id": data.dataset_id,
-            "feature_names": list(data.feature_names),
-            "model_feature_names": list(data.model_feature_names),
-            "n_train": int(len(data.y_train)),
-            "n_test": int(len(data.y_test)),
-        },
-        "model": {
-            "model_name": study.model_name,
-            "test_accuracy": float(study.test_accuracy()),
-            "training_summary": frame_records(study.training_summary_table()),
-            "training_history": frame_records(study.training_history_table()),
-            "metrics": frame_records(study.metrics_table().reset_index()),
-            "confusion_matrix": frame_records(study.confusion_matrix_table().reset_index()),
-        },
+    dataset_payload["model"] = {
+        "model_name": study.model_name,
+        "test_accuracy": float(study.test_accuracy()),
+        "training_summary": frame_records(study.training_summary_table()),
+        "training_history": frame_records(study.training_history_table()),
+        "metrics": frame_records(study.metrics_table().reset_index()),
+        "confusion_matrix": frame_records(study.confusion_matrix_table().reset_index()),
     }
+    return dataset_payload
 
 
 # -- stage 2: trials ------------------------------------------------------
@@ -204,29 +283,110 @@ def run_trials_stage(study: xaikitTest, request: TrialsStageRequest) -> dict[str
             "export does not record participants per condition."
         )
 
+    total_trials = getattr(design, "trials_per_participant", None)
+    apparatus_test_count = len(getattr(design, "apparatus_instance_ids", []) or [])
+
     num_training = request.num_training
+    if num_training is None:
+        if total_trials is not None and apparatus_test_count:
+            # Derive from the design, not a flat guess: 30 trials/participant
+            # with 20 apparatus testing instances means 10 training trials,
+            # not an arbitrary constant that happens to leave 26 "testing"
+            # trials -- more than the apparatus declared testing instances,
+            # which is exactly the mismatch that surfaced this.
+            num_training = max(0, int(total_trials) - apparatus_test_count)
+        else:
+            num_training = 4  # no apparatus/total to derive from; old default
+
     num_testing = request.num_testing
     if num_testing is None:
-        total = getattr(design, "trials_per_participant", None)
-        if total is None:
+        if total_trials is None:
             raise ValueError(
                 "num_testing was not given and the design export does not record "
                 "trials per participant."
             )
         # The export records one total; the training/testing split is the
         # server's parameter, exactly as the tutorials state it explicitly.
-        num_testing = int(total) - int(num_training)
+        num_testing = int(total_trials) - int(num_training)
         if num_testing <= 0:
             raise ValueError(
                 f"num_training={num_training} leaves no testing trials out of the "
-                f"{total} trials per participant the design records."
+                f"{total_trials} trials per participant the design records."
             )
+
+    balance_by_ai_prediction = request.balance_by_ai_prediction
+    if balance_by_ai_prediction is None:
+        # A model exists only if the dataset stage trained one -- Sim2Real
+        # designs skip that (see run_dataset_stage), so this follows what
+        # actually happened rather than assuming every design trained a model.
+        balance_by_ai_prediction = getattr(study, "trained_ai_model", None) is not None
+
+    apparatus_test_ids = sorted(set(getattr(design, "apparatus_instance_ids", [])))
+    split_overridden = bool(apparatus_test_ids)
+    if apparatus_test_ids:
+        # The apparatus declares exactly which instances were tested; the
+        # dataset's own train/test split was drawn independently (by
+        # prepare_dataset's test_size/random_state) and has no reason to
+        # agree with it. Filtering that split down to the allowed set -- what
+        # the code below does for a design with no apparatus -- silently kept
+        # only whichever fraction of the 20 declared instances happened to
+        # land in the split's own test portion (10 of 20 for this design),
+        # so the split is overridden outright instead: test = exactly what
+        # the apparatus declared, train = its own declared instances if any,
+        # else a random sample of whatever is left, never overlapping test.
+        declared_train_ids = sorted(set(getattr(design, "apparatus_training_instance_ids", [])))
+        if declared_train_ids:
+            train_ids = declared_train_ids
+        elif num_training > 0:
+            pool = (
+                set(study.data.split.train_instance_ids.tolist())
+                | set(study.data.split.test_instance_ids.tolist())
+            ) - set(apparatus_test_ids)
+            if design_framework(study) == "coxam":
+                # Sampling outside the published corpus is worse than useless
+                # here: source="assets" can only serve what it shipped, so an
+                # id the raw dataset has but the corpus does not would fail
+                # downstream instead of simulating.
+                from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_trial_executor import (
+                    coxam_available_instance_ids,
+                )
+
+                pool &= set(coxam_available_instance_ids(study.data.dataset_id))
+            pool = sorted(pool)
+            if len(pool) < num_training:
+                raise ValueError(
+                    f"The apparatus declares {len(apparatus_test_ids)} testing instances; "
+                    f"only {len(pool)} remain for the {num_training} training instances "
+                    "requested, with no overlap allowed. Declare trainingInstanceIds in "
+                    "the apparatus, lower num_training, or widen instanceIds."
+                )
+            rng = np.random.default_rng(request.seed)
+            train_ids = sorted(int(i) for i in rng.choice(pool, size=num_training, replace=False))
+        else:
+            train_ids = []
+        study.data.split.test_instance_ids = np.asarray(apparatus_test_ids)
+        study.data.split.train_instance_ids = np.asarray(train_ids)
+
+    allowed_instance_ids = request.allowed_instance_ids
+    if allowed_instance_ids is None and not split_overridden:
+        # Union, not just the testing set: generate_trials takes one pool for
+        # both phases, and a training instance the apparatus declared is still
+        # one a human participant was shown. Skipped when the split was
+        # already overridden above: that already set the train/test pools to
+        # exactly the right ids (including a randomly-sampled training id
+        # outside the apparatus's declared set), and this filter would just
+        # discard that sample again.
+        allowed_instance_ids = sorted(
+            set(getattr(design, "apparatus_instance_ids", []))
+            | set(getattr(design, "apparatus_training_instance_ids", []))
+        ) or None
 
     result = study.generate_trials(
         participants_per_between_condition=int(participants),
         num_training=int(num_training),
         num_testing=int(num_testing),
-        balance_by_ai_prediction=request.balance_by_ai_prediction,
+        balance_by_ai_prediction=balance_by_ai_prediction,
+        allowed_instance_ids=allowed_instance_ids,
         seed=request.seed,
         output_dir=request.output_dir,
         preview_rows=0,
@@ -263,7 +423,30 @@ def run_trials_stage(study: xaikitTest, request: TrialsStageRequest) -> dict[str
 
 
 def run_explanations_stage(study: xaikitTest, request: ExplanationStageRequest) -> dict[str, Any]:
-    """Generate one XAI table per method in the design, plus AI predictions."""
+    """Generate one XAI table per method in the design, plus AI predictions.
+
+    A no-op for CoXAM: ``run_coxam_study`` builds its own DT/LR surrogates
+    internally (from a trained model, or from the published corpus) and never
+    reads what this produces (``study.combined_explanations``). Calling
+    ``study.explanations()`` needs LIME/SHAP to explain a real
+    ``trained_ai_model``, so for a design whose dataset stage skipped training
+    (see ``run_dataset_stage``) it always raised -- a UI that calls every
+    stage in sequence regardless of agent should not have to know CoXAM is the
+    one agent to skip this one for.
+    """
+    if design_framework(study) == "coxam":
+        return {
+            "combined_table": None,
+            "rows": 0,
+            "by_method": [],
+            "methods": [],
+            "files": [],
+            "skipped_reason": (
+                "CoXAM builds its own DT/LR surrogates inside run_coxam_study and never "
+                "reads this stage's output, so nothing is generated here."
+            ),
+        }
+
     path, pool = study.explanations(
         methods=request.methods,
         output_dir=request.output_dir,
@@ -281,6 +464,7 @@ def run_explanations_stage(study: xaikitTest, request: ExplanationStageRequest) 
             if method != "__prediction_only__"
         ),
         "files": [str(item) for item in study.explanation_paths],
+        "skipped_reason": None,
     }
 
 
@@ -315,14 +499,34 @@ def run_simulation_stage(
             store=True,
         )
     elif runner == "coxam":
+        coxam_source = request.coxam_source
+        if coxam_source is None:
+            # 'fit' needs trained_ai_model; the dataset stage only trains one
+            # when the corpus does not already cover this dataset (see
+            # run_dataset_stage), so this follows what actually happened
+            # rather than assuming every design trained a model.
+            coxam_source = "fit" if getattr(study, "trained_ai_model", None) is not None else "assets"
         results = run_coxam_study(
             study,
             mode=request.mode,
             participant_id=request.participant_id,
             condition_filter=request.condition_filter,
-            source=request.coxam_source,
+            source=coxam_source,
             policy_override=request.coxam_policy,
-            eval_params=request.coxam_eval_params,
+            eval_params=normalize_cognitive_params("coxam", request.coxam_eval_params),
+            store=True,
+        )
+    elif runner == "sim2real":
+        # Counterfactual-only, and its corpus supplies its own stimuli and
+        # ground truth, so it needs neither a task switch nor a trained model.
+        results = run_sim2real_study(
+            study,
+            mode=request.mode,
+            participant_id=request.participant_id,
+            condition_filter=request.condition_filter,
+            strategy=request.sim2real_strategy,
+            cognitive_params=normalize_cognitive_params("sim2real", request.sim2real_params),
+            normalize_by_i_max=request.sim2real_normalize_by_i_max,
             store=True,
         )
     else:
@@ -445,6 +649,50 @@ def analysis_for(
                 # a single level after filtering) must not fail the whole request.
                 skipped.append({"iv": iv, "dv": dv, "reason": str(error)})
     return {"ivs": ivs, "dvs": dvs, "analyses": analyses, "skipped": skipped}
+
+
+def posthoc_for(
+    study: xaikitTest,
+    *,
+    dv: str,
+    condition_cols: Optional[Sequence[str]] = None,
+    correction: Optional[str] = "holm",
+    phase: str = "testing",
+) -> dict[str, Any]:
+    """Every pairwise condition comparison for one DV, with corrected p-values.
+
+    Complements ``analysis_for``'s omnibus per-IV test: this compares every
+    crossed condition cell against every other (e.g. Rules-with-XAI vs
+    Weights-without-XAI), which is what a bar plot with significance
+    annotations needs. Defaults ``condition_cols`` to every between- and
+    within-subject IV the design declares.
+    """
+    require_results(study)
+    design = study.design_export
+    condition_cols = (
+        list(condition_cols)
+        if condition_cols
+        else [iv["name"] for iv in getattr(design, "ivs", [])]
+    )
+    if not condition_cols:
+        raise ValueError(
+            "No condition columns to compare. Pass condition_cols explicitly -- "
+            "the design export declares no IVs."
+        )
+    result = study.pairwise_condition_tests(
+        dv=dv,
+        condition_cols=condition_cols,
+        correction=correction,
+        phase=phase,
+    )
+    from src.result_visualizer import pretty
+
+    payload = posthoc_payload(result)
+    payload["dv"] = dv
+    payload["dv_label"] = pretty(dv)
+    payload["condition_cols"] = condition_cols
+    payload["condition_cols_label"] = [pretty(column) for column in condition_cols]
+    return payload
 
 
 def interaction_plot_payload(

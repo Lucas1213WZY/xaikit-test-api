@@ -5,13 +5,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "136",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 1,
@@ -19,13 +23,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1507",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 1,
@@ -33,13 +41,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "789",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 1,
@@ -47,13 +59,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "984",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 1,
@@ -61,13 +77,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "439",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 1,
@@ -75,13 +95,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1192",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 1,
@@ -89,13 +113,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "195",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 1,
@@ -103,13 +131,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1278",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 1,
@@ -117,13 +149,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "861",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 1,
@@ -131,13 +167,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "299",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 1,
@@ -145,13 +185,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "562",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 1,
@@ -159,13 +203,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "362",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 2,
@@ -173,13 +221,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1485",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 2,
@@ -187,13 +239,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1019",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 2,
@@ -201,13 +257,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "149",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 2,
@@ -215,13 +275,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1416",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 2,
@@ -229,13 +293,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "237",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 2,
@@ -243,13 +311,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "877",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 2,
@@ -257,13 +329,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1577",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 2,
@@ -271,13 +347,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1125",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 2,
@@ -285,13 +365,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "766",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 2,
@@ -299,13 +383,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "265",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 2,
@@ -313,13 +401,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1480",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 2,
@@ -327,13 +419,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "24",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 3,
@@ -341,13 +437,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "877",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 3,
@@ -355,13 +455,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "69",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 3,
@@ -369,13 +473,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "542",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 3,
@@ -383,13 +491,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "521",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 3,
@@ -397,13 +509,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "216",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 3,
@@ -411,13 +527,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1337",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 3,
@@ -425,13 +545,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1070",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 3,
@@ -439,13 +563,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "434",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 3,
@@ -453,13 +581,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1019",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 3,
@@ -467,13 +599,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1262",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 3,
@@ -481,13 +617,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "739",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 3,
@@ -495,13 +635,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "382",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 4,
@@ -509,13 +653,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "241",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 4,
@@ -523,13 +671,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1197",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 4,
@@ -537,13 +689,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1247",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 4,
@@ -551,13 +707,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1019",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 4,
@@ -565,13 +725,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "451",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 4,
@@ -579,13 +743,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "680",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 4,
@@ -593,13 +761,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "156",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 4,
@@ -607,13 +779,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "542",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 4,
@@ -621,13 +797,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "434",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 4,
@@ -635,13 +815,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1242",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 4,
@@ -649,13 +833,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "212",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 4,
@@ -663,13 +851,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "873",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 5,
@@ -677,13 +869,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "599",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 5,
@@ -691,13 +887,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1070",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 5,
@@ -705,13 +905,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1263",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 5,
@@ -719,13 +923,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1206",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 5,
@@ -733,13 +941,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "743",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 5,
@@ -747,13 +959,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "502",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 5,
@@ -761,13 +977,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "372",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 5,
@@ -775,13 +995,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "424",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 5,
@@ -789,13 +1013,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "622",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 5,
@@ -803,13 +1031,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "292",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 5,
@@ -817,13 +1049,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "380",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 5,
@@ -831,13 +1067,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "38",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 6,
@@ -845,13 +1085,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "41",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 6,
@@ -859,13 +1103,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "779",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 6,
@@ -873,13 +1121,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "158",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 6,
@@ -887,13 +1139,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1199",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 6,
@@ -901,13 +1157,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "69",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 6,
@@ -915,13 +1175,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "964",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 6,
@@ -929,13 +1193,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1329",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 6,
@@ -943,13 +1211,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "100",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 6,
@@ -957,13 +1229,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1146",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 6,
@@ -971,13 +1247,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "243",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 6,
@@ -985,13 +1265,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "728",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 6,
@@ -999,13 +1283,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1058",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 7,
@@ -1013,13 +1301,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1159",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 7,
@@ -1027,13 +1319,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "29",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 7,
@@ -1041,13 +1337,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "721",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 7,
@@ -1055,13 +1355,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1019",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 7,
@@ -1069,13 +1373,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1476",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 7,
@@ -1083,13 +1391,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1546",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 7,
@@ -1097,13 +1409,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1278",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 7,
@@ -1111,13 +1427,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "539",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 7,
@@ -1125,13 +1445,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1392",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 7,
@@ -1139,13 +1463,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1341",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 7,
@@ -1153,13 +1481,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "989",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 7,
@@ -1167,13 +1499,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "23",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 8,
@@ -1181,13 +1517,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "893",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 8,
@@ -1195,13 +1535,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "599",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 8,
@@ -1209,13 +1553,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1337",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 8,
@@ -1223,13 +1571,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1269",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 8,
@@ -1237,13 +1589,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1011",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 8,
@@ -1251,13 +1607,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "626",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 8,
@@ -1265,13 +1625,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1413",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 8,
@@ -1279,13 +1643,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1229",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 8,
@@ -1293,13 +1661,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1472",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 8,
@@ -1307,13 +1679,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "595",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 8,
@@ -1321,13 +1697,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "126",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 8,
@@ -1335,13 +1715,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "535",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 9,
@@ -1349,13 +1733,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1416",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 9,
@@ -1363,13 +1751,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "524",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 9,
@@ -1377,13 +1769,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "270",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 9,
@@ -1391,13 +1787,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1453",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 9,
@@ -1405,13 +1805,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "425",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 9,
@@ -1419,13 +1823,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "244",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 9,
@@ -1433,13 +1841,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1478",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 9,
@@ -1447,13 +1859,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1384",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 9,
@@ -1461,13 +1877,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1200",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 9,
@@ -1475,13 +1895,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1453",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 9,
@@ -1489,13 +1913,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1151",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 9,
@@ -1503,13 +1931,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "712",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 10,
@@ -1517,13 +1949,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1195",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 10,
@@ -1531,13 +1967,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "902",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 10,
@@ -1545,13 +1985,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "562",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 10,
@@ -1559,13 +2003,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1510",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 10,
@@ -1573,13 +2021,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "217",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 10,
@@ -1587,13 +2039,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "502",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 10,
@@ -1601,13 +2057,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "108",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 10,
@@ -1615,13 +2075,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "989",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 10,
@@ -1629,13 +2093,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "554",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 10,
@@ -1643,13 +2111,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1462",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 10,
@@ -1657,13 +2129,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "639",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 10,
@@ -1671,13 +2147,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1210",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 11,
@@ -1685,13 +2165,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1562",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 11,
@@ -1699,13 +2183,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1413",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 11,
@@ -1713,13 +2201,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "259",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 11,
@@ -1727,13 +2219,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "372",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 11,
@@ -1741,13 +2237,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "344",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 11,
@@ -1755,13 +2255,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "103",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 11,
@@ -1769,13 +2273,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "726",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 11,
@@ -1783,13 +2291,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "546",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 11,
@@ -1797,13 +2309,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "782",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 11,
@@ -1811,13 +2327,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1126",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 11,
@@ -1825,13 +2345,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "800",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 11,
@@ -1839,13 +2363,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1416",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 12,
@@ -1853,13 +2381,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "562",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 12,
@@ -1867,13 +2399,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1070",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 12,
@@ -1881,13 +2417,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "982",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 12,
@@ -1895,13 +2435,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1322",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 12,
@@ -1909,13 +2453,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1424",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 12,
@@ -1923,13 +2471,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1413",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 12,
@@ -1937,13 +2489,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "524",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 12,
@@ -1951,13 +2507,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1478",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 12,
@@ -1965,13 +2525,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "642",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 12,
@@ -1979,13 +2543,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "472",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 12,
@@ -1993,13 +2561,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1365",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 12,
@@ -2007,13 +2579,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "782",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 13,
@@ -2021,13 +2597,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "841",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 13,
@@ -2035,13 +2615,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "814",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 13,
@@ -2049,13 +2633,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1094",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 13,
@@ -2063,13 +2651,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1384",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 13,
@@ -2077,13 +2669,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1495",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 13,
@@ -2091,13 +2687,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "855",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 13,
@@ -2105,13 +2705,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "242",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 13,
@@ -2119,13 +2723,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "720",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 13,
@@ -2133,13 +2741,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "439",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 13,
@@ -2147,13 +2759,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1039",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 13,
@@ -2161,13 +2777,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1018",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 13,
@@ -2175,13 +2795,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "92",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 14,
@@ -2189,13 +2813,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "211",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 14,
@@ -2203,13 +2831,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1519",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 14,
@@ -2217,13 +2849,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1556",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 14,
@@ -2231,13 +2867,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1039",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 14,
@@ -2245,13 +2885,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "843",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 14,
@@ -2259,13 +2903,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1128",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 14,
@@ -2273,13 +2921,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "10",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 14,
@@ -2287,13 +2939,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "622",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 14,
@@ -2301,13 +2957,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1021",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 14,
@@ -2315,13 +2975,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "244",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 14,
@@ -2329,13 +2993,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "451",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 14,
@@ -2343,13 +3011,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1341",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 15,
@@ -2357,13 +3029,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1011",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 15,
@@ -2371,13 +3047,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1205",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 15,
@@ -2385,13 +3065,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1577",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 15,
@@ -2399,13 +3083,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1019",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 15,
@@ -2413,13 +3101,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "626",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 15,
@@ -2427,13 +3119,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1556",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 15,
@@ -2441,13 +3137,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1478",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 15,
@@ -2455,13 +3155,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "692",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 15,
@@ -2469,13 +3173,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "626",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 15,
@@ -2483,13 +3191,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "532",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 15,
@@ -2497,13 +3209,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "739",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 15,
@@ -2511,13 +3227,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "156",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 16,
@@ -2525,13 +3245,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1388",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 16,
@@ -2539,13 +3263,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1365",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 16,
@@ -2553,13 +3281,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "216",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 16,
@@ -2567,13 +3299,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "192",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 16,
@@ -2581,13 +3317,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "984",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 16,
@@ -2595,13 +3335,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "434",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 16,
@@ -2609,13 +3353,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "319",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 16,
@@ -2623,13 +3371,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1197",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 16,
@@ -2637,13 +3389,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "261",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 16,
@@ -2651,13 +3407,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "528",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 16,
@@ -2665,13 +3425,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1337",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 16,
@@ -2679,13 +3443,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1279",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 17,
@@ -2693,13 +3461,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1127",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 17,
@@ -2707,13 +3479,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "502",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 17,
@@ -2721,13 +3497,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1009",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 17,
@@ -2735,13 +3515,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1485",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 17,
@@ -2749,13 +3533,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1559",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 17,
@@ -2763,13 +3551,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1356",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 17,
@@ -2777,13 +3569,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "242",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 17,
@@ -2791,13 +3587,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "656",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 17,
@@ -2805,13 +3605,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1075",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 17,
@@ -2819,13 +3623,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1279",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 17,
@@ -2833,13 +3641,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "616",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 17,
@@ -2847,13 +3659,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1267",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 18,
@@ -2861,13 +3677,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "964",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 18,
@@ -2875,13 +3695,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "893",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 18,
@@ -2889,13 +3713,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1235",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 18,
@@ -2903,13 +3731,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1562",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 18,
@@ -2917,13 +3749,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1247",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 18,
@@ -2931,13 +3767,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "216",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 18,
@@ -2945,13 +3785,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "377",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 18,
@@ -2959,13 +3803,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1365",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 18,
@@ -2973,13 +3821,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1350",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 18,
@@ -2987,13 +3839,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "362",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 18,
@@ -3001,13 +3857,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "766",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 18,
@@ -3015,13 +3875,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1319",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 19,
@@ -3029,13 +3893,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "830",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 19,
@@ -3043,13 +3911,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "481",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 19,
@@ -3057,13 +3929,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "117",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 19,
@@ -3071,13 +3947,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1369",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 19,
@@ -3085,13 +3965,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1018",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 19,
@@ -3099,13 +3983,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "195",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 19,
@@ -3113,13 +4001,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1559",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 19,
@@ -3127,13 +4019,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "616",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 19,
@@ -3141,13 +4037,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "767",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 19,
@@ -3155,13 +4055,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "380",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 19,
@@ -3169,13 +4073,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1071",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 19,
@@ -3183,13 +4091,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1378",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 20,
@@ -3197,13 +4109,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "156",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 20,
@@ -3211,13 +4127,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "964",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 20,
@@ -3225,13 +4145,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1329",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 20,
@@ -3239,13 +4163,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "897",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 20,
@@ -3253,13 +4181,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "481",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 20,
@@ -3267,13 +4199,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "44",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 20,
@@ -3281,13 +4217,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "425",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 20,
@@ -3295,13 +4235,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "578",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 20,
@@ -3309,13 +4253,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "241",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 20,
@@ -3323,13 +4271,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1337",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 20,
@@ -3337,13 +4289,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1508",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 20,
@@ -3351,13 +4307,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "424",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 21,
@@ -3365,13 +4325,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1388",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 21,
@@ -3379,13 +4343,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1262",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 21,
@@ -3393,13 +4361,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "562",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 21,
@@ -3407,13 +4379,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "339",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 21,
@@ -3421,13 +4397,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "17",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 21,
@@ -3435,13 +4415,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "390",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 21,
@@ -3449,13 +4433,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "641",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 21,
@@ -3463,13 +4451,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "524",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 21,
@@ -3477,13 +4469,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "216",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 21,
@@ -3491,13 +4487,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1442",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 21,
@@ -3505,13 +4505,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1242",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 21,
@@ -3519,13 +4523,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "319",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 22,
@@ -3533,13 +4541,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "362",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 22,
@@ -3547,13 +4559,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "972",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 22,
@@ -3561,13 +4577,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1269",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 22,
@@ -3575,13 +4595,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "739",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 22,
@@ -3589,13 +4613,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "44",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 22,
@@ -3603,13 +4631,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "282",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 22,
@@ -3617,13 +4649,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1107",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 22,
@@ -3631,13 +4667,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1322",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 22,
@@ -3645,13 +4685,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "96",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 22,
@@ -3659,13 +4703,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "242",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 22,
@@ -3673,13 +4721,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1018",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 22,
@@ -3687,13 +4739,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "595",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 23,
@@ -3701,13 +4757,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "546",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 23,
@@ -3715,13 +4775,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1200",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 23,
@@ -3729,13 +4793,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1556",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 23,
@@ -3743,13 +4811,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "302",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 23,
@@ -3757,13 +4829,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "814",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 23,
@@ -3771,13 +4847,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1378",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 23,
@@ -3785,13 +4865,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "779",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 23,
@@ -3799,13 +4883,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "890",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 23,
@@ -3813,13 +4901,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1288",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 23,
@@ -3827,13 +4919,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "44",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 23,
@@ -3841,13 +4937,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1586",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 23,
@@ -3855,13 +4955,17 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "108",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 24,
@@ -3869,13 +4973,17 @@
     "block": 1,
     "trialWithinBlock": 1,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1279",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 1,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 24,
@@ -3883,13 +4991,17 @@
     "block": 1,
     "trialWithinBlock": 2,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1327",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 2,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 24,
@@ -3897,13 +5009,17 @@
     "block": 1,
     "trialWithinBlock": 3,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1121",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 3,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 24,
@@ -3911,13 +5027,17 @@
     "block": 1,
     "trialWithinBlock": 4,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1512",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 4,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 24,
@@ -3925,13 +5045,17 @@
     "block": 1,
     "trialWithinBlock": 5,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "1094",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 5,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 24,
@@ -3939,13 +5063,17 @@
     "block": 1,
     "trialWithinBlock": 6,
     "withinCondition": "logistic_regression",
-    "xai_method": "logistic_regression",
+    "xai_type": "logistic_regression",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1207",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 6,
+    "shown_xai_type": "logistic_regression"
   },
   {
     "participantId": 24,
@@ -3953,13 +5081,17 @@
     "block": 2,
     "trialWithinBlock": 1,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "211",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 7,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 24,
@@ -3967,13 +5099,17 @@
     "block": 2,
     "trialWithinBlock": 2,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "622",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 8,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 24,
@@ -3981,13 +5117,17 @@
     "block": 2,
     "trialWithinBlock": 3,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": true,
     "dataId": "wine_quality",
     "instanceId": "1369",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 9,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 24,
@@ -3995,13 +5135,17 @@
     "block": 2,
     "trialWithinBlock": 4,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "213",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 10,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 24,
@@ -4009,13 +5153,17 @@
     "block": 2,
     "trialWithinBlock": 5,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "29",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 11,
+    "shown_xai_type": "decision_tree"
   },
   {
     "participantId": 24,
@@ -4023,12 +5171,16 @@
     "block": 2,
     "trialWithinBlock": 6,
     "withinCondition": "decision_tree",
-    "xai_method": "decision_tree",
+    "xai_type": "decision_tree",
     "tested_w_xai": false,
     "dataId": "wine_quality",
     "instanceId": "157",
     "CV_age_group_levels": "young|adult|senior",
     "CV_gender_levels": "male|female|other",
-    "model_type": "mlp"
+    "CV_user_task_levels": "forward_simulation",
+    "model_type": "mlp",
+    "phase": "testing",
+    "phaseTrialId": 12,
+    "shown_xai_type": "decision_tree"
   }
 ]

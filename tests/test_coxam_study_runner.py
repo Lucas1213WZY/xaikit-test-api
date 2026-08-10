@@ -332,7 +332,11 @@ def test_simulation_request_carries_the_coxam_options():
     from server.schemas import SimulationRequest
 
     request = SimulationRequest()
-    assert request.coxam_source == "fit"
+    # None, not "fit": the pipeline resolves this from whether the dataset
+    # stage actually trained a model (see run_simulation_stage), because a
+    # static "fit" default would fail outright whenever training was skipped
+    # for a corpus-covered dataset.
+    assert request.coxam_source is None
     assert request.coxam_policy is None
     assert request.coxam_eval_params is None
 
@@ -650,3 +654,72 @@ def test_transform_falls_back_to_x_model_width_for_an_unknown_model(model_name):
 
     rebuilt = np.vstack([_model_input_transform(dataset, model_name)(row) for row in X_raw])
     assert np.allclose(rebuilt, dataset.split.X_model)
+
+
+# -- corpus feature aliases ----------------------------------------------
+
+
+def test_corpus_aliases_only_rename_confirmed_equivalences():
+    """The corpus abbreviates `Gill Spacing` and capitalises `chlorides`.
+
+    Anything else must pass through untouched, so a genuinely different feature
+    still fails the check rather than being quietly renamed onto a corpus slot.
+    """
+    from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_trial_executor import (
+        corpus_feature_names,
+    )
+
+    assert corpus_feature_names("wine_quality", ["chlorides"]) == ("Chlorides",)
+    assert corpus_feature_names("mushrooms", ["Gill Spacing"]) == ("Gill",)
+    assert corpus_feature_names("wine_quality", ["Alcohol", "pH"]) == ("Alcohol", "pH")
+    assert corpus_feature_names("wine_quality", ["density"]) == ("density",)
+    assert corpus_feature_names("not_a_dataset", ["chlorides"]) == ("chlorides",)
+
+
+def test_the_loader_spelling_passes_the_corpus_check():
+    from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_trial_executor import (
+        _check_corpus_features_match,
+    )
+
+    _check_corpus_features_match(
+        "wine_quality", ["Alcohol", "Sulphates", "SO2", "Vinegar Taint", "pH", "chlorides"]
+    )
+    _check_corpus_features_match(
+        "mushrooms", ["Bruises", "Height", "Width", "Shape", "Cap Diameter", "Gill Spacing"]
+    )
+
+
+def test_an_alias_does_not_excuse_the_wrong_order():
+    """`a0..a5` are positional, so order still has to match after aliasing."""
+    from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_trial_executor import (
+        _check_corpus_features_match,
+    )
+
+    with pytest.raises(ValueError, match="different order"):
+        _check_corpus_features_match(
+            "wine_quality", ["Sulphates", "Alcohol", "SO2", "Vinegar Taint", "pH", "chlorides"]
+        )
+
+
+def test_a_feature_outside_the_corpus_still_fails():
+    from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_trial_executor import (
+        _check_corpus_features_match,
+    )
+
+    with pytest.raises(ValueError, match="different features"):
+        _check_corpus_features_match(
+            "wine_quality", ["Alcohol", "Sulphates", "SO2", "Vinegar Taint", "pH", "density"]
+        )
+
+
+def test_every_alias_target_is_a_real_corpus_feature():
+    from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_trial_executor import (
+        COXAM_CORPUS_FEATURES,
+        COXAM_CORPUS_FEATURE_ALIASES,
+    )
+
+    for app_id, aliases in COXAM_CORPUS_FEATURE_ALIASES.items():
+        corpus = COXAM_CORPUS_FEATURES[app_id]
+        for loader_name, corpus_name in aliases.items():
+            assert corpus_name in corpus, f"{app_id}: {corpus_name} is not a corpus feature"
+            assert loader_name not in corpus, f"{app_id}: {loader_name} needs no alias"

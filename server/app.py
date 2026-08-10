@@ -10,6 +10,7 @@ The flow mirrors the tutorial notebooks one stage at a time:
     GET  /api/studies/{id}/results       step rows as JSON (paged)
     GET  /api/studies/{id}/results.csv   the same rows as a CSV download
     GET  /api/studies/{id}/analysis      analyze_iv_dv per IV x DV
+    GET  /api/studies/{id}/posthoc       pairwise condition means + corrected p-values
     POST /api/studies/{id}/plots/...     aggregated plot data (PNG optional)
 
 The four stage endpoints return a job immediately and do the work on a
@@ -44,6 +45,7 @@ from .schemas import (
     ExplanationStageRequest,
     GridPlotRequest,
     InteractionPlotRequest,
+    PostHocRequest,
     SimulationRequest,
     TrialsStageRequest,
 )
@@ -335,6 +337,45 @@ def get_analysis(
     """Same as the POST form, for links the UI can bookmark."""
     session = _session(study_id)
     return _guard(lambda: pipeline.analysis_for(session.study, ivs=iv, dvs=dv))
+
+
+@app.post("/api/studies/{study_id}/posthoc")
+def post_posthoc(
+    study_id: str,
+    request: PostHocRequest,
+) -> dict[str, Any]:
+    """Pairwise condition means and corrected p-values for one DV."""
+    session = _session(study_id)
+    return _guard(
+        lambda: pipeline.posthoc_for(
+            session.study,
+            dv=request.dv,
+            condition_cols=request.condition_cols,
+            correction=request.correction,
+            phase=request.phase,
+        )
+    )
+
+
+@app.get("/api/studies/{study_id}/posthoc")
+def get_posthoc(
+    study_id: str,
+    dv: str = Query(...),
+    condition: Optional[list[str]] = Query(None),
+    correction: Optional[str] = Query("holm"),
+    phase: str = Query("testing"),
+) -> dict[str, Any]:
+    """Same as the POST form, for links the UI can bookmark."""
+    session = _session(study_id)
+    return _guard(
+        lambda: pipeline.posthoc_for(
+            session.study,
+            dv=dv,
+            condition_cols=condition,
+            correction=correction,
+            phase=phase,
+        )
+    )
 
 
 @app.post("/api/studies/{study_id}/plots/interaction")

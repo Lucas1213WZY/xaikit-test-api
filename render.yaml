@@ -1,0 +1,32 @@
+# Render Blueprint — connect this repo at https://dashboard.render.com/blueprints
+# and Render reads this file to create the service. Builds server/Dockerfile
+# (the existing image also used for the self-hosted deploy in deploy/), so both
+# paths stay in sync.
+services:
+  - type: web
+    name: xaikit-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free # UI-integration smoke test only -- 512MB RAM may OOM on real
+    # MLP/xgboost training and the service sleeps after 15min idle (cold
+    # starts on the next request). Free tier also has no persistent disk, so
+    # server_runs is NOT mounted here -- it writes to the container's own
+    # ephemeral filesystem and is wiped on every redeploy/restart/sleep-wake.
+    # Once this is confirmed working end-to-end, switch to the paid tier by
+    # setting plan: standard, adding XAIKIT_SERVER_RUNS_DIR=/data/server_runs,
+    # and restoring the disk block:
+    #   disk:
+    #     name: xaikit-server-runs
+    #     mountPath: /data
+    #     sizeGB: 5
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: XAIKIT_API_TOKEN
+        generateValue: true # rotate any time from the Render dashboard; put the same value in the UI's config
+      - key: XAIKIT_ALLOWED_ORIGINS
+        sync: false # set to your UI's origin, e.g. https://you.github.io -- comma-separate for more than one
+      - key: MPLBACKEND
+        value: Agg
+      - key: PYTHONUNBUFFERED
+        value: "1"

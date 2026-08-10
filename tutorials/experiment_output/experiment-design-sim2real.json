@@ -1,0 +1,80 @@
+{
+  "researchQuestions": "",
+  "studyDesign": {
+    "dependentVariables": [],
+    "modelFramework": "",
+    "independentVariables": [],
+    "controlVariablesCV": [],
+    "randomVariablesRV": [],
+    "design": "",
+    "dataset": "",
+    "totalConditions": null,
+    "betweenSubjectsCells": null,
+    "participantsPerCondition": null,
+    "totalParticipants": null,
+    "trialsPerParticipant": 10,
+    "totalTrials": null
+  },
+  "apparatus": [
+    {
+      "id": "ap_msn3s6vp_1",
+      "label": "Configuration 1",
+      "group": "All participants",
+      "mode": "ours",
+      "params": {},
+      "url": ""
+    }
+  ],
+  "procedure": [],
+  "userModel": "CoAX (XAI Property)",
+  "cognitiveAgent": "Sim2Real",
+  "mlProxyBaselines": [],
+  "cognitiveConfig": {},
+  "cognitiveParameters": [
+    {
+      "key": "max_features_attended",
+      "label": "Max Features Attended",
+      "type": "integer",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "recommendedDefault": 4,
+      "modelDefault": 12,
+      "note": "How many explanation features the simulated user attends to. The model itself defaults to all 12; 4 is the value that best matches the measured behaviour.",
+      "value": 12,
+      "source": "model default"
+    },
+    {
+      "key": "aggregation_strategy",
+      "label": "Aggregation Strategy",
+      "type": "enum",
+      "options": [
+        "attribution",
+        "value_weighted"
+      ],
+      "recommendedDefault": "value_weighted",
+      "modelDefault": "attribution",
+      "note": "How evidence from the attended features is combined into a decision.",
+      "value": "attribution",
+      "source": "model default"
+    },
+    {
+      "key": "confidence_responsiveness",
+      "label": "Confidence Responsiveness",
+      "type": "float",
+      "min": -3,
+      "max": 1,
+      "step": 0.1,
+      "recommendedDefault": -1.5,
+      "modelDefault": 0,
+      "softBounds": true,
+      "note": "Applies to all aggregation strategies. Lower = more responsive to the change. The backend accepts any float; −3.0 to 1.0 is the evidence-supported window, with the optimum at −1.5 (flat between −2.0 and −1.0), which is most accurate to the measured effect.",
+      "value": 0,
+      "source": "model default"
+    }
+  ],
+  "_rawAnswers": {
+    "user_model": "CoAX (XAI Property)",
+    "apparatus_list": "[{\"id\":\"ap_msn3s6vp_1\",\"label\":\"Configuration 1\",\"group\":\"All participants\",\"mode\":\"ours\",\"params\":{},\"url\":\"\"}]"
+  }
+}

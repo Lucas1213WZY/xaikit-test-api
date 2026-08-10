@@ -8,6 +8,48 @@ from typing import Any, Mapping, Optional, Sequence
 import numpy as np
 import pandas as pd
 
+from .labels import pretty
+from .palette import categorical_color
+
+#: Fraction of the space between adjacent x positions a bar actually fills.
+#: Matplotlib's own default (1.0) leaves no gap between neighbouring bars,
+#: which is what "too wide" meant here.
+_BAR_WIDTH = 0.48
+
+
+def _label_bars(
+    axis: Any,
+    bars: Any,
+    values: np.ndarray,
+    errors: Optional[np.ndarray] = None,
+) -> None:
+    """Draw a value label above (or below, if negative) each bar.
+
+    A hand-rolled replacement for matplotlib's own ``Axes.bar_label``: that
+    method crashes (``IndexError`` in matplotlib 3.5.3) whenever a bar's
+    height is NaN alongside a non-None ``yerr`` -- an empty error-bar segment
+    gets drawn for the missing bar, and ``bar_label`` indexes into it as if
+    it had two points. NaN heights are routine here (an x/hue combination
+    with no observed data), so this is a real, not merely theoretical, path.
+    """
+    for index, (bar, value) in enumerate(zip(bars, values)):
+        if not np.isfinite(value):
+            continue
+        error = 0.0
+        if errors is not None and np.isfinite(errors[index]):
+            error = errors[index]
+        height = bar.get_height()
+        endpoint = height + error if height >= 0 else height - error
+        axis.annotate(
+            f"{value:.3f}",
+            xy=(bar.get_x() + bar.get_width() / 2, endpoint),
+            xytext=(0, 3 if height >= 0 else -3),
+            textcoords="offset points",
+            ha="center",
+            va="bottom" if height >= 0 else "top",
+            fontsize=8,
+        )
+
 
 @dataclass
 class ResultGrid:
@@ -76,7 +118,7 @@ def plot_iv_dv_grid(
     figure, axes = plt.subplots(
         len(dvs),
         len(ivs),
-        figsize=(4.6 * len(ivs), 3.7 * len(dvs)),
+        figsize=(3.4 * len(ivs), 2.8 * len(dvs)),
         squeeze=False,
         constrained_layout=True,
     )
@@ -136,29 +178,37 @@ def plot_iv_dv_grid(
                 else plotted[errorbar].fillna(0.0).to_numpy(dtype=float)
             )
             positions = np.arange(len(plotted))
+            # One color per condition/level, not one flat color for the whole
+            # panel -- and the same index gives the same color in every other
+            # panel and in plot_dv_by_two_ivs, so a level reads as one color
+            # across the whole figure.
+            colors = [categorical_color(i) for i in range(len(plotted))]
             bars = axis.bar(
                 positions,
                 plotted["mean"].to_numpy(dtype=float),
                 yerr=errors,
                 capsize=4 if errors is not None else 0,
-                color="C0",
-                alpha=0.82,
+                width=_BAR_WIDTH,
+                color=colors,
+                alpha=0.9,
+                edgecolor="white",
+                linewidth=0.6,
             )
-            axis.set_xticks(positions, [str(level) for level in plotted["level"]])
-            axis.tick_params(axis="x", rotation=25)
-            axis.set_xlabel(iv)
-            axis.set_ylabel(dv)
-            axis.set_title(f"{dv} by {iv}")
-            axis.grid(axis="y", alpha=0.25)
+            axis.set_xticks(positions, [pretty(level) for level in plotted["level"]])
+            axis.tick_params(axis="x", rotation=25, labelsize=8)
+            axis.tick_params(axis="y", labelsize=8)
+            axis.set_xlabel(pretty(iv), fontsize=9)
+            axis.set_ylabel(pretty(dv), fontsize=9)
+            axis.set_title(f"{pretty(dv)} by {pretty(iv)}", fontsize=9)
 
             values = plotted["mean"].to_numpy(dtype=float)
             if len(values) and np.nanmin(values) >= 0 and np.nanmax(values) <= 1:
                 axis.set_ylim(0, 1.05)
             if value_labels:
-                axis.bar_label(bars, fmt="%.3f", padding=3, fontsize=8)
+                _label_bars(axis, bars, plotted["mean"].to_numpy(dtype=float), errors)
 
     if title:
-        figure.suptitle(title)
+        figure.suptitle(title, fontsize=10.5)
     summary_table = (
         pd.concat(summaries, ignore_index=True)
         if summaries
@@ -239,10 +289,15 @@ def plot_dv_by_two_ivs(
 
     ordered_x = _ordered_levels(summary["x_level"].tolist(), x_levels)
     ordered_hue = _ordered_levels(summary["hue_level"].tolist(), hue_levels)
-    figure, axis = plt.subplots(figsize=(max(6.4, 1.6 * len(ordered_x)), 4.2))
+    figure, axis = plt.subplots(figsize=(max(5.2, 1.15 * len(ordered_x)), 3.4))
 
     group_positions = np.arange(len(ordered_x), dtype=float)
-    width = 0.8 / max(1, len(ordered_hue))
+    # 0.72 rather than a full 1.0 leaves a visible gap between x-groups; each
+    # hue's own share is then narrowed again so adjacent conditions within a
+    # group don't touch either.
+    group_span = 0.72
+    width = (group_span / max(1, len(ordered_hue))) * _BAR_WIDTH
+    slot = group_span / max(1, len(ordered_hue))
     for hue_index, hue_level in enumerate(ordered_hue):
         means: list[float] = []
         errors: list[float] = []
@@ -260,9 +315,9 @@ def plot_dv_by_two_ivs(
 
         positions = (
             group_positions
-            - 0.4
-            + width / 2
-            + hue_index * width
+            - group_span / 2
+            + slot / 2
+            + hue_index * slot
         )
         bars = axis.bar(
             positions,
@@ -271,20 +326,32 @@ def plot_dv_by_two_ivs(
             yerr=None if errorbar is None else errors,
             capsize=4 if errorbar is not None else 0,
             label=_display_label(hue_level, hue_labels),
-            alpha=0.82,
+            color=categorical_color(hue_index),
+            alpha=0.9,
+            edgecolor="white",
+            linewidth=0.6,
         )
         if value_labels:
-            axis.bar_label(bars, fmt="%.3f", padding=3, fontsize=8)
+            _label_bars(
+                axis,
+                bars,
+                np.asarray(means, dtype=float),
+                np.asarray(errors, dtype=float) if errorbar is not None else None,
+            )
 
     axis.set_xticks(
         group_positions,
         [_display_label(level, x_labels) for level in ordered_x],
     )
-    axis.set_xlabel(x_iv)
-    axis.set_ylabel(dv)
-    axis.set_title(title or f"{dv} by {x_iv} and {hue_iv}")
-    axis.grid(axis="y", alpha=0.25)
-    axis.legend(title=hue_iv)
+    axis.tick_params(axis="x", labelsize=8)
+    axis.tick_params(axis="y", labelsize=8)
+    axis.set_xlabel(pretty(x_iv), fontsize=9)
+    axis.set_ylabel(pretty(dv), fontsize=9)
+    axis.set_title(
+        title or f"{pretty(dv)} by {pretty(x_iv)} and {pretty(hue_iv)}",
+        fontsize=9.5,
+    )
+    axis.legend(title=pretty(hue_iv), fontsize=8, title_fontsize=8)
 
     values = summary["mean"].to_numpy(dtype=float)
     if len(values) and np.nanmin(values) >= 0 and np.nanmax(values) <= 1:
@@ -297,10 +364,22 @@ def _ordered_levels(
     observed: Sequence[Any],
     configured: Optional[Sequence[Any]],
 ) -> list[Any]:
-    """Keep configured level order, followed by any unexpected observed levels."""
-    observed = list(observed)
+    """Keep configured level order, followed by any unexpected observed levels.
+
+    ``observed`` is deduplicated (order preserved) regardless of path: a
+    caller summarizing two IVs at once passes a column with one repeat per
+    level of the *other* IV -- e.g. four x-axis levels each repeated once per
+    hue level -- and without this, ``plot_dv_by_two_ivs`` drew one bar group
+    per repeat instead of per level, silently multiplying the bars on any plot
+    with more than one hue level.
+    """
+    deduped: list[Any] = []
+    for value in observed:
+        if not any(_same_level(value, existing) for existing in deduped):
+            deduped.append(value)
+    observed = deduped
     if configured is None:
-        return observed
+        return _hybrid_last(observed)
     ordered = [
         level
         for level in configured
@@ -311,7 +390,20 @@ def _ordered_levels(
         for value in observed
         if not any(_same_level(value, level) for level in ordered)
     )
-    return ordered
+    return _hybrid_last(ordered)
+
+
+def _hybrid_last(levels: list[Any]) -> list[Any]:
+    """CoXAM's ``hybrid`` condition plots after ``decision_tree``/
+    ``logistic_regression``, not wherever it happened to sort or appear in a
+    configured order -- it names two families rather than one, so it reads
+    better as the summary bar after the two pure conditions than interleaved
+    with them.
+    """
+    is_hybrid = lambda level: str(level).strip().lower() == "hybrid"
+    return [level for level in levels if not is_hybrid(level)] + [
+        level for level in levels if is_hybrid(level)
+    ]
 
 
 def _same_level(left: Any, right: Any) -> bool:
@@ -329,4 +421,4 @@ def _display_label(
         for level, label in labels.items():
             if _same_level(value, level):
                 return str(label)
-    return str(value)
+    return pretty(value)

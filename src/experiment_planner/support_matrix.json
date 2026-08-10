@@ -14,11 +14,10 @@
       "xai_method": [
         "xai_methods"
       ],
-      "xai_robustness": [
-        "robustness"
-      ],
-      "xai_sparsity": [
-        "sparsity"
+      "xai_property": [
+        "xai_properties",
+        "explanation_property",
+        "exp_property"
       ],
       "xai_faithfulness": [
         "xai_fidelity",
@@ -262,7 +261,7 @@
         "counterfactual_simulation"
       ],
       "sim2real": [
-        "forward_simulation"
+        "counterfactual_simulation"
       ],
       "supported": [
         "forward_simulation",
@@ -321,14 +320,6 @@
         "sparse",
         "robust",
         "sparse_robust"
-      ],
-      "robustness": [
-        "robust",
-        "not_robust"
-      ],
-      "sparsity": [
-        "sparse",
-        "not_sparse"
       ]
     },
     "ai_models": {
@@ -356,11 +347,8 @@
     "xai_method": {
       "levels": "$groups.xai_methods.supported"
     },
-    "xai_robustness": {
-      "levels": "$groups.xai_properties.robustness"
-    },
-    "xai_sparsity": {
-      "levels": "$groups.xai_properties.sparsity"
+    "xai_property": {
+      "levels": "$groups.xai_properties.sim2real"
     },
     "xai_faithfulness": {
       "levels": [
@@ -580,7 +568,7 @@
     },
     "sim2real": {
       "tasks": "$groups.tasks.sim2real",
-      "dvs": "$groups.dvs.forward",
+      "dvs": "$groups.dvs.counterfactual",
       "xai_types": "$groups.xai_types.sim2real",
       "xai_methods": "$groups.xai_methods.sim2real",
       "xai_properties": "$groups.xai_properties.sim2real",

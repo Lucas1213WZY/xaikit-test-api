@@ -32,6 +32,48 @@ from .models.synthetic import BaseSim2RealFunction, create_sim2real_function
 # Metrics helpers
 # ---------------------------------------------------------------------------
 
+def predicted_labels(predictions: Any, *, threshold: float = 0.5) -> np.ndarray:
+    """Class labels as ``(n,)`` integers, from any model's raw ``predict`` output.
+
+    This is the one place the shape differences are resolved, so no caller needs
+    ``if np.asarray(predictions).ndim == 2: ... else: ...`` of its own.
+
+    Args:
+        predictions: Raw output of a model's ``predict``.
+        threshold: Cutoff for the positive class when the model emits one
+            probability per row rather than one per class.
+    """
+    labels, _ = _labels_and_scores_from_predictions(predictions, threshold=threshold)
+    return labels
+
+
+def predicted_probabilities(predictions: Any) -> np.ndarray:
+    """Class probabilities as ``(n, n_classes)`` floats from raw ``predict`` output.
+
+    A single column of positive-class probabilities is widened to two columns.
+
+    Raises:
+        ValueError: If ``predictions`` holds hard labels or continuous values,
+            which carry no probability to return.
+    """
+    array = np.asarray(predictions)
+    if array.ndim == 2:
+        return array.astype(float)
+
+    flat = array.reshape(-1)
+    if not np.issubdtype(flat.dtype, np.floating):
+        raise ValueError(
+            "This model returns hard class labels, so it has no probabilities. "
+            "Use predict_labels(...) instead."
+        )
+    if flat.size and (np.nanmin(flat) < 0.0 or np.nanmax(flat) > 1.0):
+        raise ValueError(
+            "This model returns continuous values outside [0, 1], so they are not "
+            "probabilities. Use predict(...) for the raw output."
+        )
+    return np.column_stack((1.0 - flat, flat)).astype(float)
+
+
 def _labels_and_scores_from_predictions(
     predictions: np.ndarray,
     *,
@@ -164,7 +206,35 @@ class UnifiedModel(ABC):
               y_dev: Optional[np.ndarray] = None, **kwargs) -> Dict: ...
 
     @abstractmethod
-    def predict(self, X: np.ndarray) -> np.ndarray: ...
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        """The engine's own raw output, whose shape varies by model type.
+
+        Kept raw on purpose -- an MLP returns ``(n, n_classes)`` probabilities,
+        an XGBoost binary objective returns ``(n, 2)``, a non-binary objective
+        returns ``(n,)``, and the analytical sim2real functions return ``(n,)``
+        of either hard labels or continuous values. Use :meth:`predict_labels`
+        or :meth:`predict_proba` when you need a guaranteed shape; those exist
+        so callers never have to branch on ``ndim``.
+        """
+
+    def predict_labels(self, X: np.ndarray, *, threshold: float = 0.5) -> np.ndarray:
+        """Predicted class labels as ``(n,)`` integers, whatever the model type.
+
+        Args:
+            X: Instances to predict.
+            threshold: Cutoff for the positive class when the model emits a
+                single probability per row rather than one per class.
+        """
+        return predicted_labels(self.predict(X), threshold=threshold)
+
+    def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        """Class probabilities as ``(n, n_classes)`` floats.
+
+        Raises:
+            ValueError: If the model emits hard labels or continuous values, so
+                no probability is available to return.
+        """
+        return predicted_probabilities(self.predict(X))
 
     @abstractmethod
     def evaluate(self, X: np.ndarray, y: np.ndarray) -> float: ...
@@ -580,7 +650,18 @@ class ModelManager:
         return model
 
     def predict(self, X: np.ndarray, model: Optional[UnifiedModel] = None) -> np.ndarray:
+        """The active model's raw output; shape varies by model type."""
         return (model or self._require_active()).predict(X)
+
+    def predict_labels(
+        self, X: np.ndarray, model: Optional[UnifiedModel] = None, *, threshold: float = 0.5
+    ) -> np.ndarray:
+        """Predicted class labels as ``(n,)`` integers, whatever the model type."""
+        return (model or self._require_active()).predict_labels(X, threshold=threshold)
+
+    def predict_proba(self, X: np.ndarray, model: Optional[UnifiedModel] = None) -> np.ndarray:
+        """Class probabilities as ``(n, n_classes)`` floats."""
+        return (model or self._require_active()).predict_proba(X)
 
     def train(self, X: np.ndarray, y: np.ndarray,
               model: Optional[UnifiedModel] = None,

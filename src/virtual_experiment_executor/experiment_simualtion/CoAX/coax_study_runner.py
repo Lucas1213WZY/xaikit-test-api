@@ -228,6 +228,8 @@ def run_coax_study(
     trials: Optional[pd.DataFrame | Sequence[dict[str, Any]]] = None,
     explanation_pool: Optional[pd.DataFrame] = None,
     data: Any = None,
+    source: str = "study",
+    data_id: Optional[str] = None,
     dvs: Optional[Mapping[str, Any]] = None,
     train_with_explanation: bool = True,
     store: bool = True,
@@ -245,26 +247,48 @@ def run_coax_study(
     once, before trials are grouped by XAI method, so ``trial_by_trial`` yields
     one trial and not one trial per method.
 
+    ``source`` picks where the instances, AI predictions and explanation vectors
+    come from:
+
+    * ``"study"`` (the default) uses this study's own prepared dataset and the
+      table ``study.explanations(...)`` produced -- so it needs a trained AI
+      model and a completed explanation stage.
+    * ``"corpus"`` uses the published CoAX user-study corpus instead, needing
+      neither. ``data_id`` names the dataset (``adult``, ``forest_cover``,
+      ``mushrooms`` or ``wine_quality``); it falls back to the trials' own
+      ``dataId``/``dataset`` column and then to ``study.data.dataset_id``.
+      Pair it with ``coax_corpus_instance_ids(data_id)`` when generating trials
+      so every trial references an instance the corpus carries. This is the
+      mode that makes a simulation directly comparable with
+      ``run_coax_human_replay``: both then serve the exact vectors the human
+      participants were shown.
+
     With ``store=True`` the result is written back to
     ``study.simulated_results``, which is what ``save_results``,
     ``analyze_iv_dv`` and the plotting helpers read.
     """
+    if source not in {"study", "corpus"}:
+        raise ValueError(f"source must be 'study' or 'corpus', not {source!r}.")
     trials_df = pd.DataFrame(study.trials if trials is None else trials).copy()
     if trials_df.empty:
         raise RuntimeError(
             "No generated trials to run. Call study.generate_trials(...) first."
         )
 
-    pool = explanation_pool if explanation_pool is not None else study.combined_explanations
-    if pool is None:
+    # The corpus already carries instances, predictions and explanation vectors,
+    # so neither the explanation stage nor a prepared dataset is required.
+    pool = explanation_pool if explanation_pool is not None else getattr(study, "combined_explanations", None)
+    if pool is None and source == "study":
         raise RuntimeError(
-            "No explanation table available. Call study.explanations(...) first."
+            "No explanation table available. Call study.explanations(...) first, "
+            "or pass source='corpus' to run against the published CoAX corpus."
         )
 
-    dataset = data if data is not None else study.data
-    if dataset is None:
+    dataset = data if data is not None else getattr(study, "data", None)
+    if dataset is None and source == "study":
         raise RuntimeError(
-            "No prepared dataset available. Call study.prepare_dataset(...) first."
+            "No prepared dataset available. Call study.prepare_dataset(...) first, "
+            "or pass source='corpus' to run against the published CoAX corpus."
         )
 
     selected = select_trial_rows(
@@ -284,6 +308,18 @@ def run_coax_study(
     )
     if isinstance(models, Mapping):
         _assert_models_cover(selected, models)
+
+    if source == "corpus":
+        return _run_coax_study_from_corpus(
+            study,
+            selected,
+            models,
+            data_id=data_id,
+            dataset=dataset,
+            dvs=dvs,
+            train_with_explanation=train_with_explanation,
+            store=store,
+        )
 
     features = coax_feature_table(dataset)
     predictions = pool[pool["expMethod"].astype(str) == PREDICTION_ONLY_METHOD]
@@ -313,6 +349,101 @@ def run_coax_study(
                 data_repository=repository,
                 train_with_explanation=train_with_explanation,
                 dvs=study.DVs if dvs is None else dvs,
+            )
+        )
+
+    results = pd.concat(runs, ignore_index=True, sort=False)
+    if ORDER_COLUMN in results.columns:
+        results = (
+            results.sort_values(ORDER_COLUMN, kind="stable")
+            .drop(columns=[ORDER_COLUMN])
+            .reset_index(drop=True)
+        )
+    if store:
+        study.simulated_results = results
+    return results
+
+
+def _resolve_corpus_data_id(
+    data_id: Optional[str], trials: pd.DataFrame, dataset: Any
+) -> str:
+    """Which corpus dataset a corpus-backed run should serve.
+
+    An explicit ``data_id`` wins; otherwise the trials name it, and finally the
+    prepared dataset does. Trials spanning two datasets are rejected rather than
+    silently served from one, because a corpus instance id means a different
+    instance in each dataset.
+    """
+    if data_id is not None:
+        return str(data_id)
+    for column in ("dataId", "dataset", "dataset_id", "appId"):
+        if column in trials.columns:
+            names = {str(value) for value in trials[column].dropna().unique()}
+            if len(names) > 1:
+                raise ValueError(
+                    f"Trials span more than one dataset ({sorted(names)}); a corpus "
+                    "instance id names a different instance in each, so run one "
+                    "dataset at a time via data_id= or condition_filter."
+                )
+            if names:
+                return next(iter(names))
+    dataset_id = getattr(dataset, "dataset_id", None)
+    if dataset_id is not None:
+        return str(dataset_id)
+    raise ValueError(
+        "source='corpus' needs a dataset name. Pass data_id=, or give the trials "
+        "a 'dataId' column."
+    )
+
+
+def _run_coax_study_from_corpus(
+    study: Any,
+    selected: pd.DataFrame,
+    models: Any,
+    *,
+    data_id: Optional[str],
+    dataset: Any,
+    dvs: Optional[Mapping[str, Any]],
+    train_with_explanation: bool,
+    store: bool,
+) -> pd.DataFrame:
+    """Run selected trials against the published CoAX user-study corpus.
+
+    Imported lazily: ``coax_human_replay`` reads this module's fitted-population
+    table, so a module-level import would be circular.
+    """
+    from .coax_human_replay import build_coax_study_repository, load_coax_corpus_tables
+
+    resolved_data_id = _resolve_corpus_data_id(data_id, selected, dataset)
+    tables = load_coax_corpus_tables()
+
+    # One repository per XAI method: the corpus keeps lime and shap rows for the
+    # same instance in one table, and the repository has no notion of a method.
+    methods = (
+        sorted({str(value) for value in selected["xai_method"].dropna().unique()})
+        if "xai_method" in selected.columns
+        else [None]
+    ) or [None]
+
+    runs = []
+    for method in methods:
+        method_trials = (
+            selected
+            if method is None
+            else selected[selected["xai_method"].astype(str) == method]
+        )
+        if method_trials.empty:
+            continue
+        runs.append(
+            run_coax_experiment_executor(
+                method_trials,
+                models,
+                mode="whole_experiment",
+                data_repository=build_coax_study_repository(
+                    resolved_data_id, method, tables=tables
+                ),
+                train_with_explanation=train_with_explanation,
+                dvs=getattr(study, "DVs", None) if dvs is None else dvs,
             )
         )
 

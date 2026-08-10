@@ -27,9 +27,12 @@ SRC_EXCLUDES=(
   'cognitive_models/CoXAM/outputs/'
 )
 ASSET_EXCLUDES=(
-  'human_data/'
   'human_trials_and_cognitive_parameters/'
 )
+# assets/human_data/ ships: it is anonymised (assets/build_human_data.py,
+# participants renumbered 1..N per study) and the pipeline reads it
+# (src/result_visualizer/study_comparisons.py, the human-vs-model report).
+# Keep in step with .dockerignore's own note on this.
 
 rm -rf "$STAGE"
 mkdir -p "$STAGE"
@@ -58,14 +61,17 @@ cp "$REPO/requirements.txt" "$STAGE/"
 
 echo "Staged $(du -sh "$STAGE" | cut -f1) at $STAGE"
 
-# Fail loudly rather than shipping a tree that still holds participant records.
+# Fail loudly rather than shipping a tree that still holds RAW participant
+# records. assets/human_data/ is deliberately excluded from this check: it is
+# the anonymised output the pipeline reads, not raw data (see ASSET_EXCLUDES
+# above) -- if this check ever starts flagging it, something upstream (build
+# order, a stale copy) put unanonymised files where the anonymised ones belong.
 leaked="$(find "$STAGE" \
-  \( -path '*human_data*' -o -path '*CoAX/results*' -o -path '*human_trials*' \
-     -o -name '*.ipynb' \) \
+  \( -path '*CoAX/results*' -o -path '*human_trials*' -o -name '*.ipynb' \) \
   -print | head)"
 if [ -n "$leaked" ]; then
-  echo "REFUSING: human data present in the staged tree:" >&2
+  echo "REFUSING: raw participant data present in the staged tree:" >&2
   echo "$leaked" >&2
   exit 1
 fi
-echo "Verified: no human participant data in the staged tree."
+echo "Verified: no raw human participant data in the staged tree (anonymised assets/human_data/ is included)."

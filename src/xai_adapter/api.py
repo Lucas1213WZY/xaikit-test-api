@@ -200,6 +200,67 @@ def generate_ai_prediction_table(
     return output_path, prediction_df
 
 
+#: Methods that model the AI with a *global* surrogate rather than attributing
+#: one instance at a time. They take a different constructor shape from the
+#: attribution methods -- ``app_id``/``feature_names``/``depth`` instead of
+#: ``ai_model``/``preprocessing_fn`` -- and forward unknown kwargs straight to
+#: their sklearn estimator, so passing the attribution kwargs raises.
+SURROGATE_METHODS: frozenset[str] = frozenset(
+    {"decision_tree", "logistic_regression", "rule_list", "rule_set", "decision_list"}
+)
+
+
+def _make_explainer(method_key: str, config: ExplanationRunConfig, train_data_for_xai: Any) -> Any:
+    """Construct one explainer with the kwargs its family accepts."""
+    method_kwargs = dict(config.method_kwargs.get(method_key, {}))
+    if method_key in SURROGATE_METHODS:
+        return create_xai_method(
+            method_key,
+            app_id=config.dataset_id,
+            model_name=config.model_name,
+            feature_names=list(config.data.split.model_feature_names),
+            **method_kwargs,
+        )
+    return create_xai_method(
+        method_key,
+        ai_model=config.trained_ai_model,
+        train_data=train_data_for_xai,
+        preprocessing_fn=lambda x: np.asarray(x, dtype=np.float32),
+        target=config.target,
+        **method_kwargs,
+    )
+
+
+def _fit_surrogate_if_needed(explainer: Any, config: ExplanationRunConfig) -> None:
+    """Fit a surrogate explainer before it is asked to explain anything.
+
+    A surrogate -- decision tree, logistic regression, rule list/set -- is a
+    single *global* model of the AI, so it is fitted once over the whole
+    dataset against the AI's own predicted labels, and every instance is then
+    explained by that same surrogate. The condition (``xai_type``) decides
+    which surrogate is *shown*, not what it is fitted on, which is why
+    ``hybrid`` needs both families but no extra fitting.
+
+    Attribution methods (LIME, SHAP, gradients) come back already fitted from
+    ``create_xai_method``, so the ``is_fitted`` check leaves them untouched
+    rather than re-fitting them against labels they do not use.
+    """
+    if getattr(explainer, "is_fitted", True):
+        return
+
+    X = np.asarray(config.data.split.X_model)
+    if config.predictions_by_instance is not None:
+        y = np.asarray(
+            [
+                config.predictions_by_instance[int(instance_id)]
+                for instance_id in config.data.split.raw_instance_ids
+            ]
+        )
+    else:
+        y = predict_labels(config.trained_ai_model, X)
+    explainer.fit(X, y)
+
+
 def generate_xai_explanation_tables(
     config: ExplanationRunConfig,
 ) -> tuple[list[Path], list[pd.DataFrame]]:
@@ -214,6 +275,8 @@ def generate_xai_explanation_tables(
     train_data_for_xai = make_train_data_for_xai(config.data.split, config.data.y_train)
     saved_paths: list[Path] = []
     explanation_dfs: list[pd.DataFrame] = []
+    attempted: list[str] = []
+    failures: dict[str, str] = {}
 
     for method_name in get_xai_methods_from_design(config.iv_config):
         method_key = str(method_name).lower()
@@ -243,15 +306,10 @@ def generate_xai_explanation_tables(
 
         print(f"\nGenerating explanations for xai method: {method_name}")
         print(f"  Sampled instances: {len(instance_ids)}")
+        attempted.append(method_key)
         try:
-            explainer = create_xai_method(
-                method_key,
-                ai_model=config.trained_ai_model,
-                train_data=train_data_for_xai,
-                preprocessing_fn=lambda x: np.asarray(x, dtype=np.float32),
-                target=config.target,
-                **config.method_kwargs.get(method_key, {}),
-            )
+            explainer = _make_explainer(method_key, config, train_data_for_xai)
+            _fit_surrogate_if_needed(explainer, config)
             result = explainer.explain(explained_instances)
             result = _aggregate_result_to_raw_features(
                 config.data,
@@ -272,7 +330,19 @@ def generate_xai_explanation_tables(
             explanation_dfs.append(explanation_df)
             print(f"  Saved: {out_path} shape={explanation_df.shape}")
         except Exception as exc:
+            failures[method_key] = f"{type(exc).__name__}: {exc}"
             print(f"  Skipped {method_name}: {type(exc).__name__}: {exc}")
+
+    # Every method failing leaves a table with nothing but prediction rows,
+    # which downstream code cannot distinguish from a design that legitimately
+    # shows no explanations. Failing loudly here is the difference between an
+    # error and a silently wrong study.
+    if attempted and not explanation_dfs:
+        detail = "; ".join(f"{name}: {reason}" for name, reason in failures.items())
+        raise RuntimeError(
+            f"None of the requested XAI methods produced explanations ({detail}). "
+            "The combined table would contain only AI-prediction rows."
+        )
 
     return saved_paths, explanation_dfs
 

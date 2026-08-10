@@ -29,6 +29,8 @@ from .model_api import (
     MODEL_REQUIRES_ONE_HOT_ENCODING,
     classification_metrics,
     load_pretrained_model,
+    predicted_labels,
+    predicted_probabilities,
     requires_one_hot_encoding,
 )
 from .models.synthetic import (

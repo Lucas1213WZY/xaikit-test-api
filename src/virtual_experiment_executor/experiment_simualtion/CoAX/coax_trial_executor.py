@@ -348,8 +348,20 @@ class CoAXAssetRepository:
 
     @staticmethod
     def _filter_data_id(df: pd.DataFrame, data_id: Optional[str]) -> pd.DataFrame:
-        if data_id is not None and "dataId" in df.columns:
-            return df[df["dataId"].astype(str) == str(data_id)]
+        """Scope a table to one dataset, under either spelling of the column.
+
+        ``appId`` and ``dataId`` are the same thing -- the dataset's name. The
+        CoAX study files spell it ``appId`` and the tables ``xai_adapter``
+        produces spell it ``dataId``, so a filter that knew only one of them
+        silently matched nothing when handed the other: every dataset in a
+        multi-dataset corpus then collapsed onto whichever row for that
+        instance id came first.
+        """
+        if data_id is None:
+            return df
+        for column in ("dataId", "appId"):
+            if column in df.columns:
+                return df[df[column].astype(str) == str(data_id)]
         return df
 
     def _row_for(self, df: pd.DataFrame, instance_id: int, data_id: Optional[str], what: str):
