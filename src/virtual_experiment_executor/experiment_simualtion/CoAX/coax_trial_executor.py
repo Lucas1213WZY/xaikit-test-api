@@ -127,7 +127,7 @@ DEFAULT_COAX_PARAMS: dict[str, Any] = {
     "k": 3,
     "retrieval_threshold": -2.3,
 }
-DEFAULT_COAX_SENSITIVITY = 20.0
+DEFAULT_COAX_SENSITIVITY = 10.0
 DEFAULT_COAX_SCALING_FACTOR = 1.0
 
 
