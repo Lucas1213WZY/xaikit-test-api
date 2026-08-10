@@ -61,21 +61,28 @@ FITTED_COAX_PARAMS: dict[str, dict[str, Any]] = {
     # (21.7171) made simulated "none"-condition forward_accuracy run well
     # above real humans on the same instances (0.886 vs 0.671). sensitivity
     # is not linear here: 9 barely moved it (0.894), 1 undershot (0.588), 4.5
-    # overshot (0.832). 2.2 (interpolated between the 1/4.5 data points) is
-    # the closest single-value match found so far -- still an approximation
-    # of a population that is not well summarized by any one value. The more
-    # correct fix is per-participant sampling from this real distribution
-    # instead of one shared constant.
+    # overshot (0.832), 2.2 landed at 0.732 (+0.061). 1.9 (interpolated one
+    # step further toward the 1/2.2 data points) is the closest single-value
+    # match found so far -- still an approximation of a population that is
+    # not well summarized by any one value. The more correct fix is
+    # per-participant sampling from this real distribution instead of one
+    # shared constant.
     "SensitiveFeatures": {
         "decay_param": 0.5,
-        "sensitivity": 2.2,
+        "sensitivity": 1.9,
         "k": 3,
         "retrieval_threshold": -2.4247,
     },
-    # n = 210 assignments, mean k 1.8381
+    # n = 210 assignments, mean k 1.8381. Same bimodal issue as
+    # SensitiveFeatures, more pronounced: 62% of real participants (130/210)
+    # are pinned at the sensitivity floor of 1.0. The population mean
+    # (19.6077) made simulated "importance"-condition accuracy run at 0.916
+    # against a real 0.735 on the same instances. 2.2 (reusing the value
+    # that closed the equivalent gap for SensitiveFeatures) landed almost
+    # exactly on target: 0.742 vs 0.735 (+0.007).
     "SalientFeatures": {
         "decay_param": 0.5,
-        "sensitivity": 19.6077,
+        "sensitivity": 2.2,
         "k": 2,
         "retrieval_threshold": -2.9775,
     },
@@ -92,11 +99,18 @@ FITTED_COAX_PARAMS: dict[str, dict[str, Any]] = {
     },
     # n = 511 assignments, mean k 4.2035. AttributionSum is fitted with
     # scaling_factor instead of sensitivity, so sensitivity keeps its class
-    # default.
+    # default. scaling_factor turned out not to be the lever here (1.5 and
+    # 0.1, the real floor, both left accuracy unchanged at 0.978) -- k was:
+    # k=5 -> 0.984, k=4/rt=-4.0 -> 0.98, k=4/rt=-1.64 -> 0.838, k=2 -> 0.89.
+    # k=2 (itself the real distribution's floor value, 22/511 = 4.3% of
+    # participants -- the same "minority floor behavior matches the
+    # population average" pattern seen in SensitiveFeatures/SalientFeatures)
+    # landed almost exactly on the real "attribution"-condition accuracy on
+    # the same instances: 0.89 vs 0.883 (+0.007).
     "AttributionSum": {
         "decay_param": 0.5,
         "scaling_factor": 3.4464,
-        "k": 4,
+        "k": 2,
         "retrieval_threshold": -2.6399,
     },
 }
