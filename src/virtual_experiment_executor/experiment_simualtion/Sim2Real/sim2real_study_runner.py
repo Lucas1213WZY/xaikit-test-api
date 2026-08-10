@@ -33,7 +33,7 @@ def run_sim2real_study(
     trials: Optional[pd.DataFrame | Sequence[dict[str, Any]]] = None,
     dvs: Optional[Mapping[str, Any]] = None,
     cognitive_params: Optional[Mapping[str, Any]] = None,
-    normalize_by_i_max: bool = True,
+    normalize_by_i_max: bool = False,
     strategy: str = "attribution_sum",
     store: bool = True,
 ) -> pd.DataFrame:

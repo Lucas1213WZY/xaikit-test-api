@@ -251,4 +251,4 @@ def test_the_server_request_carries_the_sim2real_controls():
     request = SimulationRequest(sim2real_strategy="sensitive_features")
     assert request.sim2real_strategy == "sensitive_features"
     assert request.sim2real_params is None
-    assert request.sim2real_normalize_by_i_max is True
+    assert request.sim2real_normalize_by_i_max is False

@@ -549,11 +549,21 @@ def _merged_cognitive_config(raw: dict[str, Any]) -> dict[str, Any]:
 
     ``cognitiveConfig`` is the older ``{"Display Label": "string value"}``
     map. ``cognitiveParameters`` is a newer, richer form -- a list of
-    ``{key, label, min, max, value, source, ...}`` records, where ``key`` is
-    already the agent's own parameter name (not a display label) and
-    ``value`` is ``None`` for "use the model default." Both can be present at
-    once; ``cognitiveParameters`` entries win on a shared key, since it is the
-    more specific, already-resolved source.
+    ``{key, label, min, max, value, modelDefault, recommendedDefault, source,
+    ...}`` records, where ``key`` is already the agent's own parameter name
+    (not a display label). Both can be present at once; ``cognitiveParameters``
+    entries win on a shared key, since it is the more specific, already-
+    resolved source.
+
+    A ``value`` equal to ``None`` means "use the model default," but some
+    export versions instead fill ``value`` with the raw, uncalibrated
+    ``modelDefault`` for any slider the user never touched (flagged
+    ``source: "model default"``), rather than leaving it unset. That is not a
+    real user choice -- it is the export format silently overriding a
+    fitted/recommended default with the strategy class's own untuned one, so
+    an entry is only taken as a genuine override when it disagrees with
+    ``modelDefault``, or carries no ``modelDefault``/``source`` to compare
+    against in the first place (the older, simpler export shapes).
     """
     merged = dict(raw.get("cognitiveConfig") or {})
     for entry in raw.get("cognitiveParameters") or []:
@@ -561,8 +571,16 @@ def _merged_cognitive_config(raw: dict[str, Any]) -> dict[str, Any]:
             continue
         key = entry.get("key")
         value = entry.get("value")
-        if key and value is not None:
-            merged[key] = value
+        if not key or value is None:
+            continue
+        is_untouched_model_default = (
+            entry.get("source") == "model default"
+            and "modelDefault" in entry
+            and value == entry.get("modelDefault")
+        )
+        if is_untouched_model_default:
+            continue
+        merged[key] = value
     return merged
 
 

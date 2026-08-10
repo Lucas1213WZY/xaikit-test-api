@@ -179,10 +179,14 @@ class SimulationRequest(BaseModel):
         ),
     )
     sim2real_normalize_by_i_max: bool = Field(
-        True,
+        False,
         description=(
             "Sim2Real designs only. Rescale each condition's attributions by its "
-            "i_max before the model reads them."
+            "i_max before the model reads them. FITTED_SIM2REAL_PARAMS was fitted "
+            "with this off, and measured simulated forward accuracy against real "
+            "human accuracy confirms it: turning it on leaves three of four "
+            "conditions unchanged but pushes 'faithful' from a close match "
+            "(-0.039) to a much larger miss (+0.145)."
         ),
     )
     baseline_model_id: Optional[str] = Field(

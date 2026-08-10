@@ -77,9 +77,13 @@ FITTED_PARAMETER_FILE = (
 #: above any individual. Other numerics use the mean; the two categoricals use
 #: the modal choice.
 #:
-#: Fitted with ``normalize_by_i_max=False`` -- the run predates the decision to
-#: pin it True, and the refit is still pending. Fits: 46 participants, 4320
-#: candidates each, 10 training feedback cases then 29 test cases.
+#: Fitted with ``normalize_by_i_max=False``, which is also this codebase's
+#: default again: simulated forward accuracy measured against real human
+#: accuracy on the same instances confirmed True (briefly the default) was
+#: wrong -- it left three of four conditions unchanged but pushed
+#: ``faithful`` from a close match to a much larger miss. Fits: 46
+#: participants, 4320 candidates each, 10 training feedback cases then 29
+#: test cases.
 FITTED_SIM2REAL_PARAMS: dict[str, dict[str, Any]] = {
     # n = 12, mean model-participant test accuracy 0.716
     "faithful": {
@@ -224,7 +228,7 @@ def build_sim2real_model(
     exp_property: Optional[str] = None,
     strategy: str = "attribution_sum",
     projector: Optional[Sim2RealAttributionProjector] = None,
-    normalize_by_i_max: bool = True,
+    normalize_by_i_max: bool = False,
 ):
     """Construct the model for one condition, fitted values topped up by ``params``.
 
@@ -354,7 +358,7 @@ def run_sim2real_experiment_executor(
     model: Optional[Sim2RealFittedAttributionSum] = None,
     cognitive_params: Optional[Mapping[str, Any]] = None,
     dvs: Optional[Mapping[str, Any]] = None,
-    normalize_by_i_max: bool = True,
+    normalize_by_i_max: bool = False,
     strategy: str = "attribution_sum",
 ) -> pd.DataFrame:
     """Run each trial through the fitted model and return one row per trial.
@@ -366,10 +370,11 @@ def run_sim2real_experiment_executor(
     misrepresent three conditions out of four. Pass ``model`` to override that
     and use a single model everywhere.
 
-    ``normalize_by_i_max`` defaults to True: normalizing attributions by the
-    instance's own maximum is the modelling decision this study settled on.
-    Note the baked fitted parameters come from a run where it was False, so a
-    refit is still owed -- see ``FITTED_SIM2REAL_PARAMS``.
+    ``normalize_by_i_max`` defaults to False, matching how the baked
+    ``FITTED_SIM2REAL_PARAMS`` were actually fitted. Measured against real
+    human accuracy on the same instances, turning it on leaves three of the
+    four conditions unchanged but pushes ``faithful`` from a close match to a
+    much larger miss (0.677 vs a real 0.716 with it off; 0.861 with it on).
     """
     if trials.empty:
         return trials
