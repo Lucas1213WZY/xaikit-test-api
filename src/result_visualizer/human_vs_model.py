@@ -26,6 +26,8 @@ from typing import Any, Mapping, Optional, Sequence
 import numpy as np
 import pandas as pd
 
+from .intervals import ci95_multiplier
+
 __all__ = [
     "ComparisonPanel",
     "ComparisonStudy",
@@ -83,22 +85,6 @@ INTERVALS = ("ci95", "sem")
 INTERVAL_LABELS = {"ci95": "95% CI", "sem": "SEM"}
 
 
-def _ci95_multiplier(n: int) -> float:
-    """Student-t multiplier for a 95% CI on a mean of ``n`` observations.
-
-    The normal 1.96 is wrong at the sample sizes here -- t(0.975, df=10) is
-    2.23, 14% wider -- so the exact value is used and only falls back to 1.96
-    if SciPy is unavailable.
-    """
-    if n < 2:
-        return 0.0
-    try:
-        from scipy import stats
-    except ImportError:  # pragma: no cover - SciPy ships with the environment
-        return 1.959963984540054
-    return float(stats.t.ppf(0.975, n - 1))
-
-
 def participant_summary(
     frame: pd.DataFrame,
     *,
@@ -133,7 +119,7 @@ def participant_summary(
                 "group": key,
                 "mean": float(values.mean()),
                 "sem": sem,
-                "ci95": sem * _ci95_multiplier(values.size),
+                "ci95": sem * ci95_multiplier(values.size),
                 "n": int(values.size),
             }
         )

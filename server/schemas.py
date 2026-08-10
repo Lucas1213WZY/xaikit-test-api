@@ -223,7 +223,7 @@ class InteractionPlotRequest(BaseModel):
     hue_iv: str
     dv: str
     phase: Optional[str] = "testing"
-    errorbar: Optional[str] = "sem"
+    errorbar: Optional[str] = "ci95"
     title: Optional[str] = None
     include_png: bool = False
 
@@ -234,6 +234,6 @@ class GridPlotRequest(BaseModel):
     ivs: Optional[list[str]] = None
     dvs: Optional[list[str]] = None
     phase: Optional[str] = "testing"
-    errorbar: Optional[str] = "sem"
+    errorbar: Optional[str] = "ci95"
     title: Optional[str] = "Experiment results"
     include_png: bool = False

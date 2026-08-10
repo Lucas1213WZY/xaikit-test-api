@@ -171,3 +171,58 @@ def test_grid_panel_draws_hybrid_bar_last():
     grid = plot_iv_dv_grid(df, ivs=["condition"], dvs=["dv"], phase=None)
     labels = [t.get_text() for t in grid.axes.flat[0].get_xticklabels()]
     assert labels[-1] == "Hybrid"
+
+
+# -- 95% CI is now the default error bar, not SEM ----------------------------
+
+
+def _varying_responses(n_x: int = 4, n_hue: int = 2) -> pd.DataFrame:
+    """Like _responses, but with real participant-to-participant spread --
+    a constant dv gives sem=0, which can't tell ci95 apart from sem."""
+    x_levels = [f"x{i}" for i in range(n_x)]
+    hue_levels = [f"h{i}" for i in range(n_hue)]
+    rows = [
+        {
+            "participantId": p,
+            "x": x,
+            "hue": h,
+            "phase": "testing",
+            "dv": 0.1 * p,
+        }
+        for p in range(6)
+        for x in x_levels
+        for h in hue_levels
+    ]
+    return pd.DataFrame(rows)
+
+
+def test_ci95_is_the_default_errorbar_and_wider_than_sem():
+    """ci95 = sem * a Student-t multiplier > 1, so it must be strictly wider
+    than sem for the same data -- and it's what a plot draws by default now."""
+    df = _varying_responses(n_x=1, n_hue=1).rename(columns={"x": "condition"})
+    grid_default = plot_iv_dv_grid(df, ivs=["condition"], dvs=["dv"], phase="testing")
+    grid_sem = plot_iv_dv_grid(
+        df, ivs=["condition"], dvs=["dv"], phase="testing", errorbar="sem"
+    )
+    ci95_row = grid_default.summary.iloc[0]
+    sem_row = grid_sem.summary.iloc[0]
+    # Same underlying data either way -- only which column drives the error bar differs.
+    assert ci95_row["sem"] == pytest.approx(sem_row["sem"])
+    assert ci95_row["ci95"] > sem_row["sem"] > 0
+
+
+def test_interaction_plot_also_defaults_to_ci95():
+    df = _varying_responses(n_x=2, n_hue=2)
+    plot_default = plot_dv_by_two_ivs(df, x_iv="x", hue_iv="hue", dv="dv")
+    assert "ci95" in plot_default.summary.columns
+    row = plot_default.summary.iloc[0]
+    assert row["ci95"] > row["sem"] > 0
+
+
+def test_ci95_multiplier_matches_the_shared_helper():
+    from src.result_visualizer.intervals import ci95_multiplier
+
+    df = _responses(n_x=1, n_hue=1).rename(columns={"x": "condition"})
+    grid = plot_iv_dv_grid(df, ivs=["condition"], dvs=["dv"], phase="testing")
+    row = grid.summary.iloc[0]
+    assert row["ci95"] == pytest.approx(row["sem"] * ci95_multiplier(int(row["count"])))

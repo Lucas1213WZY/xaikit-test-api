@@ -1642,7 +1642,7 @@ class xaikitTest:
         dvs: Optional[Sequence[str]] = None,
         participant_column: str = "participantId",
         phase: Optional[str] = "testing",
-        errorbar: Optional[str] = "sem",
+        errorbar: Optional[str] = "ci95",
         title: Optional[str] = "Experiment results",
         value_labels: bool = True,
     ) -> Any:
@@ -1654,7 +1654,8 @@ class xaikitTest:
             dvs: DVs to plot; defaults to every DV in the design.
             participant_column: Column identifying participants.
             phase: Restrict to one trial phase, e.g. ``testing``.
-            errorbar: Error bar statistic, e.g. ``sem``; None hides them.
+            errorbar: Error bar statistic -- ``ci95`` (Student-t 95% CI half-width,
+                the default), ``sem``, ``std``, or None to hide them.
             title: Figure title.
             value_labels: Print the value above each bar.
 
@@ -1693,7 +1694,7 @@ class xaikitTest:
         responses: Optional[pd.DataFrame] = None,
         participant_column: str = "participantId",
         phase: Optional[str] = "testing",
-        errorbar: Optional[str] = "sem",
+        errorbar: Optional[str] = "ci95",
         x_levels: Optional[Sequence[Any]] = None,
         hue_levels: Optional[Sequence[Any]] = None,
         x_labels: Optional[dict[Any, str]] = None,
@@ -1710,7 +1711,8 @@ class xaikitTest:
             responses: Results to plot; defaults to the stored simulation.
             participant_column: Column identifying participants.
             phase: Restrict to one trial phase, e.g. ``testing``.
-            errorbar: Error bar statistic, e.g. ``sem``; None hides them.
+            errorbar: Error bar statistic -- ``ci95`` (Student-t 95% CI half-width,
+                the default), ``sem``, ``std``, or None to hide them.
             x_levels: Order of x-axis levels; defaults to the design's order.
             hue_levels: Order of colour levels; defaults to the design's order.
             x_labels: Display names for x-axis levels.

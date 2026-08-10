@@ -744,7 +744,7 @@ def interaction_plot_payload(
     hue_iv: str,
     dv: str,
     phase: Optional[str] = "testing",
-    errorbar: Optional[str] = "sem",
+    errorbar: Optional[str] = "ci95",
     title: Optional[str] = None,
     include_png: bool = False,
 ) -> dict[str, Any]:
@@ -772,7 +772,7 @@ def grid_plot_payload(
     ivs: Optional[Sequence[str]] = None,
     dvs: Optional[Sequence[str]] = None,
     phase: Optional[str] = "testing",
-    errorbar: Optional[str] = "sem",
+    errorbar: Optional[str] = "ci95",
     title: Optional[str] = "Experiment results",
     include_png: bool = False,
 ) -> dict[str, Any]:

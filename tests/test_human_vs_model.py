@@ -366,11 +366,11 @@ def test_an_unknown_interval_is_rejected():
 
 
 def test_the_ci_multiplier_uses_t_not_the_normal_approximation():
-    from src.result_visualizer.human_vs_model import _ci95_multiplier
+    from src.result_visualizer.intervals import ci95_multiplier
 
-    assert _ci95_multiplier(11) == pytest.approx(2.2281, rel=1e-3)  # df=10
-    assert _ci95_multiplier(62) == pytest.approx(1.9996, rel=1e-3)  # df=61
-    assert _ci95_multiplier(1) == 0.0  # no spread from one observation
+    assert ci95_multiplier(11) == pytest.approx(2.2281, rel=1e-3)  # df=10
+    assert ci95_multiplier(62) == pytest.approx(1.9996, rel=1e-3)  # df=61
+    assert ci95_multiplier(1) == 0.0  # no spread from one observation
 
 
 # -- the one-call study API ----------------------------------------------

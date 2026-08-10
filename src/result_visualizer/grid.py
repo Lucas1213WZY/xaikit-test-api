@@ -8,6 +8,7 @@ from typing import Any, Mapping, Optional, Sequence
 import numpy as np
 import pandas as pd
 
+from .intervals import ci95_multiplier
 from .labels import pretty
 from .palette import categorical_color
 
@@ -76,7 +77,7 @@ def plot_iv_dv_grid(
     dvs: Sequence[str],
     participant_column: str = "participantId",
     phase: Optional[str] = "testing",
-    errorbar: Optional[str] = "sem",
+    errorbar: Optional[str] = "ci95",
     iv_levels: Optional[Mapping[str, Sequence[Any]]] = None,
     title: Optional[str] = "Experiment results",
     value_labels: bool = True,
@@ -89,7 +90,8 @@ def plot_iv_dv_grid(
         dvs: Dependent variables, one row of panels each.
         participant_column: Column identifying participants.
         phase: Restrict to one trial phase, e.g. ``testing``.
-        errorbar: Error bar statistic, e.g. ``sem``; None hides them.
+        errorbar: Error bar statistic -- ``ci95`` (Student-t 95% CI half-width,
+            the default), ``sem``, ``std``, or None to hide them.
         iv_levels: Level order per IV.
         title: Figure title.
         value_labels: Print the value above each bar.
@@ -106,8 +108,8 @@ def plot_iv_dv_grid(
     missing = [column for column in required if column not in responses]
     if missing:
         raise ValueError(f"Response data is missing columns: {missing}.")
-    if errorbar not in {None, "sem", "std"}:
-        raise ValueError("errorbar must be one of: 'sem', 'std', or None.")
+    if errorbar not in {None, "sem", "std", "ci95"}:
+        raise ValueError("errorbar must be one of: 'ci95', 'sem', 'std', or None.")
 
     data = responses.copy()
     if phase is not None and "phase" in data:
@@ -146,6 +148,7 @@ def plot_iv_dv_grid(
                 .agg(["count", "mean", "std", "sem"])
                 .reset_index()
             )
+            summary["ci95"] = summary["sem"] * summary["count"].map(ci95_multiplier)
             summary.insert(0, "dv", dv)
             summary.insert(0, "iv", iv)
             summary = summary.rename(columns={iv: "level"})
@@ -213,7 +216,7 @@ def plot_iv_dv_grid(
         pd.concat(summaries, ignore_index=True)
         if summaries
         else pd.DataFrame(
-            columns=["iv", "dv", "level", "count", "mean", "std", "sem"]
+            columns=["iv", "dv", "level", "count", "mean", "std", "sem", "ci95"]
         )
     )
     return ResultGrid(figure=figure, axes=axes, summary=summary_table)
@@ -227,7 +230,7 @@ def plot_dv_by_two_ivs(
     dv: str,
     participant_column: str = "participantId",
     phase: Optional[str] = "testing",
-    errorbar: Optional[str] = "sem",
+    errorbar: Optional[str] = "ci95",
     x_levels: Optional[Sequence[Any]] = None,
     hue_levels: Optional[Sequence[Any]] = None,
     x_labels: Optional[Mapping[Any, str]] = None,
@@ -244,7 +247,8 @@ def plot_dv_by_two_ivs(
         dv: Dependent variable to plot.
         participant_column: Column identifying participants.
         phase: Restrict to one trial phase, e.g. ``testing``.
-        errorbar: Error bar statistic, e.g. ``sem``; None hides them.
+        errorbar: Error bar statistic -- ``ci95`` (Student-t 95% CI half-width,
+            the default), ``sem``, ``std``, or None to hide them.
         x_levels: Order of x-axis levels.
         hue_levels: Order of colour levels.
         x_labels: Display names for x-axis levels.
@@ -258,8 +262,8 @@ def plot_dv_by_two_ivs(
     missing = [column for column in required if column not in responses]
     if missing:
         raise ValueError(f"Response data is missing columns: {missing}.")
-    if errorbar not in {None, "sem", "std"}:
-        raise ValueError("errorbar must be one of: 'sem', 'std', or None.")
+    if errorbar not in {None, "sem", "std", "ci95"}:
+        raise ValueError("errorbar must be one of: 'ci95', 'sem', 'std', or None.")
 
     data = responses.copy()
     if phase is not None and "phase" in data:
@@ -283,6 +287,7 @@ def plot_dv_by_two_ivs(
         .reset_index()
         .rename(columns={x_iv: "x_level", hue_iv: "hue_level"})
     )
+    summary["ci95"] = summary["sem"] * summary["count"].map(ci95_multiplier)
     summary.insert(0, "dv", dv)
     summary.insert(0, "hue_iv", hue_iv)
     summary.insert(0, "x_iv", x_iv)
