@@ -55,10 +55,20 @@ FITTED_PARAMETER_FILE = (
 #: value. Note that several means sit outside ``COAX_PARAM_BOUNDS`` -- those are
 #: the simulator's slider limits, not bounds on the fitted population.
 FITTED_COAX_PARAMS: dict[str, dict[str, Any]] = {
-    # n = 398 assignments, mean k 2.7161
+    # n = 398 assignments, mean k 2.7161. The raw per-participant fits are
+    # bimodal (41% pinned at the sensitivity floor of 1.0, the rest spread
+    # 19-100) rather than clustered near the mean -- the population mean
+    # (21.7171) made simulated "none"-condition forward_accuracy run well
+    # above real humans on the same instances (0.886 vs 0.671). sensitivity
+    # is not linear here: 9 barely moved it (0.894), 1 undershot (0.588), 4.5
+    # overshot (0.832). 2.2 (interpolated between the 1/4.5 data points) is
+    # the closest single-value match found so far -- still an approximation
+    # of a population that is not well summarized by any one value. The more
+    # correct fix is per-participant sampling from this real distribution
+    # instead of one shared constant.
     "SensitiveFeatures": {
         "decay_param": 0.5,
-        "sensitivity": 21.7171,
+        "sensitivity": 2.2,
         "k": 3,
         "retrieval_threshold": -2.4247,
     },
@@ -70,7 +80,10 @@ FITTED_COAX_PARAMS: dict[str, dict[str, Any]] = {
         "retrieval_threshold": -2.9775,
     },
     # n = 14 assignments only -- the thinnest cell in the fitted table, so this
-    # mean is the least stable of the four.
+    # mean is the least stable of the four. No longer the default strategy for
+    # the "importance" condition (see PREFERRED_COAX_STRATEGY_BY_XAI_TYPE --
+    # SalientFeatures fits that condition much better), but still a legal
+    # fallback, so its parameters stay the real fitted values.
     "ImportanceCategorization": {
         "decay_param": 0.5,
         "sensitivity": 39.9953,

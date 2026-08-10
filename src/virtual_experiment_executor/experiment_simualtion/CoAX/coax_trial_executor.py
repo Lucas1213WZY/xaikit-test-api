@@ -138,7 +138,7 @@ DEFAULT_COAX_SCALING_FACTOR = 1.0
 # is excluded for that tested condition.
 PREFERRED_COAX_STRATEGY_BY_XAI_TYPE: dict[str, str] = {
     "none": "SensitiveFeatures",
-    "importance": "ImportanceCategorization",
+    "importance": "SalientFeatures",
     "attribution": "AttributionSum",
 }
 
