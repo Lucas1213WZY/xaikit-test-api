@@ -174,6 +174,32 @@ def _coax_corpus_covers(dataset_id: str) -> bool:
     return dataset_id in COAX_CORPUS_DATA_IDS
 
 
+def _corpus_instance_ids(framework: str, dataset_id: str) -> Optional[list[int]]:
+    """Instance ids the published corpus can serve for this framework/dataset,
+    or None when neither applies (an uncovered dataset, or a framework with no
+    corpus concept at all).
+
+    Used as the trial-generation default when nothing else (apparatus
+    instanceIds, an explicit allowed_instance_ids) restricts a corpus-covered
+    dataset's pool -- without it, trials sample freely from the dataset's own
+    random split and later fail at simulation time the first time they
+    reference an instance the corpus never shipped.
+    """
+    if framework == "coxam" and _coxam_corpus_covers(dataset_id):
+        from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_trial_executor import (
+            coxam_available_instance_ids,
+        )
+
+        return coxam_available_instance_ids(dataset_id)
+    if framework == "coax" and _coax_corpus_covers(dataset_id):
+        from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_trial_executor import (
+            coax_available_instance_ids,
+        )
+
+        return coax_available_instance_ids(dataset_id)
+    return None
+
+
 def _resolve_dataset_ids(request: DatasetStageRequest, design: Any) -> list[str]:
     """Every dataset this stage should prepare, in declared order.
 
@@ -430,22 +456,34 @@ def run_trials_stage(study: xaikitTest, request: TrialsStageRequest) -> dict[str
                 f"{total_trials} trials per participant the design records."
             )
 
-    balance_by_ai_prediction = request.balance_by_ai_prediction
-    if balance_by_ai_prediction is None:
-        # A model exists only if the dataset stage trained one. Sim2Real is
-        # excluded outright even when a model did get trained (for its own
-        # mlProxyBaselines, see run_dataset_stage): its apparatus instances
-        # are a small, fixed, curated split matching the published corpus,
-        # never meant to be filtered further by a freshly-trained baseline
-        # model's predictions.
-        balance_by_ai_prediction = (
-            design_framework(study) != "sim2real"
-            and getattr(study, "trained_ai_model", None) is not None
-        )
-
     apparatus_test_ids = sorted(set(getattr(design, "apparatus_instance_ids", [])))
     split_overridden = bool(apparatus_test_ids)
     data_by_dataset = getattr(study, "data_by_dataset", None)
+
+    balance_by_ai_prediction = request.balance_by_ai_prediction
+    if balance_by_ai_prediction is None:
+        # A model exists only if the dataset stage trained one. Excluded
+        # outright, even when a model did get trained (e.g. for a design's
+        # own mlProxyBaselines, see run_dataset_stage):
+        #
+        # * Sim2Real always -- its apparatus instances are a small, fixed,
+        #   curated split matching the published corpus, never meant to be
+        #   filtered further by a freshly-trained baseline model's predictions.
+        # * Any design with a real apparatus-declared instance set
+        #   (split_overridden) -- the same reasoning generalized: a small,
+        #   researcher-curated instance range (e.g. 20 ids) has no guarantee
+        #   of containing both AI-predicted classes, especially for an
+        #   imbalanced target, so requiring balance from it is a hard failure
+        #   waiting to happen rather than something the range was chosen for.
+        balance_by_ai_prediction = (
+            design_framework(study) != "sim2real"
+            and not split_overridden
+            and getattr(study, "trained_ai_model", None) is not None
+        )
+    #: Datasets that actually got a real split override below (test/train ids
+    #: set directly on data.split) -- everything else falls back to the
+    #: published corpus's own ids further down, when the framework has one.
+    overridden_dataset_ids: set[str] = set()
     if apparatus_test_ids and isinstance(data_by_dataset, dict) and data_by_dataset:
         # Multi-dataset: the exact same override, applied once per dataset
         # from that dataset's own per-appId apparatus declarations -- never
@@ -456,6 +494,7 @@ def run_trials_stage(study: xaikitTest, request: TrialsStageRequest) -> dict[str
             dataset_test_ids = sorted(set(ids_by_dataset.get(dataset_id, [])))
             if not dataset_test_ids:
                 continue
+            overridden_dataset_ids.add(dataset_id)
             declared_train_ids = sorted(set(training_ids_by_dataset.get(dataset_id, [])))
             if declared_train_ids:
                 train_ids = declared_train_ids
@@ -528,20 +567,60 @@ def run_trials_stage(study: xaikitTest, request: TrialsStageRequest) -> dict[str
             train_ids = []
         study.data.split.test_instance_ids = np.asarray(apparatus_test_ids)
         study.data.split.train_instance_ids = np.asarray(train_ids)
+        overridden_dataset_ids.add(study.data.dataset_id)
+
+    # Any dataset with no real split override (no apparatus instance ids at
+    # all, or a multi-dataset study where only some datasets got one) still
+    # needs constraining to whatever its own published corpus can serve, or
+    # trials sample freely from the raw dataset's own random split and later
+    # fail at simulation time on the first instance the corpus never shipped.
+    #
+    # Multi-dataset: filtered in place, per dataset, directly on its own
+    # split -- never through one flat allowed_instance_ids list. Instance ids
+    # are dataset-local (each dataset numbers its own instances from 0), so a
+    # flat union across datasets of different corpus sizes would silently
+    # admit ids that are only valid for a *different*, larger dataset's range
+    # (e.g. wine_quality's real corpus is ids 0-121, but adult's is 0-299 --
+    # unioning them would let ids 122-299 leak into wine_quality's pool).
+    framework = design_framework(study)
+    if isinstance(data_by_dataset, dict) and data_by_dataset:
+        for dataset_id, data in data_by_dataset.items():
+            if dataset_id in overridden_dataset_ids:
+                continue
+            corpus_ids = _corpus_instance_ids(framework, dataset_id)
+            if not corpus_ids:
+                continue
+            corpus_set = set(corpus_ids)
+            data.split.train_instance_ids = np.asarray(
+                sorted(i for i in data.split.train_instance_ids.tolist() if i in corpus_set)
+            )
+            data.split.test_instance_ids = np.asarray(
+                sorted(i for i in data.split.test_instance_ids.tolist() if i in corpus_set)
+            )
 
     allowed_instance_ids = request.allowed_instance_ids
-    if allowed_instance_ids is None and not split_overridden:
-        # Union, not just the testing set: generate_trials takes one pool for
-        # both phases, and a training instance the apparatus declared is still
-        # one a human participant was shown. Skipped when the split was
-        # already overridden above: that already set the train/test pools to
-        # exactly the right ids (including a randomly-sampled training id
-        # outside the apparatus's declared set), and this filter would just
-        # discard that sample again.
-        allowed_instance_ids = sorted(
-            set(getattr(design, "apparatus_instance_ids", []))
-            | set(getattr(design, "apparatus_training_instance_ids", []))
-        ) or None
+    if allowed_instance_ids is None:
+        combined_ids: set[int] = set()
+        if not split_overridden:
+            # Union, not just the testing set: generate_trials takes one pool
+            # for both phases, and a training instance the apparatus declared
+            # is still one a human participant was shown. Skipped when the
+            # split was already overridden above: that already set the
+            # train/test pools to exactly the right ids (including a
+            # randomly-sampled training id outside the apparatus's declared
+            # set), and this filter would just discard that sample again.
+            combined_ids |= set(getattr(design, "apparatus_instance_ids", []))
+            combined_ids |= set(getattr(design, "apparatus_training_instance_ids", []))
+
+        # Single-dataset: safe as a flat list here -- there is only one
+        # dataset's id space in play, so no cross-dataset leakage is possible.
+        if not (isinstance(data_by_dataset, dict) and data_by_dataset):
+            if getattr(study, "data", None) is not None and study.data.dataset_id not in overridden_dataset_ids:
+                corpus_ids = _corpus_instance_ids(framework, study.data.dataset_id)
+                if corpus_ids:
+                    combined_ids |= set(corpus_ids)
+
+        allowed_instance_ids = sorted(combined_ids) or None
 
     result = study.generate_trials(
         participants_per_between_condition=int(participants),

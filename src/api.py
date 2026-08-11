@@ -490,6 +490,23 @@ class xaikitTest:
                     num_features = 6
                 rank_features_by_target = True
                 use_default_features = False
+        elif feature_cols is None and use_default_features and resolved_agent == "coax":
+            try:
+                from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_trial_executor import (
+                    coax_loader_feature_cols,
+                )
+
+                feature_cols = coax_loader_feature_cols(dataset_id)
+                rank_features_by_target = False
+            except KeyError:
+                # Not a dataset CoAX's published corpus covers -- no fixed
+                # feature set to route to. CoAX's own datasets are always
+                # 5-feature (COAX_CORPUS_FEATURES), so match that shape the
+                # same way the CoXAM branch above does.
+                if num_features is None:
+                    num_features = 5
+                rank_features_by_target = True
+                use_default_features = False
 
         return prepare_dataset(
             dataset_id,
@@ -1172,6 +1189,24 @@ class xaikitTest:
                 "No XAI methods were provided and no `xai_method`/`xai_type` IV is stored. "
                 "Call `add_iv('xai_method', ..., [...])` or pass `methods=[...]`."
             )
+
+        if "xai_method" not in self.iv_config and len(resolved_methods) == 1 and self.trials:
+            # `xai_type` names the shown explanation family/condition (e.g.
+            # CoAX's none/importance/attribution), which is not necessarily
+            # the same vocabulary as the generated method name (CoAX's
+            # published corpus explains a given dataset with one fixed
+            # method regardless of xai_type -- see COAX_CORPUS_XAI_METHOD).
+            # Without a real `xai_method` value on each trial,
+            # `get_trial_instance_explanation` (the generic executor's
+            # lookup, used by baseline models) falls back to `xai_type` and
+            # can never match the pool's real `expMethod`, silently treating
+            # every XAI-visible trial as if it had no explanation.
+            resolved_method = str(resolved_methods[0])
+            for trial in self.trials:
+                xai_type = str(trial.get("xai_type", "none")).strip().lower()
+                trial["xai_method"] = (
+                    "none" if xai_type in {"none", "no_xai", "control"} else resolved_method
+                )
 
         if methods is None and show_checks:
             print(f"Using stored XAI methods from the design: {resolved_methods}")
@@ -2137,6 +2172,24 @@ class xaikitTest:
                     if method not in methods:
                         methods.append(method)
             return methods
+        if framework == "coax":
+            # Unlike CoXAM, a CoAX xai_type level (none/importance/attribution)
+            # does not decide the method -- the published corpus explains a
+            # given dataset with exactly one method regardless of xai_type
+            # (see COAX_CORPUS_XAI_METHOD), so a single-dataset study resolves
+            # to that one method rather than generating every method CoAX has
+            # ever used. Falls back to the framework default (both methods)
+            # for a dataset outside the corpus, or a multi-dataset study,
+            # where there is no single dataset to resolve against.
+            from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_trial_executor import (
+                COAX_CORPUS_XAI_METHOD,
+            )
+
+            data = getattr(self, "data", None)
+            if data is not None and not getattr(self, "data_by_dataset", None):
+                method = COAX_CORPUS_XAI_METHOD.get(data.dataset_id)
+                if method:
+                    return [method]
         return list(self.XAI_METHODS_BY_FRAMEWORK.get(framework, ()))
 
     def _iv_config_for_explanations(

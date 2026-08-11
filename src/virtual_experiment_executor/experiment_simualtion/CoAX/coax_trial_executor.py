@@ -249,6 +249,53 @@ def _explanation_value_columns(df: pd.DataFrame) -> list[str]:
     return [c for c in df.columns if c.startswith("a") and c.endswith("_i")]
 
 
+#: The published CoAX corpus's own feature set per dataset, in the order its
+#: x0..x4 columns are positional against (assets/ai_dataset/CoAX/metadata.csv)
+#: -- confirmed to already match the data loader's own spelling exactly for
+#: all three datasets (unlike CoXAM's corpus, which needs an alias table). A
+#: freshly trained model must use exactly this feature set for its
+#: predictions/explanations to mean the same thing the corpus's positional
+#: a0..a4 attributions do; a generic top-N-by-correlation default can select
+#: entirely different columns (confirmed for forest_cover: only 2 of 5
+#: overlapped), producing model predictions unrelated to what CoAX represents.
+COAX_CORPUS_FEATURES: dict[str, tuple[str, ...]] = {
+    "forest_cover": (
+        "Elevation", "Aspect", "Horizontal_Distance_To_Hydrology",
+        "Horizontal_Distance_To_Roadways", "Hillshade_9am",
+    ),
+    "adult": ("Age", "Years of Education", "Marital Status", "Sex", "Capital Gain"),
+    "wine_quality": ("Vinegar Taint", "SO2", "pH", "Sulphates", "Alcohol"),
+}
+
+
+def coax_loader_feature_cols(data_id: str) -> list[str]:
+    """The corpus's feature set for ``data_id``, in its positional order.
+
+    Pass as ``feature_cols`` (with ``rank_features_by_target=False``) to
+    ``prepare_dataset`` so a freshly trained model's feature space matches the
+    corpus exactly. Mirrors ``coxam_loader_feature_cols``.
+
+    Raises:
+        KeyError: If ``data_id`` is not in the published corpus.
+    """
+    return list(COAX_CORPUS_FEATURES[data_id])
+
+
+#: Which XAI method the published CoAX corpus's explanation tables were built
+#: with, per dataset -- confirmed against attribution.csv/importance.csv
+#: themselves: both tables use the *same* method for a given dataset (adult
+#: and wine_quality: lime; forest_cover: shap), so the method is a property of
+#: the dataset/model, not of the xai_type (none/importance/attribution) shown.
+#: A design that names xai_type but not xai_method is otherwise ambiguous --
+#: run_coax_study cannot tell, per trial, which of multiple generated methods
+#: to display -- so this resolves it the same way the corpus itself did.
+COAX_CORPUS_XAI_METHOD: dict[str, str] = {
+    "adult": "lime",
+    "forest_cover": "shap",
+    "wine_quality": "lime",
+}
+
+
 class CoAXAssetRepository:
     """Serve CoAX feature values, AI predictions, and explanations to the executor.
 
@@ -409,6 +456,24 @@ class CoAXAssetRepository:
             explanation = [row.get(column) for column in self._explanation_columns[loader_key]]
 
         return features, prediction_row.get("pred"), explanation
+
+
+def coax_available_instance_ids(
+    data_id: Optional[str] = None,
+    *,
+    data_dir: Path = COAX_DATA_DIR,
+    explanations_dir: Path = COAX_EXPLANATIONS_DIR,
+) -> list[int]:
+    """Instance ids the published CoAX corpus can serve, optionally for one dataset.
+
+    Pass to ``study.generate_trials(allowed_instance_ids=...)`` so trials stay
+    runnable against ``source="corpus"``/``source="study"`` reading the
+    corpus's own predictions. A thin module-level wrapper around
+    ``CoAXAssetRepository.available_instance_ids()`` -- that class needs a
+    live repository instance already loaded from assets; this is the
+    zero-setup entry point ``coxam_available_instance_ids`` already has.
+    """
+    return CoAXAssetRepository(data_dir=data_dir, explanations_dir=explanations_dir).available_instance_ids(data_id)
 
 
 @dataclass
@@ -611,11 +676,15 @@ __all__ = [
     "COAX_PARAM_BOUNDS",
     "COAX_STRATEGIES_BY_XAI_TYPE",
     "COAX_STRATEGY_EXCLUSIONS",
+    "COAX_CORPUS_FEATURES",
+    "COAX_CORPUS_XAI_METHOD",
     "DEFAULT_COAX_PARAMS",
     "PREFERRED_COAX_STRATEGY_BY_XAI_TYPE",
     "CoAXAssetRepository",
     "SimulationClock",
+    "coax_available_instance_ids",
     "coax_available_strategies",
+    "coax_loader_feature_cols",
     "default_coax_params",
     "default_coax_strategy",
     "make_coax_model",

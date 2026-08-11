@@ -49,6 +49,20 @@ DV_DISPLAY_LABELS: dict[str, str] = {
 # guess when the design gives no other signal.
 DEFAULT_SIMULATABLE_DV: str = "forward_accuracy"
 
+# Which supported DV(s) an unsupported/ambiguous measure (e.g. "Task
+# Accuracy") coerces to, per resolved framework -- matches
+# support_matrix.json's cognitive_models[*].tasks/dvs. CoXAM genuinely runs
+# both forward and counterfactual simulation as separate agents (see
+# DesignExport.user_tasks), so an ambiguous measure there coerces to *both*
+# DVs rather than guessing one; CoAX is forward-only; Sim2Real is
+# counterfactual-only. Anything else (a baseline model, or unresolved) falls
+# back to DEFAULT_SIMULATABLE_DV alone, unchanged from before this existed.
+COERCE_DVS_BY_FRAMEWORK: dict[str, tuple[str, ...]] = {
+    "coax": ("forward_accuracy",),
+    "coxam": ("forward_accuracy", "counterfactual_accuracy"),
+    "sim2real": ("counterfactual_accuracy",),
+}
+
 # IV factor labels the UI phrases freely but the planner knows under a fixed name.
 IV_FACTOR_ALIASES: dict[str, str] = {
     "tested_with_xai": "tested_w_xai",
@@ -240,6 +254,45 @@ def _is_blank_row(row: dict[str, Any], keys: Sequence[str]) -> bool:
     return not any(str(row.get(key, "")).strip() for key in keys)
 
 
+def _resolve_framework_from_ivs(ivs: list[dict[str, Any]], model_framework: str) -> str:
+    """Shared by ``DesignExport.resolved_framework`` and ``parse_design_export``
+    (which needs the framework resolved before a ``DesignExport`` exists, to
+    decide which DV(s) an unsupported measure coerces to).
+
+    ``userModel`` alone is not enough. A Sim2Real design exports
+    ``userModel: "CoAX"`` -- correctly, since its cognitive model is a
+    CoAX-derived attribution sum -- but it runs the Sim2Real fitted model and
+    supports counterfactual simulation, which plain CoAX does not. The
+    ``xai_property`` IV is the discriminator: only Sim2Real varies explanation
+    properties (faithful / sparse / robust / sparse_robust), so a design that
+    declares it is a Sim2Real study whatever ``userModel`` says.
+    """
+    if any(iv["name"] == "xai_property" for iv in ivs):
+        return "sim2real"
+    slug = slugify(model_framework)
+    return MODEL_FRAMEWORK_ALIASES.get(slug, slug)
+
+
+def _resolve_dataset_ids_from_ivs(ivs: list[dict[str, Any]], dataset_id: str) -> list[str]:
+    """Shared by ``DesignExport.dataset_ids`` and ``parse_design_export`` (which
+    needs the same resolution before a ``DesignExport`` exists to call the
+    property on, to group apparatus configurations by dataset).
+
+    A declared ``dataset`` between-subjects IV always wins, whatever its level
+    count -- not just when it names 2+ levels. A single-level "dataset" IV
+    used to fall through to the singular ``studyDesign.dataset`` field, on the
+    assumption that field would also be set whenever the IV was; a leaner
+    export that leaves the field blank and names the dataset only through a
+    single-level IV instead raised "no dataset given" rather than following it.
+    """
+    from .trials import DATASET_IV_NAME
+
+    for iv in ivs:
+        if iv["name"] == DATASET_IV_NAME and iv["iv_type"] == "between" and iv["levels"]:
+            return [DATASET_ALIASES.get(level, level) for level in iv["levels"]]
+    return [dataset_id] if dataset_id else []
+
+
 @dataclass
 class DesignExport:
     """A normalized view of one experiment-design UI export."""
@@ -295,12 +348,7 @@ class DesignExport:
         all falls back to the singular field, unchanged from before this
         existed.
         """
-        from .trials import DATASET_IV_NAME
-
-        for iv in self.ivs:
-            if iv["name"] == DATASET_IV_NAME and iv["iv_type"] == "between" and len(iv["levels"]) > 1:
-                return [DATASET_ALIASES.get(level, level) for level in iv["levels"]]
-        return [self.dataset_id] if self.dataset_id else []
+        return _resolve_dataset_ids_from_ivs(self.ivs, self.dataset_id)
 
     @property
     def is_multi_dataset(self) -> bool:
@@ -320,10 +368,7 @@ class DesignExport:
         a design that declares it is a Sim2Real study whatever ``userModel``
         says.
         """
-        if any(iv["name"] == "xai_property" for iv in self.ivs):
-            return "sim2real"
-        slug = slugify(self.model_framework)
-        return MODEL_FRAMEWORK_ALIASES.get(slug, slug)
+        return _resolve_framework_from_ivs(self.ivs, self.model_framework)
 
     @property
     def user_tasks(self) -> list[str]:
@@ -422,6 +467,8 @@ def load_design_export(path: str | Path) -> DesignExport:
 
 def parse_design_export(raw: dict[str, Any]) -> DesignExport:
     """Normalize an already-loaded experiment-design UI export."""
+    from .trials import DATASET_IV_NAME
+
     study_design = raw.get("studyDesign", {})
     report = ValidationReport(stage="design_export")
 
@@ -432,6 +479,13 @@ def parse_design_export(raw: dict[str, Any]) -> DesignExport:
         name = slugify(row["factor"])
         name = IV_FACTOR_ALIASES.get(name, name)
         levels = split_levels(row.get("levelsOrRange", ""), name=name)
+        if name == DATASET_IV_NAME:
+            # A "dataset" IV's levels name datasets the same way the singular
+            # studyDesign.dataset field does ("Mushroom" -> mushroom by plain
+            # slugify), so they need the same DATASET_ALIASES canonicalization
+            # -- otherwise this IV's levels ("mushroom") never match the ids
+            # prepare_dataset/data_by_dataset actually use ("mushrooms").
+            levels = [DATASET_ALIASES.get(level, level) for level in levels]
         if not levels:
             continue
         iv_type = _canonical_allocation(row.get("allocation", "between"))
@@ -459,6 +513,11 @@ def parse_design_export(raw: dict[str, Any]) -> DesignExport:
             "source_label": row["name"],
         })
 
+    resolved_framework_slug = _resolve_framework_from_ivs(
+        ivs, str(raw.get("userModel") or study_design.get("modelFramework", "")).strip()
+    )
+    coerce_targets = COERCE_DVS_BY_FRAMEWORK.get(resolved_framework_slug, (DEFAULT_SIMULATABLE_DV,))
+
     dvs: list[dict[str, Any]] = []
     for row in study_design.get("dependentVariables", []):
         if _is_blank_row(row, ["measure", "name"]):
@@ -467,24 +526,38 @@ def parse_design_export(raw: dict[str, Any]) -> DesignExport:
         slug = slugify(measure)
         name = DV_MEASURE_ALIASES.get(slug, slug)
         supported = name in SUPPORTED_DVS
-        if not supported:
-            report.add_warning(
-                name,
-                f"The cognitive model doesn't support `{measure}` as a dependent "
-                "variable. Simulation supports "
-                f"{DV_DISPLAY_LABELS['forward_accuracy']} or "
-                f"{DV_DISPLAY_LABELS['counterfactual_accuracy']}.",
-                f"Coercing to the user model's supported DV: "
-                f"{DV_DISPLAY_LABELS[DEFAULT_SIMULATABLE_DV]}.",
-            )
-            name = DEFAULT_SIMULATABLE_DV
-        dvs.append({
-            "name": name,
-            "levels": ["continuous"],
-            "source_label": measure,
-            "simulatable": True,
-            "coerced": not supported,
-        })
+        if supported:
+            dvs.append({
+                "name": name,
+                "levels": ["continuous"],
+                "source_label": measure,
+                "simulatable": True,
+                "coerced": False,
+            })
+            continue
+
+        target_labels = " and ".join(DV_DISPLAY_LABELS[target] for target in coerce_targets)
+        coercion_note = (
+            f"Coercing to the model's supported DV: {target_labels}."
+            if len(coerce_targets) == 1
+            else f"Coercing to the model's two supported DVs: {target_labels}."
+        )
+        report.add_warning(
+            name,
+            f"The cognitive model doesn't support `{measure}` as a dependent "
+            "variable. Simulation supports "
+            f"{DV_DISPLAY_LABELS['forward_accuracy']} or "
+            f"{DV_DISPLAY_LABELS['counterfactual_accuracy']}.",
+            coercion_note,
+        )
+        for target in coerce_targets:
+            dvs.append({
+                "name": target,
+                "levels": ["continuous"],
+                "source_label": measure,
+                "simulatable": True,
+                "coerced": True,
+            })
 
     rvs: list[dict[str, Any]] = []
     for row in study_design.get("randomVariablesRV", []):
@@ -538,11 +611,12 @@ def parse_design_export(raw: dict[str, Any]) -> DesignExport:
         apparatus_instance_ids = list(SIM2REAL_DEFAULT_TEST_INSTANCE_IDS)
         apparatus_training_instance_ids = list(SIM2REAL_DEFAULT_TRAIN_INSTANCE_IDS)
 
+    resolved_dataset_ids = _resolve_dataset_ids_from_ivs(ivs, resolved_dataset_id)
     apparatus_instance_ids_by_dataset = _apparatus_instance_ids_by_dataset(
-        raw.get("apparatus"), "instanceIds", resolved_dataset_id
+        raw.get("apparatus"), "instanceIds", resolved_dataset_ids
     )
     apparatus_training_instance_ids_by_dataset = _apparatus_instance_ids_by_dataset(
-        raw.get("apparatus"), "trainingInstanceIds", resolved_dataset_id
+        raw.get("apparatus"), "trainingInstanceIds", resolved_dataset_ids
     )
 
     return DesignExport(
@@ -622,15 +696,23 @@ def _apparatus_instance_ids(apparatus: Any, key: str) -> list[int]:
 
 
 def _apparatus_instance_ids_by_dataset(
-    apparatus: Any, key: str, default_dataset_id: str
+    apparatus: Any, key: str, default_dataset_ids: Sequence[str]
 ) -> dict[str, list[int]]:
     """Same union as ``_apparatus_instance_ids``, but grouped by each entry's
     own ``params.appId`` -- the per-dataset tag a multi-dataset export's
     apparatus configurations carry (e.g. ``{"appId": "wine_quality",
-    "instanceIds": "1-10"}``). An entry naming no ``appId`` is assumed to
-    belong to the design's single dataset, so a design with no multi-dataset
-    apparatus tagging groups everything under one key -- exactly what the
-    flat, ungrouped ``_apparatus_instance_ids`` already gives.
+    "instanceIds": "1-10"}``).
+
+    An entry naming no ``appId`` is broadcast to every id in
+    ``default_dataset_ids`` instead of picked apart per dataset: many designs
+    reuse the same apparatus configuration (small index ranges like "0-9")
+    across every level of a between-subjects ``dataset`` IV rather than
+    tagging each config with which dataset it belongs to, and attributing it
+    to only the first/legacy dataset would silently leave every other
+    dataset's trials unconstrained. A single-dataset design's
+    ``default_dataset_ids`` is just that one id, so this still groups
+    everything under one key exactly like the flat, ungrouped
+    ``_apparatus_instance_ids`` already does.
     """
     if not isinstance(apparatus, list):
         return {}
@@ -640,14 +722,17 @@ def _apparatus_instance_ids_by_dataset(
             continue
         params = entry.get("params", {})
         raw_app_id = str(params.get("appId") or "").strip()
-        app_id = (
-            DATASET_ALIASES.get(slugify(raw_app_id), slugify(raw_app_id))
-            if raw_app_id
-            else default_dataset_id
-        )
-        if not app_id:
+        ids = _parse_instance_id_ranges(params.get(key))
+        if not ids:
             continue
-        grouped.setdefault(app_id, set()).update(_parse_instance_id_ranges(params.get(key)))
+        if raw_app_id:
+            slug = slugify(raw_app_id)
+            app_ids = [DATASET_ALIASES.get(slug, slug)]
+        else:
+            app_ids = list(default_dataset_ids)
+        for app_id in app_ids:
+            if app_id:
+                grouped.setdefault(app_id, set()).update(ids)
     return {app_id: sorted(ids) for app_id, ids in grouped.items() if ids}
 
 
@@ -853,6 +938,14 @@ def apply_design_export(
         research_questions=design.research_questions,
         consent_text=design.consent_text,
         procedure_steps=design.procedure_steps,
+        # A design export drives simulation/API use, not the human-facing
+        # walkthrough that consent text and a trials-marked procedure step
+        # exist for -- validate=False stores whatever the export has as a
+        # draft instead of blocking study creation on missing research
+        # questions/consent/procedure text. approve_walkthrough(...) is the
+        # actual gate for anyone who does need a complete protocol before
+        # running with real participants.
+        validate=False,
     )
 
     if report:
