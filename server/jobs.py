@@ -9,11 +9,24 @@ longer than an HTTP request may.
 Jobs run on a single worker thread on purpose -- torch training and matplotlib
 figure rendering are not safe to run concurrently in one process, and the study
 object itself is mutated by every stage.
+
+Every study and its job history is pickled/JSON-dumped into its own
+``output_dir`` after each successful step, and reloaded from there at startup.
+``output_dir`` lives under ``XAIKIT_SERVER_RUNS_DIR``, which on a paid Render
+plan is a persistent disk mounted at ``/data`` -- so a redeploy or restart no
+longer wipes every in-flight study, only the one job that happened to be
+actively running at the moment of the restart (which genuinely cannot be
+resumed, since the thread doing the work is gone; it is marked failed instead
+of silently vanishing).
 """
 
 from __future__ import annotations
 
 import io
+import json
+import logging
+import pickle
+import shutil
 import threading
 import time
 import traceback
@@ -23,6 +36,12 @@ from contextlib import redirect_stdout
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Optional
+
+logger = logging.getLogger(__name__)
+
+STUDY_PICKLE_NAME = "study.pkl"
+STUDY_META_NAME = "meta.json"
+JOBS_RECORD_NAME = "jobs.json"
 
 
 @dataclass
@@ -104,9 +123,44 @@ class Job:
             "log": self.log_text(tail=log_tail),
         }
 
+    def to_record(self) -> dict[str, Any]:
+        """Everything needed to rehydrate this job after a restart."""
+        return {
+            "job_id": self.job_id,
+            "study_id": self.study_id,
+            "stage": self.stage,
+            "state": self.state,
+            "created_at": self.created_at,
+            "started_at": self.started_at,
+            "finished_at": self.finished_at,
+            "result": self.result,
+            "error": self.error,
+            "traceback": self.traceback,
+            "log": self.log_text(),
+        }
+
+    @classmethod
+    def from_record(cls, record: dict[str, Any]) -> "Job":
+        job = cls(job_id=record["job_id"], study_id=record["study_id"], stage=record["stage"])
+        job.state = record.get("state", "failed")
+        job.created_at = record.get("created_at", time.time())
+        job.started_at = record.get("started_at")
+        job.finished_at = record.get("finished_at")
+        job.result = record.get("result")
+        job.error = record.get("error")
+        job.traceback = record.get("traceback")
+        job._log = io.StringIO(record.get("log", ""))
+        if job.state in ("queued", "running"):
+            # The thread that was running this job is gone -- it cannot be
+            # resumed, so say so instead of leaving it stuck "running" forever.
+            job.state = "failed"
+            job.error = "Interrupted by a server restart before this job finished."
+            job.finished_at = job.finished_at or time.time()
+        return job
+
 
 class StudyRegistry:
-    """In-process store of studies and their jobs."""
+    """In-process store of studies and their jobs, mirrored to disk."""
 
     def __init__(self, root: Path, *, max_workers: int = 1) -> None:
         self.root = Path(root)
@@ -115,6 +169,82 @@ class StudyRegistry:
         self._jobs: dict[str, Job] = {}
         self._guard = threading.Lock()
         self._pool = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="xaikit")
+        self._load_existing()
+
+    # -- persistence -------------------------------------------------------
+
+    def _pickle_path(self, study_id: str) -> Path:
+        return self.root / study_id / STUDY_PICKLE_NAME
+
+    def _meta_path(self, study_id: str) -> Path:
+        return self.root / study_id / STUDY_META_NAME
+
+    def _jobs_path(self, study_id: str) -> Path:
+        return self.root / study_id / JOBS_RECORD_NAME
+
+    def _persist_study(self, session: StudySession) -> None:
+        try:
+            session.output_dir.mkdir(parents=True, exist_ok=True)
+            pickle_path = self._pickle_path(session.study_id)
+            tmp_path = pickle_path.with_suffix(".tmp")
+            with tmp_path.open("wb") as fh:
+                pickle.dump(session.study, fh)
+            tmp_path.replace(pickle_path)
+            self._meta_path(session.study_id).write_text(
+                json.dumps({"created_at": session.created_at, "stages": session.stages})
+            )
+        except Exception:  # noqa: BLE001 - persistence must never break a request
+            logger.exception("Failed to persist study %s to disk", session.study_id)
+
+    def _persist_job(self, job: Job) -> None:
+        try:
+            jobs_path = self._jobs_path(job.study_id)
+            jobs_path.parent.mkdir(parents=True, exist_ok=True)
+            records: list[dict[str, Any]] = []
+            if jobs_path.is_file():
+                try:
+                    records = json.loads(jobs_path.read_text())
+                except (json.JSONDecodeError, OSError):
+                    records = []
+            records = [r for r in records if r.get("job_id") != job.job_id]
+            records.append(job.to_record())
+            tmp_path = jobs_path.with_suffix(".tmp")
+            tmp_path.write_text(json.dumps(records))
+            tmp_path.replace(jobs_path)
+        except Exception:  # noqa: BLE001 - persistence must never break a request
+            logger.exception("Failed to persist job %s to disk", job.job_id)
+
+    def _load_existing(self) -> None:
+        if not self.root.is_dir():
+            return
+        for entry in sorted(self.root.iterdir()):
+            pickle_path = entry / STUDY_PICKLE_NAME
+            if not entry.is_dir() or not pickle_path.is_file():
+                continue
+            study_id = entry.name
+            try:
+                with pickle_path.open("rb") as fh:
+                    study = pickle.load(fh)
+                meta: dict[str, Any] = {}
+                meta_path = self._meta_path(study_id)
+                if meta_path.is_file():
+                    meta = json.loads(meta_path.read_text())
+                session = StudySession(
+                    study_id=study_id,
+                    study=study,
+                    output_dir=entry,
+                    created_at=meta.get("created_at", time.time()),
+                    stages=meta.get("stages", {}),
+                )
+                self._studies[study_id] = session
+
+                jobs_path = self._jobs_path(study_id)
+                if jobs_path.is_file():
+                    for record in json.loads(jobs_path.read_text()):
+                        job = Job.from_record(record)
+                        self._jobs[job.job_id] = job
+            except Exception:  # noqa: BLE001 - one bad study must not block the rest
+                logger.exception("Failed to restore study %s from disk -- skipping it", study_id)
 
     # -- studies ---------------------------------------------------------
     def create(self, build: Callable[[Path], Any]) -> StudySession:
@@ -125,6 +255,7 @@ class StudyRegistry:
         session = StudySession(study_id=study_id, study=build(output_dir), output_dir=output_dir)
         with self._guard:
             self._studies[study_id] = session
+        self._persist_study(session)
         return session
 
     def get(self, study_id: str) -> StudySession:
@@ -141,6 +272,10 @@ class StudyRegistry:
     def delete(self, study_id: str) -> None:
         with self._guard:
             self._studies.pop(study_id, None)
+            self._jobs = {
+                job_id: job for job_id, job in self._jobs.items() if job.study_id != study_id
+            }
+        shutil.rmtree(self.root / study_id, ignore_errors=True)
 
     # -- jobs ------------------------------------------------------------
     def submit(
@@ -185,3 +320,5 @@ class StudyRegistry:
             job.traceback = traceback.format_exc()
         finally:
             job.finished_at = time.time()
+            self._persist_study(session)
+            self._persist_job(job)

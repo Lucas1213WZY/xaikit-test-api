@@ -121,9 +121,10 @@ def _session(study_id: str) -> StudySession:
         raise HTTPException(
             status_code=404,
             detail=(
-                f"Unknown study {study_id!r}. Studies live only in memory and do "
-                "not survive a server restart or redeploy -- if this id worked "
-                "before, POST /api/studies again to create a new one."
+                f"Unknown study {study_id!r}. Studies are persisted to disk and "
+                "reloaded on restart, so this id either never existed, was "
+                "deleted, or failed to restore (check the server logs) -- "
+                "POST /api/studies again to create a new one."
             ),
         )
 
@@ -268,9 +269,11 @@ def get_job(job_id: str, log_tail: int = Query(40, ge=0, le=5000)) -> dict[str, 
         raise HTTPException(
             status_code=404,
             detail=(
-                f"Unknown job {job_id!r}. Jobs live only in memory and do not "
-                "survive a server restart or redeploy -- the study that owned "
-                "this job is gone too; POST /api/studies again to start over."
+                f"Unknown job {job_id!r}. Jobs are persisted alongside their "
+                "study and reloaded on restart, so this id either never "
+                "existed or belongs to a study that was deleted or failed to "
+                "restore -- GET /api/studies/{study_id}/jobs to see what's "
+                "still there, or POST /api/studies to start over."
             ),
         )
     return job.payload(log_tail=log_tail or None)
