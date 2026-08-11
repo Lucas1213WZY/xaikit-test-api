@@ -26,7 +26,7 @@ def main() -> int:
 
     matplotlib.use("Agg")
 
-    from src.result_visualizer import render_panel_grid_png
+    from src.result_visualizer import render_comparison_figure
 
     if not DATA.is_file():
         raise FileNotFoundError(
@@ -38,7 +38,7 @@ def main() -> int:
 
     for study in payload["studies"]:
         slug = study["name"].lower().replace(" ", "_")
-        figure = render_panel_grid_png(
+        figure = render_comparison_figure(
             study["panels"], title=f"Human vs {study['name']}"
         )
         out_path = OUTPUT_DIR / f"{slug}.png"

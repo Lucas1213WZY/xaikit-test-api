@@ -121,8 +121,16 @@ def _panel(
     dv: str,
     note: str,
     order: Optional[list[str]] = None,
+    section: str = "",
+    subtitle: str = "",
+    role: str = "",
 ) -> dict[str, Any]:
-    """One grouped-bar panel: a category axis, one bar per agent."""
+    """One grouped-bar panel: a category axis, one bar per agent.
+
+    ``section`` groups panels into a row under one spanning heading, and
+    ``subtitle`` is the short label shown over the panel itself -- together they
+    give the published figures' "Wine Quality / w-o XAI | w- XAI" layout.
+    """
     summaries = {
         name: {row["group"]: row for row in _participant_summary(
             frame[frame[column].notna()], participant=participant, group=group, value=column
@@ -132,6 +140,9 @@ def _panel(
     keys = order or sorted({key for summary in summaries.values() for key in summary})
     return {
         "title": title,
+        "section": section,
+        "subtitle": subtitle,
+        "role": role,
         "dv": dv,
         "note": note,
         "categories": [_label(key, group_labels) for key in keys],
@@ -231,6 +242,10 @@ def build_coax() -> dict[str, Any]:
                         f"Forward simulation — "
                         f"{DATASET_LABELS.get(data_id, data_id).lower()}, {shown}"
                     ),
+                    # One row per dataset, split into w/o- and w/-XAI panels:
+                    # the layout the published figures use.
+                    "section": DATASET_LABELS.get(data_id, data_id),
+                    "subtitle": shown,
                     "dv": dv,
                     "note": note,
                     **_bars(subset, "XAIType", keys, xai_labels),
@@ -243,6 +258,7 @@ def build_coax() -> dict[str, Any]:
     panels.insert(
         0,
         {"title": "Overall — by dataset", "dv": dv,
+         "section": "Overall", "subtitle": "every dataset", "role": "summary",
          "note": note + " Pooled over explanation type.",
          **_bars(frame, "dataId", keys, DATASET_LABELS)},
     )
@@ -289,6 +305,8 @@ def build_coxam() -> dict[str, Any]:
                 series={"Human": "Response==AI", "CoXAM": "Model==AI"},
                 group_labels={},
                 title=f"Forward simulation — mushrooms, {label}",
+                section="Forward simulation — mushrooms",
+                subtitle=label,
                 dv="Forward accuracy",
                 note=(
                     "Rules = decision tree, Weights = logistic regression. Mushrooms only; "
@@ -328,6 +346,9 @@ def build_coxam() -> dict[str, Any]:
             series={"Human": "Changed AI prediction", "CoXAM": "Model changed AI prediction"},
             group_labels=DATASET_LABELS,
             title="Overall — counterfactual, by dataset",
+            section="Counterfactual",
+            subtitle="both datasets",
+            role="summary",
             dv="Counterfactual accuracy",
             note=(
                 "Both datasets side by side, pooled over condition and whether the "
@@ -358,6 +379,8 @@ def build_coxam() -> dict[str, Any]:
                         f"Counterfactual — {DATASET_LABELS.get(data_id, data_id).lower()}, "
                         f"{shown_label}"
                     ),
+                    section="Counterfactual",
+                    subtitle=f"{DATASET_LABELS.get(data_id, data_id)}, {shown_label}",
                     dv="Counterfactual accuracy",
                     note=(
                         "Whether the edit flipped the AI's prediction — a different question "

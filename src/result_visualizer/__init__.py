@@ -22,7 +22,7 @@ from .human_vs_model import (
     participant_summary,
     render_comparison_report,
 )
-from .panel_grid import render_panel_grid_png
+from .panel_grid import render_comparison_figure, render_panel_grid_png
 
 __all__ = [
     "STUDY_NAMES",
@@ -42,5 +42,6 @@ __all__ = [
     "pretty",
     "prettify_condition_label",
     "render_comparison_report",
+    "render_comparison_figure",
     "render_panel_grid_png",
 ]

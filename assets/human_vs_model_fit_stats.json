@@ -4,167 +4,636 @@
   "studies": [
     {
       "name": "sim2real",
-      "facets": [
-        "Faithful",
-        "Sparse",
-        "Robust",
-        "Sparse + robust"
-      ],
-      "models": [
+      "tables": [
         {
-          "name": "sim2real",
-          "label": "sim2real",
-          "is_target": true,
-          "cells": {
-            "Faithful": {
-              "nll_mean": 0.5199893344134598,
-              "nll_sd": 0.09320522148491664,
-              "bic_mean": 63.83233969584543,
-              "bic_sd": 7.927871975117025,
-              "n": 12
+          "title": "Counterfactual comparison, by explanation property",
+          "facets": [
+            "Faithful",
+            "Sparse",
+            "Robust",
+            "Sparse + robust"
+          ],
+          "models": [
+            {
+              "name": "sim2real",
+              "label": "sim2real",
+              "is_target": true,
+              "cells": {
+                "Faithful": {
+                  "nll_mean": 0.5199893344134598,
+                  "nll_sd": 0.09320522148491664,
+                  "bic_mean": 63.83233969584543,
+                  "bic_sd": 7.927871975117025,
+                  "n": 12
+                },
+                "Robust": {
+                  "nll_mean": 0.2072376376782956,
+                  "nll_sd": 0.22072270632587146,
+                  "bic_mean": 45.69274128520589,
+                  "bic_sd": 12.801916966900544,
+                  "n": 11
+                },
+                "Sparse": {
+                  "nll_mean": 0.5353597958556094,
+                  "nll_sd": 0.10117634385159227,
+                  "bic_mean": 55.46376292702729,
+                  "bic_sd": 12.087174078961384,
+                  "n": 12
+                },
+                "Sparse + robust": {
+                  "nll_mean": 0.3297750919785054,
+                  "nll_sd": 0.07102123102915263,
+                  "bic_mean": 43.31026175011072,
+                  "bic_sd": 10.226845768629685,
+                  "n": 11
+                }
+              }
             },
-            "Robust": {
-              "nll_mean": 0.2072376376782956,
-              "nll_sd": 0.22072270632587146,
-              "bic_mean": 45.69274128520589,
-              "bic_sd": 12.801916966900544,
-              "n": 11
+            {
+              "name": "decision_tree",
+              "label": "Decision Tree",
+              "is_target": false,
+              "cells": {
+                "Faithful": {
+                  "nll_mean": 0.6865341059283324,
+                  "nll_sd": 0.015677692480763745,
+                  "bic_mean": 46.55356980381625,
+                  "bic_sd": 0.9093061638842976,
+                  "n": 12
+                },
+                "Robust": {
+                  "nll_mean": 0.8487543485995832,
+                  "nll_sd": 0.09376980780502994,
+                  "bic_mean": 55.96234387874878,
+                  "bic_sd": 5.438648852691736,
+                  "n": 11
+                },
+                "Sparse": {
+                  "nll_mean": 0.8766904059795683,
+                  "nll_sd": 0.08490512274577462,
+                  "bic_mean": 57.582635206787906,
+                  "bic_sd": 4.924497119254927,
+                  "n": 12
+                },
+                "Sparse + robust": {
+                  "nll_mean": 0.8529513333677471,
+                  "nll_sd": 0.09754427882330866,
+                  "bic_mean": 56.205768995302286,
+                  "bic_sd": 5.657568171751903,
+                  "n": 11
+                }
+              }
             },
-            "Sparse": {
-              "nll_mean": 0.5353597958556094,
-              "nll_sd": 0.10117634385159227,
-              "bic_mean": 55.46376292702729,
-              "bic_sd": 12.087174078961384,
-              "n": 12
+            {
+              "name": "logistic_regression",
+              "label": "Logistic Regression",
+              "is_target": false,
+              "cells": {
+                "Faithful": {
+                  "nll_mean": 1.1994154922814408,
+                  "nll_sd": 0.6126251428336706,
+                  "bic_mean": 76.30069021229652,
+                  "bic_sd": 35.5322582843529,
+                  "n": 12
+                },
+                "Robust": {
+                  "nll_mean": 0.8899363919111881,
+                  "nll_sd": 0.6472755426652659,
+                  "bic_mean": 58.35090239082186,
+                  "bic_sd": 37.54198147458542,
+                  "n": 11
+                },
+                "Sparse": {
+                  "nll_mean": 1.8810988498578662,
+                  "nll_sd": 0.9151356211390139,
+                  "bic_mean": 115.83832495172918,
+                  "bic_sd": 53.0778660260628,
+                  "n": 12
+                },
+                "Sparse + robust": {
+                  "nll_mean": 0.8195209678028262,
+                  "nll_sd": 0.27919312762741344,
+                  "bic_mean": 54.266807792536866,
+                  "bic_sd": 16.193201402389974,
+                  "n": 11
+                }
+              }
             },
-            "Sparse + robust": {
-              "nll_mean": 0.3297750919785054,
-              "nll_sd": 0.07102123102915263,
-              "bic_mean": 43.31026175011072,
-              "bic_sd": 10.226845768629685,
-              "n": 11
+            {
+              "name": "mlp",
+              "label": "MLP",
+              "is_target": false,
+              "cells": {
+                "Faithful": {
+                  "nll_mean": 3.260908955300184,
+                  "nll_sd": 1.5891168996143294,
+                  "bic_mean": 195.8673110673836,
+                  "bic_sd": 92.1687801776311,
+                  "n": 12
+                },
+                "Robust": {
+                  "nll_mean": 2.1450082615091266,
+                  "nll_sd": 0.861090969778987,
+                  "bic_mean": 131.1450708275023,
+                  "bic_sd": 49.943276247181245,
+                  "n": 11
+                },
+                "Sparse": {
+                  "nll_mean": 4.200675978145932,
+                  "nll_sd": 2.35641983452968,
+                  "bic_mean": 250.37379839243695,
+                  "bic_sd": 136.67235040272146,
+                  "n": 12
+                },
+                "Sparse + robust": {
+                  "nll_mean": 2.6920151776367742,
+                  "nll_sd": 0.6538758381110601,
+                  "bic_mean": 162.87147196290587,
+                  "bic_sd": 37.92479861044149,
+                  "n": 11
+                }
+              }
             }
-          }
-        },
-        {
-          "name": "decision_tree",
-          "label": "Decision Tree",
-          "is_target": false,
-          "cells": {
-            "Faithful": {
-              "nll_mean": 0.6865341059283324,
-              "nll_sd": 0.015677692480763745,
-              "bic_mean": 46.55356980381625,
-              "bic_sd": 0.9093061638842976,
-              "n": 12
-            },
-            "Robust": {
-              "nll_mean": 0.8487543485995832,
-              "nll_sd": 0.09376980780502994,
-              "bic_mean": 55.96234387874878,
-              "bic_sd": 5.438648852691736,
-              "n": 11
-            },
-            "Sparse": {
-              "nll_mean": 0.8766904059795683,
-              "nll_sd": 0.08490512274577462,
-              "bic_mean": 57.582635206787906,
-              "bic_sd": 4.924497119254927,
-              "n": 12
-            },
-            "Sparse + robust": {
-              "nll_mean": 0.8529513333677471,
-              "nll_sd": 0.09754427882330866,
-              "bic_mean": 56.205768995302286,
-              "bic_sd": 5.657568171751903,
-              "n": 11
-            }
-          }
-        },
-        {
-          "name": "logistic_regression",
-          "label": "Logistic Regression",
-          "is_target": false,
-          "cells": {
-            "Faithful": {
-              "nll_mean": 1.1994154922814408,
-              "nll_sd": 0.6126251428336706,
-              "bic_mean": 76.30069021229652,
-              "bic_sd": 35.5322582843529,
-              "n": 12
-            },
-            "Robust": {
-              "nll_mean": 0.8899363919111881,
-              "nll_sd": 0.6472755426652659,
-              "bic_mean": 58.35090239082186,
-              "bic_sd": 37.54198147458542,
-              "n": 11
-            },
-            "Sparse": {
-              "nll_mean": 1.8810988498578662,
-              "nll_sd": 0.9151356211390139,
-              "bic_mean": 115.83832495172918,
-              "bic_sd": 53.0778660260628,
-              "n": 12
-            },
-            "Sparse + robust": {
-              "nll_mean": 0.8195209678028262,
-              "nll_sd": 0.27919312762741344,
-              "bic_mean": 54.266807792536866,
-              "bic_sd": 16.193201402389974,
-              "n": 11
-            }
-          }
-        },
-        {
-          "name": "mlp",
-          "label": "MLP",
-          "is_target": false,
-          "cells": {
-            "Faithful": {
-              "nll_mean": 3.260908955300184,
-              "nll_sd": 1.5891168996143294,
-              "bic_mean": 195.8673110673836,
-              "bic_sd": 92.1687801776311,
-              "n": 12
-            },
-            "Robust": {
-              "nll_mean": 2.1450082615091266,
-              "nll_sd": 0.861090969778987,
-              "bic_mean": 131.1450708275023,
-              "bic_sd": 49.943276247181245,
-              "n": 11
-            },
-            "Sparse": {
-              "nll_mean": 4.200675978145932,
-              "nll_sd": 2.35641983452968,
-              "bic_mean": 250.37379839243695,
-              "bic_sd": 136.67235040272146,
-              "n": 12
-            },
-            "Sparse + robust": {
-              "nll_mean": 2.6920151776367742,
-              "nll_sd": 0.6538758381110601,
-              "bic_mean": 162.87147196290587,
-              "bic_sd": 37.92479861044149,
-              "n": 11
-            }
-          }
+          ],
+          "note": "sim2real is the study's fitted cognitive model (best strategy per participant); the three baselines are DecisionTreeBaseline, LogisticRegressionBaseline and MLPBaseline from src/cognitive_models/baseline_models, trained once per exp_property on the ten training cases and scored against every participant's real answers. Lower is better."
         }
-      ],
-      "note": "sim2real is the study's fitted cognitive model (best strategy per participant); the three baselines are DecisionTreeBaseline, LogisticRegressionBaseline and MLPBaseline from src/cognitive_models/baseline_models, trained once per exp_property on the ten training cases and scored against every participant's real answers. Lower is better."
+      ]
     },
     {
       "name": "coax",
-      "facets": [],
-      "models": [],
-      "note": "assets/human_data/CoAX/coax_human_model_and_baselines.csv carries only hard 0/1 predictions for the DT/KNN/MLP baselines, not the probabilities NLL needs -- no fit table until those baselines are re-scored with predict_proba."
+      "tables": [
+        {
+          "title": "Forward simulation, by XAI type",
+          "facets": [
+            "None XAI",
+            "Importance XAI",
+            "Attribution XAI"
+          ],
+          "models": [
+            {
+              "name": "decision_tree",
+              "label": "DT",
+              "is_target": false,
+              "cells": {
+                "None XAI": {
+                  "nll_mean": 0.61,
+                  "nll_sd": 0.1,
+                  "bic_mean": 27.7,
+                  "bic_sd": 3.6,
+                  "n": null
+                },
+                "Importance XAI": {
+                  "nll_mean": 0.6,
+                  "nll_sd": 0.1,
+                  "bic_mean": 27.4,
+                  "bic_sd": 3.6,
+                  "n": null
+                },
+                "Attribution XAI": {
+                  "nll_mean": 0.58,
+                  "nll_sd": 0.09,
+                  "bic_mean": 26.7,
+                  "bic_sd": 3.2,
+                  "n": null
+                }
+              }
+            },
+            {
+              "name": "knn",
+              "label": "KNN",
+              "is_target": false,
+              "cells": {
+                "None XAI": {
+                  "nll_mean": 0.58,
+                  "nll_sd": 0.14,
+                  "bic_mean": 26.7,
+                  "bic_sd": 5.0,
+                  "n": null
+                },
+                "Importance XAI": {
+                  "nll_mean": 0.59,
+                  "nll_sd": 0.11,
+                  "bic_mean": 27.0,
+                  "bic_sd": 4.0,
+                  "n": null
+                },
+                "Attribution XAI": {
+                  "nll_mean": 0.46,
+                  "nll_sd": 0.16,
+                  "bic_mean": 22.3,
+                  "bic_sd": 5.8,
+                  "n": null
+                }
+              }
+            },
+            {
+              "name": "mlp",
+              "label": "MLP",
+              "is_target": false,
+              "cells": {
+                "None XAI": {
+                  "nll_mean": 0.61,
+                  "nll_sd": 0.07,
+                  "bic_mean": 27.7,
+                  "bic_sd": 2.5,
+                  "n": null
+                },
+                "Importance XAI": {
+                  "nll_mean": 0.6,
+                  "nll_sd": 0.09,
+                  "bic_mean": 27.4,
+                  "bic_sd": 3.2,
+                  "n": null
+                },
+                "Attribution XAI": {
+                  "nll_mean": 0.43,
+                  "nll_sd": 0.11,
+                  "bic_mean": 21.3,
+                  "bic_sd": 4.0,
+                  "n": null
+                }
+              }
+            },
+            {
+              "name": "coax",
+              "label": "CoAX",
+              "is_target": true,
+              "cells": {
+                "None XAI": {
+                  "nll_mean": 0.47,
+                  "nll_sd": 0.22,
+                  "bic_mean": 26.0,
+                  "bic_sd": 7.9,
+                  "n": null
+                },
+                "Importance XAI": {
+                  "nll_mean": 0.38,
+                  "nll_sd": 0.23,
+                  "bic_mean": 25.8,
+                  "bic_sd": 7.2,
+                  "n": null
+                },
+                "Attribution XAI": {
+                  "nll_mean": 0.31,
+                  "nll_sd": 0.21,
+                  "bic_mean": 25.7,
+                  "bic_sd": 7.6,
+                  "n": null
+                }
+              }
+            }
+          ],
+          "note": "From the published paper table, not computed in this repo -- assets/human_data/CoAX/coax_human_model_and_baselines.csv carries only hard 0/1 predictions for the DT/KNN/MLP baselines, not the probabilities NLL needs. Averaged over all participants from the 3 corpus datasets (adult, forest_cover, wine_quality). Lower is better."
+        }
+      ]
     },
     {
       "name": "coxam",
-      "facets": [],
-      "models": [],
-      "note": "No DT/LR baseline predictions exist yet under assets/human_data/CoXAM -- no fit table until one is fitted."
+      "tables": [
+        {
+          "title": "Forward simulation, by dataset and explanation family",
+          "facets": [
+            "Wine Quality \u2014 Rules",
+            "Wine Quality \u2014 Weights",
+            "Wine Quality \u2014 Hybrid",
+            "Mushrooms \u2014 Rules",
+            "Mushrooms \u2014 Weights",
+            "Mushrooms \u2014 Hybrid"
+          ],
+          "models": [
+            {
+              "name": "decision_tree",
+              "label": "Decision Tree",
+              "is_target": false,
+              "cells": {
+                "Wine Quality \u2014 Rules": {
+                  "nll_mean": 26.8,
+                  "nll_sd": null,
+                  "bic_mean": 57.3,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Wine Quality \u2014 Hybrid": {
+                  "nll_mean": 26.2,
+                  "nll_sd": null,
+                  "bic_mean": 56.1,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Rules": {
+                  "nll_mean": 21.7,
+                  "nll_sd": null,
+                  "bic_mean": 47.1,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Hybrid": {
+                  "nll_mean": 29.7,
+                  "nll_sd": null,
+                  "bic_mean": 63.1,
+                  "bic_sd": null,
+                  "n": null
+                }
+              }
+            },
+            {
+              "name": "linear_regression",
+              "label": "Linear Regression",
+              "is_target": false,
+              "cells": {
+                "Wine Quality \u2014 Weights": {
+                  "nll_mean": 28.0,
+                  "nll_sd": null,
+                  "bic_mean": 59.7,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Wine Quality \u2014 Hybrid": {
+                  "nll_mean": 26.8,
+                  "nll_sd": null,
+                  "bic_mean": 57.3,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Weights": {
+                  "nll_mean": 37.0,
+                  "nll_sd": null,
+                  "bic_mean": 77.7,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Hybrid": {
+                  "nll_mean": 35.5,
+                  "nll_sd": null,
+                  "bic_mean": 74.7,
+                  "bic_sd": null,
+                  "n": null
+                }
+              }
+            },
+            {
+              "name": "knn_no_xai",
+              "label": "KNN w/o XAI",
+              "is_target": false,
+              "cells": {
+                "Wine Quality \u2014 Rules": {
+                  "nll_mean": 29.7,
+                  "nll_sd": null,
+                  "bic_mean": 66.8,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Wine Quality \u2014 Weights": {
+                  "nll_mean": 30.1,
+                  "nll_sd": null,
+                  "bic_mean": 67.6,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Wine Quality \u2014 Hybrid": {
+                  "nll_mean": 29.9,
+                  "nll_sd": null,
+                  "bic_mean": 67.2,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Rules": {
+                  "nll_mean": 24.0,
+                  "nll_sd": null,
+                  "bic_mean": 55.4,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Weights": {
+                  "nll_mean": 28.1,
+                  "nll_sd": null,
+                  "bic_mean": 63.6,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Hybrid": {
+                  "nll_mean": 27.2,
+                  "nll_sd": null,
+                  "bic_mean": 61.8,
+                  "bic_sd": null,
+                  "n": null
+                }
+              }
+            },
+            {
+              "name": "coxam",
+              "label": "CoXAM",
+              "is_target": true,
+              "cells": {
+                "Wine Quality \u2014 Rules": {
+                  "nll_mean": 18.9,
+                  "nll_sd": null,
+                  "bic_mean": 48.8,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Wine Quality \u2014 Weights": {
+                  "nll_mean": 19.9,
+                  "nll_sd": null,
+                  "bic_mean": 50.9,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Wine Quality \u2014 Hybrid": {
+                  "nll_mean": 20.2,
+                  "nll_sd": null,
+                  "bic_mean": 51.5,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Rules": {
+                  "nll_mean": 20.7,
+                  "nll_sd": null,
+                  "bic_mean": 52.5,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Weights": {
+                  "nll_mean": 21.5,
+                  "nll_sd": null,
+                  "bic_mean": 54.1,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Hybrid": {
+                  "nll_mean": 20.8,
+                  "nll_sd": null,
+                  "bic_mean": 52.7,
+                  "bic_sd": null,
+                  "n": null
+                }
+              }
+            }
+          ],
+          "note": "From the published paper table, not computed in this repo -- no DT/LR baseline predictions exist yet under assets/human_data/CoXAM. A model absent for a facet is the paper's '---': that baseline is only comparable against the explanation family it models (Decision Tree vs Rules, Linear Regression vs Weights; both still apply at Hybrid). Lower is better."
+        },
+        {
+          "title": "Counterfactual, by dataset and explanation family",
+          "facets": [
+            "Wine Quality \u2014 Rules",
+            "Wine Quality \u2014 Weights",
+            "Wine Quality \u2014 Hybrid",
+            "Mushrooms \u2014 Rules",
+            "Mushrooms \u2014 Weights",
+            "Mushrooms \u2014 Hybrid"
+          ],
+          "models": [
+            {
+              "name": "random",
+              "label": "Random",
+              "is_target": false,
+              "cells": {
+                "Wine Quality \u2014 Rules": {
+                  "nll_mean": 71.67,
+                  "nll_sd": null,
+                  "bic_mean": 143.34,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Wine Quality \u2014 Weights": {
+                  "nll_mean": 71.67,
+                  "nll_sd": null,
+                  "bic_mean": 143.34,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Wine Quality \u2014 Hybrid": {
+                  "nll_mean": 71.67,
+                  "nll_sd": null,
+                  "bic_mean": 143.34,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Rules": {
+                  "nll_mean": 71.67,
+                  "nll_sd": null,
+                  "bic_mean": 143.34,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Weights": {
+                  "nll_mean": 71.67,
+                  "nll_sd": null,
+                  "bic_mean": 143.34,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Hybrid": {
+                  "nll_mean": 71.67,
+                  "nll_sd": null,
+                  "bic_mean": 143.34,
+                  "bic_sd": null,
+                  "n": null
+                }
+              }
+            },
+            {
+              "name": "global_shap",
+              "label": "Global SHAP",
+              "is_target": false,
+              "cells": {
+                "Wine Quality \u2014 Rules": {
+                  "nll_mean": 42.1,
+                  "nll_sd": null,
+                  "bic_mean": 84.2,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Wine Quality \u2014 Weights": {
+                  "nll_mean": 56.3,
+                  "nll_sd": null,
+                  "bic_mean": 112.6,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Wine Quality \u2014 Hybrid": {
+                  "nll_mean": 54.7,
+                  "nll_sd": null,
+                  "bic_mean": 106.4,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Rules": {
+                  "nll_mean": 50.2,
+                  "nll_sd": null,
+                  "bic_mean": 100.4,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Weights": {
+                  "nll_mean": 55.1,
+                  "nll_sd": null,
+                  "bic_mean": 110.2,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Hybrid": {
+                  "nll_mean": 51.0,
+                  "nll_sd": null,
+                  "bic_mean": 102.0,
+                  "bic_sd": null,
+                  "n": null
+                }
+              }
+            },
+            {
+              "name": "coxam",
+              "label": "CoXAM",
+              "is_target": true,
+              "cells": {
+                "Wine Quality \u2014 Rules": {
+                  "nll_mean": 35.6,
+                  "nll_sd": null,
+                  "bic_mean": 71.2,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Wine Quality \u2014 Weights": {
+                  "nll_mean": 51.8,
+                  "nll_sd": null,
+                  "bic_mean": 103.6,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Wine Quality \u2014 Hybrid": {
+                  "nll_mean": 45.0,
+                  "nll_sd": null,
+                  "bic_mean": 90.0,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Rules": {
+                  "nll_mean": 45.8,
+                  "nll_sd": null,
+                  "bic_mean": 91.6,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Weights": {
+                  "nll_mean": 50.6,
+                  "nll_sd": null,
+                  "bic_mean": 101.2,
+                  "bic_sd": null,
+                  "n": null
+                },
+                "Mushrooms \u2014 Hybrid": {
+                  "nll_mean": 46.6,
+                  "nll_sd": null,
+                  "bic_mean": 93.2,
+                  "bic_sd": null,
+                  "n": null
+                }
+              }
+            }
+          ],
+          "note": "From the published paper table, not computed in this repo. Random is constant by construction (no XAI-dependence); Global SHAP is a single global attribution baseline, not fit per participant. Lower is better."
+        }
+      ]
     }
   ]
 }
