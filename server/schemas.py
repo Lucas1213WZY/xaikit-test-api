@@ -38,10 +38,10 @@ class DatasetStageRequest(BaseModel):
     test_size: float = 0.4
     random_state: int = 42
     target_metric: str = "accuracy"
-    target_score: Optional[float] = 0.90
-    max_epochs: int = 1000
-    check_every_epochs: int = 10
-    batch_size: int = 100
+    target_score: Optional[float] = 0.85
+    max_epochs: int = 300
+    check_every_epochs: int = 20
+    batch_size: int = 512
 
 
 class TrialsStageRequest(BaseModel):
