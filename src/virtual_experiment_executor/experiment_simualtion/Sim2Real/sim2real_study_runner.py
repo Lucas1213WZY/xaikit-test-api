@@ -18,6 +18,7 @@ import pandas as pd
 from src.experiment_planner import select_trial_rows
 
 from .sim2real_trial_executor import (
+    AUTO_STRATEGY,
     ORDER_COLUMN,
     build_sim2real_projector,
     run_sim2real_experiment_executor,
@@ -34,7 +35,7 @@ def run_sim2real_study(
     dvs: Optional[Mapping[str, Any]] = None,
     cognitive_params: Optional[Mapping[str, Any]] = None,
     normalize_by_i_max: bool = False,
-    strategy: str = "attribution_sum",
+    strategy: str = AUTO_STRATEGY,
     store: bool = True,
 ) -> pd.DataFrame:
     """Execute a study's trials with Sim2Real participants.

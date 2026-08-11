@@ -167,15 +167,19 @@ class SimulationRequest(BaseModel):
         ),
     )
     sim2real_strategy: str = Field(
-        "attribution_sum",
+        "auto",
         description=(
-            "Sim2Real designs only. Which cognitive model simulates a participant: "
-            "'attribution_sum' reads the explanation's attributions and is the best "
-            "fit wherever the changed feature has a visible attribution; "
-            "'sensitive_features' and 'salient_features' classify by exemplar "
-            "similarity over feature values and fit better where it does not, which "
-            "is most of the sparse condition. Defaults to attribution_sum so an "
-            "unset request behaves as before."
+            "Sim2Real designs only. Which cognitive model simulates a participant. "
+            "'auto' (the default) picks per condition: 'sparse' runs "
+            "'sensitive_features' because its explanation almost never shows the "
+            "changed feature (6.9% of trials), leaving 'attribution_sum' nothing to "
+            "read -- it degenerates to a constant response scoring 0.310 against a "
+            "real human 0.757, where exemplar similarity scores 0.762. The other "
+            "three conditions keep 'attribution_sum', which reads the attributions "
+            "they do carry. Naming a strategy explicitly ('attribution_sum', "
+            "'sensitive_features', 'salient_features') forces it on every condition "
+            "instead -- note the exemplar strategies ignore the explanation, so "
+            "forcing one returns the same accuracy for all four conditions."
         ),
     )
     sim2real_params: Optional[dict] = Field(
