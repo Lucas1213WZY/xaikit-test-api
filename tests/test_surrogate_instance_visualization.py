@@ -74,3 +74,33 @@ def test_decision_tree_instance_view_renders_from_fitted_surrogate():
     assert fig is not None
     assert len(axes) == 4
     plt.close(fig)
+
+
+def test_instance_view_shows_every_trained_feature_not_just_ones_the_tree_split_on():
+    """A shallow tree routinely leaves some trained features out of its own
+    structure (greedy CART only splits on what it needs) -- the Attribute/
+    Value panel must still show every feature the tree was trained on, since
+    that's what the model was given to work with, not just the subset one
+    particular fit happened to use."""
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    rng = np.random.default_rng(0)
+    X = rng.normal(size=(60, 6))
+    y = (X[:, 0] > 0).astype(int)  # only feature 0 actually matters
+
+    surrogate = DecisionTreeSurrogateMethod(
+        app_id="toy", model_name="mlp", depth=3,
+        feature_names=["f0", "f1", "f2", "f3", "f4", "f5"],
+    ).fit(X, y)
+
+    used_in_tree = {
+        node["feature"] for node in surrogate.get_tree_structure() if not node["is_leaf"]
+    }
+    assert len(used_in_tree) < 6, "test setup expects the tree to leave features unused"
+
+    fig, axes = plot_decision_tree_instance_view(
+        surrogate, X[0], instance_id=0, class_labels=["Type 1", "Type 2"],
+    )
+    assert len(axes[0].texts) == 6
+    plt.close(fig)

@@ -825,15 +825,12 @@ def plot_decision_tree_instance_view(
         last_node = nodes_by_id[int(last_step["node"])]
         leaf_id = int(last_node["left"] if last_step["direction"] == "left" else last_node["right"])
 
-    used_indices = []
-    for node in tree_structure:
-        feature_key = node.get("feature")
-        if feature_key:
-            idx = _feature_index_from_key(str(feature_key))
-            if idx not in used_indices:
-                used_indices.append(idx)
-    if not used_indices:
-        used_indices = list(range(min(len(names), len(instance_array))))
+    # Every feature the tree was trained on, not just the ones it happened to
+    # split on -- a shallow tree routinely leaves some training features out
+    # of its actual structure (greedy CART only splits on what it needs), but
+    # the instance view is meant to show what the model was given to work
+    # with, not just the subset one particular fitted tree ended up using.
+    used_indices = list(range(min(len(names), len(instance_array))))
 
     row_count = len(used_indices)
     max_depth = _tree_depth(nodes_by_id)
