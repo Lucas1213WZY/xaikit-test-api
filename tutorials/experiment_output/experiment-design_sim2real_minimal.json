@@ -1,0 +1,118 @@
+{
+  "researchQuestions": "na",
+  "studyDesign": {
+    "dependentVariables": [
+      {
+        "measure": "counterfactual_sim",
+        "name": "",
+        "formula": ""
+      }
+    ],
+    "modelFramework": "",
+    "independentVariables": [
+      {
+        "factor": "XAI Property",
+        "levelsOrRange": "faithful | sparse | robust | sparse_robust",
+        "allocation": "Between-subjects",
+        "counterbalancing": ""
+      }
+    ],
+    "controlVariablesCV": [],
+    "randomVariablesRV": [],
+    "design": "between-subjects",
+    "dataset": "",
+    "totalConditions": 4,
+    "betweenSubjectsCells": 4,
+    "participantsPerCondition": 30,
+    "totalParticipants": 120,
+    "trialsPerParticipant": 30,
+    "totalTrials": 3600
+  },
+  "apparatus": [
+    {
+      "id": "ap_msof5y73_0",
+      "label": "Configuration 1",
+      "group": "All participants",
+      "mode": "ours",
+      "params": {
+        "appId": "adult_sim2real",
+        "expMethod": "faithful"
+      },
+      "url": ""
+    },
+    {
+      "id": "ap_msol5x9i_1",
+      "label": "Configuration 2",
+      "group": "All participants",
+      "mode": "ours",
+      "params": {
+        "appId": "adult_sim2real",
+        "expMethod": "sparse"
+      },
+      "url": ""
+    },
+    {
+      "id": "ap_msol62od_2",
+      "label": "Configuration 3",
+      "group": "All participants",
+      "mode": "ours",
+      "params": {
+        "appId": "adult_sim2real",
+        "expMethod": "sparse_robust"
+      },
+      "url": ""
+    },
+    {
+      "id": "ap_msol66x5_3",
+      "label": "Configuration 4",
+      "group": "All participants",
+      "mode": "ours",
+      "params": {
+        "appId": "adult_sim2real",
+        "expMethod": "sparse_robust"
+      },
+      "url": ""
+    }
+  ],
+  "procedure": [
+    {
+      "title": "Welcome & consent",
+      "note": "Greet the participant, explain the study, and collect informed consent."
+    },
+    {
+      "title": "Demographics questionnaire",
+      "note": "Short background questions (e.g. age range, AI familiarity)."
+    },
+    {
+      "title": "Training / practice",
+      "note": "Walk through the interface with a few practice trials so the task is understood before it counts."
+    },
+    {
+      "title": "Main task (trials)",
+      "note": "The core trials where your dependent variables are collected, in the counterbalanced order from Study Design."
+    },
+    {
+      "title": "Post-task questionnaire",
+      "note": "Self-report measures (e.g. trust, workload, satisfaction)."
+    },
+    {
+      "title": "Debrief",
+      "note": "Explain the study's purpose, answer questions, and thank the participant."
+    }
+  ],
+  "userModel": "CoAX",
+  "mlProxyBaselines": [],
+  "cognitiveConfig": {},
+  "_rawAnswers": {
+    "user_model": "CoAX",
+    "apparatus_list": "[{\"id\":\"ap_msof5y73_0\",\"label\":\"Configuration 1\",\"group\":\"All participants\",\"mode\":\"ours\",\"params\":{\"appId\":\"adult_sim2real\",\"expMethod\":\"faithful\"},\"url\":\"\"},{\"id\":\"ap_msol5x9i_1\",\"label\":\"Configuration 2\",\"group\":\"All participants\",\"mode\":\"ours\",\"params\":{\"appId\":\"adult_sim2real\",\"expMethod\":\"sparse\"},\"url\":\"\"},{\"id\":\"ap_msol62od_2\",\"label\":\"Configuration 3\",\"group\":\"All participants\",\"mode\":\"ours\",\"params\":{\"appId\":\"adult_sim2real\",\"expMethod\":\"sparse_robust\"},\"url\":\"\"},{\"id\":\"ap_msol66x5_3\",\"label\":\"Configuration 4\",\"group\":\"All participants\",\"mode\":\"ours\",\"params\":{\"appId\":\"adult_sim2real\",\"expMethod\":\"sparse_robust\"},\"url\":\"\"}]",
+    "run_status": "done",
+    "sd_dv": "[{\"measure\":\"counterfactual_sim\",\"name\":\"\",\"formula\":\"\"}]",
+    "sd_ivs": "[{\"factor\":\"xai_property\",\"label\":\"XAI Property\",\"levels\":\"faithful | sparse | robust | sparse_robust\",\"alloc\":\"Between-subjects\",\"cogParam\":\"\",\"min\":\"\",\"max\":\"\"}]",
+    "sd_conditions": "4",
+    "sd_participants": "30",
+    "sd_trials": "30",
+    "proc_steps": "[{\"title\":\"Welcome & consent\",\"note\":\"Greet the participant, explain the study, and collect informed consent.\"},{\"title\":\"Demographics questionnaire\",\"note\":\"Short background questions (e.g. age range, AI familiarity).\"},{\"title\":\"Training / practice\",\"note\":\"Walk through the interface with a few practice trials so the task is understood before it counts.\"},{\"title\":\"Main task (trials)\",\"note\":\"The core trials where your dependent variables are collected, in the counterbalanced order from Study Design.\"},{\"title\":\"Post-task questionnaire\",\"note\":\"Self-report measures (e.g. trust, workload, satisfaction).\"},{\"title\":\"Debrief\",\"note\":\"Explain the study's purpose, answer questions, and thank the participant.\"}]",
+    "rq": "na\n"
+  }
+}

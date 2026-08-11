@@ -84,6 +84,14 @@ DATASET_ALIASES: dict[str, str] = {
     "breast_cancer_wisconsin": "breast_cancer",
 }
 
+#: Sim2Real's one published corpus, and the curated instance split every prior
+#: export declared explicitly (testing 10-30, training 0-9) -- the defaults a
+#: Sim2Real design falls back to when it leaves them unspecified, since the
+#: corpus never changes from study to study.
+SIM2REAL_DEFAULT_DATASET_ID = "adult"
+SIM2REAL_DEFAULT_TEST_INSTANCE_IDS: tuple[int, ...] = tuple(range(10, 31))
+SIM2REAL_DEFAULT_TRAIN_INSTANCE_IDS: tuple[int, ...] = tuple(range(0, 10))
+
 # ML-proxy baseline labels the UI offers, mapped onto the ids
 # ``cognitive_models`` declares. "MLP" already normalizes to mlp_baseline via
 # normalize_baseline_model_id; these are the ones that do not.
@@ -516,6 +524,20 @@ def parse_design_export(raw: dict[str, Any]) -> DesignExport:
     )
     dataset_label = study_design.get("dataset", "")
     resolved_dataset_id = DATASET_ALIASES.get(slugify(dataset_label), slugify(dataset_label))
+
+    # Sim2Real has exactly one published corpus (assets/ai_dataset/sim2real,
+    # appId "adult_sim2real", built from the adult dataset) -- it is always the
+    # same dataset and the same curated instance split, so a leaner export that
+    # leaves studyDesign.dataset blank and/or the apparatus instanceIds
+    # unspecified still resolves to the same values every prior export spelled
+    # out explicitly, rather than failing with "no dataset given".
+    is_sim2real = any(iv["name"] == "xai_property" for iv in ivs)
+    if is_sim2real and not resolved_dataset_id:
+        resolved_dataset_id = SIM2REAL_DEFAULT_DATASET_ID
+    if is_sim2real and not apparatus_instance_ids and not apparatus_training_instance_ids:
+        apparatus_instance_ids = list(SIM2REAL_DEFAULT_TEST_INSTANCE_IDS)
+        apparatus_training_instance_ids = list(SIM2REAL_DEFAULT_TRAIN_INSTANCE_IDS)
+
     apparatus_instance_ids_by_dataset = _apparatus_instance_ids_by_dataset(
         raw.get("apparatus"), "instanceIds", resolved_dataset_id
     )
