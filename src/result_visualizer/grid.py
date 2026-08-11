@@ -52,6 +52,58 @@ def _label_bars(
         )
 
 
+def _despine(axis: Any) -> None:
+    """Keep the left and bottom frame only.
+
+    The top and right spines carry no information and box the data in; dropping
+    them is the usual convention for a bar chart.
+    """
+    for side in ("top", "right"):
+        axis.spines[side].set_visible(False)
+
+
+def _proportion_ylim(
+    values: np.ndarray,
+    errors: Optional[np.ndarray] = None,
+    *,
+    labelled: bool = True,
+) -> Optional[tuple[float, float]]:
+    """A 0-1 axis with room above the tallest bar, or None if not a proportion.
+
+    A bar at exactly 1.000 -- a saturated condition, which happens -- reaches
+    the top of a 0..1.05 axis, and its value label then sits outside the axes
+    where it collides with the title. The headroom is measured from the top of
+    the error bar so the label always has somewhere to go.
+    """
+    finite = values[np.isfinite(values)] if values.size else values
+    if not finite.size or finite.min() < 0 or finite.max() > 1:
+        return None
+
+    top = float(finite.max())
+    if errors is not None and errors.size:
+        with np.errstate(invalid="ignore"):
+            capped = values + np.where(np.isfinite(errors), errors, 0.0)
+        capped = capped[np.isfinite(capped)]
+        if capped.size:
+            top = max(top, float(capped.max()))
+    # Enough for the label's own line height above the tallest error bar.
+    return (0.0, max(1.05, top + (0.10 if labelled else 0.04)))
+
+
+def _finish_axis(
+    axis: Any,
+    values: np.ndarray,
+    errors: Optional[np.ndarray] = None,
+    *,
+    labelled: bool = True,
+) -> None:
+    """Apply the shared bar-chart axis conventions."""
+    _despine(axis)
+    limits = _proportion_ylim(values, errors, labelled=labelled)
+    if limits is not None:
+        axis.set_ylim(*limits)
+
+
 @dataclass
 class ResultGrid:
     """Figure, axes, and aggregated values used by an IV/DV plot grid."""
@@ -205,10 +257,9 @@ def plot_iv_dv_grid(
             axis.set_title(f"{pretty(dv)} by {pretty(iv)}", fontsize=9)
 
             values = plotted["mean"].to_numpy(dtype=float)
-            if len(values) and np.nanmin(values) >= 0 and np.nanmax(values) <= 1:
-                axis.set_ylim(0, 1.05)
+            _finish_axis(axis, values, errors, labelled=value_labels)
             if value_labels:
-                _label_bars(axis, bars, plotted["mean"].to_numpy(dtype=float), errors)
+                _label_bars(axis, bars, values, errors)
 
     if title:
         figure.suptitle(title, fontsize=10.5)
@@ -359,8 +410,12 @@ def plot_dv_by_two_ivs(
     axis.legend(title=pretty(hue_iv), fontsize=8, title_fontsize=8)
 
     values = summary["mean"].to_numpy(dtype=float)
-    if len(values) and np.nanmin(values) >= 0 and np.nanmax(values) <= 1:
-        axis.set_ylim(0, 1.05)
+    summary_errors = (
+        summary[errorbar].to_numpy(dtype=float)
+        if errorbar is not None and errorbar in summary
+        else None
+    )
+    _finish_axis(axis, values, summary_errors)
     figure.tight_layout()
     return InteractionPlot(figure=figure, axis=axis, summary=summary)
 

@@ -288,6 +288,42 @@ FITTED_SIM2REAL_GCM_PARAMS: dict[str, dict[str, Any]] = {
     "sparse_robust": {"sensitivity": 10.0, "k": 3},
 }
 
+#: Chance a trial is answered at random rather than from the evidence, per
+#: condition -- the standard psychometric lapse, applied to the *response*.
+#:
+#: ``robust`` needs one and the other conditions do not. Its changed feature is
+#: visible on 100% of trials, so the evidence is unambiguous and the model is
+#: right about every instance, simulating 1.000 against a real human 0.912.
+#: That 8.8% is people slipping on easy trials, and no evidence-side parameter
+#: reproduces it: comparison_scale jumps accuracy 0.857 -> 1.000 between 10 and
+#: 12 with nothing in between, because at the threshold several instances flip
+#: at once.
+#:
+#: This is deliberately *not* the model's own ``lapse_rate``. That one mixes the
+#: guess into the probability (``(1-l)*p + l*guess``) before the response is
+#: thresholded at 0.5 -- and since it moves p toward 0.5 without ever crossing
+#: it, no value of it changes a single response. It is also forced to 0.0
+#: whenever the changed feature is visible, i.e. exactly here. Applying the
+#: lapse to the response instead makes it do what a lapse is supposed to do.
+#:
+#: A lapse answers at random, so it is wrong half the time: expected accuracy is
+#: ``1 - lapse/2``, and 0.176 takes a perfect model to 0.912. It also restores
+#: real between-participant variance -- without it every participant in a
+#: condition returns identical answers and 30 participants carry no more
+#: information than one.
+SIM2REAL_LAPSE_BY_PROPERTY: dict[str, float] = {
+    "robust": 0.176,
+}
+
+#: Seed for the lapse draws, so a study is reproducible run to run. Overridable
+#: per run via ``run_sim2real_experiment_executor(seed=...)``.
+DEFAULT_SIM2REAL_SEED = 0
+
+
+def sim2real_lapse_for(exp_property: Any) -> float:
+    """Response-level lapse rate for one condition (0.0 where none is needed)."""
+    return float(SIM2REAL_LAPSE_BY_PROPERTY.get(str(exp_property), 0.0))
+
 
 def sim2real_strategy_for(exp_property: Any, requested: str = AUTO_STRATEGY) -> str:
     """The strategy one condition simulates with.
@@ -410,15 +446,25 @@ def _result_row(
     *,
     truth: Optional[int],
     dvs: Optional[Mapping[str, Any]],
+    lapse: float = 0.0,
+    rng: Optional[np.random.Generator] = None,
 ) -> dict[str, Any]:
     """One output row per trial, shaped like the CoAX/CoXAM runners'.
 
     The response is "does income increase?", so the DV is whether that matches
     the corpus's own feedback label. Fills any DV whose name mentions accuracy,
     the convention the other runners use.
+
+    ``lapse`` is the chance of answering at random instead of from the evidence
+    (see :data:`SIM2REAL_LAPSE_BY_PROPERTY`). At 0.0 -- every condition but
+    robust -- the response is the plain threshold it has always been.
     """
     probability = float(comparison.probability_income_increases)
     response = int(probability >= 0.5)
+    lapsed = False
+    if lapse > 0.0 and rng is not None and rng.random() < lapse:
+        lapsed = True
+        response = int(rng.random() < 0.5)
     correct = None if truth is None else int(response == int(truth))
 
     dv_columns = {
@@ -444,6 +490,8 @@ def _result_row(
         "changed_feature_names": ", ".join(comparison.changed_feature_names),
         "retrieved_exemplar_count": comparison.retrieved_exemplar_count,
         "effective_lapse_rate": comparison.effective_lapse_rate,
+        "response_lapse_rate": lapse,
+        "response_lapsed": lapsed,
     }
 
 
@@ -456,6 +504,7 @@ def run_sim2real_experiment_executor(
     dvs: Optional[Mapping[str, Any]] = None,
     normalize_by_i_max: bool = False,
     strategy: str = AUTO_STRATEGY,
+    seed: Optional[int] = DEFAULT_SIM2REAL_SEED,
 ) -> pd.DataFrame:
     """Run each trial through the fitted model and return one row per trial.
 
@@ -490,6 +539,9 @@ def run_sim2real_experiment_executor(
 
     models: dict[Optional[str], Sim2RealFittedAttributionSum] = {}
     rows: list[dict[str, Any]] = []
+    # Seeded so a study reproduces run to run; only conditions with a lapse
+    # (see SIM2REAL_LAPSE_BY_PROPERTY) draw from it at all.
+    rng = np.random.default_rng(seed)
     for _, trial in trials.iterrows():
         record = trial.to_dict()
         instance_id = int(record["instanceId"])
@@ -520,7 +572,16 @@ def run_sim2real_experiment_executor(
         )
         comparison = trial_model.compare(pair)
         truth = int(projector.increase_labels([instance_id])[0])
-        rows.append(_result_row(record, comparison, truth=truth, dvs=dvs))
+        rows.append(
+            _result_row(
+                record,
+                comparison,
+                truth=truth,
+                dvs=dvs,
+                lapse=sim2real_lapse_for(exp_property),
+                rng=rng,
+            )
+        )
     return pd.DataFrame(rows)
 
 

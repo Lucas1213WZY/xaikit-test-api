@@ -15,7 +15,7 @@ from typing import Any, Sequence
 
 import numpy as np
 
-from .grid import _BAR_WIDTH, _label_bars
+from .grid import _BAR_WIDTH, _despine, _label_bars
 from .palette import categorical_color
 
 __all__ = ["render_panel_grid_png"]
@@ -79,6 +79,7 @@ def _draw_panel(axis: Any, panel: dict[str, Any], *, letter: str) -> None:
     axis.set_ylabel(panel.get("dv", ""), fontsize=8.5)
     axis.set_title(f"{letter}) {panel['title']}", fontsize=9, loc="left")
     axis.set_ylim(0, 1.12)
+    _despine(axis)
     axis.legend(fontsize=7, loc="best", framealpha=0.85)
 
 

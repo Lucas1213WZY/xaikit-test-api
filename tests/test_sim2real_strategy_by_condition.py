@@ -173,3 +173,94 @@ def test_auto_beats_a_single_forced_strategy_against_real_human_accuracy():
     # The conditions that already read attributions must be untouched.
     assert auto["faithful"] == forced["faithful"]
     assert auto["robust"] == forced["robust"]
+
+
+# ---------------------------------------------------------------------------
+# Response-level lapse: robust
+# ---------------------------------------------------------------------------
+
+
+def test_only_robust_carries_a_response_lapse():
+    from src.virtual_experiment_executor.experiment_simualtion.Sim2Real.sim2real_trial_executor import (
+        sim2real_lapse_for,
+    )
+
+    # robust is the one condition whose evidence is unambiguous on every trial,
+    # so it is the one the model is otherwise perfect on.
+    assert sim2real_lapse_for("robust") > 0.0
+    for exp_property in ("faithful", "sparse", "sparse_robust", "baseline", None):
+        assert sim2real_lapse_for(exp_property) == 0.0
+
+
+def test_the_lapse_is_sized_to_the_human_error_rate():
+    from src.virtual_experiment_executor.experiment_simualtion.Sim2Real.sim2real_trial_executor import (
+        sim2real_lapse_for,
+    )
+
+    # A lapse answers at random, so it is wrong half the time: a perfect model
+    # lands at 1 - lapse/2. Human robust accuracy is 0.912.
+    expected = 1.0 - sim2real_lapse_for("robust") / 2.0
+    assert abs(expected - HUMAN_ACCURACY["robust"]) < 0.01
+
+
+@pytest.mark.slow
+def test_robust_stops_simulating_a_perfect_participant():
+    accuracy = _condition_accuracy({})
+    # Was exactly 1.000 before the lapse; the human value is 0.912.
+    assert accuracy["robust"] < 1.0
+    assert abs(accuracy["robust"] - HUMAN_ACCURACY["robust"]) < 0.05
+
+
+@pytest.mark.slow
+def test_the_lapse_is_seeded_so_a_study_reproduces():
+    first = _condition_accuracy({})
+    second = _condition_accuracy({})
+    pd.testing.assert_series_equal(first, second)
+
+
+@pytest.mark.slow
+def test_the_lapse_restores_between_participant_variance():
+    import json
+    import tempfile
+    from pathlib import Path
+
+    from server.pipeline import (
+        build_study,
+        run_dataset_stage,
+        run_explanations_stage,
+        run_simulation_stage,
+        run_trials_stage,
+    )
+    from server.schemas import (
+        DatasetStageRequest,
+        ExplanationStageRequest,
+        SimulationRequest,
+        TrialsStageRequest,
+    )
+
+    export = (
+        Path(__file__).resolve().parents[1]
+        / "tutorials"
+        / "experiment_output"
+        / "experiment-design_sim2real_minimal.json"
+    )
+    study = build_study(
+        json.loads(export.read_text()),
+        project_name="sim2real-lapse",
+        output_dir=Path(tempfile.mkdtemp()),
+    )
+    run_dataset_stage(study, DatasetStageRequest())
+    run_trials_stage(study, TrialsStageRequest())
+    run_explanations_stage(study, ExplanationStageRequest())
+    run_simulation_stage(
+        study, SimulationRequest(mode="whole_experiment"), output_subdir="sim"
+    )
+    results = study.simulated_results
+    robust = results[
+        (results["phase"].astype(str) == "testing")
+        & (results["xai_property"] == "robust")
+    ]
+    # Without a lapse the model is deterministic, so every participant returns
+    # identical answers and 30 participants carry no more information than one.
+    per_participant = robust.groupby("participantId")["counterfactual_accuracy"].mean()
+    assert per_participant.nunique() > 1
