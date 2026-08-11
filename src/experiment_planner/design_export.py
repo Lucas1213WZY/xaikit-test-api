@@ -516,7 +516,17 @@ def parse_design_export(raw: dict[str, Any]) -> DesignExport:
     resolved_framework_slug = _resolve_framework_from_ivs(
         ivs, str(raw.get("userModel") or study_design.get("modelFramework", "")).strip()
     )
-    coerce_targets = COERCE_DVS_BY_FRAMEWORK.get(resolved_framework_slug, (DEFAULT_SIMULATABLE_DV,))
+    framework_dvs = COERCE_DVS_BY_FRAMEWORK.get(resolved_framework_slug)
+    coerce_targets = framework_dvs if framework_dvs is not None else (DEFAULT_SIMULATABLE_DV,)
+    #: A DV can be globally valid and still be wrong for *this* model -- CoAX
+    #: simulates forward only, Sim2Real counterfactual only. Judging against
+    #: SUPPORTED_DVS alone let those through untouched, and the runners fill any
+    #: DV whose name contains "accuracy" with forward-simulation correctness --
+    #: so a CoAX design asking for counterfactual_accuracy got forward numbers
+    #: under a counterfactual label, silently. Judge against the model's own
+    #: list when it has one; frameworks with no entry (a baseline model, or an
+    #: unresolved one) keep the global list, as before.
+    supported_dvs = framework_dvs if framework_dvs is not None else SUPPORTED_DVS
 
     dvs: list[dict[str, Any]] = []
     for row in study_design.get("dependentVariables", []):
@@ -525,7 +535,7 @@ def parse_design_export(raw: dict[str, Any]) -> DesignExport:
         measure = str(row.get("name") or row.get("measure")).strip()
         slug = slugify(measure)
         name = DV_MEASURE_ALIASES.get(slug, slug)
-        supported = name in SUPPORTED_DVS
+        supported = name in supported_dvs
         if supported:
             dvs.append({
                 "name": name,
@@ -542,14 +552,25 @@ def parse_design_export(raw: dict[str, Any]) -> DesignExport:
             if len(coerce_targets) == 1
             else f"Coercing to the model's two supported DVs: {target_labels}."
         )
-        report.add_warning(
-            name,
-            f"The cognitive model doesn't support `{measure}` as a dependent "
-            "variable. Simulation supports "
-            f"{DV_DISPLAY_LABELS['forward_accuracy']} or "
-            f"{DV_DISPLAY_LABELS['counterfactual_accuracy']}.",
-            coercion_note,
-        )
+        if name in SUPPORTED_DVS:
+            # A real measure, simulated by *some* model but not this one. Saying
+            # it is unsupported while listing it as an option would read as a
+            # contradiction, so name the model as the reason instead.
+            reason = (
+                f"`{measure}` is a supported measure, but the "
+                f"{resolved_framework_slug or 'selected'} model does not simulate "
+                f"it -- it only produces {target_labels}. The results would "
+                f"otherwise be labelled {DV_DISPLAY_LABELS[name]} while holding "
+                f"{target_labels} values."
+            )
+        else:
+            reason = (
+                f"The cognitive model doesn't support `{measure}` as a dependent "
+                "variable. Simulation supports "
+                f"{DV_DISPLAY_LABELS['forward_accuracy']} or "
+                f"{DV_DISPLAY_LABELS['counterfactual_accuracy']}."
+            )
+        report.add_warning(name, reason, coercion_note)
         for target in coerce_targets:
             dvs.append({
                 "name": target,

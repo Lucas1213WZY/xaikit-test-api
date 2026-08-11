@@ -540,6 +540,20 @@ def run_coax_experiment_executor(
                 "read.",
                 stacklevel=2,
             )
+        # Every scorable DV is filled with agent-vs-AI agreement below, which is
+        # forward simulation. A DV named for a different task therefore gets
+        # forward numbers under its own label -- correct-looking and wrong. A
+        # design export coerces this away before reaching here; setting DVs
+        # directly (a notebook) does not, so say so rather than let it pass.
+        mislabelled = [name for name in scorable if name != "forward_accuracy"]
+        if mislabelled:
+            warnings.warn(
+                f"CoAX simulates forward simulation only, but DV(s) {sorted(mislabelled)} "
+                "will be filled with agent-vs-AI agreement -- i.e. forward-simulation "
+                "values carrying another task's name. Use `forward_accuracy`, or read "
+                "`cognitive_correct_vs_ai` directly.",
+                stacklevel=2,
+            )
 
     trials_df = pd.DataFrame(trials).copy()
     selected = select_trial_rows(
