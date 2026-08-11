@@ -40,6 +40,12 @@ def ensure_prediction_coverage(
     Explanations may intentionally cover only a subset of test instances. This
     helper keeps execution standardized by adding prediction-only rows for trial
     instances missing from the explanation table.
+
+    ``trained_ai_model`` may be ``None`` when the pool already covers every
+    trial instance -- a published corpus (CoAX/CoXAM) ships its own predictions
+    and explanations, so nothing here needs a model and training one would be
+    wasted work. It is only required to fill genuine gaps, and is demanded at
+    that point rather than up front.
     """
     aligned_pool = explanation_pool.copy()
     if PREDICTION_COL not in aligned_pool.columns:
@@ -72,6 +78,20 @@ def ensure_prediction_coverage(
         int(instance_id): data.X_train[position:position + 1]
         for position, instance_id in enumerate(np.asarray(data.train_instance_ids))
     })
+    coverable_instance_ids = [
+        instance_id for instance_id in missing_instance_ids
+        if instance_rows.get(instance_id) is not None
+    ]
+    if coverable_instance_ids and trained_ai_model is None:
+        preview = coverable_instance_ids[:10]
+        raise RuntimeError(
+            f"{len(coverable_instance_ids)} trial instance(s) have no AI "
+            f"prediction in the explanation pool (e.g. {preview}), so an AI "
+            "model is needed to predict them, but none was trained. Either "
+            "train one (train_AI_model) or restrict trials to instances the "
+            "published corpus already covers."
+        )
+
     prediction_rows = []
     for instance_id in missing_instance_ids:
         model_row = instance_rows.get(instance_id)

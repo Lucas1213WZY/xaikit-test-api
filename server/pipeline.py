@@ -317,9 +317,13 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
 
     None of that skipping applies when the design also declares
     ``mlProxyBaselines`` (``design.baseline_model_ids``): those run through
-    the generic executor in ``run_simulation_stage``, which needs a real
-    ``trained_ai_model`` and explanation table regardless of what the
-    design's primary framework would otherwise let it skip.
+    the generic executor in ``run_simulation_stage``, which reads
+    ``study.combined_explanations``. Nothing loads a published corpus into
+    that table today, so the explanation stage has to *generate* one, and
+    generating needs a trained model. A baseline is a virtual participant,
+    not a replacement for the explained AI, so in principle it could read the
+    corpus's own predictions/explanations and skip training entirely -- see
+    the note in ``run_explanations_stage`` for what blocks that.
     """
     design = study.design_export
     dataset_ids = _resolve_dataset_ids(request, design)
@@ -689,6 +693,16 @@ def run_explanations_stage(study: xaikitTest, request: ExplanationStageRequest) 
     ``mlProxyBaselines``: the dataset stage already trained a real AI model
     for them (see ``run_dataset_stage``), and they read this stage's
     explanation table the same way a plain baseline design always has.
+
+    That training is avoidable in principle and is not today. CoAX's corpus
+    files (``assets/explanations/CoAX/{attribution,importance}.csv``) already
+    use this table's exact schema, so they could be loaded straight into
+    ``study.combined_explanations`` -- except both files carry the *same*
+    ``expMethod`` for a given dataset (``lime`` for adult), because what
+    separates them is ``xai_type``, not the method. The generic executor keys
+    its lookup on ``expMethod`` alone, so concatenating them would make the
+    lookup ambiguous. Wiring the corpus in needs that lookup to key on
+    ``xai_type`` as well; until then, baselines generate their own table.
     """
     design = study.design_export
     framework = design_framework(study)
@@ -903,6 +917,43 @@ def require_results(study: xaikitTest) -> pd.DataFrame:
     return study.simulated_results
 
 
+def resolve_variable_name(study: xaikitTest, requested: str) -> str:
+    """Map a UI display label onto the column name the results table uses.
+
+    The design export keeps both spellings for every IV/CV/DV: ``name`` is the
+    slug the planner and the results table use (``xai_type``), ``source_label``
+    is the free text the UI shows and posts back (``"XAI Type"``). A plot or
+    analysis request phrased in labels would otherwise fail with "Response data
+    is missing columns", naming columns that were never supposed to exist.
+
+    An unmatched value is returned unchanged, so a genuinely wrong name still
+    raises against the real column list rather than being silently rewritten.
+    """
+    if not requested:
+        return requested
+    results = study.simulated_results
+    if results is not None and requested in results.columns:
+        return requested
+
+    design = getattr(study, "design_export", None)
+    wanted = str(requested).strip().casefold()
+    for group in ("ivs", "cvs", "dvs", "rvs"):
+        for entry in getattr(design, group, None) or []:
+            label = str(entry.get("source_label", "")).strip().casefold()
+            name = entry.get("name")
+            if name and label == wanted:
+                return str(name)
+    return requested
+
+
+def _resolve_variable_names(
+    study: xaikitTest, requested: Optional[Sequence[str]]
+) -> Optional[list[str]]:
+    if requested is None:
+        return None
+    return [resolve_variable_name(study, name) for name in requested]
+
+
 def results_payload(
     study: xaikitTest,
     *,
@@ -949,8 +1000,16 @@ def analysis_for(
     """Every requested IV x DV analysis, defaulting to the design's own lists."""
     require_results(study)
     design = study.design_export
-    ivs = list(ivs) if ivs else [iv["name"] for iv in getattr(design, "between_ivs", [])]
-    dvs = list(dvs) if dvs else list(getattr(design, "simulatable_dvs", []))
+    ivs = (
+        _resolve_variable_names(study, ivs)
+        if ivs
+        else [iv["name"] for iv in getattr(design, "between_ivs", [])]
+    )
+    dvs = (
+        _resolve_variable_names(study, dvs)
+        if dvs
+        else list(getattr(design, "simulatable_dvs", []))
+    )
     if not ivs or not dvs:
         raise ValueError(
             "No IV/DV pair to analyze. Pass ivs and dvs explicitly -- the design "
@@ -988,8 +1047,9 @@ def posthoc_for(
     """
     require_results(study)
     design = study.design_export
+    dv = resolve_variable_name(study, dv)
     condition_cols = (
-        list(condition_cols)
+        _resolve_variable_names(study, condition_cols)
         if condition_cols
         else [iv["name"] for iv in getattr(design, "ivs", [])]
     )
@@ -1026,6 +1086,11 @@ def interaction_plot_payload(
     include_png: bool = False,
 ) -> dict[str, Any]:
     """Aggregated bars for one DV against two IVs, as data the UI can draw."""
+    # The UI posts the design's display labels ("XAI Type"), not the slugged
+    # column names the results table carries ("xai_type").
+    x_iv = resolve_variable_name(study, x_iv)
+    hue_iv = resolve_variable_name(study, hue_iv)
+    dv = resolve_variable_name(study, dv)
     plot = plot_dv_by_two_ivs(
         require_results(study),
         x_iv=x_iv,
@@ -1055,8 +1120,18 @@ def grid_plot_payload(
 ) -> dict[str, Any]:
     """Aggregated bars for every DV x IV combination in the design."""
     design = study.design_export
-    ivs = list(ivs) if ivs else [iv["name"] for iv in getattr(design, "ivs", [])]
-    dvs = list(dvs) if dvs else list(getattr(design, "simulatable_dvs", []))
+    # Explicit lists come from the UI in display labels; the design's own
+    # entries are already slugged.
+    ivs = (
+        _resolve_variable_names(study, ivs)
+        if ivs
+        else [iv["name"] for iv in getattr(design, "ivs", [])]
+    )
+    dvs = (
+        _resolve_variable_names(study, dvs)
+        if dvs
+        else list(getattr(design, "simulatable_dvs", []))
+    )
     grid = plot_iv_dv_grid(
         require_results(study),
         ivs=ivs,

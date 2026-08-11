@@ -1375,7 +1375,7 @@ class xaikitTest:
             self._require_combined_explanations(),
             trials=trials,
             data=data,
-            trained_ai_model=self._require_trained_ai_model(),
+            trained_ai_model=self.trained_ai_model,
             model_name=self.model_name or "model",
             show=False,
         )
@@ -1418,7 +1418,7 @@ class xaikitTest:
             pool,
             trials=trials,
             data=data,
-            trained_ai_model=self._require_trained_ai_model(),
+            trained_ai_model=self.trained_ai_model,
             model_name=self.model_name or "model",
             show=False,
         )
@@ -1732,7 +1732,11 @@ class xaikitTest:
             explanation_pool,
             trials=trials,
             data=data,
-            trained_ai_model=self._require_trained_ai_model(),
+            # Not _require_trained_ai_model(): a corpus-covered study (CoAX/
+            # CoXAM) ships its own predictions for every trial instance, so no
+            # model is needed. ensure_prediction_coverage demands one only if a
+            # genuine gap has to be predicted.
+            trained_ai_model=self.trained_ai_model,
             model_name=self.model_name or "model",
         )
 
