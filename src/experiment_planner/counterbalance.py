@@ -403,7 +403,7 @@ def assign_participants(
 
 def build_trial_sequence(
     assignments: list[dict],
-    instance_pool: list[dict],
+    instance_pool: list[dict] | None = None,
     trials_per_condition: int | None = None,
     trials_per_participant: int | None = None,
     controlled_vars: dict[str, Any] | None = None,
@@ -414,6 +414,8 @@ def build_trial_sequence(
     include_instance_fields: bool | None = None,
     shuffle_instances: bool = True,
     seed: int | None = None,
+    instance_pool_by_level: dict[Any, list[dict]] | None = None,
+    pool_selector_key: str | None = None,
 ) -> list[dict]:
     """
     Build a flat trial-level sequence for all participants.
@@ -465,10 +467,25 @@ def build_trial_sequence(
                               Deprecated alias for instance_wise_explanation.
         shuffle_instances:    Randomly shuffle instance pool per participant-block.
         seed:                 Random seed for reproducibility.
+        instance_pool_by_level:
+                              Multi-dataset alternative to instance_pool: one pool
+                              per between-subjects level (e.g. one per `dataset` IV
+                              level), keyed the same way that level appears in each
+                              assignment dict. Pass together with pool_selector_key;
+                              each participant then samples only from their own
+                              level's pool instead of one pool shared by everyone.
+        pool_selector_key:    Which key in each assignment dict selects the pool
+                              from instance_pool_by_level (e.g. "dataset"). Required
+                              when instance_pool_by_level is given.
 
     Returns:
         List of trial dicts (one per row in the export CSV/JSON).
     """
+    if (instance_pool is None) == (instance_pool_by_level is None):
+        raise ValueError("Pass exactly one of instance_pool or instance_pool_by_level.")
+    if instance_pool_by_level is not None and not pool_selector_key:
+        raise ValueError("pool_selector_key is required together with instance_pool_by_level.")
+
     rng = random.Random(seed)
     all_trials = []
     auto_data_id = 1
@@ -502,6 +519,18 @@ def build_trial_sequence(
         between_cols = {k: v for k, v in assignment.items()
                         if k not in ("participantId", "within_order")}
         n_blocks = len(within_order)
+
+        if instance_pool_by_level is not None:
+            level = assignment.get(pool_selector_key)
+            if level not in instance_pool_by_level:
+                raise ValueError(
+                    f"Participant {p_id}'s {pool_selector_key!r} assignment "
+                    f"{level!r} has no matching pool in instance_pool_by_level "
+                    f"(have: {sorted(map(str, instance_pool_by_level))})."
+                )
+            participant_pool = instance_pool_by_level[level]
+        else:
+            participant_pool = instance_pool
 
         if trials_per_participant is not None:
             if trial_randomization_strategy == "balanced":
@@ -567,7 +596,7 @@ def build_trial_sequence(
                 ]
 
             # Sample instances for this block
-            available = instance_pool.copy()
+            available = participant_pool.copy()
             if shuffle_instances:
                 rng.shuffle(available)
             if len(available) < len(trial_conditions):

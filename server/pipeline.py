@@ -22,10 +22,6 @@ from src.cognitive_models.baseline_models import BASELINE_MODEL_IDS
 from src.result_visualizer import plot_dv_by_two_ivs, plot_iv_dv_grid
 from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_study_runner import (
     coax_models_for_trials,
-    run_coax_study,
-)
-from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_study_runner import (
-    run_coxam_study,
 )
 from src.virtual_experiment_executor.experiment_simualtion.Sim2Real.sim2real_study_runner import (
     run_sim2real_study,
@@ -181,78 +177,65 @@ def _coax_corpus_covers(dataset_id: str) -> bool:
     return dataset_id in COAX_CORPUS_DATA_IDS
 
 
-def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[str, Any]:
-    """Prepare the dataset and, where a published corpus makes it unnecessary,
-    skip training the AI model it would otherwise explain.
+def _resolve_dataset_ids(request: DatasetStageRequest, design: Any) -> list[str]:
+    """Every dataset this stage should prepare, in declared order.
 
-    ``generate_trials()`` needs a prepared dataset regardless of participant
-    runner, so this always calls ``prepare_dataset``. Training is skipped for:
-
-    * **Sim2Real**, always -- its simulation reads a fixed published corpus,
-      not ``study.trained_ai_model`` (see ``run_sim2real_study``'s own
-      docstring).
-    * **CoXAM**, when the dataset is one its corpus covers -- ``prepare_dataset``
-      already routed onto that corpus's own feature set (see
-      ``xaikitTest.prepare_dataset``'s ``cognitive_model_id``), and
-      ``run_coxam_study(source="assets")`` reads the corpus's own AI
-      predictions and DT/LR surrogates, never ``trained_ai_model``. Training
-      here would be a full MLP run spent on a model nothing downstream reads.
-      A CoXAM dataset the corpus does *not* cover still trains, since only
-      ``source="fit"`` can serve it.
+    An explicit ``request.dataset_id`` (scalar or list) always wins. Otherwise
+    ``design.dataset_ids`` already resolves both shapes the export can name a
+    dataset with -- the older singular ``studyDesign.dataset`` field, or a
+    between-subjects IV named ``dataset`` with 2+ levels -- so nothing further
+    needs deciding here.
     """
-    design = study.design_export
-    dataset_id = request.dataset_id or getattr(design, "dataset_id", None)
-    if not dataset_id:
-        raise ValueError(
-            "No dataset_id given and the design export does not name one."
+    if request.dataset_id:
+        return (
+            list(request.dataset_id)
+            if isinstance(request.dataset_id, (list, tuple))
+            else [request.dataset_id]
         )
+    return list(getattr(design, "dataset_ids", None) or [])
 
-    framework = design_framework(study)
-    data = study.prepare_dataset(
-        dataset_id,
-        model_type=request.model_type,
-        feature_cols=request.feature_cols,
-        num_features=request.num_features,
-        rank_features_by_target=request.rank_features_by_target,
-        test_size=request.test_size,
-        random_state=request.random_state,
-        show_available=False,
-        show_summary=True,
-        cognitive_model_id=framework,
-    )
 
-    dataset_payload = {
-        "dataset": {
-            "dataset_id": data.dataset_id,
-            "feature_names": list(data.feature_names),
-            "model_feature_names": list(data.model_feature_names),
-            "n_train": int(len(data.y_train)),
-            "n_test": int(len(data.y_test)),
-        }
+def _dataset_payload_entry(data: Any) -> dict[str, Any]:
+    return {
+        "dataset_id": data.dataset_id,
+        "feature_names": list(data.feature_names),
+        "model_feature_names": list(data.model_feature_names),
+        "n_train": int(len(data.y_train)),
+        "n_test": int(len(data.y_test)),
     }
 
-    skip_reason = None
+
+def _corpus_skip_reason(framework: str, dataset_id: str) -> Optional[str]:
+    """Why AI training can be skipped for this framework/dataset, or None."""
     if framework == "sim2real":
-        skip_reason = (
+        return (
             "Sim2Real simulates from a fixed published corpus and never reads "
             "trained_ai_model, so no AI model is trained here."
         )
-    elif framework == "coxam" and _coxam_corpus_covers(data.dataset_id):
-        skip_reason = (
-            f"CoXAM's published corpus covers {data.dataset_id!r}: "
+    if framework == "coxam" and _coxam_corpus_covers(dataset_id):
+        return (
+            f"CoXAM's published corpus covers {dataset_id!r}: "
             "run_coxam_study(source='assets') reads its own AI predictions and "
             "DT/LR surrogates, never trained_ai_model, so no AI model is "
             "trained here. Pass a dataset the corpus does not cover, or use a "
             "different agent, to train one."
         )
-    elif framework == "coax" and _coax_corpus_covers(data.dataset_id):
-        skip_reason = (
-            f"CoAX's published corpus covers {data.dataset_id!r}: "
+    if framework == "coax" and _coax_corpus_covers(dataset_id):
+        return (
+            f"CoAX's published corpus covers {dataset_id!r}: "
             "run_coax_study(source='corpus') reads its own AI predictions and "
             "explanation vectors, never trained_ai_model, so no AI model is "
             "trained here. Pass a dataset the corpus does not cover to train one."
         )
+    return None
 
+
+def _finish_dataset_stage(
+    study: xaikitTest,
+    request: DatasetStageRequest,
+    dataset_payload: dict[str, Any],
+    skip_reason: Optional[str],
+) -> dict[str, Any]:
     if skip_reason:
         # train_AI_model would normally set this; run_coxam_study(source="assets")
         # looks the corpus's AI predictions up by model_name, so a request for
@@ -283,6 +266,102 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
         "confusion_matrix": frame_records(study.confusion_matrix_table().reset_index()),
     }
     return dataset_payload
+
+
+def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[str, Any]:
+    """Prepare the dataset(s) and, where a published corpus makes it
+    unnecessary, skip training the AI model it would otherwise explain.
+
+    ``generate_trials()`` needs prepared data regardless of participant
+    runner, so this always calls ``prepare_dataset``. Training is skipped for:
+
+    * **Sim2Real**, always -- its simulation reads a fixed published corpus,
+      not ``study.trained_ai_model`` (see ``run_sim2real_study``'s own
+      docstring). Sim2Real also does not support a multi-dataset study at all.
+    * **CoXAM**, when the dataset is one its corpus covers -- ``prepare_dataset``
+      already routed onto that corpus's own feature set (see
+      ``xaikitTest.prepare_dataset``'s ``cognitive_model_id``), and
+      ``run_coxam_study(source="assets")`` reads the corpus's own AI
+      predictions and DT/LR surrogates, never ``trained_ai_model``. Training
+      here would be a full MLP run spent on a model nothing downstream reads.
+      A CoXAM dataset the corpus does *not* cover still trains, since only
+      ``source="fit"`` can serve it.
+    * **A multi-dataset study**, one dataset at a time is never trained here --
+      ``study.train_AI_model()`` only ever has one ``study.data`` to train
+      against. Every requested dataset must therefore already be corpus-
+      covered (source='assets'/'corpus' can serve all of them), or this
+      raises rather than silently training against just one of them.
+    """
+    design = study.design_export
+    dataset_ids = _resolve_dataset_ids(request, design)
+    if not dataset_ids:
+        raise ValueError(
+            "No dataset_id given and the design export does not name one."
+        )
+
+    framework = design_framework(study)
+
+    if len(dataset_ids) == 1:
+        data = study.prepare_dataset(
+            dataset_ids[0],
+            model_type=request.model_type,
+            feature_cols=request.feature_cols,
+            num_features=request.num_features,
+            rank_features_by_target=request.rank_features_by_target,
+            test_size=request.test_size,
+            random_state=request.random_state,
+            show_available=False,
+            show_summary=True,
+            cognitive_model_id=framework,
+        )
+        dataset_payload = {"dataset": _dataset_payload_entry(data)}
+        skip_reason = _corpus_skip_reason(framework, data.dataset_id)
+        return _finish_dataset_stage(study, request, dataset_payload, skip_reason)
+
+    # -- multi-dataset, between-subjects ------------------------------------
+    if framework == "sim2real":
+        raise ValueError(
+            f"Sim2Real does not support a multi-dataset study; got {dataset_ids!r}."
+        )
+
+    uncovered = [
+        dataset_id for dataset_id in dataset_ids
+        if _corpus_skip_reason(framework, dataset_id) is None
+    ]
+    if uncovered:
+        raise ValueError(
+            "Multi-dataset AI training is not yet supported -- each dataset's "
+            f"model can only be trained one at a time, but dataset(s) {uncovered!r} "
+            f"have no published {framework} corpus to run source='assets'/'corpus' "
+            "against instead. Remove them from the study, or prepare/train each "
+            "uncovered dataset on its own with a single dataset_id first."
+        )
+
+    data_by_dataset = study.prepare_dataset(
+        dataset_ids,
+        model_type=request.model_type,
+        feature_cols=request.feature_cols,
+        num_features=request.num_features,
+        rank_features_by_target=request.rank_features_by_target,
+        test_size=request.test_size,
+        random_state=request.random_state,
+        show_available=False,
+        show_summary=True,
+        cognitive_model_id=framework,
+    )
+    dataset_payload = {
+        "datasets": {
+            dataset_id: _dataset_payload_entry(data)
+            for dataset_id, data in data_by_dataset.items()
+        }
+    }
+    skip_reason = (
+        f"Multi-dataset study: every dataset ({', '.join(dataset_ids)}) is "
+        f"covered by {framework}'s published corpus, so no AI model is trained "
+        "-- each dataset's own corpus predictions/surrogates are used at "
+        "simulation time instead."
+    )
+    return _finish_dataset_stage(study, request, dataset_payload, skip_reason)
 
 
 # -- stage 2: trials ------------------------------------------------------
@@ -342,7 +421,47 @@ def run_trials_stage(study: xaikitTest, request: TrialsStageRequest) -> dict[str
 
     apparatus_test_ids = sorted(set(getattr(design, "apparatus_instance_ids", [])))
     split_overridden = bool(apparatus_test_ids)
-    if apparatus_test_ids:
+    data_by_dataset = getattr(study, "data_by_dataset", None)
+    if apparatus_test_ids and isinstance(data_by_dataset, dict) and data_by_dataset:
+        # Multi-dataset: the exact same override, applied once per dataset
+        # from that dataset's own per-appId apparatus declarations -- never
+        # applying one dataset's declared instance ids to another's split.
+        ids_by_dataset = getattr(design, "apparatus_instance_ids_by_dataset", {}) or {}
+        training_ids_by_dataset = getattr(design, "apparatus_training_instance_ids_by_dataset", {}) or {}
+        for dataset_id, data in data_by_dataset.items():
+            dataset_test_ids = sorted(set(ids_by_dataset.get(dataset_id, [])))
+            if not dataset_test_ids:
+                continue
+            declared_train_ids = sorted(set(training_ids_by_dataset.get(dataset_id, [])))
+            if declared_train_ids:
+                train_ids = declared_train_ids
+            elif num_training > 0:
+                pool = (
+                    set(data.split.train_instance_ids.tolist())
+                    | set(data.split.test_instance_ids.tolist())
+                ) - set(dataset_test_ids)
+                if design_framework(study) == "coxam":
+                    from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_trial_executor import (
+                        coxam_available_instance_ids,
+                    )
+
+                    pool &= set(coxam_available_instance_ids(dataset_id))
+                pool = sorted(pool)
+                if len(pool) < num_training:
+                    raise ValueError(
+                        f"Dataset {dataset_id!r}'s apparatus declares {len(dataset_test_ids)} "
+                        f"testing instances; only {len(pool)} remain for the {num_training} "
+                        "training instances requested, with no overlap allowed. Declare "
+                        "trainingInstanceIds in that dataset's apparatus configuration, "
+                        "lower num_training, or widen instanceIds."
+                    )
+                rng = np.random.default_rng(request.seed)
+                train_ids = sorted(int(i) for i in rng.choice(pool, size=num_training, replace=False))
+            else:
+                train_ids = []
+            data.split.test_instance_ids = np.asarray(dataset_test_ids)
+            data.split.train_instance_ids = np.asarray(train_ids)
+    elif apparatus_test_ids:
         # The apparatus declares exactly which instances were tested; the
         # dataset's own train/test split was drawn independently (by
         # prepare_dataset's test_size/random_state) and has no reason to
@@ -517,6 +636,15 @@ def run_simulation_stage(
     serves a single-trial walkthrough and the full experiment:
     ``trial_by_trial``, ``participant_by_participant``, ``whole_condition``
     (with ``condition_filter``) and ``whole_experiment``.
+
+    coax/coxam are dispatched through ``study.run_experiment(...)`` rather
+    than calling ``run_coax_study``/``run_coxam_study`` directly -- the two
+    used to be equivalent, but ``run_experiment`` is also where a
+    multi-dataset study's per-dataset simulation loop lives
+    (``xaikitTest._run_multi_dataset_experiment``): calling the runner
+    directly would bypass that loop entirely and crash on ``study.data is
+    None`` for a multi-dataset study. ``store=True`` is not passed here --
+    ``run_experiment`` already hardcodes it for these two agents.
     """
     runner = participant_runner(study)
     if runner == "coax":
@@ -527,8 +655,7 @@ def run_simulation_stage(
             # (see run_dataset_stage), so this follows what actually happened
             # rather than assuming every design trained a model.
             coax_source = "study" if getattr(study, "trained_ai_model", None) is not None else "corpus"
-        results = run_coax_study(
-            study,
+        results = study.run_experiment(
             mode=request.mode,
             participant_id=request.participant_id,
             condition_filter=request.condition_filter,
@@ -538,7 +665,6 @@ def run_simulation_stage(
                 params=request.coax_params,
             ),
             source=coax_source,
-            store=True,
         )
     elif runner == "coxam":
         coxam_source = request.coxam_source
@@ -548,15 +674,13 @@ def run_simulation_stage(
             # run_dataset_stage), so this follows what actually happened
             # rather than assuming every design trained a model.
             coxam_source = "fit" if getattr(study, "trained_ai_model", None) is not None else "assets"
-        results = run_coxam_study(
-            study,
+        results = study.run_experiment(
             mode=request.mode,
             participant_id=request.participant_id,
             condition_filter=request.condition_filter,
             source=coxam_source,
             policy_override=request.coxam_policy,
             eval_params=normalize_cognitive_params("coxam", request.coxam_eval_params),
-            store=True,
         )
     elif runner == "sim2real":
         # Counterfactual-only, and its corpus supplies its own stimuli and

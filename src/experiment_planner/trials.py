@@ -28,12 +28,19 @@ from .counterbalance import (
 )
 from .support import validate_ui_config_support
 
+#: The fixed name a multi-dataset study's between-subjects IV must use.
+#: `data_by_dataset` being set is the only signal multi-dataset mode needs;
+#: this stays a hardcoded convention rather than a second configurable field,
+#: the same way `cognitive_model_id` is a fixed name elsewhere rather than a
+#: caller-chosen one.
+DATASET_IV_NAME = "dataset"
+
 
 @dataclass
 class TrialBuildConfig:
     """Notebook-facing settings for experimental trial generation."""
 
-    data: PreparedDataset
+    data: Optional[PreparedDataset]
     iv_config: dict[str, dict[str, Any]]
     cvs: dict[str, list[Any]]
     model_name: Optional[str] = None
@@ -52,6 +59,12 @@ class TrialBuildConfig:
     trials_csv: str = "trials.csv"
     trials_json: str = "trials.json"
     summary_json: str = "design_summary.json"
+    #: Multi-dataset alternative to `data`: one PreparedDataset per level of the
+    #: `DATASET_IV_NAME` between-subjects IV, keyed by dataset id. Setting this
+    #: is itself the signal that this is a multi-dataset study -- each
+    #: participant's trials then sample only from their own assigned dataset's
+    #: instances instead of one dataset shared by everyone.
+    data_by_dataset: Optional[dict[str, PreparedDataset]] = None
 
 
 @dataclass
@@ -75,7 +88,7 @@ class TrialGenerationResult:
 
 
 def init_trial_build_config(
-    data: PreparedDataset,
+    data: Optional[PreparedDataset],
     iv_config: dict[str, dict[str, Any]],
     cvs: dict[str, list[Any]],
     *,
@@ -95,19 +108,25 @@ def init_trial_build_config(
     trials_csv: str = "trials.csv",
     trials_json: str = "trials.json",
     summary_json: str = "design_summary.json",
+    data_by_dataset: Optional[dict[str, PreparedDataset]] = None,
 ) -> TrialBuildConfig:
     """Collect trial-generation settings in one notebook-friendly config object.
 
     Args:
-        data: The prepared dataset trials are sampled from.
-        iv_config: Independent variables defining the conditions.
+        data: The prepared dataset trials are sampled from. Pass ``None`` (and
+            use ``data_by_dataset`` instead) for a multi-dataset study.
+        iv_config: Independent variables defining the conditions. For a
+            multi-dataset study this must declare a between-subjects IV named
+            ``DATASET_IV_NAME`` ("dataset") whose levels match
+            ``data_by_dataset``'s keys.
         cvs: Control variables recorded on each trial.
         model_name: Name recorded on the trials.
         participants_per_between_condition: Participants per between-subjects cell.
         num_training: Instances shown in the training phase.
         num_testing: Held-out instances shown in the testing phase.
         ai_predictions_by_instance: Predicted label per instance, required for
-            prediction-balanced sampling.
+            prediction-balanced sampling. Not yet supported together with
+            ``data_by_dataset``.
         counterbalancing_strategy: How conditions are ordered across
             participants; ``auto`` picks from the design.
         trial_randomization_strategy: How trials are ordered within a participant.
@@ -120,6 +139,9 @@ def init_trial_build_config(
         trials_csv: Filename for the trial table.
         trials_json: Filename for the trial JSON.
         summary_json: Filename for the design summary.
+        data_by_dataset: Multi-dataset alternative to ``data`` -- one prepared
+            dataset per level of the ``DATASET_IV_NAME`` between-subjects IV,
+            keyed by dataset id.
 
     Returns:
         The assembled config, ready for ``generate_experimental_trials``.
@@ -128,6 +150,13 @@ def init_trial_build_config(
         raise ValueError("num_training cannot be negative.")
     if num_testing < 1:
         raise ValueError("num_testing must be at least 1.")
+    if (data is None) == (data_by_dataset is None):
+        raise ValueError("Pass exactly one of data or data_by_dataset.")
+    if data_by_dataset is not None and ai_predictions_by_instance is not None:
+        raise ValueError(
+            "AI-prediction-balanced sampling is not yet supported for "
+            "multi-dataset trial generation."
+        )
     return TrialBuildConfig(
         data=data,
         iv_config=iv_config,
@@ -142,6 +171,7 @@ def init_trial_build_config(
         instance_wise_explanation=instance_wise_explanation,
         shuffle_instances=shuffle_instances,
         max_trial_instances=max_trial_instances,
+        data_by_dataset=data_by_dataset,
         allowed_instance_ids=list(allowed_instance_ids) if allowed_instance_ids is not None else None,
         seed=seed,
         output_dir=Path(output_dir),
@@ -186,66 +216,121 @@ def generate_experimental_trials(
         experiment_structure.between_ivs or None,
     )
 
-    train_instance_ids = config.data.train_instance_ids
-    trial_instance_ids = config.data.test_instance_ids
+    multi_dataset = config.data_by_dataset is not None
+    if multi_dataset and DATASET_IV_NAME not in experiment_structure.between_ivs:
+        raise ValueError(
+            f"data_by_dataset was given, but iv_config has no between-subjects "
+            f"IV named {DATASET_IV_NAME!r} for it to key off of."
+        )
 
-    if config.allowed_instance_ids is not None:
-        # Constrained generation: keep only instances an external asset set can
-        # serve, so trials stay runnable against a fixed study corpus.
-        allowed = {int(value) for value in config.allowed_instance_ids}
-        train_instance_ids = [i for i in train_instance_ids if int(i) in allowed]
-        trial_instance_ids = [i for i in trial_instance_ids if int(i) in allowed]
-        if not trial_instance_ids:
-            raise ValueError(
-                "No testing instances remain after applying allowed_instance_ids. "
-                "The dataset split and the allowed set do not overlap."
-            )
-        if config.num_training > 0 and not train_instance_ids:
-            raise ValueError(
-                "No training instances remain after applying allowed_instance_ids."
-            )
+    def _filtered_ids(dataset: PreparedDataset) -> tuple[list[Any], list[Any]]:
+        """One dataset's (train_instance_ids, trial_instance_ids), with
+        allowed_instance_ids/max_trial_instances applied -- the same per-dataset
+        filtering the single-dataset path always did, just callable per level."""
+        train_ids = dataset.train_instance_ids
+        trial_ids = dataset.test_instance_ids
+        if config.allowed_instance_ids is not None:
+            # Constrained generation: keep only instances an external asset set can
+            # serve, so trials stay runnable against a fixed study corpus.
+            allowed = {int(value) for value in config.allowed_instance_ids}
+            train_ids = [i for i in train_ids if int(i) in allowed]
+            trial_ids = [i for i in trial_ids if int(i) in allowed]
+            if not trial_ids:
+                raise ValueError(
+                    f"No testing instances remain for dataset {dataset.dataset_id!r} "
+                    "after applying allowed_instance_ids. The dataset split and the "
+                    "allowed set do not overlap."
+                )
+            if config.num_training > 0 and not train_ids:
+                raise ValueError(
+                    f"No training instances remain for dataset {dataset.dataset_id!r} "
+                    "after applying allowed_instance_ids."
+                )
+        if config.max_trial_instances is not None:
+            trial_ids = trial_ids[:config.max_trial_instances]
+        return train_ids, trial_ids
 
-    if config.max_trial_instances is not None:
-        trial_instance_ids = trial_instance_ids[:config.max_trial_instances]
-
-    instance_pool = [
-        {"dataId": config.data.dataset_id, "instanceId": str(instance_id)}
-        for instance_id in trial_instance_ids
-    ]
     controlled_vars = build_controlled_vars(config.model_name, config.cvs)
 
-    trials = build_trial_sequence(
-        assignments=assignments,
-        instance_pool=instance_pool,
-        trials_per_participant=config.num_testing,
-        controlled_vars=controlled_vars,
-        id_map={"dataId": "dataId", "instanceId": "instanceId"},
-        trial_randomized_ivs=experiment_structure.trial_within_ivs or None,
-        trial_randomization_strategy=config.trial_randomization_strategy,
-        instance_wise_explanation=config.instance_wise_explanation,
-        shuffle_instances=config.shuffle_instances,
-        seed=config.seed,
-    )
-    trials = _add_training_and_testing_phases(
-        trials,
-        train_instance_ids=train_instance_ids,
-        dataset_id=config.data.dataset_id,
-        num_training=config.num_training,
-        condition_columns=[
-            *experiment_structure.between_ivs,
-            *experiment_structure.block_within_ivs,
-        ],
-        test_only_columns=list(experiment_structure.trial_within_ivs),
-        seed=config.seed,
-    )
-    if config.ai_predictions_by_instance is not None:
-        trials = _balance_phase_instances_by_ai_prediction(
-            trials,
-            train_instance_ids=train_instance_ids,
-            test_instance_ids=trial_instance_ids,
-            predictions_by_instance=config.ai_predictions_by_instance,
+    if multi_dataset:
+        train_instance_ids_by_level: dict[str, list[Any]] = {}
+        instance_pool_by_level: dict[str, list[dict[str, Any]]] = {}
+        for level, dataset in config.data_by_dataset.items():
+            train_ids, trial_ids = _filtered_ids(dataset)
+            train_instance_ids_by_level[level] = train_ids
+            instance_pool_by_level[level] = [
+                {"dataId": level, "instanceId": str(instance_id)}
+                for instance_id in trial_ids
+            ]
+        instance_pool = [row for pool in instance_pool_by_level.values() for row in pool]
+
+        trials = build_trial_sequence(
+            assignments=assignments,
+            instance_pool_by_level=instance_pool_by_level,
+            pool_selector_key=DATASET_IV_NAME,
+            trials_per_participant=config.num_testing,
+            controlled_vars=controlled_vars,
+            id_map={"dataId": "dataId", "instanceId": "instanceId"},
+            trial_randomized_ivs=experiment_structure.trial_within_ivs or None,
+            trial_randomization_strategy=config.trial_randomization_strategy,
+            instance_wise_explanation=config.instance_wise_explanation,
+            shuffle_instances=config.shuffle_instances,
             seed=config.seed,
         )
+        trials = _add_training_and_testing_phases(
+            trials,
+            train_instance_ids=None,
+            train_instance_ids_by_level=train_instance_ids_by_level,
+            dataset_id=None,
+            num_training=config.num_training,
+            condition_columns=[
+                *experiment_structure.between_ivs,
+                *experiment_structure.block_within_ivs,
+            ],
+            test_only_columns=list(experiment_structure.trial_within_ivs),
+            seed=config.seed,
+        )
+        # config.ai_predictions_by_instance is guaranteed None here --
+        # init_trial_build_config already rejects that combination.
+    else:
+        train_instance_ids, trial_instance_ids = _filtered_ids(config.data)
+        instance_pool = [
+            {"dataId": config.data.dataset_id, "instanceId": str(instance_id)}
+            for instance_id in trial_instance_ids
+        ]
+
+        trials = build_trial_sequence(
+            assignments=assignments,
+            instance_pool=instance_pool,
+            trials_per_participant=config.num_testing,
+            controlled_vars=controlled_vars,
+            id_map={"dataId": "dataId", "instanceId": "instanceId"},
+            trial_randomized_ivs=experiment_structure.trial_within_ivs or None,
+            trial_randomization_strategy=config.trial_randomization_strategy,
+            instance_wise_explanation=config.instance_wise_explanation,
+            shuffle_instances=config.shuffle_instances,
+            seed=config.seed,
+        )
+        trials = _add_training_and_testing_phases(
+            trials,
+            train_instance_ids=train_instance_ids,
+            dataset_id=config.data.dataset_id,
+            num_training=config.num_training,
+            condition_columns=[
+                *experiment_structure.between_ivs,
+                *experiment_structure.block_within_ivs,
+            ],
+            test_only_columns=list(experiment_structure.trial_within_ivs),
+            seed=config.seed,
+        )
+        if config.ai_predictions_by_instance is not None:
+            trials = _balance_phase_instances_by_ai_prediction(
+                trials,
+                train_instance_ids=train_instance_ids,
+                test_instance_ids=trial_instance_ids,
+                predictions_by_instance=config.ai_predictions_by_instance,
+                seed=config.seed,
+            )
     trials = _assign_shown_xai_type(trials, seed=config.seed)
 
     output_dir = config.output_dir
@@ -279,7 +364,11 @@ def generate_experimental_trials(
         preview_trial_rows(trials, experiment_structure, n=preview_rows)
 
     dataset_config = {
-        "dataset_id": config.data.dataset_id,
+        "dataset_id": (
+            config.data.dataset_id
+            if config.data is not None
+            else list(config.data_by_dataset)
+        ),
         "id_map": {"dataId": "dataId", "instanceId": "instanceId"},
     }
     if config.model_name is not None:
@@ -326,22 +415,27 @@ def generate_experimental_trials(
 def _add_training_and_testing_phases(
     trials: list[dict[str, Any]],
     *,
-    train_instance_ids: Any,
-    dataset_id: str,
+    train_instance_ids: Optional[Any] = None,
+    dataset_id: Optional[str] = None,
+    train_instance_ids_by_level: Optional[dict[str, Any]] = None,
     num_training: int,
     seed: int,
     condition_columns: Optional[list[str]] = None,
     test_only_columns: Optional[list[str]] = None,
 ) -> list[dict[str, Any]]:
-    """Place all training rows before all randomized testing rows per participant."""
+    """Place all training rows before all randomized testing rows per participant.
+
+    Pass either ``train_instance_ids``/``dataset_id`` (single-dataset: every
+    participant draws training instances from the same pool) or
+    ``train_instance_ids_by_level`` (multi-dataset: each participant draws from
+    their own assigned dataset's pool, found via the ``dataId`` their trial rows
+    already carry from the per-level instance pool built upstream).
+    """
     if num_training < 0:
         raise ValueError("num_training cannot be negative.")
-
-    available_ids = list(train_instance_ids)
-    if num_training > len(available_ids):
+    if (train_instance_ids is None) == (train_instance_ids_by_level is None):
         raise ValueError(
-            f"Requested {num_training} cognitive training instances, "
-            f"but the dataset training split contains only {len(available_ids)}."
+            "Pass exactly one of train_instance_ids or train_instance_ids_by_level."
         )
 
     participant_ids = list(dict.fromkeys(trial["participantId"] for trial in trials))
@@ -358,6 +452,20 @@ def _add_training_and_testing_phases(
         ]
         if not participant_trials:
             continue
+
+        if train_instance_ids_by_level is not None:
+            participant_data_id = participant_trials[0].get("dataId", dataset_id)
+            available_ids = list(train_instance_ids_by_level[participant_data_id])
+        else:
+            participant_data_id = dataset_id
+            available_ids = list(train_instance_ids)
+        if num_training > len(available_ids):
+            raise ValueError(
+                f"Requested {num_training} cognitive training instances, "
+                f"but participant {participant_id}'s training split "
+                f"(dataset {participant_data_id!r}) contains only "
+                f"{len(available_ids)}."
+            )
 
         condition_groups: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
         for trial in participant_trials:
@@ -390,7 +498,7 @@ def _add_training_and_testing_phases(
                     training_trial.pop(column, None)
                 training_trial.update({
                     "trialWithinBlock": phase_position,
-                    "dataId": dataset_id,
+                    "dataId": participant_data_id,
                     "instanceId": str(instance_id),
                     "phase": "training",
                     "phaseTrialId": len(participant_training_trials) + 1,

@@ -34,10 +34,20 @@ DV_MEASURE_ALIASES: dict[str, str] = {
 
 # The only DVs the virtual-participant executor can produce. A measure the UI
 # collected that is not one of these (trust, decision_time, workload, ...) has no
-# simulated counterpart. Those are kept under the name the UI gave them and
-# reported as warnings rather than rewritten, so the design is never silently
-# changed into something it did not say.
+# simulated counterpart, so it is coerced to the default below and flagged as a
+# warning -- the design still runs, but under a DV it did not literally name.
 SUPPORTED_DVS: tuple[str, ...] = ("forward_accuracy", "counterfactual_accuracy")
+
+# Display labels for the warning shown when a DV gets coerced.
+DV_DISPLAY_LABELS: dict[str, str] = {
+    "forward_accuracy": "Forward Simulation Accuracy",
+    "counterfactual_accuracy": "Counterfactual Simulation Accuracy",
+}
+
+# What an unsupported DV falls back to -- forward_accuracy is every cognitive
+# model's default task (see study_simulators.task default), so it is the safer
+# guess when the design gives no other signal.
+DEFAULT_SIMULATABLE_DV: str = "forward_accuracy"
 
 # IV factor labels the UI phrases freely but the planner knows under a fixed name.
 IV_FACTOR_ALIASES: dict[str, str] = {
@@ -250,12 +260,43 @@ class DesignExport:
     #: configuration does).
     apparatus_instance_ids: list[int] = field(default_factory=list)
     apparatus_training_instance_ids: list[int] = field(default_factory=list)
+    #: Same testing/training instance ids as above, grouped by each apparatus
+    #: configuration's own ``params.appId`` instead of unioned flat. An entry
+    #: naming no ``appId`` is assumed to belong to this design's single dataset,
+    #: so a design with no multi-dataset apparatus tagging groups everything
+    #: under one key -- exactly what the flat properties above already give.
+    apparatus_instance_ids_by_dataset: dict[str, list[int]] = field(default_factory=dict)
+    apparatus_training_instance_ids_by_dataset: dict[str, list[int]] = field(default_factory=dict)
     report: ValidationReport = field(default_factory=lambda: ValidationReport(stage="design_export"))
 
     @property
     def simulatable_dvs(self) -> list[str]:
         """DV names the virtual-participant executor can actually produce."""
         return [dv["name"] for dv in self.dvs if dv["name"] in SUPPORTED_DVS]
+
+    @property
+    def dataset_ids(self) -> list[str]:
+        """Every dataset this design uses, in declared order.
+
+        A design names its dataset(s) two ways: the older single
+        ``studyDesign.dataset`` field (``dataset_id``), or a between-subjects
+        IV literally named ``dataset`` (matching
+        ``experiment_planner.trials.DATASET_IV_NAME``) with 2+ levels. The IV
+        wins when it declares more than one level, since that is the more
+        specific multi-dataset signal; a single-level "dataset" IV or none at
+        all falls back to the singular field, unchanged from before this
+        existed.
+        """
+        from .trials import DATASET_IV_NAME
+
+        for iv in self.ivs:
+            if iv["name"] == DATASET_IV_NAME and iv["iv_type"] == "between" and len(iv["levels"]) > 1:
+                return [DATASET_ALIASES.get(level, level) for level in iv["levels"]]
+        return [self.dataset_id] if self.dataset_id else []
+
+    @property
+    def is_multi_dataset(self) -> bool:
+        return len(self.dataset_ids) > 1
 
     @property
     def resolved_framework(self) -> str:
@@ -417,19 +458,24 @@ def parse_design_export(raw: dict[str, Any]) -> DesignExport:
         measure = str(row.get("name") or row.get("measure")).strip()
         slug = slugify(measure)
         name = DV_MEASURE_ALIASES.get(slug, slug)
-        if name not in SUPPORTED_DVS:
+        supported = name in SUPPORTED_DVS
+        if not supported:
             report.add_warning(
                 name,
-                f"`{measure}` has no simulated counterpart, so the virtual "
-                "participant cannot produce it.",
-                f"Collect it from human participants, or analyse one of: "
-                f"{', '.join(sorted(SUPPORTED_DVS))}.",
+                f"The cognitive model doesn't support `{measure}` as a dependent "
+                "variable. Simulation supports "
+                f"{DV_DISPLAY_LABELS['forward_accuracy']} or "
+                f"{DV_DISPLAY_LABELS['counterfactual_accuracy']}.",
+                f"Coercing to the user model's supported DV: "
+                f"{DV_DISPLAY_LABELS[DEFAULT_SIMULATABLE_DV]}.",
             )
+            name = DEFAULT_SIMULATABLE_DV
         dvs.append({
             "name": name,
             "levels": ["continuous"],
             "source_label": measure,
-            "simulatable": name in SUPPORTED_DVS,
+            "simulatable": True,
+            "coerced": not supported,
         })
 
     rvs: list[dict[str, Any]] = []
@@ -469,6 +515,13 @@ def parse_design_export(raw: dict[str, Any]) -> DesignExport:
         raw.get("apparatus"), "trainingInstanceIds"
     )
     dataset_label = study_design.get("dataset", "")
+    resolved_dataset_id = DATASET_ALIASES.get(slugify(dataset_label), slugify(dataset_label))
+    apparatus_instance_ids_by_dataset = _apparatus_instance_ids_by_dataset(
+        raw.get("apparatus"), "instanceIds", resolved_dataset_id
+    )
+    apparatus_training_instance_ids_by_dataset = _apparatus_instance_ids_by_dataset(
+        raw.get("apparatus"), "trainingInstanceIds", resolved_dataset_id
+    )
 
     return DesignExport(
         raw=raw,
@@ -484,7 +537,7 @@ def parse_design_export(raw: dict[str, Any]) -> DesignExport:
         cvs=cvs,
         dvs=dvs,
         rvs=rvs,
-        dataset_id=DATASET_ALIASES.get(slugify(dataset_label), slugify(dataset_label)),
+        dataset_id=resolved_dataset_id,
         model_framework=str(raw.get("userModel") or study_design.get("modelFramework", "")).strip(),
         design_type=str(study_design.get("design", "")).strip(),
         participants_per_condition=study_design.get("participantsPerCondition"),
@@ -495,6 +548,8 @@ def parse_design_export(raw: dict[str, Any]) -> DesignExport:
         cognitive_config=_merged_cognitive_config(raw),
         apparatus_instance_ids=apparatus_instance_ids,
         apparatus_training_instance_ids=apparatus_training_instance_ids,
+        apparatus_instance_ids_by_dataset=apparatus_instance_ids_by_dataset,
+        apparatus_training_instance_ids_by_dataset=apparatus_training_instance_ids_by_dataset,
         report=report,
     )
 
@@ -542,6 +597,36 @@ def _apparatus_instance_ids(apparatus: Any, key: str) -> list[int]:
         if isinstance(entry, dict):
             ids.update(_parse_instance_id_ranges(entry.get("params", {}).get(key)))
     return sorted(ids)
+
+
+def _apparatus_instance_ids_by_dataset(
+    apparatus: Any, key: str, default_dataset_id: str
+) -> dict[str, list[int]]:
+    """Same union as ``_apparatus_instance_ids``, but grouped by each entry's
+    own ``params.appId`` -- the per-dataset tag a multi-dataset export's
+    apparatus configurations carry (e.g. ``{"appId": "wine_quality",
+    "instanceIds": "1-10"}``). An entry naming no ``appId`` is assumed to
+    belong to the design's single dataset, so a design with no multi-dataset
+    apparatus tagging groups everything under one key -- exactly what the
+    flat, ungrouped ``_apparatus_instance_ids`` already gives.
+    """
+    if not isinstance(apparatus, list):
+        return {}
+    grouped: dict[str, set[int]] = {}
+    for entry in apparatus:
+        if not isinstance(entry, dict):
+            continue
+        params = entry.get("params", {})
+        raw_app_id = str(params.get("appId") or "").strip()
+        app_id = (
+            DATASET_ALIASES.get(slugify(raw_app_id), slugify(raw_app_id))
+            if raw_app_id
+            else default_dataset_id
+        )
+        if not app_id:
+            continue
+        grouped.setdefault(app_id, set()).update(_parse_instance_id_ranges(params.get(key)))
+    return {app_id: sorted(ids) for app_id, ids in grouped.items() if ids}
 
 
 def _merged_cognitive_config(raw: dict[str, Any]) -> dict[str, Any]:
@@ -629,10 +714,14 @@ def check_against_support_matrix(design: DesignExport) -> ValidationReport:
             )
 
     dataset_levels = declared_ivs.get("dataset", {}).get("levels") or []
-    if design.dataset_id and dataset_levels and design.dataset_id not in dataset_levels:
+    unknown_datasets = [
+        dataset_id for dataset_id in design.dataset_ids
+        if dataset_levels and dataset_id not in dataset_levels
+    ]
+    if unknown_datasets:
         report.add_warning(
             "dataset",
-            f"dataset {design.dataset_id!r} is not one the toolkit can load.",
+            f"dataset(s) {unknown_datasets!r} are not ones the toolkit can load.",
             f"Available: {dataset_levels}. Add an entry to DATASET_ALIASES if the UI "
             "just names it differently.",
         )

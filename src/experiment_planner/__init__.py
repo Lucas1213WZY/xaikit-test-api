@@ -50,6 +50,7 @@ from .protocol import (
     validate_study_protocol,
 )
 from .trials import (
+    DATASET_IV_NAME,
     TrialBuildConfig,
     TrialGenerationResult,
     generate_experimental_trials,
@@ -74,6 +75,7 @@ from .support import (
 )
 
 __all__ = [
+    "DATASET_IV_NAME",
     "DEFAULT_CVS",
     "DEFAULT_DVS",
     "DEFAULT_IV_CONFIG",

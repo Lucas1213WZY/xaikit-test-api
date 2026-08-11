@@ -21,6 +21,7 @@ from src.cognitive_models import (
 )
 from src.data_loaders import PreparedDataset, prepare_dataset, reencode_prepared_dataset
 from src.experiment_planner import (
+    DATASET_IV_NAME,
     TrialGenerationResult,
     ValidationReport,
     init_experiment_config,
@@ -101,6 +102,10 @@ class xaikitTest:
         self.iv_config, self.CVs, self.DVs = init_experiment_config()
 
         self.data: Optional[PreparedDataset] = None
+        #: Multi-dataset alternative to ``self.data``, keyed by dataset id --
+        #: populated by ``prepare_dataset(dataset_id=[...])``. Empty for an
+        #: ordinary single-dataset study.
+        self.data_by_dataset: dict[str, PreparedDataset] = {}
         self.model_manager = None
         self.model = None
         self.trained_ai_model = None
@@ -446,9 +451,63 @@ class xaikitTest:
         self.validation_reports[report.stage] = report
         return report
 
-    def prepare_dataset(
+    def _prepare_single_dataset(
         self,
         dataset_id: str,
+        *,
+        model_type: str,
+        feature_cols: Optional[Sequence[str]],
+        num_features: Optional[int],
+        rank_features_by_target: bool,
+        use_default_features: bool,
+        requires_one_hot_encoding: Optional[bool],
+        test_size: float,
+        random_state: int,
+        show_available: bool,
+        show_summary: bool,
+        cognitive_model_id: Optional[str],
+    ) -> PreparedDataset:
+        resolved_agent = str(cognitive_model_id or self.cognitive_model_id or "").lower().strip()
+        if feature_cols is None and use_default_features and resolved_agent == "coxam":
+            try:
+                from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_trial_executor import (
+                    coxam_loader_feature_cols,
+                )
+
+                feature_cols = coxam_loader_feature_cols(dataset_id)
+                rank_features_by_target = False
+            except KeyError:
+                # Not a dataset CoXAM's published corpus covers -- no fixed
+                # feature set to route to, so a fresh model gets trained on
+                # this dataset instead. CoXAM's own datasets are always
+                # 6-feature (COXAM_CORPUS_FEATURES), so match that: rank the
+                # full available feature pool by target correlation and keep
+                # the top 6, rather than each dataset's own curated default
+                # (which can carry a different count, e.g. 5 for
+                # wine_quality -- the exact mismatch that made the corpus
+                # need its own feature list in the first place).
+                if num_features is None:
+                    num_features = 6
+                rank_features_by_target = True
+                use_default_features = False
+
+        return prepare_dataset(
+            dataset_id,
+            model_type=model_type,
+            feature_cols=feature_cols,
+            num_features=num_features,
+            rank_features_by_target=rank_features_by_target,
+            use_default_features=use_default_features,
+            requires_one_hot_encoding=requires_one_hot_encoding,
+            test_size=test_size,
+            random_state=random_state,
+            show_available=show_available,
+            show_summary=show_summary,
+        )
+
+    def prepare_dataset(
+        self,
+        dataset_id: str | Sequence[str],
         *,
         model_type: str = "mlp",
         feature_cols: Optional[Sequence[str]] = None,
@@ -461,11 +520,18 @@ class xaikitTest:
         show_available: bool = True,
         show_summary: bool = True,
         cognitive_model_id: Optional[str] = None,
-    ) -> PreparedDataset:
+    ) -> PreparedDataset | dict[str, PreparedDataset]:
         """Load, optionally feature-select, and split the dataset.
 
         Args:
-            dataset_id: Dataset to load, e.g. ``wine_quality``.
+            dataset_id: Dataset to load, e.g. ``wine_quality``. Pass a list of
+                ids (e.g. ``["wine_quality", "mushrooms"]``) for a
+                multi-dataset, between-subjects study: each id is prepared the
+                same way and stored in ``self.data_by_dataset`` (keyed by id),
+                and a ``dataset`` between-subjects IV with those levels is
+                registered automatically -- ``generate_trials()`` then samples
+                each participant's trials from only their assigned dataset,
+                never mixing instance ids across datasets.
             model_type: Model the encoding should suit, e.g. ``mlp``.
             feature_cols: Use exactly these columns, skipping selection.
             num_features: Keep this many features when selecting.
@@ -496,33 +562,38 @@ class xaikitTest:
                 given explicitly, or for any other agent.
 
         Returns:
-            The prepared dataset, also stored on ``self.data``.
+            The prepared dataset (single id), also stored on ``self.data``; or
+            ``{dataset_id: PreparedDataset}`` (list of ids), also stored on
+            ``self.data_by_dataset``.
         """
-        resolved_agent = str(cognitive_model_id or self.cognitive_model_id or "").lower().strip()
-        if feature_cols is None and use_default_features and resolved_agent == "coxam":
-            try:
-                from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_trial_executor import (
-                    coxam_loader_feature_cols,
+        if isinstance(dataset_id, (list, tuple)):
+            dataset_ids = list(dataset_id)
+            if len(dataset_ids) < 2:
+                raise ValueError(
+                    "Pass at least two dataset ids for a multi-dataset study."
                 )
+            self.data_by_dataset = {
+                one_id: self._prepare_single_dataset(
+                    one_id,
+                    model_type=model_type,
+                    feature_cols=feature_cols,
+                    num_features=num_features,
+                    rank_features_by_target=rank_features_by_target,
+                    use_default_features=use_default_features,
+                    requires_one_hot_encoding=requires_one_hot_encoding,
+                    test_size=test_size,
+                    random_state=random_state,
+                    show_available=show_available and one_id == dataset_ids[0],
+                    show_summary=show_summary,
+                    cognitive_model_id=cognitive_model_id,
+                )
+                for one_id in dataset_ids
+            }
+            self.data = None
+            self.add_iv(DATASET_IV_NAME, "between", dataset_ids)
+            return self.data_by_dataset
 
-                feature_cols = coxam_loader_feature_cols(dataset_id)
-                rank_features_by_target = False
-            except KeyError:
-                # Not a dataset CoXAM's published corpus covers -- no fixed
-                # feature set to route to, so a fresh model gets trained on
-                # this dataset instead. CoXAM's own datasets are always
-                # 6-feature (COXAM_CORPUS_FEATURES), so match that: rank the
-                # full available feature pool by target correlation and keep
-                # the top 6, rather than each dataset's own curated default
-                # (which can carry a different count, e.g. 5 for
-                # wine_quality -- the exact mismatch that made the corpus
-                # need its own feature list in the first place).
-                if num_features is None:
-                    num_features = 6
-                rank_features_by_target = True
-                use_default_features = False
-
-        self.data = prepare_dataset(
+        self.data = self._prepare_single_dataset(
             dataset_id,
             model_type=model_type,
             feature_cols=feature_cols,
@@ -534,7 +605,9 @@ class xaikitTest:
             random_state=random_state,
             show_available=show_available,
             show_summary=show_summary,
+            cognitive_model_id=cognitive_model_id,
         )
+        self.data_by_dataset = {}
         return self.data
 
     def generate_trials(
@@ -587,27 +660,37 @@ class xaikitTest:
         Returns:
             The result, also stored on ``trial_result``/``trials``.
         """
-        data = self._require_data()
+        multi_dataset = bool(self.data_by_dataset)
         ai_predictions_by_instance = None
-        if balance_by_ai_prediction:
-            from src.workflow_standard import prediction_labels
-
-            trained_ai_model = self._require_trained_ai_model()
-            predictions = prediction_labels(
-                trained_ai_model.predict(data.split.X_model)
-            )
-            ai_predictions_by_instance = {
-                int(instance_id): _as_python_scalar(prediction)
-                for instance_id, prediction in zip(
-                    data.split.raw_instance_ids,
-                    predictions,
+        if multi_dataset:
+            if balance_by_ai_prediction:
+                raise ValueError(
+                    "balance_by_ai_prediction is not yet supported for a "
+                    "multi-dataset study (prepare_dataset was given a list of ids)."
                 )
-            }
-            self.ai_predictions_by_instance = ai_predictions_by_instance
+            data = None
+        else:
+            data = self._require_data()
+            if balance_by_ai_prediction:
+                from src.workflow_standard import prediction_labels
+
+                trained_ai_model = self._require_trained_ai_model()
+                predictions = prediction_labels(
+                    trained_ai_model.predict(data.split.X_model)
+                )
+                ai_predictions_by_instance = {
+                    int(instance_id): _as_python_scalar(prediction)
+                    for instance_id, prediction in zip(
+                        data.split.raw_instance_ids,
+                        predictions,
+                    )
+                }
+                self.ai_predictions_by_instance = ai_predictions_by_instance
         if model_name is not None:
             self.model_name = model_name
         self.trial_config = experiment_planner_api.init_trial_build_config(
             data=data,
+            data_by_dataset=self.data_by_dataset if multi_dataset else None,
             iv_config=self.iv_config,
             cvs=self.CVs,
             model_name=model_name,
@@ -1462,6 +1545,76 @@ class xaikitTest:
         )
         return self.simulated_results
 
+    def _run_multi_dataset_experiment(
+        self,
+        *,
+        mode: str,
+        participant_id: Optional[int],
+        condition_filter: Optional[dict[str, Any]],
+        explanation_pool: Optional[pd.DataFrame],
+        runner_kwargs: dict[str, Any],
+    ) -> pd.DataFrame:
+        """Run each dataset's own single-dataset runner and concatenate.
+
+        ``prepare_dataset(dataset_id=[...])`` never merges instance-id spaces --
+        one dataset's instance ids mean nothing in another's feature space -- so
+        this does not rewire the agent runners to be dataset-aware internally.
+        Instead it loops the *unmodified* runner once per dataset, temporarily
+        pointing ``self.data``/``self.trials`` at that dataset's own prepared
+        data and trial rows (already tagged with the matching ``dataId`` by
+        ``generate_trials()``), then restores the multi-dataset state.
+        """
+        all_trials = self._require_trials()
+        levels = list(self.data_by_dataset)
+        trials_by_level = {
+            level: [trial for trial in all_trials if trial.get("dataId") == level]
+            for level in levels
+        }
+        missing = [level for level, rows in trials_by_level.items() if not rows]
+        if missing:
+            raise RuntimeError(
+                f"No trial rows found for dataset(s) {missing!r}. "
+                "Call generate_trials() on this study first."
+            )
+
+        original_data, original_trials = self.data, self.trials
+        results: list[pd.DataFrame] = []
+        try:
+            for level in levels:
+                self.data = self.data_by_dataset[level]
+                self.trials = trials_by_level[level]
+                agent_results = self._run_agent_experiment(
+                    mode=mode,
+                    participant_id=participant_id,
+                    condition_filter=condition_filter,
+                    explanation_pool=explanation_pool,
+                    runner_kwargs=dict(runner_kwargs),
+                )
+                if agent_results is None:
+                    raise ValueError(
+                        "Multi-dataset simulation requires a research-agent "
+                        f"cognitive model (one of {sorted(self._AGENT_RUNNERS)}); "
+                        f"{self.cognitive_model_id!r} is not one."
+                    )
+                if agent_results.empty:
+                    # This level had no rows matching participant_id/condition_filter
+                    # -- expected for participant_by_participant, since participant
+                    # ids are disjoint across dataset levels.
+                    continue
+                tagged = agent_results.copy()
+                tagged[DATASET_IV_NAME] = level
+                results.append(tagged)
+        finally:
+            self.data, self.trials = original_data, original_trials
+
+        if not results:
+            raise RuntimeError(
+                f"No trials matched mode={mode!r}, participant_id={participant_id!r}, "
+                f"condition_filter={condition_filter!r} in any dataset."
+            )
+        self.simulated_results = pd.concat(results, ignore_index=True)
+        return self.simulated_results
+
     def run_experiment(
         self,
         *,
@@ -1512,6 +1665,15 @@ class xaikitTest:
             raise RuntimeError(
                 "Experiment execution is locked. Preview the complete walkthrough and "
                 "click 'Approve walkthrough' first."
+            )
+
+        if self.data_by_dataset:
+            return self._run_multi_dataset_experiment(
+                mode=mode,
+                participant_id=participant_id,
+                condition_filter=condition_filter,
+                explanation_pool=explanation_pool,
+                runner_kwargs=runner_kwargs,
             )
 
         agent_results = self._run_agent_experiment(

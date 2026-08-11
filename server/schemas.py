@@ -7,7 +7,7 @@ restate what it exported.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -22,7 +22,15 @@ class CreateStudyRequest(BaseModel):
 class DatasetStageRequest(BaseModel):
     """Dataset preparation and AI-model training."""
 
-    dataset_id: Optional[str] = Field(None, description="Defaults to the export's dataset.")
+    dataset_id: Optional[Union[str, list[str]]] = Field(
+        None,
+        description=(
+            "Defaults to the export's dataset(s). Pass a list of 2+ ids for a "
+            "multi-dataset, between-subjects study -- or declare a between-"
+            "subjects IV named 'dataset' with 2+ levels in the design export "
+            "itself, which this defaults to when unset."
+        ),
+    )
     feature_cols: Optional[list[str]] = None
     num_features: Optional[int] = None
     rank_features_by_target: bool = False

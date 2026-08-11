@@ -309,7 +309,11 @@ def test_coxam_still_trains_for_a_dataset_outside_the_corpus():
 
 
 def test_coxam_source_defaults_to_assets_with_no_trained_model():
-    from unittest.mock import MagicMock, patch
+    """coax/coxam are dispatched through study.run_experiment(...) now, not a
+    direct run_coxam_study/run_coax_study import -- that's what lets a
+    multi-dataset study's per-dataset simulation loop (which lives inside
+    run_experiment) apply to them too. See run_simulation_stage's docstring."""
+    from unittest.mock import MagicMock
 
     from server.pipeline import run_simulation_stage
     from server.schemas import SimulationRequest
@@ -321,15 +325,14 @@ def test_coxam_source_defaults_to_assets_with_no_trained_model():
     )
     study.trained_ai_model = None
     study.save_results.return_value = ("x.csv", "x.json")
+    study.run_experiment.return_value = MagicMock(empty=False)
 
-    with patch("server.pipeline.run_coxam_study") as mocked:
-        mocked.return_value = MagicMock(empty=False)
-        run_simulation_stage(study, SimulationRequest(), output_subdir="x")
-        assert mocked.call_args.kwargs["source"] == "assets"
+    run_simulation_stage(study, SimulationRequest(), output_subdir="x")
+    assert study.run_experiment.call_args.kwargs["source"] == "assets"
 
 
 def test_coxam_source_defaults_to_fit_with_a_trained_model():
-    from unittest.mock import MagicMock, patch
+    from unittest.mock import MagicMock
 
     from server.pipeline import run_simulation_stage
     from server.schemas import SimulationRequest
@@ -341,11 +344,10 @@ def test_coxam_source_defaults_to_fit_with_a_trained_model():
     )
     study.trained_ai_model = object()
     study.save_results.return_value = ("x.csv", "x.json")
+    study.run_experiment.return_value = MagicMock(empty=False)
 
-    with patch("server.pipeline.run_coxam_study") as mocked:
-        mocked.return_value = MagicMock(empty=False)
-        run_simulation_stage(study, SimulationRequest(), output_subdir="x")
-        assert mocked.call_args.kwargs["source"] == "fit"
+    run_simulation_stage(study, SimulationRequest(), output_subdir="x")
+    assert study.run_experiment.call_args.kwargs["source"] == "fit"
 
 
 # -- apparatus-declared instances override the dataset's own train/test split
