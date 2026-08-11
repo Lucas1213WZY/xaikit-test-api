@@ -64,6 +64,21 @@ def test_blank_dataset_and_apparatus_default_to_the_sim2real_corpus():
     assert design.apparatus_training_instance_ids == list(SIM2REAL_DEFAULT_TRAIN_INSTANCE_IDS)
 
 
+@pytest.mark.parametrize("user_model", ["CoAX", "CoAX (XAI Property)", "Sim2Real"])
+def test_the_defaults_apply_regardless_of_which_usermodel_spelling_is_used(user_model):
+    """Neither the fallback nor resolved_framework reads userModel for this --
+    both key off the xai_property IV alone, so every spelling the UI has used
+    for a Sim2Real design resolves identically."""
+    raw = _sim2real_raw()
+    raw["userModel"] = user_model
+    design = parse_design_export(raw)
+
+    assert design.resolved_framework == "sim2real"
+    assert design.dataset_id == SIM2REAL_DEFAULT_DATASET_ID
+    assert design.apparatus_instance_ids == list(SIM2REAL_DEFAULT_TEST_INSTANCE_IDS)
+    assert design.apparatus_training_instance_ids == list(SIM2REAL_DEFAULT_TRAIN_INSTANCE_IDS)
+
+
 def test_explicit_values_still_win_over_the_default():
     design = parse_design_export(_sim2real_raw(
         dataset="Adult Income",

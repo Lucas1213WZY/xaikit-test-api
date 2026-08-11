@@ -23,9 +23,6 @@ from src.result_visualizer import plot_dv_by_two_ivs, plot_iv_dv_grid
 from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_study_runner import (
     coax_models_for_trials,
 )
-from src.virtual_experiment_executor.experiment_simualtion.Sim2Real.sim2real_study_runner import (
-    run_sim2real_study,
-)
 
 from .schemas import (
     DatasetStageRequest,
@@ -291,6 +288,12 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
       against. Every requested dataset must therefore already be corpus-
       covered (source='assets'/'corpus' can serve all of them), or this
       raises rather than silently training against just one of them.
+
+    None of that skipping applies when the design also declares
+    ``mlProxyBaselines`` (``design.baseline_model_ids``): those run through
+    the generic executor in ``run_simulation_stage``, which needs a real
+    ``trained_ai_model`` and explanation table regardless of what the
+    design's primary framework would otherwise let it skip.
     """
     design = study.design_export
     dataset_ids = _resolve_dataset_ids(request, design)
@@ -300,6 +303,7 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
         )
 
     framework = design_framework(study)
+    needs_baselines = bool(getattr(design, "baseline_model_ids", None))
 
     if len(dataset_ids) == 1:
         data = study.prepare_dataset(
@@ -315,13 +319,27 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
             cognitive_model_id=framework,
         )
         dataset_payload = {"dataset": _dataset_payload_entry(data)}
-        skip_reason = _corpus_skip_reason(framework, data.dataset_id)
+        skip_reason = None if needs_baselines else _corpus_skip_reason(framework, data.dataset_id)
         return _finish_dataset_stage(study, request, dataset_payload, skip_reason)
 
     # -- multi-dataset, between-subjects ------------------------------------
     if framework == "sim2real":
         raise ValueError(
             f"Sim2Real does not support a multi-dataset study; got {dataset_ids!r}."
+        )
+    if needs_baselines:
+        # An ML-proxy baseline runs through the generic executor, which needs a
+        # real trained_ai_model and an explanation table -- and only one of each
+        # can exist per study, against one study.data. Failing here names the
+        # cause; letting it through would instead skip training (below) and
+        # surface as a confusing crash two stages later.
+        raise ValueError(
+            "mlProxyBaselines are not supported alongside a multi-dataset study: "
+            "each baseline needs its own trained AI model and explanation table "
+            f"per dataset, and only one of each exists per study. Got datasets "
+            f"{dataset_ids!r} with baselines "
+            f"{list(getattr(design, 'baseline_model_ids', None) or [])!r}. Drop the "
+            "baselines, or run each dataset as its own single-dataset study."
         )
 
     uncovered = [
@@ -414,10 +432,16 @@ def run_trials_stage(study: xaikitTest, request: TrialsStageRequest) -> dict[str
 
     balance_by_ai_prediction = request.balance_by_ai_prediction
     if balance_by_ai_prediction is None:
-        # A model exists only if the dataset stage trained one -- Sim2Real
-        # designs skip that (see run_dataset_stage), so this follows what
-        # actually happened rather than assuming every design trained a model.
-        balance_by_ai_prediction = getattr(study, "trained_ai_model", None) is not None
+        # A model exists only if the dataset stage trained one. Sim2Real is
+        # excluded outright even when a model did get trained (for its own
+        # mlProxyBaselines, see run_dataset_stage): its apparatus instances
+        # are a small, fixed, curated split matching the published corpus,
+        # never meant to be filtered further by a freshly-trained baseline
+        # model's predictions.
+        balance_by_ai_prediction = (
+            design_framework(study) != "sim2real"
+            and getattr(study, "trained_ai_model", None) is not None
+        )
 
     apparatus_test_ids = sorted(set(getattr(design, "apparatus_instance_ids", [])))
     split_overridden = bool(apparatus_test_ids)
@@ -581,10 +605,19 @@ def run_explanations_stage(study: xaikitTest, request: ExplanationStageRequest) 
     explanation vectors directly and never touches ``combined_explanations``
     either. A CoAX dataset the corpus does *not* cover still needs this stage,
     since only ``source='study'`` can serve it.
+
+    None of this skipping applies when the design also declares
+    ``mlProxyBaselines``: the dataset stage already trained a real AI model
+    for them (see ``run_dataset_stage``), and they read this stage's
+    explanation table the same way a plain baseline design always has.
     """
+    design = study.design_export
     framework = design_framework(study)
-    if framework in {"coxam", "sim2real"} or (
-        framework == "coax" and getattr(study, "trained_ai_model", None) is None
+    needs_baselines = bool(getattr(design, "baseline_model_ids", None))
+    if not needs_baselines and (
+        framework in {"coxam", "sim2real"} or (
+            framework == "coax" and getattr(study, "trained_ai_model", None) is None
+        )
     ):
         return {
             "combined_table": None,
@@ -685,15 +718,16 @@ def run_simulation_stage(
     elif runner == "sim2real":
         # Counterfactual-only, and its corpus supplies its own stimuli and
         # ground truth, so it needs neither a task switch nor a trained model.
-        results = run_sim2real_study(
-            study,
+        # Dispatched through run_experiment for the same reason as coax/coxam
+        # above -- the per-dataset loop lives there, and store=True is already
+        # hardcoded on the far side.
+        results = study.run_experiment(
             mode=request.mode,
             participant_id=request.participant_id,
             condition_filter=request.condition_filter,
             strategy=request.sim2real_strategy,
             cognitive_params=normalize_cognitive_params("sim2real", request.sim2real_params),
             normalize_by_i_max=request.sim2real_normalize_by_i_max,
-            store=True,
         )
     else:
         baseline_model_id = resolve_baseline_model_id(study, request.baseline_model_id)
@@ -714,11 +748,51 @@ def run_simulation_stage(
             "condition_filter against the generated trial table."
         )
 
+    # A design can name mlProxyBaselines alongside a real participant runner
+    # (e.g. a Sim2Real design that also wants KNN/Decision-Tree/MLP proxy
+    # comparisons) -- each is a separate simulation run against the same
+    # trials/explanations, tagged and concatenated rather than the last one
+    # silently overwriting study.simulated_results. run_dataset_stage and
+    # run_explanations_stage already skip nothing when these are declared, so
+    # a trained_ai_model and explanation table are guaranteed to exist here.
+    design = study.design_export
+    baseline_model_ids = list(getattr(design, "baseline_model_ids", None) or [])
+    if runner != "baseline" and baseline_model_ids:
+        primary_model_id = study.cognitive_model_id
+        primary_cognitive_model = study.cognitive_model
+        primary_cognitive_params = study.cognitive_params
+        tagged = results.copy()
+        tagged["cognitive_model_id"] = primary_model_id
+        variants = [tagged]
+        for baseline_model_id in baseline_model_ids:
+            study.set_cognitive_model(
+                cognitive_model_id=baseline_model_id,
+                model_kwargs=request.baseline_model_kwargs,
+            )
+            baseline_results = study.run_experiment(
+                mode=request.mode,
+                participant_id=request.participant_id,
+                condition_filter=request.condition_filter,
+            )
+            if baseline_results.empty:
+                continue
+            baseline_tagged = baseline_results.copy()
+            baseline_tagged["cognitive_model_id"] = baseline_model_id
+            variants.append(baseline_tagged)
+        # Restore the design's primary model, so the study's "current" model
+        # (and the payload below) reflects it rather than the last baseline run.
+        study.cognitive_model = primary_cognitive_model
+        study.cognitive_model_id = primary_model_id
+        study.cognitive_params = primary_cognitive_params
+        results = pd.concat(variants, ignore_index=True)
+        study.simulated_results = results
+
     csv_path, json_path = study.save_results(out_dir=output_subdir)
     testing = results[results["phase"].astype(str) == "testing"] if "phase" in results else results
     return {
         "runner": runner,
         "cognitive_model_id": study.cognitive_model_id,
+        "baseline_model_ids": baseline_model_ids,
         "mode": request.mode,
         "participant_id": request.participant_id,
         "condition_filter": jsonable(request.condition_filter),
