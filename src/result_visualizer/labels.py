@@ -17,6 +17,12 @@ KNOWN_LABELS: dict[str, str] = {
     "decision_tree": "Rules",
     "logistic_regression": "Weights",
     "hybrid": "Hybrid",
+    # CoXAM's runner writes the surrogate it actually showed per trial into
+    # `explanation_type`, abbreviated. Title-casing those gives "Dt"/"Lr",
+    # which names nothing a reader recognizes -- and leaves the same surrogate
+    # labelled two different ways depending on which column a plot split on.
+    "dt": "Rules",
+    "lr": "Weights",
 }
 
 #: Words ``.title()`` mangles because they're acronyms, not ordinary words

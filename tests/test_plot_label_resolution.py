@@ -93,3 +93,35 @@ def test_grid_plot_accepts_the_ui_labels_too(study):
     payload = grid_plot_payload(study, ivs=["XAI Type"], dvs=["Task Accuracy"])
     assert payload["spec"]["ivs"] == ["xai_type"]
     assert payload["spec"]["dvs"] == ["forward_accuracy"]
+
+
+# ---------------------------------------------------------------------------
+# Runner bookkeeping columns are not plot dimensions
+# ---------------------------------------------------------------------------
+
+
+def test_plot_variables_lists_the_designs_factors_not_every_column(study):
+    from server.pipeline import plot_variables
+
+    study.simulated_results["explanation_type"] = "dt"
+    assert plot_variables(study) == ["xai_type", "tested_w_xai"]
+
+
+def test_splitting_on_explanation_type_is_refused_with_a_pointer(study):
+    # CoXAM writes the surrogate it showed per trial here. Splitting on it
+    # drops Hybrid (shown as dt/lr per trial) and invents a "none" bar from
+    # the without-XAI trials -- a chart that looks like a result and is not.
+    study.simulated_results["explanation_type"] = "dt"
+    with pytest.raises(ValueError) as error:
+        interaction_plot_payload(
+            study, x_iv="dataset", hue_iv="explanation_type", dv="forward_accuracy"
+        )
+    assert "xai_type" in str(error.value)
+
+
+def test_the_grid_plot_refuses_it_too(study):
+    from server.pipeline import grid_plot_payload as grid
+
+    study.simulated_results["explanation_type"] = "dt"
+    with pytest.raises(ValueError):
+        grid(study, ivs=["explanation_type"], dvs=["forward_accuracy"])

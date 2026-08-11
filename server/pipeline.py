@@ -964,7 +964,70 @@ def results_payload(
 ) -> dict[str, Any]:
     """Trial-by-trial step rows, filtered and paged for step-through rendering."""
     results = _filter_results(require_results(study), phase=phase, participant_id=participant_id)
-    return frame_payload(results, limit=limit, offset=offset)
+    payload = frame_payload(results, limit=limit, offset=offset)
+    payload["plot_variables"] = plot_variables(study)
+    return payload
+
+
+#: Result columns a runner writes for its own bookkeeping. They are real data
+#: and stay in the table and the CSV, but they are not experimental factors and
+#: must not be offered as plot dimensions -- ``columns`` lists every column, so
+#: a picker built from it offers these too.
+#:
+#: ``explanation_type`` is the concrete surrogate CoXAM showed on a given trial
+#: (dt/lr/none). Splitting on it answers a different question than the design's
+#: ``xai_type``: a Hybrid participant is assigned Hybrid but is shown dt on some
+#: trials and lr on others, so Hybrid disappears from the axis, while the
+#: Without-XAI half of ``tested_w_xai`` reappears as a spurious "none" bar.
+RUNNER_INTERNAL_COLUMNS = frozenset({
+    "explanation_type",
+    "selected_strategy",
+    "cognitive_model_strategy",
+    "condition_name",
+    "shown_xai_type",
+    "withinCondition",
+})
+
+
+def _reject_runner_internal(study: xaikitTest, *names: Optional[str]) -> None:
+    """Refuse to plot against a runner's bookkeeping column.
+
+    Drawing it would succeed and produce a chart that reads as an experimental
+    result, so this fails loudly and names the factor that was meant instead.
+    """
+    offenders = [name for name in names if name in RUNNER_INTERNAL_COLUMNS]
+    if not offenders:
+        return
+    choices = plot_variables(study) or sorted(
+        getattr(study, "iv_config", None) or {}
+    )
+    raise ValueError(
+        f"{offenders!r} record what a runner did per trial, not a factor the "
+        "study manipulated, so plotting against them misreads the design "
+        "(a Hybrid participant is shown dt on some trials and lr on others, so "
+        "Hybrid vanishes from the axis and the without-XAI trials appear as a "
+        f"'none' condition). Use one of the design's own factors: {choices}."
+    )
+
+
+def plot_variables(study: xaikitTest) -> list[str]:
+    """The design's own factors, as the only sane x/split choices for a plot.
+
+    Built from the design export rather than the results columns so a picker
+    offers the factors the study actually manipulated -- and nothing a runner
+    happened to record alongside them.
+    """
+    results = study.simulated_results
+    if results is None:
+        return []
+    design = getattr(study, "design_export", None)
+    names = [iv["name"] for iv in getattr(design, "ivs", None) or []]
+    if not names:
+        names = [
+            column for column in results.columns
+            if column not in RUNNER_INTERNAL_COLUMNS
+        ]
+    return [name for name in names if name in results.columns]
 
 
 def results_csv(
@@ -1091,6 +1154,7 @@ def interaction_plot_payload(
     x_iv = resolve_variable_name(study, x_iv)
     hue_iv = resolve_variable_name(study, hue_iv)
     dv = resolve_variable_name(study, dv)
+    _reject_runner_internal(study, x_iv, hue_iv)
     plot = plot_dv_by_two_ivs(
         require_results(study),
         x_iv=x_iv,
@@ -1132,6 +1196,7 @@ def grid_plot_payload(
         if dvs
         else list(getattr(design, "simulatable_dvs", []))
     )
+    _reject_runner_internal(study, *ivs)
     grid = plot_iv_dv_grid(
         require_results(study),
         ivs=ivs,
