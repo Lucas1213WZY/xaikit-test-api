@@ -941,3 +941,52 @@ def _plot_payload(
     else:
         plt.close(figure)
     return payload
+
+
+# -- human-vs-model comparison (precomputed, no fitting at request time) --
+
+ASSETS_ROOT = Path(__file__).resolve().parents[1] / "assets"
+HUMAN_COMPARISON_STUDIES = ("coax", "coxam", "sim2real")
+
+
+def human_comparison_payload(study: str) -> Optional[dict[str, Any]]:
+    """A precomputed study's comparison PNG and NLL/BIC table, read from disk.
+
+    Everything here was built ahead of time by ``assets/build_human_vs_model_plot_data.py``,
+    ``assets/build_human_vs_model_plots.py`` and ``assets/build_human_vs_model_fit_stats.py``
+    -- this only reads and re-serves those files. Returns ``None`` if ``study``
+    is not one of ``coax``/``coxam``/``sim2real``, or if its files have not
+    been built yet.
+    """
+    import base64
+    import json
+
+    key = str(study).lower().strip()
+    if key not in HUMAN_COMPARISON_STUDIES:
+        return None
+
+    plot_path = ASSETS_ROOT / "human_vs_model_plots" / f"{key}.png"
+    panels_path = ASSETS_ROOT / "human_vs_model_plot_data.json"
+    fit_stats_path = ASSETS_ROOT / "human_vs_model_fit_stats.json"
+    if not plot_path.is_file():
+        return None
+
+    payload: dict[str, Any] = {
+        "study": key,
+        "plot_png": "data:image/png;base64," + base64.b64encode(plot_path.read_bytes()).decode("ascii"),
+        "panels": None,
+        "fit_stats": None,
+    }
+    if panels_path.is_file():
+        panel_data = json.loads(panels_path.read_text())
+        payload["panels"] = next(
+            (s for s in panel_data.get("studies", []) if s.get("name", "").lower() == key),
+            None,
+        )
+    if fit_stats_path.is_file():
+        fit_data = json.loads(fit_stats_path.read_text())
+        payload["fit_stats"] = next(
+            (s for s in fit_data.get("studies", []) if s.get("name", "").lower() == key),
+            None,
+        )
+    return payload

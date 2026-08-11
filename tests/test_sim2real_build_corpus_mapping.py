@@ -61,18 +61,17 @@ def test_every_effective_delta_maps_values_to_counterfactual(corpus_builder, cas
         )
 
 
-def test_raw_source_contradictions_are_preserved_as_provenance(corpus_builder, cases):
+def test_raw_source_matches_observation_for_every_instance(corpus_builder, cases):
+    """Instances 2, 8 and 9 used to declare a source the case did not hold;
+    the raw declaration was corrected to match the observation (see
+    raw_training's capital-gain/age/education deltas), so no instance is a
+    source/observation mismatch any more."""
     resolved = [corpus_builder.resolve_delta(case) for _, _, case in cases]
 
-    assert [i for i, item in enumerate(resolved) if not item["source_matches"]] == [
-        2,
-        8,
-        9,
-    ]
+    assert [i for i, item in enumerate(resolved) if not item["source_matches"]] == []
     assert [i for i, item in enumerate(resolved) if not item["has_change"]] == []
     assert [i for i, item in enumerate(resolved) if item["direction_reversed"]] == []
 
-    # The corrected raw observation and declared delta now agree exactly.
     item = resolved[1]
     assert (item["value_from"], item["value_to"]) == ("Female", "Male")
     assert (item["dim_from"], item["dim_to"]) == (56, 57)
@@ -85,11 +84,8 @@ def test_raw_source_contradictions_are_preserved_as_provenance(corpus_builder, c
         "Male",
     )
 
-    # Instance 9's suggested transition starts from what the participant can
-    # actually see (Assoc-voc), not from the declaration's 9th: labelling a
-    # change "9th -> 1st-4th" beside a case reading Assoc-voc would ask them to
-    # reason from a value that is not on screen. The declaration survives
-    # verbatim in source_value_from for audit.
+    # Instance 9's source now names the same value that is on screen
+    # (Assoc-voc), not the raw file's original "9th" declaration.
     item = resolved[9]
     assert (item["value_from"], item["value_to"]) == ("Assoc-voc", "1st-4th")
     assert (item["dim_from"], item["dim_to"]) == (12, 7)
@@ -97,7 +93,7 @@ def test_raw_source_contradictions_are_preserved_as_provenance(corpus_builder, c
         "Assoc-voc",
         12,
     )
-    assert (item["source_value_from"], item["source_dim_from"]) == ("9th", 10)
+    assert (item["source_value_from"], item["source_dim_from"]) == ("Assoc-voc", 12)
 
 
 def test_generated_delta_csv_uses_effective_mapping_without_changing_cf(
@@ -140,29 +136,28 @@ def test_generated_delta_csv_uses_effective_mapping_without_changing_cf(
     assert rows[1]["originalPrediction"] == "0"
     assert rows[1]["answer"] == "1"
 
-    # Instances 2, 8 and 9 are the three whose raw declaration names a source
-    # the case does not hold. The label follows the observation so the
-    # participant is never asked to reason from a value that is not on screen;
-    # the declaration is kept in sourceValueFrom, and valueFromMatchesInstance
-    # is 1 because valueFrom now does match the instance.
+    # Instances 2, 8 and 9 previously had a raw declaration naming a source
+    # the case did not hold; raw_training was corrected so sourceValueFrom
+    # now matches observedValueFrom exactly for all three.
     assert rows[2]["valueFrom"] == "0.0"
     assert rows[2]["valueTo"] == "1205.0"
     assert rows[2]["observedValueFrom"] == "0.0"
-    assert rows[2]["sourceValueFrom"] == "500"
+    assert rows[2]["sourceValueFrom"] == "0"
     assert rows[2]["valueFromMatchesInstance"] == "1"
-    assert rows[2]["sourceValueFromMatchesInstance"] == "0"
+    assert rows[2]["sourceValueFromMatchesInstance"] == "1"
+    assert rows[2]["mappingStatus"] == "matched"
 
     assert rows[8]["valueFrom"] == "46.0"
     assert rows[8]["valueTo"] == "20.0"
     assert rows[8]["observedValueFrom"] == "46"
-    assert rows[8]["sourceValueFrom"] == "50"
+    assert rows[8]["sourceValueFrom"] == "46"
 
     assert rows[9]["valueFrom"] == "Assoc-voc"
     assert rows[9]["dimFrom"] == "12"
     assert rows[9]["observedValueFrom"] == "Assoc-voc"
     assert rows[9]["observedDimFrom"] == "12"
-    assert rows[9]["sourceValueFrom"] == "9th"
-    assert rows[9]["sourceDimFrom"] == "10"
+    assert rows[9]["sourceValueFrom"] == "Assoc-voc"
+    assert rows[9]["sourceDimFrom"] == "12"
     assert rows[9]["changedDimensions"] == "7;12"
 
 

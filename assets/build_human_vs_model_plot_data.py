@@ -37,9 +37,12 @@ OUTPUT = REPO_ROOT / "assets" / "human_vs_model_plot_data.json"
 
 SIM2REAL_CONDITIONS = ("faithful", "sparse", "robust", "sparse_robust")
 
-#: The dataset the published CoAX figure covers. Its XAI-type panels are scoped
-#: to this one; the by-dataset overview panel carries the other three.
-COAX_FIGURE_DATASET = "adult"
+#: The datasets broken out into per-XAI-type panels, nested with the
+#: "shown"/"not shown" split like build_coxam()'s dataset x shown layout.
+#: Mushrooms is deliberately excluded from this per-condition grid (see the
+#: note where these panels are built); the by-dataset overview panel below
+#: still covers all four.
+COAX_FIGURE_DATASETS = ("adult", "covertype", "wine quality")
 
 #: The study tables spell the same dataset several ways.
 DATASET_LABELS = {
@@ -207,29 +210,32 @@ def build_coax() -> dict[str, Any]:
             ],
         }
 
-    # Laid out like the published figure: one panel per explanation-shown cell,
-    # with the three XAI types on the x axis, for the dataset that figure covers.
-    # Pooling the four datasets here would mix very different difficulties --
-    # mushrooms sits at 0.56 against adult income's 0.76 -- so the bars would
-    # move with the dataset mix rather than with the explanation type.
-    for shown in ("w/o XAI", "w/ XAI"):
-        subset = frame[
-            (frame["Tested w/ XAI"].astype(str) == shown) & (frame["dataId"] == COAX_FIGURE_DATASET)
-        ]
-        if subset.empty:
-            continue
-        keys = [key for key in xai_order if key in set(subset["XAIType"].astype(str))]
-        panels.append(
-            {
-                "title": (
-                    f"Forward simulation — "
-                    f"{DATASET_LABELS.get(COAX_FIGURE_DATASET, COAX_FIGURE_DATASET).lower()}, {shown}"
-                ),
-                "dv": dv,
-                "note": note,
-                **_bars(subset, "XAIType", keys, xai_labels),
-            }
-        )
+    # Laid out like the published figure: one panel per dataset x
+    # explanation-shown cell, with the three XAI types on the x axis --
+    # nested/multifaceted the same way build_coxam() lays out its dataset x
+    # shown panels. Mushrooms is excluded here (kept only in the pooled
+    # "Overall — by dataset" panel below): its own difficulty (0.56) sits far
+    # enough from the other three that mixing it into this per-condition grid
+    # was called out explicitly as unwanted.
+    for data_id in COAX_FIGURE_DATASETS:
+        for shown in ("w/o XAI", "w/ XAI"):
+            subset = frame[
+                (frame["Tested w/ XAI"].astype(str) == shown) & (frame["dataId"] == data_id)
+            ]
+            if subset.empty:
+                continue
+            keys = [key for key in xai_order if key in set(subset["XAIType"].astype(str))]
+            panels.append(
+                {
+                    "title": (
+                        f"Forward simulation — "
+                        f"{DATASET_LABELS.get(data_id, data_id).lower()}, {shown}"
+                    ),
+                    "dv": dv,
+                    "note": note,
+                    **_bars(subset, "XAIType", keys, xai_labels),
+                }
+            )
 
     # Overall view, every dataset side by side. The published figure covers one
     # dataset; the table covers four, and this is where the other three appear.

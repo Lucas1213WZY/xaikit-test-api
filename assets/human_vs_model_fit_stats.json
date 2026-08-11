@@ -1,0 +1,170 @@
+{
+  "generated_from": "assets/build_human_vs_model_fit_stats.py",
+  "bic_formula": "n_parameters * log(n_trials) + 2 * total_nll",
+  "studies": [
+    {
+      "name": "sim2real",
+      "facets": [
+        "Faithful",
+        "Sparse",
+        "Robust",
+        "Sparse + robust"
+      ],
+      "models": [
+        {
+          "name": "sim2real",
+          "label": "sim2real",
+          "is_target": true,
+          "cells": {
+            "Faithful": {
+              "nll_mean": 0.5199893344134598,
+              "nll_sd": 0.09320522148491664,
+              "bic_mean": 63.83233969584543,
+              "bic_sd": 7.927871975117025,
+              "n": 12
+            },
+            "Robust": {
+              "nll_mean": 0.2072376376782956,
+              "nll_sd": 0.22072270632587146,
+              "bic_mean": 45.69274128520589,
+              "bic_sd": 12.801916966900544,
+              "n": 11
+            },
+            "Sparse": {
+              "nll_mean": 0.5353597958556094,
+              "nll_sd": 0.10117634385159227,
+              "bic_mean": 55.46376292702729,
+              "bic_sd": 12.087174078961384,
+              "n": 12
+            },
+            "Sparse + robust": {
+              "nll_mean": 0.3297750919785054,
+              "nll_sd": 0.07102123102915263,
+              "bic_mean": 43.31026175011072,
+              "bic_sd": 10.226845768629685,
+              "n": 11
+            }
+          }
+        },
+        {
+          "name": "decision_tree",
+          "label": "Decision Tree",
+          "is_target": false,
+          "cells": {
+            "Faithful": {
+              "nll_mean": 0.6865341059283324,
+              "nll_sd": 0.015677692480763745,
+              "bic_mean": 46.55356980381625,
+              "bic_sd": 0.9093061638842976,
+              "n": 12
+            },
+            "Robust": {
+              "nll_mean": 0.8487543485995832,
+              "nll_sd": 0.09376980780502994,
+              "bic_mean": 55.96234387874878,
+              "bic_sd": 5.438648852691736,
+              "n": 11
+            },
+            "Sparse": {
+              "nll_mean": 0.8766904059795683,
+              "nll_sd": 0.08490512274577462,
+              "bic_mean": 57.582635206787906,
+              "bic_sd": 4.924497119254927,
+              "n": 12
+            },
+            "Sparse + robust": {
+              "nll_mean": 0.8529513333677471,
+              "nll_sd": 0.09754427882330866,
+              "bic_mean": 56.205768995302286,
+              "bic_sd": 5.657568171751903,
+              "n": 11
+            }
+          }
+        },
+        {
+          "name": "logistic_regression",
+          "label": "Logistic Regression",
+          "is_target": false,
+          "cells": {
+            "Faithful": {
+              "nll_mean": 1.1994154922814408,
+              "nll_sd": 0.6126251428336706,
+              "bic_mean": 76.30069021229652,
+              "bic_sd": 35.5322582843529,
+              "n": 12
+            },
+            "Robust": {
+              "nll_mean": 0.8899363919111881,
+              "nll_sd": 0.6472755426652659,
+              "bic_mean": 58.35090239082186,
+              "bic_sd": 37.54198147458542,
+              "n": 11
+            },
+            "Sparse": {
+              "nll_mean": 1.8810988498578662,
+              "nll_sd": 0.9151356211390139,
+              "bic_mean": 115.83832495172918,
+              "bic_sd": 53.0778660260628,
+              "n": 12
+            },
+            "Sparse + robust": {
+              "nll_mean": 0.8195209678028262,
+              "nll_sd": 0.27919312762741344,
+              "bic_mean": 54.266807792536866,
+              "bic_sd": 16.193201402389974,
+              "n": 11
+            }
+          }
+        },
+        {
+          "name": "mlp",
+          "label": "MLP",
+          "is_target": false,
+          "cells": {
+            "Faithful": {
+              "nll_mean": 3.260908955300184,
+              "nll_sd": 1.5891168996143294,
+              "bic_mean": 195.8673110673836,
+              "bic_sd": 92.1687801776311,
+              "n": 12
+            },
+            "Robust": {
+              "nll_mean": 2.1450082615091266,
+              "nll_sd": 0.861090969778987,
+              "bic_mean": 131.1450708275023,
+              "bic_sd": 49.943276247181245,
+              "n": 11
+            },
+            "Sparse": {
+              "nll_mean": 4.200675978145932,
+              "nll_sd": 2.35641983452968,
+              "bic_mean": 250.37379839243695,
+              "bic_sd": 136.67235040272146,
+              "n": 12
+            },
+            "Sparse + robust": {
+              "nll_mean": 2.6920151776367742,
+              "nll_sd": 0.6538758381110601,
+              "bic_mean": 162.87147196290587,
+              "bic_sd": 37.92479861044149,
+              "n": 11
+            }
+          }
+        }
+      ],
+      "note": "sim2real is the study's fitted cognitive model (best strategy per participant); the three baselines are DecisionTreeBaseline, LogisticRegressionBaseline and MLPBaseline from src/cognitive_models/baseline_models, trained once per exp_property on the ten training cases and scored against every participant's real answers. Lower is better."
+    },
+    {
+      "name": "coax",
+      "facets": [],
+      "models": [],
+      "note": "assets/human_data/CoAX/coax_human_model_and_baselines.csv carries only hard 0/1 predictions for the DT/KNN/MLP baselines, not the probabilities NLL needs -- no fit table until those baselines are re-scored with predict_proba."
+    },
+    {
+      "name": "coxam",
+      "facets": [],
+      "models": [],
+      "note": "No DT/LR baseline predictions exist yet under assets/human_data/CoXAM -- no fit table until one is fitted."
+    }
+  ]
+}

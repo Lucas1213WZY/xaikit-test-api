@@ -327,6 +327,31 @@ def download_results_csv(
     )
 
 
+# -- human-vs-model comparison ---------------------------------------------
+
+
+@app.get("/api/human-comparison/{study}")
+def get_human_comparison(study: str) -> dict[str, Any]:
+    """A precomputed study's human-vs-model PNG and NLL/BIC table.
+
+    Not tied to any running study session -- ``study`` is ``coax``, ``coxam``
+    or ``sim2real``, matching the files ``assets/build_human_vs_model_plots.py``
+    and ``assets/build_human_vs_model_fit_stats.py`` already wrote to disk.
+    Nothing is fitted or rendered here, only read back.
+    """
+    payload = pipeline.human_comparison_payload(study)
+    if payload is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"No precomputed human comparison for {study!r}. Use one of "
+                f"{pipeline.HUMAN_COMPARISON_STUDIES}, and make sure "
+                "assets/build_human_vs_model_plots.py has been run."
+            ),
+        )
+    return payload
+
+
 # -- analysis and plots ---------------------------------------------------
 
 

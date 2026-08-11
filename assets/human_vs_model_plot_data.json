@@ -157,6 +157,198 @@
               ]
             }
           ]
+        },
+        {
+          "title": "Forward simulation \u2014 forest cover, w/o XAI",
+          "dv": "Forward simulation accuracy",
+          "note": "Test trials only. The published table carries no participant id for CoAX, so only the human bars carry a confidence interval \u2014 the CoAX bar is one deterministic agent (n = 1), not a sample.",
+          "categories": [
+            "None",
+            "Importance",
+            "Attribution"
+          ],
+          "series": [
+            {
+              "name": "Human",
+              "values": [
+                0.5481481481481482,
+                0.6111111111111109,
+                0.5659722222222222
+              ],
+              "error": [
+                0.04130372926472589,
+                0.05447977465020477,
+                0.05128115123363735
+              ],
+              "n": [
+                15,
+                14,
+                24
+              ]
+            },
+            {
+              "name": "CoAX",
+              "values": [
+                0.5911111111111111,
+                0.5637037037037037,
+                0.6227777777777778
+              ],
+              "error": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "n": [
+                1,
+                1,
+                1
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Forward simulation \u2014 forest cover, w/ XAI",
+          "dv": "Forward simulation accuracy",
+          "note": "Test trials only. The published table carries no participant id for CoAX, so only the human bars carry a confidence interval \u2014 the CoAX bar is one deterministic agent (n = 1), not a sample.",
+          "categories": [
+            "None",
+            "Importance",
+            "Attribution"
+          ],
+          "series": [
+            {
+              "name": "Human",
+              "values": [
+                0.611111111111111,
+                0.6309523809523808,
+                0.9363425925925927
+              ],
+              "error": [
+                0.04152140523471841,
+                0.07481234157770039,
+                0.017113147282592108
+              ],
+              "n": [
+                15,
+                14,
+                24
+              ]
+            },
+            {
+              "name": "CoAX",
+              "values": [
+                0.5911111111111111,
+                0.6563888888888889,
+                0.98
+              ],
+              "error": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "n": [
+                1,
+                1,
+                1
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Forward simulation \u2014 wine quality, w/o XAI",
+          "dv": "Forward simulation accuracy",
+          "note": "Test trials only. The published table carries no participant id for CoAX, so only the human bars carry a confidence interval \u2014 the CoAX bar is one deterministic agent (n = 1), not a sample.",
+          "categories": [
+            "None",
+            "Importance",
+            "Attribution"
+          ],
+          "series": [
+            {
+              "name": "Human",
+              "values": [
+                0.6094771241830065,
+                0.6837606837606837,
+                0.6608187134502925
+              ],
+              "error": [
+                0.07308126087958464,
+                0.09384589840884966,
+                0.06257168982664588
+              ],
+              "n": [
+                17,
+                13,
+                19
+              ]
+            },
+            {
+              "name": "CoAX",
+              "values": [
+                0.6411111111111111,
+                0.6177777777777778,
+                0.6661111111111111
+              ],
+              "error": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "n": [
+                1,
+                1,
+                1
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Forward simulation \u2014 wine quality, w/ XAI",
+          "dv": "Forward simulation accuracy",
+          "note": "Test trials only. The published table carries no participant id for CoAX, so only the human bars carry a confidence interval \u2014 the CoAX bar is one deterministic agent (n = 1), not a sample.",
+          "categories": [
+            "None",
+            "Importance",
+            "Attribution"
+          ],
+          "series": [
+            {
+              "name": "Human",
+              "values": [
+                0.6160130718954249,
+                0.6752136752136751,
+                0.8479532163742691
+              ],
+              "error": [
+                0.0789130296519365,
+                0.07134342293159257,
+                0.03580517570363414
+              ],
+              "n": [
+                17,
+                13,
+                19
+              ]
+            },
+            {
+              "name": "CoAX",
+              "values": [
+                0.5188888888888888,
+                0.5486111111111112,
+                0.88
+              ],
+              "error": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "n": [
+                1,
+                1,
+                1
+              ]
+            }
+          ]
         }
       ]
     },
