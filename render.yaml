@@ -7,18 +7,13 @@ services:
     name: xaikit-api
     runtime: docker
     dockerfilePath: ./Dockerfile
-    plan: free # UI-integration smoke test only -- 512MB RAM may OOM on real
-    # MLP/xgboost training and the service sleeps after 15min idle (cold
-    # starts on the next request). Free tier also has no persistent disk, so
-    # server_runs is NOT mounted here -- it writes to the container's own
-    # ephemeral filesystem and is wiped on every redeploy/restart/sleep-wake.
-    # Once this is confirmed working end-to-end, switch to the paid tier by
-    # setting plan: standard, adding XAIKIT_SERVER_RUNS_DIR=/data/server_runs,
-    # and restoring the disk block:
-    #   disk:
-    #     name: xaikit-server-runs
-    #     mountPath: /data
-    #     sizeGB: 5
+    plan: standard # free tier's 512MB RAM OOMs on real MLP/xgboost training
+    # (confirmed: one CoAX design with 3 ml_proxy baselines plus LIME/SHAP
+    # generation for adult-income exceeded it) and sleeps after 15min idle.
+    disk:
+      name: xaikit-server-runs
+      mountPath: /data
+      sizeGB: 5
     healthCheckPath: /api/health
     autoDeployTrigger: commit
     envVars:
@@ -30,3 +25,11 @@ services:
         value: Agg
       - key: PYTHONUNBUFFERED
         value: "1"
+      - key: XAIKIT_SERVER_RUNS_DIR
+        value: /data/server_runs
+      - key: OMP_NUM_THREADS
+        value: "1"
+      - key: MKL_NUM_THREADS
+        value: "1"
+      - key: KMP_DUPLICATE_LIB_OK
+        value: "TRUE"
