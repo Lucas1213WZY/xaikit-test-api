@@ -20,6 +20,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from server.jobs import StudySession
 from server.pipeline import (
     _resolve_dataset_ids,
     run_dataset_stage,
@@ -225,6 +226,44 @@ def test_apparatus_override_single_dataset_study_is_unchanged():
         pass  # only the split override is under test here
 
     assert sorted(study.data.split.test_instance_ids.tolist()) == [1, 2, 3, 4, 5]
+
+
+# ---------------------------------------------------------------------------
+# StudySession.summary(): dataset_ready must recognize data_by_dataset too
+# ---------------------------------------------------------------------------
+
+
+def _bare_study(**overrides):
+    study = SimpleNamespace(
+        project_name="p",
+        design_export=None,
+        data=None,
+        data_by_dataset={},
+        trained_ai_model=None,
+        trials=[],
+        combined_explanations=None,
+        simulated_results=None,
+    )
+    for key, value in overrides.items():
+        setattr(study, key, value)
+    return study
+
+
+def test_dataset_ready_true_for_a_multi_dataset_study_with_no_scalar_data():
+    session = StudySession(
+        study_id="s1",
+        study=_bare_study(data_by_dataset={"wine_quality": object(), "mushrooms": object()}),
+        output_dir="/tmp/x",
+    )
+    assert session.summary()["state"]["dataset_ready"] is True
+
+
+def test_dataset_ready_still_works_for_single_dataset_and_unprepared_studies():
+    prepared = StudySession(study_id="s2", study=_bare_study(data=object()), output_dir="/tmp/x")
+    assert prepared.summary()["state"]["dataset_ready"] is True
+
+    unprepared = StudySession(study_id="s3", study=_bare_study(), output_dir="/tmp/x")
+    assert unprepared.summary()["state"]["dataset_ready"] is False
 
 
 # ---------------------------------------------------------------------------

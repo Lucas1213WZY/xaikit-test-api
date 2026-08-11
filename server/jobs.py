@@ -49,7 +49,9 @@ class StudySession:
             "output_dir": str(self.output_dir),
             "completed_stages": sorted(self.stages),
             "state": {
-                "dataset_ready": study.data is not None,
+                "dataset_ready": (
+                    study.data is not None or bool(getattr(study, "data_by_dataset", None))
+                ),
                 "model_trained": study.trained_ai_model is not None,
                 "trials_generated": bool(study.trials),
                 "explanations_generated": study.combined_explanations is not None,
