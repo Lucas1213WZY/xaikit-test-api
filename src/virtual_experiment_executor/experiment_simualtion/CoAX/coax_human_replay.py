@@ -195,10 +195,28 @@ def build_coax_study_repository(
         xai_type: scope(source[xai_type], by_method=True)
         for xai_type in ("attribution", "importance")
     }
+    explanations = {key: table for key, table in explanations.items() if not table.empty}
+    if xai_method is not None and not explanations:
+        # A design can declare xai_method as its own IV with levels the
+        # published corpus never collected (it only ever generated lime/shap,
+        # one method per dataset) -- without this, the caller gets a
+        # repository that looks valid but silently has no explanation table
+        # at all, and the failure only surfaces much later as "No explanation
+        # table for xai_type=... Available: []" with no mention of the
+        # dataset or method actually at fault.
+        available = sorted(
+            scope(source["attribution"])["expMethod"].astype(str).unique().tolist()
+        )
+        raise ValueError(
+            f"The published CoAX corpus has no {name!r} explanations for "
+            f"xai_method={xai_method!r}. Available for this dataset: {available!r}. "
+            "Restrict the design's xai_method IV to one of these, or drop xai_method "
+            "as a factor and let CoAX use its own default method per xai_type."
+        )
     return CoAXAssetRepository.from_tables(
         features=features,
         predictions=scope(source["predictions"]),
-        explanations={key: table for key, table in explanations.items() if not table.empty},
+        explanations=explanations,
     )
 
 

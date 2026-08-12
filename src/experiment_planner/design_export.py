@@ -98,6 +98,17 @@ DATASET_ALIASES: dict[str, str] = {
     "breast_cancer_wisconsin": "breast_cancer",
 }
 
+# The UI writes some xai_method levels out in full prose, which slugifies
+# longer than the toolkit's short canonical codes ("Layer-wise Relevance
+# Propagation" -> "layer_wise_relevance_propagation", not "lrp"). Only
+# mismatches need an entry -- "LIME"/"SHAP"/"Integrated Gradients" already
+# slugify onto their declared codes.
+XAI_METHOD_ALIASES: dict[str, str] = {
+    "layer_wise_relevance_propagation": "lrp",
+    "layerwise_relevance_propagation": "lrp",
+    "captum_deeplift": "deeplift",
+}
+
 #: Sim2Real's one published corpus, and the curated instance split every prior
 #: export declared explicitly (testing 10-30, training 0-9) -- the defaults a
 #: Sim2Real design falls back to when it leaves them unspecified, since the
@@ -486,6 +497,8 @@ def parse_design_export(raw: dict[str, Any]) -> DesignExport:
             # -- otherwise this IV's levels ("mushroom") never match the ids
             # prepare_dataset/data_by_dataset actually use ("mushrooms").
             levels = [DATASET_ALIASES.get(level, level) for level in levels]
+        elif name == "xai_method":
+            levels = [XAI_METHOD_ALIASES.get(level, level) for level in levels]
         if not levels:
             continue
         iv_type = _canonical_allocation(row.get("allocation", "between"))

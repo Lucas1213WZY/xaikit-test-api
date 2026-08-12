@@ -177,6 +177,55 @@ def _coax_corpus_covers(dataset_id: str) -> bool:
     return dataset_id in COAX_CORPUS_DATA_IDS
 
 
+def _coax_corpus_methods(dataset_id: str) -> set[str]:
+    """``xai_method`` values the published CoAX corpus actually collected for
+    one dataset.
+
+    The corpus is fixed, pre-collected human-study data -- it can only ever
+    replay the method(s) it was collected with (one per dataset today: lime
+    for adult/wine_quality, shap for forest_cover), never a method a design's
+    ``xai_method`` IV asks for but the corpus never ran.
+    """
+    from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_human_replay import (
+        load_coax_corpus_tables,
+    )
+
+    rows = load_coax_corpus_tables()["attribution"]
+    rows = rows[rows["dataId"].astype(str) == str(dataset_id)]
+    return set(rows["expMethod"].astype(str).unique())
+
+
+def _design_xai_methods(design: Any) -> list[str]:
+    """The design's declared ``xai_method`` IV levels, or ``[]`` if it has none."""
+    for iv in getattr(design, "ivs", None) or []:
+        if iv.get("name") == "xai_method":
+            return list(iv.get("levels") or [])
+    return []
+
+
+def _coax_needs_real_generation(design: Any, framework: str, dataset_id: str) -> bool:
+    """Whether this dataset's declared ``xai_method`` levels force real CoAX
+    training and explanation generation instead of the published corpus.
+
+    Routing to ``source='corpus'`` for a design that also asks for a method
+    the corpus never collected silently builds an explanation repository
+    with nothing in it for that method -- the failure then only surfaces much
+    later, deep in trial execution, with a message that names neither the
+    dataset nor the method at fault (see ``build_coax_study_repository``).
+    Forcing real training+generation here -- the same override
+    ``needs_baselines`` already applies -- catches it immediately instead,
+    either by actually generating the missing method(s) (single dataset) or
+    by raising the existing, clearer "multi-dataset training is not yet
+    supported" error (multi-dataset), rather than the cryptic one.
+    """
+    if framework != "coax":
+        return False
+    declared = _design_xai_methods(design)
+    if not declared:
+        return False
+    return not set(declared) <= (_coax_corpus_methods(dataset_id) | {"none"})
+
+
 def _corpus_instance_ids(framework: str, dataset_id: str) -> Optional[list[int]]:
     """Instance ids the published corpus can serve for this framework/dataset,
     or None when neither applies (an uncovered dataset, or a framework with no
@@ -352,7 +401,10 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
             cognitive_model_id=framework,
         )
         dataset_payload = {"dataset": _dataset_payload_entry(data)}
-        skip_reason = None if needs_baselines else _corpus_skip_reason(framework, data.dataset_id)
+        needs_real_ai = needs_baselines or _coax_needs_real_generation(
+            design, framework, data.dataset_id
+        )
+        skip_reason = None if needs_real_ai else _corpus_skip_reason(framework, data.dataset_id)
         return _finish_dataset_stage(study, request, dataset_payload, skip_reason)
 
     # -- multi-dataset, between-subjects ------------------------------------
@@ -378,14 +430,18 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
     uncovered = [
         dataset_id for dataset_id in dataset_ids
         if _corpus_skip_reason(framework, dataset_id) is None
+        or _coax_needs_real_generation(design, framework, dataset_id)
     ]
     if uncovered:
         raise ValueError(
             "Multi-dataset AI training is not yet supported -- each dataset's "
             f"model can only be trained one at a time, but dataset(s) {uncovered!r} "
-            f"have no published {framework} corpus to run source='assets'/'corpus' "
-            "against instead. Remove them from the study, or prepare/train each "
-            "uncovered dataset on its own with a single dataset_id first."
+            f"cannot be served by {framework}'s published corpus (either it does not "
+            "cover the dataset at all, or it does not cover every xai_method the "
+            "design declares -- the corpus only ever collected one method per "
+            "dataset). Remove them from the study, drop the unsupported xai_method "
+            "levels, or prepare/train each uncovered dataset on its own with a "
+            "single dataset_id first."
         )
 
     data_by_dataset = study.prepare_dataset(
