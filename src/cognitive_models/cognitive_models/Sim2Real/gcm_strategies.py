@@ -1160,7 +1160,7 @@ class Sim2RealFittedAttributionSum:
 # fit/compare surface so one grid and one BIC can compare all three.
 # ---------------------------------------------------------------------------
 _COAX_MODEL_FILE = (
-    Path(__file__).resolve().parents[1] / "coax" / "coax_gcm_multiple_strategies.py"
+    Path(__file__).resolve().parents[1] / "CoAX" / "coax_gcm_multiple_strategies.py"
 )
 
 

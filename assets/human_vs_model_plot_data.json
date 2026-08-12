@@ -9,7 +9,7 @@
       "panels": [
         {
           "title": "Overall \u2014 by dataset",
-          "dv": "Forward simulation accuracy",
+          "dv": "Forward Simulation Accuracy",
           "section": "Overall",
           "subtitle": "every dataset",
           "role": "summary",
@@ -69,7 +69,7 @@
           "title": "Forward simulation \u2014 adult income, w/o XAI",
           "section": "Adult income",
           "subtitle": "w/o XAI",
-          "dv": "Forward simulation accuracy",
+          "dv": "Forward Simulation Accuracy",
           "note": "Test trials only. The published table carries no participant id for CoAX, so only the human bars carry a confidence interval \u2014 the CoAX bar is one deterministic agent (n = 1), not a sample.",
           "categories": [
             "None",
@@ -119,7 +119,7 @@
           "title": "Forward simulation \u2014 adult income, w/ XAI",
           "section": "Adult income",
           "subtitle": "w/ XAI",
-          "dv": "Forward simulation accuracy",
+          "dv": "Forward Simulation Accuracy",
           "note": "Test trials only. The published table carries no participant id for CoAX, so only the human bars carry a confidence interval \u2014 the CoAX bar is one deterministic agent (n = 1), not a sample.",
           "categories": [
             "None",
@@ -169,7 +169,7 @@
           "title": "Forward simulation \u2014 forest cover, w/o XAI",
           "section": "Forest cover",
           "subtitle": "w/o XAI",
-          "dv": "Forward simulation accuracy",
+          "dv": "Forward Simulation Accuracy",
           "note": "Test trials only. The published table carries no participant id for CoAX, so only the human bars carry a confidence interval \u2014 the CoAX bar is one deterministic agent (n = 1), not a sample.",
           "categories": [
             "None",
@@ -219,7 +219,7 @@
           "title": "Forward simulation \u2014 forest cover, w/ XAI",
           "section": "Forest cover",
           "subtitle": "w/ XAI",
-          "dv": "Forward simulation accuracy",
+          "dv": "Forward Simulation Accuracy",
           "note": "Test trials only. The published table carries no participant id for CoAX, so only the human bars carry a confidence interval \u2014 the CoAX bar is one deterministic agent (n = 1), not a sample.",
           "categories": [
             "None",
@@ -269,7 +269,7 @@
           "title": "Forward simulation \u2014 wine quality, w/o XAI",
           "section": "Wine quality",
           "subtitle": "w/o XAI",
-          "dv": "Forward simulation accuracy",
+          "dv": "Forward Simulation Accuracy",
           "note": "Test trials only. The published table carries no participant id for CoAX, so only the human bars carry a confidence interval \u2014 the CoAX bar is one deterministic agent (n = 1), not a sample.",
           "categories": [
             "None",
@@ -319,7 +319,7 @@
           "title": "Forward simulation \u2014 wine quality, w/ XAI",
           "section": "Wine quality",
           "subtitle": "w/ XAI",
-          "dv": "Forward simulation accuracy",
+          "dv": "Forward Simulation Accuracy",
           "note": "Test trials only. The published table carries no participant id for CoAX, so only the human bars carry a confidence interval \u2014 the CoAX bar is one deterministic agent (n = 1), not a sample.",
           "categories": [
             "None",
@@ -377,7 +377,7 @@
           "section": "Forward simulation \u2014 mushrooms",
           "subtitle": "w/o XAI",
           "role": "",
-          "dv": "Forward accuracy",
+          "dv": "Forward Simulation Accuracy",
           "note": "Rules = decision tree, Weights = logistic regression. Mushrooms only; the wine-quality forward fit exported parameters, not per-trial predictions.",
           "categories": [
             "Rules",
@@ -428,7 +428,7 @@
           "section": "Forward simulation \u2014 mushrooms",
           "subtitle": "w/ XAI",
           "role": "",
-          "dv": "Forward accuracy",
+          "dv": "Forward Simulation Accuracy",
           "note": "Rules = decision tree, Weights = logistic regression. Mushrooms only; the wine-quality forward fit exported parameters, not per-trial predictions.",
           "categories": [
             "Rules",
@@ -479,7 +479,7 @@
           "section": "Counterfactual",
           "subtitle": "both datasets",
           "role": "summary",
-          "dv": "Counterfactual accuracy",
+          "dv": "Counterfactual Simulation Accuracy",
           "note": "Both datasets side by side, pooled over condition and whether the explanation was shown.",
           "categories": [
             "Wine quality",
@@ -523,7 +523,7 @@
           "section": "Counterfactual",
           "subtitle": "Wine quality, w/o XAI",
           "role": "",
-          "dv": "Counterfactual accuracy",
+          "dv": "Counterfactual Simulation Accuracy",
           "note": "Whether the edit flipped the AI's prediction \u2014 a different question from the forward panels. Rules = decision tree, Weights = logistic regression.",
           "categories": [
             "Rules",
@@ -574,7 +574,7 @@
           "section": "Counterfactual",
           "subtitle": "Wine quality, w/ XAI",
           "role": "",
-          "dv": "Counterfactual accuracy",
+          "dv": "Counterfactual Simulation Accuracy",
           "note": "Whether the edit flipped the AI's prediction \u2014 a different question from the forward panels. Rules = decision tree, Weights = logistic regression.",
           "categories": [
             "Rules",
@@ -625,7 +625,7 @@
           "section": "Counterfactual",
           "subtitle": "Mushrooms, w/o XAI",
           "role": "",
-          "dv": "Counterfactual accuracy",
+          "dv": "Counterfactual Simulation Accuracy",
           "note": "Whether the edit flipped the AI's prediction \u2014 a different question from the forward panels. Rules = decision tree, Weights = logistic regression.",
           "categories": [
             "Rules",
@@ -676,7 +676,7 @@
           "section": "Counterfactual",
           "subtitle": "Mushrooms, w/ XAI",
           "role": "",
-          "dv": "Counterfactual accuracy",
+          "dv": "Counterfactual Simulation Accuracy",
           "note": "Whether the edit flipped the AI's prediction \u2014 a different question from the forward panels. Rules = decision tree, Weights = logistic regression.",
           "categories": [
             "Rules",
@@ -734,7 +734,7 @@
           "section": "",
           "subtitle": "",
           "role": "",
-          "dv": "Correct on the counterfactual question",
+          "dv": "Counterfactual Simulation Accuracy",
           "note": "Scored against the answer key.",
           "categories": [
             "Faithful",
@@ -788,11 +788,11 @@
           ]
         },
         {
-          "title": "How often the model reproduces the person",
+          "title": "How often the model reproduces the human responses",
           "section": "",
           "subtitle": "",
           "role": "",
-          "dv": "Model answer matches the participant's",
+          "dv": "Rate of Matches",
           "note": "This is what the fit optimises \u2014 not accuracy.",
           "categories": [
             "Faithful",

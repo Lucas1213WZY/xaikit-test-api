@@ -22,7 +22,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -47,7 +49,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -72,7 +76,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"age",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -97,7 +103,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -122,7 +130,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -147,7 +157,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -172,7 +184,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -197,7 +211,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -222,7 +238,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"sex",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -247,7 +265,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -272,7 +292,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -297,7 +319,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -322,7 +346,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -347,7 +373,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -372,7 +400,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -397,7 +427,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -422,7 +454,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -447,7 +481,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -472,7 +508,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":true
   },
   {
     "counterfactual_accuracy":1,
@@ -497,7 +535,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -522,7 +562,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -547,7 +589,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"sex",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -572,7 +616,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"age",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -597,7 +643,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -622,7 +670,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -647,7 +697,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -672,7 +724,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -697,7 +751,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -722,7 +778,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"age",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -747,7 +805,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -772,7 +832,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -797,7 +859,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -822,7 +886,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -847,7 +913,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"sex",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -872,7 +940,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -897,7 +967,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -922,7 +994,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -947,7 +1021,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -972,7 +1048,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -997,7 +1075,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1022,7 +1102,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"sex",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -1047,7 +1129,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -1072,7 +1156,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -1097,7 +1183,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -1122,7 +1210,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -1147,7 +1237,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"relationship",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1172,7 +1264,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1197,7 +1291,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1222,7 +1318,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1247,10 +1345,12 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
-    "counterfactual_accuracy":1,
+    "counterfactual_accuracy":0,
     "participantId":2,
     "trialIndex":3,
     "phase":"testing",
@@ -1266,16 +1366,18 @@
     "p_new_high_income":0.406365979,
     "confidence_delta":0.0258354611,
     "probability_income_increases":0.9610183949,
-    "agent_response_increases":1,
+    "agent_response_increases":0,
     "ground_truth_increases":1,
-    "counterfactual_correct":1,
+    "counterfactual_correct":0,
     "changed_feature_visible":true,
     "changed_feature_names":"relationship",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":true
   },
   {
-    "counterfactual_accuracy":1,
+    "counterfactual_accuracy":0,
     "participantId":2,
     "trialIndex":4,
     "phase":"testing",
@@ -1291,13 +1393,15 @@
     "p_new_high_income":0.4194906414,
     "confidence_delta":0.0885366647,
     "probability_income_increases":0.9998656305,
-    "agent_response_increases":1,
+    "agent_response_increases":0,
     "ground_truth_increases":1,
-    "counterfactual_correct":1,
+    "counterfactual_correct":0,
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":true
   },
   {
     "counterfactual_accuracy":1,
@@ -1322,7 +1426,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":true
   },
   {
     "counterfactual_accuracy":1,
@@ -1347,7 +1453,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"age",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1372,7 +1480,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"sex",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1397,7 +1507,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1422,7 +1534,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1447,7 +1561,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1472,7 +1588,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -1497,7 +1615,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1522,7 +1642,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -1547,7 +1669,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -1572,7 +1696,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -1597,7 +1723,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1622,7 +1750,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1647,7 +1777,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1672,7 +1804,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1697,7 +1831,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"sex",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1722,7 +1858,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"age",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1747,7 +1885,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -1772,7 +1912,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1797,7 +1939,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1822,7 +1966,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1847,7 +1993,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1872,7 +2020,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -1897,7 +2047,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -1922,7 +2074,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -1947,7 +2101,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -1972,7 +2128,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -1997,7 +2155,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2022,7 +2182,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":true
   },
   {
     "counterfactual_accuracy":1,
@@ -2047,7 +2209,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2072,7 +2236,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2097,7 +2263,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2122,7 +2290,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2147,7 +2317,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2172,7 +2344,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2197,7 +2371,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2222,7 +2398,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2247,7 +2425,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2272,7 +2452,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2297,7 +2479,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -2322,7 +2506,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2347,7 +2533,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"relationship",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2372,7 +2560,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2397,7 +2587,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2422,7 +2614,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2447,7 +2641,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -2472,7 +2668,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2497,7 +2695,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"relationship",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2522,7 +2722,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2547,7 +2749,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2572,7 +2776,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2597,7 +2803,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2622,7 +2830,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -2647,7 +2857,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2672,7 +2884,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2697,7 +2911,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"sex",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -2722,7 +2938,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -2747,7 +2965,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -2772,7 +2992,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -2797,7 +3019,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"sex",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2822,7 +3046,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2847,7 +3073,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2872,10 +3100,12 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
-    "counterfactual_accuracy":1,
+    "counterfactual_accuracy":0,
     "participantId":4,
     "trialIndex":4,
     "phase":"testing",
@@ -2891,13 +3121,15 @@
     "p_new_high_income":0.406365979,
     "confidence_delta":0.0258354611,
     "probability_income_increases":0.9610183949,
-    "agent_response_increases":1,
+    "agent_response_increases":0,
     "ground_truth_increases":1,
-    "counterfactual_correct":1,
+    "counterfactual_correct":0,
     "changed_feature_visible":true,
     "changed_feature_names":"relationship",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":true
   },
   {
     "counterfactual_accuracy":1,
@@ -2922,7 +3154,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2947,7 +3181,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2972,7 +3208,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -2997,7 +3235,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3022,7 +3262,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3047,7 +3289,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3072,7 +3316,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -3097,7 +3343,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3122,7 +3370,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3147,7 +3397,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"relationship",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3172,7 +3424,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -3197,7 +3451,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"age",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3222,7 +3478,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"sex",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3247,7 +3505,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3272,7 +3532,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3297,7 +3559,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3322,7 +3586,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -3347,7 +3613,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3372,7 +3640,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3397,7 +3667,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -3422,7 +3694,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3447,7 +3721,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"sex",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -3472,7 +3748,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -3497,7 +3775,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3522,7 +3802,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -3547,7 +3829,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"relationship",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -3572,7 +3856,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -3597,7 +3883,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3622,7 +3910,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"age",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3647,7 +3937,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3672,7 +3964,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3697,7 +3991,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3722,7 +4018,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3747,7 +4045,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3772,7 +4072,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3797,7 +4099,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -3822,7 +4126,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3847,7 +4153,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3872,7 +4180,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -3897,7 +4207,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3922,7 +4234,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3947,7 +4261,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3972,7 +4288,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -3997,7 +4315,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4022,7 +4342,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"relationship",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4047,7 +4369,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4072,7 +4396,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4097,7 +4423,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4122,7 +4450,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4147,7 +4477,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4172,7 +4504,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4197,7 +4531,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4222,7 +4558,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -4247,7 +4585,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"relationship",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -4272,7 +4612,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"age",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -4297,7 +4639,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -4322,7 +4666,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -4347,7 +4693,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -4372,7 +4720,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4397,7 +4747,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4422,7 +4774,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4447,10 +4801,12 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
-    "counterfactual_accuracy":1,
+    "counterfactual_accuracy":0,
     "participantId":6,
     "trialIndex":3,
     "phase":"testing",
@@ -4466,13 +4822,15 @@
     "p_new_high_income":0.384794006,
     "confidence_delta":0.0035541652,
     "probability_income_increases":0.7642025504,
-    "agent_response_increases":1,
+    "agent_response_increases":0,
     "ground_truth_increases":1,
-    "counterfactual_correct":1,
+    "counterfactual_correct":0,
     "changed_feature_visible":true,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":true
   },
   {
     "counterfactual_accuracy":1,
@@ -4497,7 +4855,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4522,7 +4882,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"sex",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4547,7 +4909,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4572,7 +4936,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":true
   },
   {
     "counterfactual_accuracy":1,
@@ -4597,7 +4963,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":true
   },
   {
     "counterfactual_accuracy":0,
@@ -4622,7 +4990,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"age",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4647,7 +5017,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4672,7 +5044,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"sex",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -4697,7 +5071,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -4722,7 +5098,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -4747,7 +5125,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4772,7 +5152,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4797,7 +5179,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"relationship",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4822,7 +5206,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"sex",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -4847,7 +5233,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4872,7 +5260,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4897,7 +5287,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4922,7 +5314,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4947,7 +5341,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4972,7 +5368,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -4997,7 +5395,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -5022,7 +5422,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5047,7 +5449,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5072,7 +5476,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -5097,7 +5503,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"sex",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5122,7 +5530,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -5147,7 +5557,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5172,7 +5584,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -5197,7 +5611,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5222,7 +5638,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5247,10 +5665,12 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
-    "counterfactual_accuracy":1,
+    "counterfactual_accuracy":0,
     "participantId":7,
     "trialIndex":3,
     "phase":"testing",
@@ -5266,13 +5686,15 @@
     "p_new_high_income":0.2686139573,
     "confidence_delta":-0.1055559049,
     "probability_income_increases":0.0001568227,
-    "agent_response_increases":0,
+    "agent_response_increases":1,
     "ground_truth_increases":0,
-    "counterfactual_correct":1,
+    "counterfactual_correct":0,
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":true
   },
   {
     "counterfactual_accuracy":1,
@@ -5297,10 +5719,12 @@
     "changed_feature_visible":true,
     "changed_feature_names":"relationship",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
-    "counterfactual_accuracy":1,
+    "counterfactual_accuracy":0,
     "participantId":7,
     "trialIndex":5,
     "phase":"testing",
@@ -5316,13 +5740,15 @@
     "p_new_high_income":0.3190768111,
     "confidence_delta":0.02866358,
     "probability_income_increases":0.9696001485,
-    "agent_response_increases":1,
+    "agent_response_increases":0,
     "ground_truth_increases":1,
-    "counterfactual_correct":1,
+    "counterfactual_correct":0,
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":true
   },
   {
     "counterfactual_accuracy":1,
@@ -5347,7 +5773,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"age",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5372,7 +5800,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5397,7 +5827,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -5422,7 +5854,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -5447,7 +5881,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -5472,7 +5908,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"age",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5497,7 +5935,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5522,7 +5962,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"relationship",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5547,7 +5989,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -5572,7 +6016,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5597,7 +6043,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"sex",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5622,7 +6070,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5647,7 +6097,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5672,7 +6124,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5697,7 +6151,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5722,7 +6178,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5747,7 +6205,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"age",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5772,7 +6232,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5797,7 +6259,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -5822,7 +6286,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5847,7 +6313,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -5872,7 +6340,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -5897,7 +6367,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"race",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -5922,7 +6394,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -5947,7 +6421,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -5972,7 +6448,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -5997,7 +6475,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -6022,7 +6502,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -6047,10 +6529,12 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
-    "counterfactual_accuracy":1,
+    "counterfactual_accuracy":0,
     "participantId":8,
     "trialIndex":3,
     "phase":"testing",
@@ -6066,13 +6550,15 @@
     "p_new_high_income":0.386932449,
     "confidence_delta":0.1339715032,
     "probability_income_increases":0.9999978549,
-    "agent_response_increases":1,
+    "agent_response_increases":0,
     "ground_truth_increases":1,
-    "counterfactual_correct":1,
+    "counterfactual_correct":0,
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":true
   },
   {
     "counterfactual_accuracy":1,
@@ -6097,7 +6583,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -6122,7 +6610,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -6147,7 +6637,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"hours-per-week",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -6172,7 +6664,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -6197,7 +6691,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"relationship",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.176,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -6222,7 +6718,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -6247,7 +6745,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -6272,7 +6772,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":0,
@@ -6297,7 +6799,9 @@
     "changed_feature_visible":false,
     "changed_feature_names":"occupation",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -6322,7 +6826,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"relationship",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -6347,7 +6853,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"marital",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -6372,7 +6880,9 @@
     "changed_feature_visible":true,
     "changed_feature_names":"education",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   },
   {
     "counterfactual_accuracy":1,
@@ -6397,6 +6907,8 @@
     "changed_feature_visible":true,
     "changed_feature_names":"relationship",
     "retrieved_exemplar_count":0,
-    "effective_lapse_rate":0.0
+    "effective_lapse_rate":0.0,
+    "response_lapse_rate":0.0,
+    "response_lapsed":false
   }
 ]

@@ -142,7 +142,7 @@ def _coax(replay: Optional[pd.DataFrame] = None) -> Optional[ComparisonStudy]:
     panels = [
         comparison_panel(
             rows, participant_column="participantId", group_column="dataId", series=series,
-            title="Overall — by dataset", dv="Forward simulation accuracy",
+            title="Overall — by dataset", dv="Forward Simulation Accuracy",
             note=note + " Pooled over explanation type.", group_labels=_DATASET_LABELS,
         )
     ]
@@ -154,7 +154,7 @@ def _coax(replay: Optional[pd.DataFrame] = None) -> Optional[ComparisonStudy]:
             comparison_panel(
                 subset, participant_column="participantId", group_column="xai_type", series=series,
                 title=f"Forward simulation — adult income, {shown}",
-                dv="Forward simulation accuracy", note=note,
+                dv="Forward Simulation Accuracy", note=note,
                 order=[k for k in ("none", "importance", "attribution") if k in set(subset["xai_type"])],
                 group_labels={"none": "None", "importance": "Importance", "attribution": "Attribution"},
             )
@@ -189,7 +189,7 @@ def _coxam() -> Optional[ComparisonStudy]:
                 subset, participant_column="Participant Id", group_column="family",
                 series={"Human": "Response==AI", "CoXAM": "Model==AI"},
                 title=f"Forward simulation — mushrooms, {'w/ XAI' if shown else 'w/o XAI'}",
-                dv="Forward accuracy",
+                dv="Forward Simulation Accuracy",
                 note=("Rules = decision tree, Weights = logistic regression. Mushrooms only; the "
                       "wine-quality forward fit exported parameters, not per-trial predictions."),
                 order=[f for f in _FAMILY_ORDER if f in set(subset["family"])],
@@ -206,7 +206,7 @@ def _coxam() -> Optional[ComparisonStudy]:
                 "forward panels. Rules = decision tree, Weights = logistic regression.")
         panels.append(comparison_panel(
             replay, participant_column="Participant Id", group_column="dataId", series=series,
-            title="Overall — counterfactual, by dataset", dv="Counterfactual accuracy",
+            title="Overall — counterfactual, by dataset", dv="Counterfactual Simulation Accuracy",
             note="Both datasets, pooled over condition and whether the explanation was shown.",
             order=["Wine Quality", "Mushrooms"], group_labels=_DATASET_LABELS,
         ))
@@ -220,7 +220,7 @@ def _coxam() -> Optional[ComparisonStudy]:
                 panels.append(comparison_panel(
                     subset, participant_column="Participant Id", group_column="family", series=series,
                     title=f"Counterfactual — {_DATASET_LABELS.get(data_id, data_id).lower()}, {shown}",
-                    dv="Counterfactual accuracy", note=note,
+                    dv="Counterfactual Simulation Accuracy", note=note,
                     order=[f for f in _FAMILY_ORDER if f in set(subset["family"])],
                 ))
 
@@ -258,14 +258,14 @@ def _sim2real() -> Optional[ComparisonStudy]:
                 frame, participant_column="participant_id", group_column="exp_property",
                 series={"Human": "human_correct", "sim2real": "model_correct"},
                 title="Accuracy, by explanation property",
-                dv="Correct on the counterfactual question",
+                dv="Counterfactual Simulation Accuracy",
                 note="Scored against the answer key.", order=order, group_labels=_SIM2REAL_LABELS,
             ),
             comparison_panel(
                 frame, participant_column="participant_id", group_column="exp_property",
                 series={"sim2real": "model_matches_human"},
-                title="How often the model reproduces the person",
-                dv="Model answer matches the participant's",
+                title="How often the model reproduces the human responses",
+                dv="Rate of Matches",
                 note="This is what the fit optimises — not accuracy.",
                 order=order, group_labels=_SIM2REAL_LABELS,
             ),

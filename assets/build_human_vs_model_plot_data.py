@@ -189,7 +189,7 @@ def build_coax() -> dict[str, Any]:
     # accuracy. It cannot be re-derived here: ``predicted`` is empty for both
     # agents on test trials and ``AI Prediction`` is empty for CoAX, so the
     # column is taken exactly as the study computed it.
-    dv = "Forward simulation accuracy"
+    dv = "Forward Simulation Accuracy"
     note = (
         "Test trials only. The published table carries no participant id for CoAX, so only "
         "the human bars carry a confidence interval — the CoAX bar is one deterministic agent "
@@ -307,7 +307,7 @@ def build_coxam() -> dict[str, Any]:
                 title=f"Forward simulation — mushrooms, {label}",
                 section="Forward simulation — mushrooms",
                 subtitle=label,
-                dv="Forward accuracy",
+                dv="Forward Simulation Accuracy",
                 note=(
                     "Rules = decision tree, Weights = logistic regression. Mushrooms only; "
                     "the wine-quality forward fit exported parameters, not per-trial predictions."
@@ -349,7 +349,7 @@ def build_coxam() -> dict[str, Any]:
             section="Counterfactual",
             subtitle="both datasets",
             role="summary",
-            dv="Counterfactual accuracy",
+            dv="Counterfactual Simulation Accuracy",
             note=(
                 "Both datasets side by side, pooled over condition and whether the "
                 "explanation was shown."
@@ -381,7 +381,7 @@ def build_coxam() -> dict[str, Any]:
                     ),
                     section="Counterfactual",
                     subtitle=f"{DATASET_LABELS.get(data_id, data_id)}, {shown_label}",
-                    dv="Counterfactual accuracy",
+                    dv="Counterfactual Simulation Accuracy",
                     note=(
                         "Whether the edit flipped the AI's prediction — a different question "
                         "from the forward panels. Rules = decision tree, Weights = logistic "
@@ -432,7 +432,7 @@ def build_sim2real() -> dict[str, Any]:
             series={"Human": "human_correct", "sim2real": "model_correct"},
             group_labels=CONDITION_LABELS,
             title="Accuracy, by explanation property",
-            dv="Correct on the counterfactual question",
+            dv="Counterfactual Simulation Accuracy",
             note="Scored against the answer key.",
             order=order,
         ),
@@ -442,8 +442,8 @@ def build_sim2real() -> dict[str, Any]:
             group="condition",
             series={"sim2real": "model_matches_human"},
             group_labels=CONDITION_LABELS,
-            title="How often the model reproduces the person",
-            dv="Model answer matches the participant's",
+            title="How often the model reproduces the human responses",
+            dv="Rate of Matches",
             note="This is what the fit optimises — not accuracy.",
             order=order,
         ),
