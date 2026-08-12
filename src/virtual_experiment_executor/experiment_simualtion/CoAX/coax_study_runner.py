@@ -24,6 +24,7 @@ from src.experiment_planner import select_trial_rows
 from .coax_trial_executor import (
     COAX_STRATEGIES_BY_XAI_TYPE,
     CoAXAssetRepository,
+    coax_params_for_strategy,
     default_coax_strategy,
     make_coax_model,
     make_coax_models,
@@ -185,7 +186,7 @@ def fitted_coax_params(
     params = dict(FITTED_COAX_PARAMS.get(strategy_name, {}))
     if strategy_name == "AttributionSum":
         params["explanation_type"] = _canonical_xai_type(xai_type)
-    params.update(overrides)
+    params.update(coax_params_for_strategy(strategy_name, overrides))
     return params
 
 

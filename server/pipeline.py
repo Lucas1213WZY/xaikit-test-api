@@ -23,6 +23,9 @@ from src.result_visualizer import plot_dv_by_two_ivs, plot_iv_dv_grid
 from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_study_runner import (
     coax_models_for_trials,
 )
+from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_trial_executor import (
+    COAX_STRATEGIES_BY_XAI_TYPE,
+)
 
 from .schemas import (
     DatasetStageRequest,
@@ -750,6 +753,29 @@ def run_explanations_stage(study: xaikitTest, request: ExplanationStageRequest) 
 # -- stage 4: simulation --------------------------------------------------
 
 
+def _design_coax_params(study: xaikitTest) -> Optional[dict[str, dict[str, Any]]]:
+    """The design export's flat cognitiveConfig, broadcast to every CoAX condition.
+
+    ``request.coax_params`` is keyed by condition (``xai_type`` or
+    ``(xai_type, tested_w_xai)``), because that is what a notebook/API caller
+    who wants per-condition control needs. The design-planner UI has no such
+    per-condition control -- it edits one flat parameter set (retrieval
+    threshold, exemplar distance sensitivity, attended features, feature-class
+    sensitivity) that is meant to apply everywhere -- so without this, a
+    design's User Model page values are silently dropped and every run falls
+    back to the fitted population defaults, no matter what the UI shows.
+
+    The same resolved dict is handed to every condition; ``coax_params_for_strategy``
+    (inside ``coax_models_for_trials``) drops whichever keys that condition's actual
+    strategy class does not read, so e.g. ``scaling_factor`` only reaches AttributionSum.
+    """
+    design = getattr(study, "design_export", None)
+    resolved = normalize_cognitive_params("coax", getattr(design, "cognitive_config", None))
+    if not resolved:
+        return None
+    return {xai_type: resolved for xai_type in COAX_STRATEGIES_BY_XAI_TYPE}
+
+
 def run_simulation_stage(
     study: xaikitTest,
     request: SimulationRequest,
@@ -788,7 +814,7 @@ def run_simulation_stage(
             cognitive_model=coax_models_for_trials(
                 pd.DataFrame(study.trials),
                 strategies=request.coax_strategies,
-                params=request.coax_params,
+                params=request.coax_params if request.coax_params is not None else _design_coax_params(study),
             ),
             source=coax_source,
         )

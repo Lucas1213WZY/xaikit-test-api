@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import random
 from typing import Any, Optional, Sequence
+import warnings
 
 from src.data_loaders import PreparedDataset, load_csv_records, load_json_config
 from src.workflow_standard import DEFAULT_EXPLANATION_INSTANCE_LIMIT
@@ -587,7 +588,17 @@ def _balance_phase_instances_by_ai_prediction(
     predictions_by_instance: dict[int, Any],
     seed: int,
 ) -> list[dict[str, Any]]:
-    """Assign a randomized half-and-half prediction mix within each phase."""
+    """Assign a randomized half-and-half prediction mix within each phase.
+
+    Falls back to the trials as already drawn -- unbalanced -- when the
+    trained AI model's predictions over the instance pool are too skewed to
+    give every participant an even mix (one predicted class overall, a phase
+    with none of one class, or too few of one class to cover every
+    participant). A warning names this as a likely target-class imbalance
+    rather than crashing the whole run: an imbalanced classifier is a
+    property of the dataset/model, not a bug in trial generation, so the
+    trials it *can* produce are still worth returning.
+    """
     balanced_trials = [dict(trial) for trial in trials]
     rng = random.Random(seed)
     participant_ids = list(dict.fromkeys(
@@ -605,10 +616,17 @@ def _balance_phase_instances_by_ai_prediction(
         if int(instance_id) in predictions_by_instance
     ))
     if len(all_labels) != 2:
-        raise ValueError(
-            "AI-prediction-balanced sampling requires exactly two predicted "
-            f"classes; found {all_labels}."
+        warnings.warn(
+            "Skipping AI-prediction-balanced sampling: the trained AI model "
+            f"predicts only {all_labels} across the trial instance pool, not "
+            "two classes. This is usually a class-imbalanced dataset/split "
+            "where the model never predicts the minority class on these "
+            "instances -- trials will use their unbalanced draw instead. "
+            "Pass balance_by_ai_prediction=False to silence this, restrict "
+            "allowed_instance_ids to a less skewed pool, or retrain against "
+            "a more balanced split."
         )
+        return trials
 
     pools_by_phase: dict[str, dict[Any, list[int]]] = {}
     for phase, instance_ids in phase_pools.items():
@@ -625,10 +643,14 @@ def _balance_phase_instances_by_ai_prediction(
             )
         empty_labels = [label for label, ids in by_label.items() if not ids]
         if empty_labels:
-            raise ValueError(
-                f"The {phase} pool has no instances for predicted class(es) "
-                f"{empty_labels}."
+            warnings.warn(
+                f"Skipping AI-prediction-balanced sampling: the {phase} instance "
+                f"pool has no instances predicted as {empty_labels} -- the AI "
+                "model's predictions over this pool are too class-imbalanced to "
+                "draw an even mix from. Trials will use their unbalanced draw "
+                "instead."
             )
+            return trials
         pools_by_phase[phase] = by_label
 
     for participant_position, participant_id in enumerate(participant_ids):
@@ -661,10 +683,22 @@ def _balance_phase_instances_by_ai_prediction(
                 available = pools_by_phase[phase][label]
                 required = required_by_label[label]
                 if required > len(available):
-                    raise ValueError(
-                        f"Not enough {phase} instances predicted as {label!r}: "
-                        f"need {required}, found {len(available)}."
+                    # Enough of both classes exist overall (the phase-level
+                    # check above passed), but not enough to cover every
+                    # participant's even split -- the same class-imbalance
+                    # story, just surfacing later. Abandon balancing
+                    # entirely rather than leaving some participants already
+                    # rewritten and others not: partially balanced trials
+                    # would be a subtler, harder-to-notice inconsistency
+                    # than the unbalanced draw this falls back to.
+                    warnings.warn(
+                        f"Skipping AI-prediction-balanced sampling: the {phase} pool "
+                        f"has too few instances predicted as {label!r} ({len(available)} "
+                        f"available, {required} needed) to give every participant an "
+                        "even mix. This is the same class-imbalance issue at a smaller "
+                        "scale -- trials will use their unbalanced draw instead."
                     )
+                    return trials
                 selected_by_label[label] = rng.sample(available, required)
 
             label_offsets = {label: 0 for label in all_labels}

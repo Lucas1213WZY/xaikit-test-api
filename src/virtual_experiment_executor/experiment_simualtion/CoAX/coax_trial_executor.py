@@ -66,21 +66,69 @@ def _load_coax_model_module():
     return module
 
 
+#: Every spelling a caller might use for a strategy name, resolved to the
+#: class name as it appears in ``coax_gcm_multiple_strategies.py``.
+COAX_STRATEGY_CLASS_NAMES: dict[str, str] = {
+    "sensitivefeatures": "SensitiveFeatures",
+    "sensitive_features": "SensitiveFeatures",
+    "salientfeatures": "SalientFeatures",
+    "salient_features": "SalientFeatures",
+    "importancecategorization": "ImportanceCategorization",
+    "importance_categorization": "ImportanceCategorization",
+    "attributionsum": "AttributionSum",
+    "attribution_sum": "AttributionSum",
+}
+
+
+def _normalize_strategy_class_name(strategy_name: str) -> str:
+    """The class name for any accepted spelling of a strategy name."""
+    normalized = str(strategy_name).strip().lower().replace("-", "_").replace(" ", "_")
+    return COAX_STRATEGY_CLASS_NAMES.get(normalized, strategy_name)
+
+
+#: Constructor parameters each strategy class actually reads, from its
+#: ``__init__`` in ``coax_gcm_multiple_strategies.py`` -- excludes ``time``,
+#: which the runner supplies itself rather than the UI/design layer.
+#: ``AttributionSum`` is the only one with ``scaling_factor``, since it is the
+#: only strategy whose response comes from a logistic over a summed
+#: attribution rather than exemplar retrieval.
+COAX_STRATEGY_PARAMS: dict[str, set[str]] = {
+    "SensitiveFeatures": {"decay_param", "retrieval_threshold", "sensitivity", "k"},
+    "SalientFeatures": {"decay_param", "retrieval_threshold", "sensitivity", "k"},
+    "ImportanceCategorization": {"decay_param", "retrieval_threshold", "sensitivity", "k"},
+    "AttributionSum": {
+        "decay_param", "retrieval_threshold", "sensitivity", "scaling_factor", "k", "explanation_type",
+    },
+}
+
+
+def coax_params_for_strategy(strategy_name: str, overrides: Mapping[str, Any]) -> dict[str, Any]:
+    """Keep only the ``overrides`` entries ``strategy_name``'s constructor reads.
+
+    A design's cognitive-parameter config is one flat dict applied to every
+    condition (see ``coax_models_for_trials``), and conditions run different
+    strategy classes -- ``SensitiveFeatures`` has no ``scaling_factor``,
+    ``AttributionSum``'s ``k`` selects top-k attributions rather than top-k
+    retrieved exemplars, and a mistyped or wrong-agent label (e.g. a
+    CoXAM/Sim2Real parameter name that slipped into a CoAX design) should not
+    silently reach a strategy that has no use for it. Every strategy class
+    accepts ``**kwargs`` so an unfiltered override would not raise -- it would
+    just be ignored -- but filtering here makes the routing explicit rather
+    than relying on that.
+
+    An unknown ``strategy_name`` passes every override through unfiltered,
+    since :func:`make_coax_model` is what raises on an unknown strategy.
+    """
+    accepted = COAX_STRATEGY_PARAMS.get(_normalize_strategy_class_name(strategy_name))
+    if accepted is None:
+        return dict(overrides)
+    return {key: value for key, value in overrides.items() if key in accepted}
+
+
 def make_coax_model(strategy_name: str, **strategy_kwargs):
     """Instantiate one of the CoAX strategy classes from the model file."""
     module = _load_coax_model_module()
-    normalized = str(strategy_name).strip().lower().replace("-", "_").replace(" ", "_")
-    class_map = {
-        "sensitivefeatures": "SensitiveFeatures",
-        "sensitive_features": "SensitiveFeatures",
-        "salientfeatures": "SalientFeatures",
-        "salient_features": "SalientFeatures",
-        "importancecategorization": "ImportanceCategorization",
-        "importance_categorization": "ImportanceCategorization",
-        "attributionsum": "AttributionSum",
-        "attribution_sum": "AttributionSum",
-    }
-    class_name = class_map.get(normalized, strategy_name)
+    class_name = _normalize_strategy_class_name(strategy_name)
     try:
         strategy_cls = getattr(module, class_name)
     except AttributeError as exc:
@@ -199,9 +247,10 @@ def make_coax_models(
     for key in keys:
         xai_type, tested = key if isinstance(key, tuple) else (key, None)
         strategy_name = overrides.get(key) or default_coax_strategy(xai_type, tested)
+        filtered = coax_params_for_strategy(strategy_name, param_overrides.get(key, {}))
         models[key] = make_coax_model(
             strategy_name,
-            **default_coax_params(strategy_name, xai_type, **param_overrides.get(key, {})),
+            **default_coax_params(strategy_name, xai_type, **filtered),
         )
     return models
 
@@ -689,7 +738,9 @@ __all__ = [
     "COAX_EXPLANATIONS_DIR",
     "COAX_PARAM_BOUNDS",
     "COAX_STRATEGIES_BY_XAI_TYPE",
+    "COAX_STRATEGY_CLASS_NAMES",
     "COAX_STRATEGY_EXCLUSIONS",
+    "COAX_STRATEGY_PARAMS",
     "COAX_CORPUS_FEATURES",
     "COAX_CORPUS_XAI_METHOD",
     "DEFAULT_COAX_PARAMS",
@@ -699,6 +750,7 @@ __all__ = [
     "coax_available_instance_ids",
     "coax_available_strategies",
     "coax_loader_feature_cols",
+    "coax_params_for_strategy",
     "default_coax_params",
     "default_coax_strategy",
     "make_coax_model",

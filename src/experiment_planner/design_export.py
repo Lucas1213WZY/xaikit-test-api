@@ -1005,10 +1005,19 @@ COGNITIVE_PARAM_ALIASES: dict[str, dict[str, str]] = {
         "features_attended": "max_features_attended",
     },
     "coax": {
-        "retrieval_threshold": "cog_retrieval_threshold",
-        "encoding_time": "cog_T_enc",
-        "operation_time": "cog_T_op",
-        "latency_factor": "cog_latency_factor",
+        # These are the GCM strategy classes' own constructor kwargs (see
+        # COAX_STRATEGY_PARAMS in coax_trial_executor.py) -- the support
+        # matrix declares the first four under these exact names, so most
+        # entries here are the identity map, kept explicit so the alias
+        # table stays the single place that documents what a CoAX design's
+        # cognitiveConfig/cognitiveParameters keys actually mean.
+        "retrieval_threshold": "retrieval_threshold",
+        "exemplar_distance_sensitivity": "sensitivity",
+        "distance_sensitivity": "sensitivity",
+        "attended_features": "k",
+        "max_features_attended": "k",
+        "feature_class_sensitivity": "scaling_factor",
+        "decay_rate": "decay_param",
     },
 }
 
@@ -1029,6 +1038,10 @@ ACCEPTED_COGNITIVE_PARAMS: dict[str, set[str]] = {
         "decision_noise", "memory_recall_threshold", "opportunity_cost",
         "random_response_rate", "counterfactual_overshoot_fraction", "time_penalty_weight",
     },
+    # The real GCM strategy kwargs (COAX_STRATEGY_PARAMS in
+    # coax_trial_executor.py) -- not default_cognitive_params("coax")'s
+    # cog_*/ACT-R-timing placeholder set, which no CoAX strategy class reads.
+    "coax": {"retrieval_threshold", "sensitivity", "k", "scaling_factor", "decay_param"},
 }
 
 
