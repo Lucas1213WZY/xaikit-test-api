@@ -10,7 +10,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# Torch first, from the CPU wheel index: the default index serves the CUDA build,
+# typing-extensions first, from the normal index: every release proxied
+# through the PyTorch CPU wheel index below has a metadata Name-casing
+# mismatch ("typing_extensions" vs the requested "typing-extensions"), which
+# makes pip discard the wheel and try to build the sdist instead -- needing
+# flit_core, which that CPU-only index does not carry, failing the install no
+# matter which version is requested. Satisfying the requirement here first
+# means torch's own install below finds it already present and never touches
+# that index for it.
+RUN pip install --no-cache-dir "typing-extensions>=4.10,<5"
+
+# Torch from the CPU wheel index: the default index serves the CUDA build,
 # which is several GB larger and useless here -- the MLP trains fine on CPU.
 RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu \
         "torch>=2.5,<3"
