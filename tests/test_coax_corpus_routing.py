@@ -113,12 +113,18 @@ def test_inferred_xai_methods_resolves_the_single_corpus_method_for_the_dataset(
     assert study._inferred_xai_methods() == [COAX_CORPUS_XAI_METHOD["forest_cover"]]
 
 
-def test_inferred_xai_methods_falls_back_to_both_for_an_uncovered_dataset():
+def test_inferred_xai_methods_falls_back_to_the_first_default_for_an_uncovered_dataset():
+    """An uncovered dataset (no COAX_CORPUS_XAI_METHOD entry, e.g. a freshly
+    trained one) resolves to one method, not every framework default -- CoAX
+    only ever needs one explanation vector per instance regardless of
+    xai_type, and generating more than one leaves trials with no xai_method
+    column to disambiguate between them at simulation time (see
+    coax_human_replay.build_coax_study_repository's mismatch error)."""
     study = xk.xaikitTest(output_dir="/tmp/coax-xai-method-test2")
     study.set_cognitive_model(cognitive_model_id="coax")
     study.data = MagicMock(dataset_id="prima_diabetes")
 
-    assert study._inferred_xai_methods() == list(study.XAI_METHODS_BY_FRAMEWORK["coax"])
+    assert study._inferred_xai_methods() == [study.XAI_METHODS_BY_FRAMEWORK["coax"][0]]
 
 
 # ---------------------------------------------------------------------------

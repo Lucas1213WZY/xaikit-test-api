@@ -74,6 +74,19 @@ def design_framework(study: xaikitTest) -> str:
     return raw.strip().lower().replace("-", "_").replace(" ", "_")
 
 
+def _as_dict(value: Any) -> dict[Any, Any]:
+    """``value`` if it is a real dict, else ``{}``.
+
+    ``study`` is a bare ``MagicMock()`` in many tests -- an unconfigured
+    attribute access (``study.data_by_dataset``) auto-vivifies a *truthy*
+    ``MagicMock`` rather than the real empty dict a fresh ``xaikitTest``
+    instance would have, so a plain truthiness check reads a mocked
+    single-dataset study as multi-dataset. Matches the ``isinstance(...,
+    dict)`` guard already used elsewhere in this module for the same reason.
+    """
+    return value if isinstance(value, dict) else {}
+
+
 def resolve_baseline_model_id(study: xaikitTest, requested: Optional[str]) -> Optional[str]:
     """Decide which baseline the simulation should run.
 
@@ -226,6 +239,27 @@ def _coax_needs_real_generation(design: Any, framework: str, dataset_id: str) ->
     return not set(declared) <= (_coax_corpus_methods(dataset_id) | {"none"})
 
 
+def _coax_baseline_servable_from_corpus(design: Any, framework: str, dataset_id: str) -> bool:
+    """Whether a declared ``mlProxyBaselines`` model can read this dataset's
+    published CoAX corpus directly instead of needing a real trained model.
+
+    A baseline (KNN, decision tree, ...) is a machine-learning proxy reading
+    predictions/explanations/features to stand in for a human -- it does not
+    explain the AI model itself, so it needs exactly what
+    ``run_coax_study(source='corpus')`` already reads for the primary agent,
+    nothing more. ``combined_explanations_from_corpus`` reshapes that same
+    corpus data into the shape the generic executor's baseline path reads.
+    CoAX-only for now -- CoXAM's/Sim2Real's baseline+corpus interaction is
+    unchanged, still forcing real training/generation when a baseline is
+    declared alongside them.
+    """
+    if framework != "coax":
+        return False
+    return _corpus_skip_reason(framework, dataset_id) is not None and not _coax_needs_real_generation(
+        design, framework, dataset_id
+    )
+
+
 def _corpus_instance_ids(framework: str, dataset_id: str) -> Optional[list[int]]:
     """Instance ids the published corpus can serve for this framework/dataset,
     or None when neither applies (an uncovered dataset, or a framework with no
@@ -343,6 +377,66 @@ def _finish_dataset_stage(
     return dataset_payload
 
 
+def _finish_multi_dataset_stage(
+    study: xaikitTest,
+    request: DatasetStageRequest,
+    dataset_payload: dict[str, Any],
+    dataset_ids: list[str],
+    framework: str,
+) -> dict[str, Any]:
+    """Per dataset, train a real AI model where the published corpus can't
+    fully serve it, and skip training where it can -- decided dynamically per
+    dataset (``_corpus_skip_reason``/``_coax_needs_real_generation``), not by
+    an all-or-nothing rule for the whole study. A multi-dataset design can
+    freely mix corpus-covered datasets (e.g. CoAX's adult/wine_quality/
+    forest_cover) with one the corpus never collected (e.g. mushrooms), or
+    with one whose declared ``xai_method`` levels outgrow what the corpus has
+    for it -- each is judged on its own.
+    """
+    models_payload: dict[str, Any] = {}
+    for dataset_id in dataset_ids:
+        skip_reason = _corpus_skip_reason(framework, dataset_id)
+        needs_real = skip_reason is None or _coax_needs_real_generation(
+            study.design_export, framework, dataset_id
+        )
+        if not needs_real:
+            # run_coxam_study(source="assets")/run_coax_study(source="corpus")
+            # look the corpus's own AI predictions up by model name -- train_AI_model
+            # would normally set this (see _finish_dataset_stage), so a
+            # corpus-covered dataset that never trains needs it set explicitly,
+            # per dataset, or use_dataset's swap restores None for it at
+            # simulation time instead of the corpus's own model name.
+            study.model_name_by_dataset[dataset_id] = request.model_type
+            models_payload[dataset_id] = {"model": None, "model_skipped_reason": skip_reason}
+            continue
+
+        study.train_AI_model_for_dataset(
+            dataset_id,
+            model_type=request.model_type,
+            target_metric=request.target_metric,
+            target_score=request.target_score,
+            max_epochs=request.max_epochs,
+            check_every_epochs=request.check_every_epochs,
+            batch_size=request.batch_size,
+            verbose=False,
+        )
+        with study.use_dataset(dataset_id):
+            study.evaluate(split="both")
+            models_payload[dataset_id] = {
+                "model": {
+                    "model_name": study.model_name,
+                    "test_accuracy": float(study.test_accuracy()),
+                    "training_summary": frame_records(study.training_summary_table()),
+                    "training_history": frame_records(study.training_history_table()),
+                    "metrics": frame_records(study.metrics_table().reset_index()),
+                    "confusion_matrix": frame_records(study.confusion_matrix_table().reset_index()),
+                },
+                "model_skipped_reason": None,
+            }
+    dataset_payload["models"] = models_payload
+    return dataset_payload
+
+
 def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[str, Any]:
     """Prepare the dataset(s) and, where a published corpus makes it
     unnecessary, skip training the AI model it would otherwise explain.
@@ -361,11 +455,14 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
       here would be a full MLP run spent on a model nothing downstream reads.
       A CoXAM dataset the corpus does *not* cover still trains, since only
       ``source="fit"`` can serve it.
-    * **A multi-dataset study**, one dataset at a time is never trained here --
-      ``study.train_AI_model()`` only ever has one ``study.data`` to train
-      against. Every requested dataset must therefore already be corpus-
-      covered (source='assets'/'corpus' can serve all of them), or this
-      raises rather than silently training against just one of them.
+    * **A multi-dataset study**, per dataset -- ``_finish_multi_dataset_stage``
+      trains a real model (via ``train_AI_model_for_dataset``, which trains
+      against ``data_by_dataset[dataset_id]`` and stores the result under
+      that id rather than on the shared singular fields) for whichever
+      dataset(s) the published corpus cannot fully serve, and skips the rest,
+      decided independently per dataset -- so a design can freely mix e.g.
+      CoAX's corpus-covered adult/wine_quality/forest_cover with mushrooms,
+      which the corpus never collected.
 
     None of that skipping applies when the design also declares
     ``mlProxyBaselines`` (``design.baseline_model_ids``): those run through
@@ -401,8 +498,21 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
             cognitive_model_id=framework,
         )
         dataset_payload = {"dataset": _dataset_payload_entry(data)}
-        needs_real_ai = needs_baselines or _coax_needs_real_generation(
-            design, framework, data.dataset_id
+        # A declared baseline only forces real training when it can't be
+        # served from the corpus instead: a baseline (KNN, decision tree, ...)
+        # is a proxy that reads predictions/explanations/features -- it does
+        # not explain the AI model itself, so a corpus-covered CoAX dataset
+        # can serve it exactly like it already serves the primary agent's
+        # source="corpus". See _coax_baseline_servable_from_corpus and
+        # run_explanations_stage, which loads the corpus into
+        # combined_explanations for this case instead of generating a
+        # redundant real table. CoXAM's corpus stores fitted DT/LR surrogate
+        # models rather than per-instance explanation vectors, so it cannot
+        # be served the same way without a surrogate evaluator that does not
+        # exist yet -- a CoXAM baseline still forces real training/generation.
+        needs_real_ai = _coax_needs_real_generation(design, framework, data.dataset_id) or (
+            needs_baselines
+            and not _coax_baseline_servable_from_corpus(design, framework, data.dataset_id)
         )
         skip_reason = None if needs_real_ai else _corpus_skip_reason(framework, data.dataset_id)
         return _finish_dataset_stage(study, request, dataset_payload, skip_reason)
@@ -427,23 +537,6 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
             "baselines, or run each dataset as its own single-dataset study."
         )
 
-    uncovered = [
-        dataset_id for dataset_id in dataset_ids
-        if _corpus_skip_reason(framework, dataset_id) is None
-        or _coax_needs_real_generation(design, framework, dataset_id)
-    ]
-    if uncovered:
-        raise ValueError(
-            "Multi-dataset AI training is not yet supported -- each dataset's "
-            f"model can only be trained one at a time, but dataset(s) {uncovered!r} "
-            f"cannot be served by {framework}'s published corpus (either it does not "
-            "cover the dataset at all, or it does not cover every xai_method the "
-            "design declares -- the corpus only ever collected one method per "
-            "dataset). Remove them from the study, drop the unsupported xai_method "
-            "levels, or prepare/train each uncovered dataset on its own with a "
-            "single dataset_id first."
-        )
-
     data_by_dataset = study.prepare_dataset(
         dataset_ids,
         model_type=request.model_type,
@@ -462,13 +555,7 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
             for dataset_id, data in data_by_dataset.items()
         }
     }
-    skip_reason = (
-        f"Multi-dataset study: every dataset ({', '.join(dataset_ids)}) is "
-        f"covered by {framework}'s published corpus, so no AI model is trained "
-        "-- each dataset's own corpus predictions/surrogates are used at "
-        "simulation time instead."
-    )
-    return _finish_dataset_stage(study, request, dataset_payload, skip_reason)
+    return _finish_multi_dataset_stage(study, request, dataset_payload, dataset_ids, framework)
 
 
 # -- stage 2: trials ------------------------------------------------------
@@ -748,27 +835,62 @@ def run_explanations_stage(study: xaikitTest, request: ExplanationStageRequest) 
     either. A CoAX dataset the corpus does *not* cover still needs this stage,
     since only ``source='study'`` can serve it.
 
-    None of this skipping applies when the design also declares
-    ``mlProxyBaselines``: the dataset stage already trained a real AI model
-    for them (see ``run_dataset_stage``), and they read this stage's
-    explanation table the same way a plain baseline design always has.
-
-    That training is avoidable in principle and is not today. CoAX's corpus
-    files (``assets/explanations/CoAX/{attribution,importance}.csv``) already
-    use this table's exact schema, so they could be loaded straight into
-    ``study.combined_explanations`` -- except both files carry the *same*
-    ``expMethod`` for a given dataset (``lime`` for adult), because what
-    separates them is ``xai_type``, not the method. The generic executor keys
-    its lookup on ``expMethod`` alone, so concatenating them would make the
-    lookup ambiguous. Wiring the corpus in needs that lookup to key on
-    ``xai_type`` as well; until then, baselines generate their own table.
+    A declared ``mlProxyBaselines`` model on a CoAX dataset the corpus *does*
+    cover is also served without training: a baseline (KNN, decision tree,
+    ...) reads predictions/explanations/features, not the explained AI model
+    itself, so ``combined_explanations_from_corpus`` reshapes the same corpus
+    data ``run_coax_study(source='corpus')`` already reads for the primary
+    agent into the shape the generic executor's baseline path
+    (``get_trial_instance_explanation``) expects, in place of generating a
+    real table. The one thing that used to block this: CoAX's
+    ``attribution.csv``/``importance.csv`` carry the *same* ``expMethod`` for
+    a given dataset (what separates them is which file, not a column), and
+    that lookup keyed on ``expMethod`` alone -- ``combined_explanations_from_corpus``
+    tags each row with its own ``xai_type``, and ``get_trial_instance_explanation``
+    now disambiguates on it when present. CoXAM's corpus stores fitted DT/LR
+    surrogate models rather than per-instance vectors, so it still needs real
+    training/generation when a baseline is declared -- no evaluator exists yet
+    to read a surrogate's stored structure/coefficients per trial instance.
     """
     design = study.design_export
     framework = design_framework(study)
     needs_baselines = bool(getattr(design, "baseline_model_ids", None))
+    trained_by_dataset = _as_dict(getattr(study, "trained_ai_model_by_dataset", None))
+    has_a_trained_model = (
+        getattr(study, "trained_ai_model", None) is not None
+        or any(model is not None for model in trained_by_dataset.values())
+    )
+    data_by_dataset = _as_dict(getattr(study, "data_by_dataset", None))
+    if (
+        framework == "coax"
+        and needs_baselines
+        and not has_a_trained_model
+        and not data_by_dataset
+        and getattr(study, "data", None) is not None
+    ):
+        dataset_id = study.data.dataset_id
+        pool = study.load_coax_corpus_explanations(dataset_id)
+        counts = pool["expMethod"].value_counts().rename_axis("expMethod").reset_index(name="rows")
+        return {
+            "combined_table": None,
+            "rows": int(len(pool)),
+            "by_method": frame_records(counts),
+            "methods": sorted(
+                method for method in pool["expMethod"].astype(str).unique()
+                if method != "__prediction_only__"
+            ),
+            "files": [],
+            "skipped_reason": (
+                f"Loaded {dataset_id!r}'s published CoAX corpus directly into "
+                "combined_explanations for the declared baseline(s) to read -- "
+                "no AI model was trained, since a baseline reads predictions/"
+                "explanations/features rather than explaining the AI itself."
+            ),
+        }
+
     if not needs_baselines and (
         framework in {"coxam", "sim2real"} or (
-            framework == "coax" and getattr(study, "trained_ai_model", None) is None
+            framework == "coax" and not has_a_trained_model
         )
     ):
         return {
@@ -784,6 +906,43 @@ def run_explanations_stage(study: xaikitTest, request: ExplanationStageRequest) 
                 "none of these read this stage's output, so nothing is generated here."
             ),
         }
+
+    if _as_dict(getattr(study, "data_by_dataset", None)):
+        # Multi-dataset: only the level(s) run_dataset_stage actually trained
+        # (trained_by_dataset) need a real explanation table -- a
+        # corpus-covered level has none and needs none, exactly like the
+        # single-dataset skip above. Looped rather than one combined table,
+        # since expMethod alone cannot disambiguate two datasets' rows and
+        # each dataset's own trained model needs its own table anyway.
+        by_dataset: dict[str, Any] = {}
+        for dataset_id, model in trained_by_dataset.items():
+            if model is None:
+                by_dataset[dataset_id] = {
+                    "combined_table": None, "rows": 0, "by_method": [], "methods": [],
+                    "files": [], "skipped_reason": "Served by the published corpus.",
+                }
+                continue
+            path, pool = study.explanations_for_dataset(
+                dataset_id,
+                methods=request.methods,
+                output_dir=f"{request.output_dir}/{dataset_id}",
+                target=request.target,
+                method_kwargs=request.method_kwargs,
+                show_checks=True,
+            )
+            counts = pool["expMethod"].value_counts().rename_axis("expMethod").reset_index(name="rows")
+            by_dataset[dataset_id] = {
+                "combined_table": str(path),
+                "rows": int(len(pool)),
+                "by_method": frame_records(counts),
+                "methods": sorted(
+                    method for method in pool["expMethod"].astype(str).unique()
+                    if method != "__prediction_only__"
+                ),
+                "files": [str(item) for item in study.explanation_paths_by_dataset.get(dataset_id, [])],
+                "skipped_reason": None,
+            }
+        return {"by_dataset": by_dataset}
 
     path, pool = study.explanations(
         methods=request.methods,
@@ -809,6 +968,18 @@ def run_explanations_stage(study: xaikitTest, request: ExplanationStageRequest) 
 # -- stage 4: simulation --------------------------------------------------
 
 
+def _broadcast_coax_params(resolved: Optional[dict[str, Any]]) -> Optional[dict[str, dict[str, Any]]]:
+    """One resolved param set, applied to every CoAX condition.
+
+    ``coax_params_for_strategy`` (inside ``coax_models_for_trials``) drops
+    whichever keys that condition's actual strategy class does not read, so
+    e.g. ``scaling_factor`` only reaches AttributionSum.
+    """
+    if not resolved:
+        return None
+    return {xai_type: resolved for xai_type in COAX_STRATEGIES_BY_XAI_TYPE}
+
+
 def _design_coax_params(study: xaikitTest) -> Optional[dict[str, dict[str, Any]]]:
     """The design export's flat cognitiveConfig, broadcast to every CoAX condition.
 
@@ -820,16 +991,56 @@ def _design_coax_params(study: xaikitTest) -> Optional[dict[str, dict[str, Any]]
     sensitivity) that is meant to apply everywhere -- so without this, a
     design's User Model page values are silently dropped and every run falls
     back to the fitted population defaults, no matter what the UI shows.
-
-    The same resolved dict is handed to every condition; ``coax_params_for_strategy``
-    (inside ``coax_models_for_trials``) drops whichever keys that condition's actual
-    strategy class does not read, so e.g. ``scaling_factor`` only reaches AttributionSum.
     """
     design = getattr(study, "design_export", None)
     resolved = normalize_cognitive_params("coax", getattr(design, "cognitive_config", None))
-    if not resolved:
-        return None
-    return {xai_type: resolved for xai_type in COAX_STRATEGIES_BY_XAI_TYPE}
+    return _broadcast_coax_params(resolved)
+
+
+def _resolve_coax_params(
+    study: xaikitTest, request: SimulationRequest
+) -> Optional[dict[str, dict[str, Any]]]:
+    """``request.coax_params`` in whichever shape the caller actually sent.
+
+    A notebook/API caller wanting per-condition control sends it pre-keyed by
+    ``xai_type`` (values are dicts of strategy kwargs). The design-planner UI
+    has no per-condition control and instead sends its flat cognitiveConfig
+    shape straight through -- ``{"Retrieval Threshold": "-1", ...}``, labels
+    mapped to string values -- since that is the only shape it has. Detected
+    by whether the top-level values are themselves dicts; a flat shape goes
+    through the same label-resolution/type-coercion/broadcast as
+    ``_design_coax_params`` instead of being handed to ``coax_models_for_trials``
+    unresolved, or rejected as invalid before this code even runs.
+    """
+    params = request.coax_params
+    if params is None:
+        return _design_coax_params(study)
+    if params and not all(isinstance(value, dict) for value in params.values()):
+        return _broadcast_coax_params(normalize_cognitive_params("coax", params))
+    return params
+
+
+def _per_dataset_or_single_source(
+    study: xaikitTest, *, trained_value: str, corpus_value: str
+) -> str | dict[str, str]:
+    """Which runner ``source`` each dataset actually needs.
+
+    A single-dataset study returns one value, exactly as before. A
+    multi-dataset study returns a ``{dataset_id: value}`` mapping instead,
+    since ``run_dataset_stage`` can train some datasets for real while others
+    stay corpus-covered (see ``_finish_multi_dataset_stage``) -- one flat
+    value would force every dataset onto whichever source the *first* one
+    happened to need. ``xaikitTest._run_multi_dataset_experiment`` resolves a
+    dict per level; a plain string is used for every level unchanged.
+    """
+    data_by_dataset = _as_dict(getattr(study, "data_by_dataset", None))
+    if not data_by_dataset:
+        return trained_value if getattr(study, "trained_ai_model", None) is not None else corpus_value
+    trained_by_dataset = _as_dict(getattr(study, "trained_ai_model_by_dataset", None))
+    return {
+        level: (trained_value if trained_by_dataset.get(level) is not None else corpus_value)
+        for level in data_by_dataset
+    }
 
 
 def run_simulation_stage(
@@ -861,8 +1072,13 @@ def run_simulation_stage(
             # source="study" needs trained_ai_model; the dataset stage only
             # trains one when the corpus does not already cover this dataset
             # (see run_dataset_stage), so this follows what actually happened
-            # rather than assuming every design trained a model.
-            coax_source = "study" if getattr(study, "trained_ai_model", None) is not None else "corpus"
+            # rather than assuming every design trained a model. A
+            # multi-dataset study can mix corpus-covered and trained-for-real
+            # datasets, so this is a {dataset_id: source} mapping in that
+            # case -- _run_multi_dataset_experiment resolves it per level.
+            coax_source = _per_dataset_or_single_source(
+                study, trained_value="study", corpus_value="corpus"
+            )
         results = study.run_experiment(
             mode=request.mode,
             participant_id=request.participant_id,
@@ -870,7 +1086,7 @@ def run_simulation_stage(
             cognitive_model=coax_models_for_trials(
                 pd.DataFrame(study.trials),
                 strategies=request.coax_strategies,
-                params=request.coax_params if request.coax_params is not None else _design_coax_params(study),
+                params=_resolve_coax_params(study, request),
             ),
             source=coax_source,
         )
@@ -880,8 +1096,11 @@ def run_simulation_stage(
             # 'fit' needs trained_ai_model; the dataset stage only trains one
             # when the corpus does not already cover this dataset (see
             # run_dataset_stage), so this follows what actually happened
-            # rather than assuming every design trained a model.
-            coxam_source = "fit" if getattr(study, "trained_ai_model", None) is not None else "assets"
+            # rather than assuming every design trained a model. Same
+            # per-dataset mapping as coax_source above for a multi-dataset study.
+            coxam_source = _per_dataset_or_single_source(
+                study, trained_value="fit", corpus_value="assets"
+            )
         results = study.run_experiment(
             mode=request.mode,
             participant_id=request.participant_id,

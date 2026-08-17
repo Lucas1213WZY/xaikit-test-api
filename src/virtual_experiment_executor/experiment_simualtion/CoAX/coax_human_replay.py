@@ -220,6 +220,54 @@ def build_coax_study_repository(
     )
 
 
+def combined_explanations_from_corpus(
+    data_id: str, *, tables: Optional[Mapping[str, pd.DataFrame]] = None
+) -> pd.DataFrame:
+    """One dataset's published CoAX corpus rows, reshaped as a
+    ``combined_explanations`` table -- what the generic executor's baseline
+    path (``get_trial_instance_explanation``) reads, normally built by
+    ``study.explanations()`` generating a fresh LIME/SHAP table.
+
+    A CoAX-declared baseline (e.g. KNN) does not explain the AI itself -- it
+    reads predictions/explanations/features exactly like ``run_coax_study
+    (source="corpus")`` does -- so a corpus-covered dataset should not need a
+    real trained model just because a baseline is also declared. The one
+    thing that blocked this before: ``attribution.csv`` and ``importance.csv``
+    carry the *same* ``expMethod`` for a given dataset (what separates them is
+    which file, not a column), and the generic lookup keys on ``expMethod``
+    alone -- concatenating them naively would let it pick whichever family's
+    row happens to come first, silently wrong for the other family's trials
+    (confirmed against the raw CSVs: the two files' vectors for the same
+    instance are genuinely different, not an abs() transform of each other).
+    Tagging every row with its own ``xai_type`` here, and having
+    ``get_trial_instance_explanation`` disambiguate on it when present, fixes
+    that without touching real-generated tables (which never carry the column).
+    """
+    from src.workflow_standard import PREDICTION_ONLY_METHOD
+
+    source = dict(tables) if tables is not None else load_coax_corpus_tables()
+    name = _canonical_data_id(data_id)
+
+    frames = []
+    for xai_type in ("attribution", "importance"):
+        rows = source[xai_type]
+        rows = rows[rows["dataId"].astype(str) == name].copy()
+        rows["xai_type"] = xai_type
+        frames.append(rows)
+    explanations = pd.concat(frames, ignore_index=True, sort=False)
+    if explanations.empty:
+        raise ValueError(
+            f"No corpus explanations for dataId={name!r}. Available: "
+            f"{sorted(source['attribution']['dataId'].astype(str).unique())}."
+        )
+
+    predictions = source["predictions"]
+    predictions = predictions[predictions["dataId"].astype(str) == name].copy()
+    predictions["expMethod"] = PREDICTION_ONLY_METHOD
+
+    return pd.concat([explanations, predictions], ignore_index=True, sort=False)
+
+
 def coax_corpus_instance_ids(
     data_id: str, *, tables: Optional[Mapping[str, pd.DataFrame]] = None
 ) -> list[int]:

@@ -1,0 +1,4399 @@
+{
+  "SurveyEntry": {
+    "SurveyID": "SV_roRAccnu3Mj6I2j",
+    "SurveyName": "XAI Study",
+    "SurveyDescription": null,
+    "SurveyOwnerID": "UR_WKWFHEKaSqxnmge",
+    "SurveyBrandID": "xaikit",
+    "DivisionID": null,
+    "SurveyLanguage": "EN",
+    "SurveyActiveResponseSet": "RS_RnJ1dNFZCfylVVX",
+    "SurveyStatus": "Inactive",
+    "SurveyStartDate": "0000-00-00 00:00:00",
+    "SurveyExpirationDate": "0000-00-00 00:00:00",
+    "SurveyCreationDate": "2026-08-13 13:39:22",
+    "CreatorID": "UR_WKWFHEKaSqxnmge",
+    "LastModified": "2026-08-13 13:39:22",
+    "LastAccessed": "0000-00-00 00:00:00",
+    "LastActivated": "0000-00-00 00:00:00",
+    "Deleted": null
+  },
+  "SurveyElements": [
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "BL",
+      "PrimaryAttribute": "Survey Blocks",
+      "SecondaryAttribute": null,
+      "TertiaryAttribute": null,
+      "Payload": [
+        {
+          "Type": "Standard",
+          "SubType": "",
+          "Description": "Welcome & consent",
+          "ID": "BL_2",
+          "BlockElements": [
+            {
+              "Type": "Question",
+              "QuestionID": "QID1"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID2"
+            }
+          ]
+        },
+        {
+          "Type": "Standard",
+          "SubType": "",
+          "Description": "Apparatus — Configuration 1",
+          "ID": "BL_3",
+          "BlockElements": [
+            {
+              "Type": "Question",
+              "QuestionID": "QID3"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID4"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID5"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID6"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID7"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID8"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID9"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID10"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID11"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID12"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID13"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID14"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID15"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID16"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID17"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID18"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID19"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID20"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID21"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID22"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID23"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID24"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID25"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID26"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID27"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID28"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID29"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID30"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID31"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID32"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID33"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID34"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID35"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID36"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID37"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID38"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID39"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID40"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID41"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID42"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID43"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID44"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID45"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID46"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID47"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID48"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID49"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID50"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID51"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID52"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID53"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID54"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID55"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID56"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID57"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID58"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID59"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID60"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID61"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID62"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID63"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID64"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID65"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID66"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID67"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID68"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID69"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID70"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID71"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID72"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID73"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID74"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID75"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID76"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID77"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID78"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID79"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID80"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID81"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID82"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID83"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID84"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID85"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID86"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID87"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID88"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID89"
+            },
+            {
+              "Type": "Page Break"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID90"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID91"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID92"
+            }
+          ]
+        },
+        {
+          "Type": "Trash",
+          "SubType": "",
+          "Description": "Trash / Unused Questions",
+          "ID": "BL_Trash",
+          "BlockElements": []
+        }
+      ]
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "FL",
+      "PrimaryAttribute": "Survey Flow",
+      "SecondaryAttribute": null,
+      "TertiaryAttribute": null,
+      "Payload": {
+        "Type": "Root",
+        "FlowID": "FL_1",
+        "Flow": [
+          {
+            "Type": "Block",
+            "ID": "BL_2",
+            "FlowID": "FL_2"
+          },
+          {
+            "Type": "Block",
+            "ID": "BL_3",
+            "FlowID": "FL_3"
+          }
+        ],
+        "Properties": {
+          "Count": 3
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SO",
+      "PrimaryAttribute": "Survey Options",
+      "SecondaryAttribute": null,
+      "TertiaryAttribute": null,
+      "Payload": {
+        "BackButton": "true",
+        "SaveAndContinue": "true",
+        "SurveyProtection": "PublicSurvey",
+        "BallotBoxStuffingPrevention": "false",
+        "NoIndex": "Yes",
+        "SecureResponseFiles": "true",
+        "SurveyExpiration": "None",
+        "SurveyTermination": "DefaultMessage",
+        "Header": "",
+        "Footer": "",
+        "ProgressBarDisplay": "None",
+        "PartialData": "+1 week",
+        "ValidationMessage": "",
+        "PreviousButton": " ← ",
+        "NextButton": " → ",
+        "SurveyTitle": "XAI Study",
+        "SkinLibrary": "qualtrics",
+        "SkinType": "MQ",
+        "NewScoring": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "QC",
+      "PrimaryAttribute": "Survey Question Count",
+      "SecondaryAttribute": "92",
+      "TertiaryAttribute": null,
+      "Payload": null
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID1",
+      "SecondaryAttribute": "Welcome Thank you for taking part in this study. In this session you will look at an AI system's pre",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID1",
+        "DataExportTag": "Q1",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Welcome Thank you for taking part in this study. In this session you will look at an AI system's pre",
+        "QuestionText": "<h2>Welcome</h2><p>Thank you for taking part in this study. In this session you will look at an AI system's predictions and explanations, and answer a few short questions about them.</p><p>Your participation is voluntary and your responses are kept anonymous. You may stop at any time without penalty.</p>",
+        "QuestionText_Unsafe": "<h2>Welcome</h2><p>Thank you for taking part in this study. In this session you will look at an AI system's predictions and explanations, and answer a few short questions about them.</p><p>Your participation is voluntary and your responses are kept anonymous. You may stop at any time without penalty.</p>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID2",
+      "SecondaryAttribute": "Consent. I have read the information above and I agree to take part in this study.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID2",
+        "DataExportTag": "Q2",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Consent. I have read the information above and I agree to take part in this study.",
+        "QuestionText": "<strong>Consent.</strong> I have read the information above and I agree to take part in this study.",
+        "QuestionText_Unsafe": "<strong>Consent.</strong> I have read the information above and I agree to take part in this study.",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "I agree to take part"
+          },
+          "2": {
+            "Display": "I do not agree"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 3,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID3",
+      "SecondaryAttribute": "Practice trial 1 of 10 — instance 0 This is a practice round: you will see feedback after answering.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID3",
+        "DataExportTag": "Q3",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Practice trial 1 of 10 — instance 0 This is a practice round: you will see feedback after answering.",
+        "QuestionText": "<div><strong>Practice trial 1 of 10</strong> — instance 0</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=0&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Practice trial 1 of 10</strong> — instance 0</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=0&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID4",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID4",
+        "DataExportTag": "Q4",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID5",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID5",
+        "DataExportTag": "Q5",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID6",
+      "SecondaryAttribute": "Practice trial 2 of 10 — instance 1 This is a practice round: you will see feedback after answering.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID6",
+        "DataExportTag": "Q6",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Practice trial 2 of 10 — instance 1 This is a practice round: you will see feedback after answering.",
+        "QuestionText": "<div><strong>Practice trial 2 of 10</strong> — instance 1</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=1&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Practice trial 2 of 10</strong> — instance 1</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=1&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID7",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID7",
+        "DataExportTag": "Q7",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID8",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID8",
+        "DataExportTag": "Q8",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID9",
+      "SecondaryAttribute": "Practice trial 3 of 10 — instance 2 This is a practice round: you will see feedback after answering.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID9",
+        "DataExportTag": "Q9",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Practice trial 3 of 10 — instance 2 This is a practice round: you will see feedback after answering.",
+        "QuestionText": "<div><strong>Practice trial 3 of 10</strong> — instance 2</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=2&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Practice trial 3 of 10</strong> — instance 2</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=2&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID10",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID10",
+        "DataExportTag": "Q10",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID11",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID11",
+        "DataExportTag": "Q11",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID12",
+      "SecondaryAttribute": "Practice trial 4 of 10 — instance 3 This is a practice round: you will see feedback after answering.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID12",
+        "DataExportTag": "Q12",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Practice trial 4 of 10 — instance 3 This is a practice round: you will see feedback after answering.",
+        "QuestionText": "<div><strong>Practice trial 4 of 10</strong> — instance 3</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=3&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Practice trial 4 of 10</strong> — instance 3</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=3&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID13",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID13",
+        "DataExportTag": "Q13",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID14",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID14",
+        "DataExportTag": "Q14",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID15",
+      "SecondaryAttribute": "Practice trial 5 of 10 — instance 4 This is a practice round: you will see feedback after answering.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID15",
+        "DataExportTag": "Q15",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Practice trial 5 of 10 — instance 4 This is a practice round: you will see feedback after answering.",
+        "QuestionText": "<div><strong>Practice trial 5 of 10</strong> — instance 4</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=4&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Practice trial 5 of 10</strong> — instance 4</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=4&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID16",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID16",
+        "DataExportTag": "Q16",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID17",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID17",
+        "DataExportTag": "Q17",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID18",
+      "SecondaryAttribute": "Practice trial 6 of 10 — instance 5 This is a practice round: you will see feedback after answering.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID18",
+        "DataExportTag": "Q18",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Practice trial 6 of 10 — instance 5 This is a practice round: you will see feedback after answering.",
+        "QuestionText": "<div><strong>Practice trial 6 of 10</strong> — instance 5</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=5&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Practice trial 6 of 10</strong> — instance 5</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=5&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID19",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID19",
+        "DataExportTag": "Q19",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID20",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID20",
+        "DataExportTag": "Q20",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID21",
+      "SecondaryAttribute": "Practice trial 7 of 10 — instance 6 This is a practice round: you will see feedback after answering.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID21",
+        "DataExportTag": "Q21",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Practice trial 7 of 10 — instance 6 This is a practice round: you will see feedback after answering.",
+        "QuestionText": "<div><strong>Practice trial 7 of 10</strong> — instance 6</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=6&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Practice trial 7 of 10</strong> — instance 6</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=6&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID22",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID22",
+        "DataExportTag": "Q22",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID23",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID23",
+        "DataExportTag": "Q23",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID24",
+      "SecondaryAttribute": "Practice trial 8 of 10 — instance 7 This is a practice round: you will see feedback after answering.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID24",
+        "DataExportTag": "Q24",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Practice trial 8 of 10 — instance 7 This is a practice round: you will see feedback after answering.",
+        "QuestionText": "<div><strong>Practice trial 8 of 10</strong> — instance 7</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=7&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Practice trial 8 of 10</strong> — instance 7</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=7&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID25",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID25",
+        "DataExportTag": "Q25",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID26",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID26",
+        "DataExportTag": "Q26",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID27",
+      "SecondaryAttribute": "Practice trial 9 of 10 — instance 8 This is a practice round: you will see feedback after answering.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID27",
+        "DataExportTag": "Q27",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Practice trial 9 of 10 — instance 8 This is a practice round: you will see feedback after answering.",
+        "QuestionText": "<div><strong>Practice trial 9 of 10</strong> — instance 8</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=8&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Practice trial 9 of 10</strong> — instance 8</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=8&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID28",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID28",
+        "DataExportTag": "Q28",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID29",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID29",
+        "DataExportTag": "Q29",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID30",
+      "SecondaryAttribute": "Practice trial 10 of 10 — instance 9 This is a practice round: you will see feedback after answering",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID30",
+        "DataExportTag": "Q30",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Practice trial 10 of 10 — instance 9 This is a practice round: you will see feedback after answering",
+        "QuestionText": "<div><strong>Practice trial 10 of 10</strong> — instance 9</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=9&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Practice trial 10 of 10</strong> — instance 9</div><p>This is a practice round: you will see feedback after answering. Study the interface below, then answer the questions.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=9&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID31",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID31",
+        "DataExportTag": "Q31",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID32",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID32",
+        "DataExportTag": "Q32",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID33",
+      "SecondaryAttribute": "Trial 1 of 20 — instance 20 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID33",
+        "DataExportTag": "Q33",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 1 of 20 — instance 20 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 1 of 20</strong> — instance 20</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=20&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 1 of 20</strong> — instance 20</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=20&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID34",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID34",
+        "DataExportTag": "Q34",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID35",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID35",
+        "DataExportTag": "Q35",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID36",
+      "SecondaryAttribute": "Trial 2 of 20 — instance 21 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID36",
+        "DataExportTag": "Q36",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 2 of 20 — instance 21 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 2 of 20</strong> — instance 21</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=21&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 2 of 20</strong> — instance 21</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=21&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID37",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID37",
+        "DataExportTag": "Q37",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID38",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID38",
+        "DataExportTag": "Q38",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID39",
+      "SecondaryAttribute": "Trial 3 of 20 — instance 22 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID39",
+        "DataExportTag": "Q39",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 3 of 20 — instance 22 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 3 of 20</strong> — instance 22</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=22&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 3 of 20</strong> — instance 22</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=22&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID40",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID40",
+        "DataExportTag": "Q40",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID41",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID41",
+        "DataExportTag": "Q41",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID42",
+      "SecondaryAttribute": "Trial 4 of 20 — instance 23 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID42",
+        "DataExportTag": "Q42",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 4 of 20 — instance 23 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 4 of 20</strong> — instance 23</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=23&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 4 of 20</strong> — instance 23</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=23&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID43",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID43",
+        "DataExportTag": "Q43",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID44",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID44",
+        "DataExportTag": "Q44",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID45",
+      "SecondaryAttribute": "Trial 5 of 20 — instance 24 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID45",
+        "DataExportTag": "Q45",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 5 of 20 — instance 24 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 5 of 20</strong> — instance 24</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=24&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 5 of 20</strong> — instance 24</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=24&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID46",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID46",
+        "DataExportTag": "Q46",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID47",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID47",
+        "DataExportTag": "Q47",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID48",
+      "SecondaryAttribute": "Trial 6 of 20 — instance 25 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID48",
+        "DataExportTag": "Q48",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 6 of 20 — instance 25 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 6 of 20</strong> — instance 25</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=25&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 6 of 20</strong> — instance 25</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=25&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID49",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID49",
+        "DataExportTag": "Q49",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID50",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID50",
+        "DataExportTag": "Q50",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID51",
+      "SecondaryAttribute": "Trial 7 of 20 — instance 26 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID51",
+        "DataExportTag": "Q51",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 7 of 20 — instance 26 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 7 of 20</strong> — instance 26</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=26&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 7 of 20</strong> — instance 26</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=26&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID52",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID52",
+        "DataExportTag": "Q52",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID53",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID53",
+        "DataExportTag": "Q53",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID54",
+      "SecondaryAttribute": "Trial 8 of 20 — instance 27 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID54",
+        "DataExportTag": "Q54",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 8 of 20 — instance 27 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 8 of 20</strong> — instance 27</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=27&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 8 of 20</strong> — instance 27</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=27&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID55",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID55",
+        "DataExportTag": "Q55",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID56",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID56",
+        "DataExportTag": "Q56",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID57",
+      "SecondaryAttribute": "Trial 9 of 20 — instance 28 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID57",
+        "DataExportTag": "Q57",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 9 of 20 — instance 28 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 9 of 20</strong> — instance 28</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=28&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 9 of 20</strong> — instance 28</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=28&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID58",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID58",
+        "DataExportTag": "Q58",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID59",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID59",
+        "DataExportTag": "Q59",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID60",
+      "SecondaryAttribute": "Trial 10 of 20 — instance 29 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID60",
+        "DataExportTag": "Q60",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 10 of 20 — instance 29 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 10 of 20</strong> — instance 29</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=29&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 10 of 20</strong> — instance 29</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=29&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID61",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID61",
+        "DataExportTag": "Q61",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID62",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID62",
+        "DataExportTag": "Q62",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID63",
+      "SecondaryAttribute": "Trial 11 of 20 — instance 30 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID63",
+        "DataExportTag": "Q63",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 11 of 20 — instance 30 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 11 of 20</strong> — instance 30</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=30&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 11 of 20</strong> — instance 30</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=30&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID64",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID64",
+        "DataExportTag": "Q64",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID65",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID65",
+        "DataExportTag": "Q65",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID66",
+      "SecondaryAttribute": "Trial 12 of 20 — instance 31 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID66",
+        "DataExportTag": "Q66",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 12 of 20 — instance 31 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 12 of 20</strong> — instance 31</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=31&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 12 of 20</strong> — instance 31</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=31&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID67",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID67",
+        "DataExportTag": "Q67",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID68",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID68",
+        "DataExportTag": "Q68",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID69",
+      "SecondaryAttribute": "Trial 13 of 20 — instance 32 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID69",
+        "DataExportTag": "Q69",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 13 of 20 — instance 32 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 13 of 20</strong> — instance 32</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=32&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 13 of 20</strong> — instance 32</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=32&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID70",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID70",
+        "DataExportTag": "Q70",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID71",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID71",
+        "DataExportTag": "Q71",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID72",
+      "SecondaryAttribute": "Trial 14 of 20 — instance 33 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID72",
+        "DataExportTag": "Q72",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 14 of 20 — instance 33 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 14 of 20</strong> — instance 33</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=33&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 14 of 20</strong> — instance 33</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=33&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID73",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID73",
+        "DataExportTag": "Q73",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID74",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID74",
+        "DataExportTag": "Q74",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID75",
+      "SecondaryAttribute": "Trial 15 of 20 — instance 34 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID75",
+        "DataExportTag": "Q75",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 15 of 20 — instance 34 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 15 of 20</strong> — instance 34</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=34&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 15 of 20</strong> — instance 34</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=34&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID76",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID76",
+        "DataExportTag": "Q76",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID77",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID77",
+        "DataExportTag": "Q77",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID78",
+      "SecondaryAttribute": "Trial 16 of 20 — instance 35 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID78",
+        "DataExportTag": "Q78",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 16 of 20 — instance 35 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 16 of 20</strong> — instance 35</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=35&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 16 of 20</strong> — instance 35</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=35&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID79",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID79",
+        "DataExportTag": "Q79",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID80",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID80",
+        "DataExportTag": "Q80",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID81",
+      "SecondaryAttribute": "Trial 17 of 20 — instance 36 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID81",
+        "DataExportTag": "Q81",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 17 of 20 — instance 36 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 17 of 20</strong> — instance 36</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=36&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 17 of 20</strong> — instance 36</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=36&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID82",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID82",
+        "DataExportTag": "Q82",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID83",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID83",
+        "DataExportTag": "Q83",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID84",
+      "SecondaryAttribute": "Trial 18 of 20 — instance 37 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID84",
+        "DataExportTag": "Q84",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 18 of 20 — instance 37 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 18 of 20</strong> — instance 37</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=37&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 18 of 20</strong> — instance 37</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=37&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID85",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID85",
+        "DataExportTag": "Q85",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID86",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID86",
+        "DataExportTag": "Q86",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID87",
+      "SecondaryAttribute": "Trial 19 of 20 — instance 38 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID87",
+        "DataExportTag": "Q87",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 19 of 20 — instance 38 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 19 of 20</strong> — instance 38</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=38&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 19 of 20</strong> — instance 38</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=38&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID88",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID88",
+        "DataExportTag": "Q88",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID89",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID89",
+        "DataExportTag": "Q89",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID90",
+      "SecondaryAttribute": "Trial 20 of 20 — instance 39 Study the interface below, then answer the questions that follow.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID90",
+        "DataExportTag": "Q90",
+        "QuestionType": "DB",
+        "Selector": "TB",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Trial 20 of 20 — instance 39 Study the interface below, then answer the questions that follow.",
+        "QuestionText": "<div><strong>Trial 20 of 20</strong> — instance 39</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=39&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "QuestionText_Unsafe": "<div><strong>Trial 20 of 20</strong> — instance 39</div><p>Study the interface below, then answer the questions that follow.</p><div style=\"width:100%;overflow:hidden;\"><iframe src=\"https://lucas1213wzy.github.io/xaikit-test-ui-apparatus/global/iframe.html?appId=mushrooms&amp;instanceId=39&amp;modelName=mlp&amp;xaiType=LR&amp;LRVariant=dense&amp;showPrediction=1\" data-natural-width=\"1280\" data-natural-height=\"900\" style=\"width:100%;height:700px;border:1px solid #ccc;\" allow=\"fullscreen\"></iframe></div>",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 1,
+        "NextAnswerId": 1,
+        "QuestionJS": "Qualtrics.SurveyEngine.addOnload(function() {\n  var qc = this.getQuestionContainer();\n  var frames = qc.querySelectorAll('iframe[data-natural-width]');\n  for (var i = 0; i < frames.length; i++) {\n    (function(f) {\n      var nw = parseInt(f.getAttribute('data-natural-width'), 10) || 1280;\n      var nh = parseInt(f.getAttribute('data-natural-height'), 10) || 900;\n      var wrap = f.parentElement;\n      function fit() {\n        var w = wrap.clientWidth || qc.clientWidth || nw;\n        var s = Math.min(1, w / nw);\n        f.style.width = nw + 'px';\n        f.style.height = nh + 'px';\n        f.style.transform = 'scale(' + s + ')';\n        f.style.webkitTransform = 'scale(' + s + ')';\n        f.style.transformOrigin = '0 0';\n        f.style.webkitTransformOrigin = '0 0';\n        wrap.style.height = Math.ceil(nh * s) + 'px';\n        wrap.style.overflow = 'hidden';\n      }\n      fit();\n      window.addEventListener('resize', fit);\n    })(frames[i]);\n  }\n});"
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID91",
+      "SecondaryAttribute": "Based on the interface above, what do you predict the AI's output is for this item?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID91",
+        "DataExportTag": "Q91",
+        "QuestionType": "TE",
+        "Selector": "SL",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "QuestionText_Unsafe": "Based on the interface above, what do you predict the AI's output is for this item?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "SearchSource": {
+          "AllowFreeResponse": "false"
+        },
+        "NextChoiceId": 4,
+        "NextAnswerId": 1
+      }
+    },
+    {
+      "SurveyID": "SV_roRAccnu3Mj6I2j",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID92",
+      "SecondaryAttribute": "How confident are you in your prediction?",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionID": "QID92",
+        "DataExportTag": "Q92",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "How confident are you in your prediction?",
+        "QuestionText": "How confident are you in your prediction?",
+        "QuestionText_Unsafe": "How confident are you in your prediction?",
+        "DataVisibility": {
+          "Private": false,
+          "Hidden": false
+        },
+        "Language": [],
+        "SubSelector": "TX",
+        "Choices": {
+          "1": {
+            "Display": "1 — Not at all confident"
+          },
+          "2": {
+            "Display": "2 — Slightly confident"
+          },
+          "3": {
+            "Display": "3 — Moderately confident"
+          },
+          "4": {
+            "Display": "4 — Very confident"
+          },
+          "5": {
+            "Display": "5 — Extremely confident"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "Type": "None"
+          }
+        },
+        "NextChoiceId": 6,
+        "NextAnswerId": 1
+      }
+    }
+  ]
+}

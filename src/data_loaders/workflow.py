@@ -141,6 +141,7 @@ class PreparedDataset:
 def prepare_dataset(
     dataset_id: str,
     *,
+    dataset: Optional[Any] = None,
     model_type: str = "mlp",
     feature_cols: Optional[Sequence[str]] = None,
     num_features: Optional[int] = None,
@@ -155,24 +156,34 @@ def prepare_dataset(
     """Load a dataset through `src.data_loaders`, split it, and return one wrapper.
 
     Args:
-        dataset_id: Dataset to load, e.g. ``wine_quality``.
+        dataset_id: Dataset to load, e.g. ``wine_quality``. Recorded on the
+            split either way; only used to look the dataset up when
+            ``dataset`` is not given.
+        dataset: An already-loaded ``TabularDataset``, e.g. from
+            ``load_custom_dataset``. Skips ``load_original_dataset(dataset_id)``
+            -- everything after loading (feature selection, encoding, the
+            split) is unchanged, so a custom dataset goes through the exact
+            same pipeline a bundled one does.
         model_type: Model the encoding should suit, e.g. ``mlp``.
         feature_cols: Use exactly these columns, skipping selection.
         num_features: Keep this many features when selecting.
         rank_features_by_target: Rank candidates by association with the target
             before taking ``num_features``.
         use_default_features: Fall back to the dataset's curated default set.
+            No effect when ``dataset`` is given -- a custom dataset has no
+            curated default to fall back to.
         requires_one_hot_encoding: Force one-hot encoding on or off; None
             decides from the model type.
         test_size: Fraction held out for testing.
         random_state: Seed for the split.
-        show_available: Print the datasets that can be loaded.
+        show_available: Print the datasets that can be loaded. No effect when
+            ``dataset`` is given.
         show_summary: Print a summary of the prepared dataset.
 
     Returns:
         The dataset with both display and model-ready views.
     """
-    if show_available:
+    if show_available and dataset is None:
         print("Available training datasets:", list_original_datasets())
 
     if requires_one_hot_encoding is None:
@@ -180,9 +191,11 @@ def prepare_dataset(
 
         requires_one_hot_encoding = model_requires_one_hot_encoding(model_type)
 
-    dataset = load_original_dataset(dataset_id)
+    is_custom_dataset = dataset is not None
+    if dataset is None:
+        dataset = load_original_dataset(dataset_id)
     resolved_feature_cols = feature_cols
-    if resolved_feature_cols is None and use_default_features:
+    if resolved_feature_cols is None and use_default_features and not is_custom_dataset:
         resolved_feature_cols = get_default_feature_cols(dataset_id)
     selected_features = _resolve_feature_selection(
         dataset,

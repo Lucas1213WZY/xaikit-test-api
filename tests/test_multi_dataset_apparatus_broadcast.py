@@ -129,7 +129,14 @@ def test_the_real_export_runs_the_full_pipeline_without_the_corpus_error(tmp_pat
 
     dataset_result = run_dataset_stage(study, DatasetStageRequest())
     assert set(dataset_result["datasets"]) == {"wine_quality", "mushrooms"}
-    assert dataset_result["model"] is None
+    # Both datasets are covered by CoXAM's own published corpus, so neither
+    # trains for real -- see _finish_multi_dataset_stage, which now decides
+    # this per dataset rather than requiring every dataset in the study to
+    # agree (dataset_result["models"] replaces the old single "model" key).
+    assert set(dataset_result["models"]) == {"wine_quality", "mushrooms"}
+    for entry in dataset_result["models"].values():
+        assert entry["model"] is None
+        assert entry["model_skipped_reason"]
 
     trials_result = run_trials_stage(study, TrialsStageRequest())
     assert trials_result["counts"]["trials"] > 0

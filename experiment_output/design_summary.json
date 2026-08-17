@@ -2,20 +2,33 @@
   "iv_config": {
     "xai_type": [
       "decision_tree"
+    ],
+    "dataset": [
+      "wine_quality",
+      "mushrooms"
     ]
   },
   "between_subjects_ivs": {
+    "dataset": [
+      "wine_quality",
+      "mushrooms"
+    ]
+  },
+  "within_subjects_ivs": {
     "xai_type": [
       "decision_tree"
     ]
   },
-  "within_subjects_ivs": {},
-  "block_counterbalanced_within_ivs": {},
+  "block_counterbalanced_within_ivs": {
+    "xai_type": [
+      "decision_tree"
+    ]
+  },
   "trial_randomized_within_ivs": {},
   "requested_counterbalancing_strategy": "auto",
   "trial_randomization_strategy": "balanced",
   "trials_per_condition": null,
-  "trials_per_participant": 4,
+  "trials_per_participant": 3,
   "counterbalancing_strategy": "complete_counterbalancing",
   "n_conditions": 1,
   "n_orders": 1,
@@ -28,7 +41,7 @@
     "immediate_pair_balanced": true,
     "position_counts": {
       "1": {
-        "{\"withinCondition\": \"single_condition\"}": 1
+        "{\"xai_type\": \"decision_tree\"}": 1
       }
     },
     "immediate_pair_counts": {}
@@ -38,21 +51,48 @@
       "order_id": 1,
       "sequence": [
         {
-          "withinCondition": "single_condition"
+          "xai_type": "decision_tree"
         }
       ]
     }
   ],
-  "n_participants": 1,
+  "n_participants": 4,
   "participant_assignments": [
     {
       "participantId": 1,
       "within_order": [
         {
-          "withinCondition": "single_condition"
+          "xai_type": "decision_tree"
         }
       ],
-      "xai_type": "decision_tree"
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 2,
+      "within_order": [
+        {
+          "xai_type": "decision_tree"
+        }
+      ],
+      "dataset": "mushrooms"
+    },
+    {
+      "participantId": 3,
+      "within_order": [
+        {
+          "xai_type": "decision_tree"
+        }
+      ],
+      "dataset": "wine_quality"
+    },
+    {
+      "participantId": 4,
+      "within_order": [
+        {
+          "xai_type": "decision_tree"
+        }
+      ],
+      "dataset": "mushrooms"
     }
   ]
 }

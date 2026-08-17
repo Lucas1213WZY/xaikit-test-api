@@ -26,6 +26,7 @@ import numpy as np
 import pandas as pd
 
 from src.cognitive_models.cognitive_models.Sim2Real.gcm_strategies import (
+    SIM2REAL_RAW_FEATURE_ORDER,
     Sim2RealAttributionProjector,
     Sim2RealFittedAttributionSum,
 )
@@ -177,6 +178,87 @@ def build_sim2real_projector(
         app_id=app_id,
         model_name=model_name,
         exp_method=exp_method,
+    )
+
+
+def build_sim2real_dataset_split(
+    projector: Optional[Sim2RealAttributionProjector] = None,
+) -> "DatasetSplit":
+    """Build a ``DatasetSplit`` from the published corpus, for ``prepare_dataset``.
+
+    Unlike every other dataset ``prepare_dataset`` can load, Sim2Real's split is
+    not drawn by ``train_test_split`` -- it *is* the corpus's own
+    ``training``/``test`` labels from ``deltas.csv``, the same ones
+    ``sim2real_available_instance_ids(split=...)`` reads. ``X_model`` is the
+    67-dimension encoded feature vector each attribution row was computed
+    against; ``df`` carries each instance's human-readable value per raw
+    feature (age, education, ...), the same projection
+    ``Sim2RealAttributionProjector.project`` performs per trial, done once here
+    for every published instance so raw and encoded views agree by
+    construction rather than by two separate decodings.
+
+    ``y`` is the AI's own prediction (the unoptimized baseline explanation
+    row's ``pred``), not a fitted label -- there is no AI model to train here,
+    only the published corpus's own already-predicted classes.
+    """
+    from types import SimpleNamespace
+
+    from src.data_loaders import DatasetSplit
+
+    projector = projector or build_sim2real_projector()
+    instance_ids = np.asarray(sorted(projector.instance_ids), dtype=int)
+
+    value_columns = [f"v{i}" for i in range(67)]
+    values_by_instance = (
+        projector._filter_app(projector.values)
+        .drop_duplicates(subset="instanceId")
+        .set_index("instanceId")
+        .loc[instance_ids]
+    )
+    X_model = values_by_instance[value_columns].to_numpy(dtype=np.float32)
+
+    raw_rows: list[dict[str, Any]] = []
+    predictions: list[int] = []
+    for instance_id in instance_ids:
+        pair = projector.project(int(instance_id), exp_property=None)
+        raw_rows.append(dict(zip(pair.feature_names, pair.original_feature_values)))
+        predictions.append(pair.ai_prediction)
+    y = np.asarray(predictions, dtype=int)
+
+    df = pd.DataFrame(raw_rows, index=instance_ids)
+    df.index.name = "instanceId"
+    df["pred"] = y
+
+    train_instance_ids = np.asarray(sorted(projector.instance_ids_for_split("training")), dtype=int)
+    test_instance_ids = np.asarray(sorted(projector.instance_ids_for_split("test")), dtype=int)
+    train_positions = np.searchsorted(instance_ids, train_instance_ids)
+    test_positions = np.searchsorted(instance_ids, test_instance_ids)
+
+    dataset = SimpleNamespace(
+        target_name="pred",
+        feature_names=list(SIM2REAL_RAW_FEATURE_ORDER),
+    )
+
+    return DatasetSplit(
+        dataset_id="sim2real",
+        dataset=dataset,
+        df=df,
+        X_raw=X_model,
+        y=y,
+        feature_names=list(SIM2REAL_RAW_FEATURE_ORDER),
+        raw_feature_names=list(SIM2REAL_RAW_FEATURE_ORDER),
+        model_feature_names=value_columns,
+        raw_instance_ids=instance_ids,
+        X_model=X_model,
+        X_raw_train=X_model[train_positions],
+        X_raw_test=X_model[test_positions],
+        X_train=X_model[train_positions],
+        X_test=X_model[test_positions],
+        y_train=y[train_positions],
+        y_test=y[test_positions],
+        train_instance_ids=train_instance_ids,
+        test_instance_ids=test_instance_ids,
+        one_hot_encode=True,
     )
 
 

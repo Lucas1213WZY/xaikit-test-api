@@ -76,28 +76,62 @@ def _trial_explanation_family(trial: Mapping[str, Any]) -> Any:
     )
 
 
-def _is_counterfactual(trials: pd.DataFrame, user_task: Optional[str]) -> bool:
+#: Maps a design's canonical DV name to the task it names, so a call that
+#: gets no explicit ``user_task`` and no per-trial ``user_task`` column (the
+#: normal state for a design that names both DVs without also declaring
+#: ``user_task`` as an explicit IV/CV -- see ``DesignExport.user_tasks``) can
+#: still be routed correctly instead of silently defaulting to forward.
+_TASK_BY_DV_NAME: dict[str, str] = {
+    "forward_accuracy": "forward",
+    "counterfactual_accuracy": "counterfactual",
+}
+
+
+def _tasks_implied_by_dvs(dvs: Optional[Mapping[str, Any]]) -> set[str]:
+    if not dvs:
+        return set()
+    return {_TASK_BY_DV_NAME[name] for name in dvs if name in _TASK_BY_DV_NAME}
+
+
+def _is_counterfactual(
+    trials: pd.DataFrame,
+    user_task: Optional[str],
+    dvs: Optional[Mapping[str, Any]] = None,
+) -> bool:
     """Whether this run is counterfactual rather than forward simulation.
 
     An explicit ``user_task`` wins; otherwise the trials' own ``user_task``
     column decides, so a design that varies task as an IV routes correctly.
+
+    Failing both of those, the DV names decide: a design that asks for only
+    ``counterfactual_accuracy`` (no ``forward_accuracy``) means counterfactual
+    simulation even with no ``user_task`` IV telling the trials apart, and
+    defaulting that case to forward silently ran the wrong agent. A design
+    naming *both* DVs (e.g. an ambiguous measure coerced to both, see
+    ``COERCE_DVS_BY_FRAMEWORK``) still defaults to forward for a single
+    ambiguous call -- CoXAM runs the two as separate agents, and a single
+    call only ever produces one agent's numbers, so it cannot fill both DV
+    columns correctly regardless of which one runs. ``_result_row`` is what
+    actually guards against the original bug in this case: it fills only the
+    DV(s) belonging to whichever task ran and warns about the rest, instead
+    of filling every accuracy-shaped DV with that one task's numbers.
     """
     if user_task is not None:
         return "counterfactual" in str(user_task).strip().lower()
-    if "user_task" not in trials.columns:
-        return False
-    values = {str(value).strip().lower() for value in trials["user_task"].dropna().unique()}
-    if not values:
-        return False
-    if any("counterfactual" in value for value in values) and any(
-        "forward" in value for value in values
-    ):
-        raise ValueError(
-            "Trials mix forward and counterfactual user_task values. CoXAM runs these "
-            "as separate agents, so select one task at a time via "
-            "run_coxam_study(user_task=...) or condition_filter."
-        )
-    return any("counterfactual" in value for value in values)
+    if "user_task" in trials.columns:
+        values = {str(value).strip().lower() for value in trials["user_task"].dropna().unique()}
+        if values:
+            if any("counterfactual" in value for value in values) and any(
+                "forward" in value for value in values
+            ):
+                raise ValueError(
+                    "Trials mix forward and counterfactual user_task values. CoXAM runs these "
+                    "as separate agents, so select one task at a time via "
+                    "run_coxam_study(user_task=...) or condition_filter."
+                )
+            return any("counterfactual" in value for value in values)
+    implied = _tasks_implied_by_dvs(dvs)
+    return implied == {"counterfactual"}
 
 
 def _model_input_transform(dataset: Any, model_name: Optional[str] = None) -> Any:
@@ -229,10 +263,23 @@ def _result_row(
     instead of being reconstructed from those two fields.
     """
     cognitive_correct_vs_ai = info.get("selected_predicted_correct")
+    scorable = [name for name in (dvs or {}) if "accuracy" in name.lower()]
+    # Forward simulation only ever produces agent-vs-AI agreement. A DV that
+    # names a different task (counterfactual_accuracy) has to come from that
+    # task's own run instead -- filling it here would be forward numbers
+    # under another task's label, exactly the bug this guards against.
+    mislabelled = [name for name in scorable if _TASK_BY_DV_NAME.get(name, "forward") != "forward"]
+    if mislabelled and cognitive_correct_vs_ai is not None:
+        warnings.warn(
+            f"This is a forward-simulation run, but DV(s) {sorted(mislabelled)} name "
+            "another task and will be left unfilled here. Run once per task (see "
+            "DesignExport.user_tasks) and combine the results.",
+            stacklevel=2,
+        )
     dv_columns = {
         name: int(cognitive_correct_vs_ai)
-        for name in (dvs or {})
-        if "accuracy" in name.lower() and cognitive_correct_vs_ai is not None
+        for name in scorable
+        if name not in mislabelled and cognitive_correct_vs_ai is not None
     }
     return {
         **dv_columns,
@@ -374,6 +421,8 @@ def run_coxam_study(
     if source == "fit" and trained_ai_model is None:
         raise RuntimeError("No trained AI model available. Call study.train_AI_model(...) first.")
 
+    resolved_dvs = study.DVs if dvs is None else dvs
+
     selected = select_trial_rows(
         trials_df, mode, participant_id=participant_id, condition_filter=condition_filter,
     ).copy()
@@ -453,7 +502,7 @@ def run_coxam_study(
             )
         )
 
-    if _is_counterfactual(selected, user_task):
+    if _is_counterfactual(selected, user_task, resolved_dvs):
         # Counterfactual simulation is a different trained agent with a
         # different observation space and a different DV, so it has its own
         # runner. Bundle construction and the coverage preflight above are
@@ -472,7 +521,7 @@ def run_coxam_study(
             bundle=bundle,
             predict_fn=predict_fn,
             trials=selected.drop(columns=[ORDER_COLUMN]),
-            dvs=dvs,
+            dvs=resolved_dvs,
             cognitive_params=eval_params,
             store=store,
         )
@@ -512,7 +561,7 @@ def run_coxam_study(
                 config=config,
                 policy_override=policy_override,
                 fixed_eval_params=eval_params,
-                dvs=study.DVs if dvs is None else dvs,
+                dvs=resolved_dvs,
             )
         )
 

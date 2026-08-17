@@ -39,7 +39,7 @@ class DatasetStageRequest(BaseModel):
     random_state: int = 42
     target_metric: str = "accuracy"
     target_score: Optional[float] = 0.85
-    max_epochs: int = 300
+    max_epochs: int = 50
     check_every_epochs: int = 20
     batch_size: int = 512
 
@@ -113,6 +113,14 @@ class SimulationRequest(BaseModel):
     / AttributionSum at sensitivity 20, k 3, retrieval_threshold -2.3), which are
     *not* the hand-tuned values in the tutorial notebooks -- pass them here to
     reproduce a notebook run exactly.
+
+    ``coax_params`` also accepts the design-planner UI's flat cognitiveConfig
+    shape -- ``{"Retrieval Threshold": "-1", ...}``, labels mapped to string
+    values rather than xai_type mapped to kwarg dicts -- since that is the
+    only shape the UI has to send; ``dict[str, Any]`` (rather than
+    ``dict[str, dict[str, Any]]``) lets that through so the pipeline can
+    resolve it instead of pydantic rejecting each label's string value as
+    "not a valid dictionary". See ``pipeline._resolve_coax_params``.
     """
 
     mode: str = Field(
@@ -125,7 +133,7 @@ class SimulationRequest(BaseModel):
     participant_id: Optional[int] = None
     condition_filter: Optional[dict[str, Any]] = None
     coax_strategies: Optional[dict[str, str]] = None
-    coax_params: Optional[dict[str, dict[str, Any]]] = None
+    coax_params: Optional[dict[str, Any]] = None
     coax_source: Optional[str] = Field(
         None,
         description=(

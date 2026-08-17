@@ -91,25 +91,44 @@ def test_run_dataset_stage_multi_dataset_corpus_covered_skips_training():
 
     study.prepare_dataset.assert_called_once()
     assert study.prepare_dataset.call_args.args[0] == ["wine_quality", "mushrooms"]
-    study.train_AI_model.assert_not_called()
-    assert result["model"] is None
+    study.train_AI_model_for_dataset.assert_not_called()
+    # dataset_result["models"] replaces the old single "model" key -- a
+    # multi-dataset study can mix corpus-covered and trained-for-real
+    # datasets, so each is reported on its own (see
+    # _finish_multi_dataset_stage). Both are corpus-covered here.
+    assert set(result["models"]) == {"wine_quality", "mushrooms"}
+    for entry in result["models"].values():
+        assert entry["model"] is None
+        assert "corpus" in entry["model_skipped_reason"]
     assert set(result["datasets"]) == {"wine_quality", "mushrooms"}
     assert result["datasets"]["wine_quality"]["dataset_id"] == "wine_quality"
-    assert "corpus" in result["model_skipped_reason"]
 
 
-def test_run_dataset_stage_multi_dataset_raises_for_an_uncovered_dataset():
+def test_run_dataset_stage_multi_dataset_trains_an_uncovered_dataset_for_real():
+    """A dataset the published corpus never collected (e.g. prima_diabetes)
+    used to make the whole multi-dataset stage raise -- it now trains a real
+    AI model for just that dataset (train_AI_model_for_dataset), leaving the
+    corpus-covered dataset(s) alone, rather than blocking the entire study."""
     study = MagicMock()
     study.design_export = DesignExport(
         raw={}, study_title="", research_questions=[], consent_text="",
         procedure_steps=[], ivs=[], model_framework="CoXAM",
     )
+    fake_by_id = {
+        "wine_quality": _prepared("wine_quality", train_ids=[1], test_ids=[2]),
+        "prima_diabetes": _prepared("prima_diabetes", train_ids=[3], test_ids=[4]),
+    }
+    study.prepare_dataset.return_value = fake_by_id
 
-    with pytest.raises(ValueError, match="prima_diabetes"):
-        run_dataset_stage(
-            study, DatasetStageRequest(dataset_id=["wine_quality", "prima_diabetes"])
-        )
-    study.prepare_dataset.assert_not_called()
+    result = run_dataset_stage(
+        study, DatasetStageRequest(dataset_id=["wine_quality", "prima_diabetes"])
+    )
+
+    study.prepare_dataset.assert_called_once()
+    study.train_AI_model_for_dataset.assert_called_once()
+    assert study.train_AI_model_for_dataset.call_args.args[0] == "prima_diabetes"
+    assert result["models"]["wine_quality"]["model"] is None
+    assert result["models"]["prima_diabetes"]["model_skipped_reason"] is None
 
 
 def test_run_dataset_stage_multi_dataset_rejects_sim2real():

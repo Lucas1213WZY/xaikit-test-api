@@ -91,7 +91,7 @@ def test_build_trial_sequence_routes_each_participant_to_their_own_level_pool():
 def test_init_trial_build_config_rejects_both_data_args():
     iv_config, cvs, _ = init_experiment_config()
     set_iv(iv_config, "xai_type", "within", ["decision_tree"])
-    with pytest.raises(ValueError, match="exactly one"):
+    with pytest.raises(ValueError, match="at most one"):
         init_trial_build_config(
             data=_fake_dataset("x", train_ids=[1], test_ids=[2]),
             iv_config=iv_config,
@@ -100,10 +100,60 @@ def test_init_trial_build_config_rejects_both_data_args():
         )
 
 
-def test_init_trial_build_config_rejects_neither_data_arg():
+def test_init_trial_build_config_allows_corpus_mode_with_allowed_instance_ids():
+    """data and data_by_dataset both unset, but allowed_instance_ids given:
+    corpus mode, e.g. a Sim2Real study with no prepared dataset at all."""
     iv_config, cvs, _ = init_experiment_config()
-    with pytest.raises(ValueError, match="exactly one"):
+    config = init_trial_build_config(
+        data=None,
+        iv_config=iv_config,
+        cvs=cvs,
+        allowed_instance_ids=[1, 2, 3],
+        num_training=0,
+    )
+    assert config.data is None
+    assert config.data_by_dataset is None
+    assert config.allowed_instance_ids == [1, 2, 3]
+
+
+def test_init_trial_build_config_rejects_neither_data_arg_nor_instance_ids():
+    """data, data_by_dataset and allowed_instance_ids all unset: nothing tells
+    trial generation which instances to sample from, whether from a prepared
+    dataset or (corpus mode) a fixed published corpus."""
+    iv_config, cvs, _ = init_experiment_config()
+    with pytest.raises(ValueError, match="allowed_instance_ids"):
         init_trial_build_config(data=None, iv_config=iv_config, cvs=cvs)
+
+
+def test_init_trial_build_config_corpus_mode_rejects_training_without_pool():
+    """num_training > 0 in corpus mode needs a training pool of its own --
+    there is no prepared dataset to draw an implicit training split from."""
+    iv_config, cvs, _ = init_experiment_config()
+    with pytest.raises(ValueError, match="training_instance_ids"):
+        init_trial_build_config(
+            data=None,
+            iv_config=iv_config,
+            cvs=cvs,
+            allowed_instance_ids=[1, 2, 3],
+            num_training=2,
+        )
+
+
+def test_init_trial_build_config_corpus_mode_accepts_training_instance_ids():
+    """training_instance_ids is corpus mode's training-side counterpart to
+    allowed_instance_ids -- e.g. Sim2Real's published corpus, which has both
+    a training split (10 instances) and a test split (29)."""
+    iv_config, cvs, _ = init_experiment_config()
+    config = init_trial_build_config(
+        data=None,
+        iv_config=iv_config,
+        cvs=cvs,
+        allowed_instance_ids=[10, 11, 12],
+        training_instance_ids=[1, 2],
+        num_training=2,
+    )
+    assert config.training_instance_ids == [1, 2]
+    assert config.num_training == 2
 
 
 def test_init_trial_build_config_blocks_ai_prediction_balancing_with_multi_dataset():

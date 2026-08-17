@@ -74,6 +74,7 @@ from .visualization import (
     plot_global_explanation_importance,
     plot_instance_explanation,
     plot_logistic_regression_instance_view,
+    plot_sim2real_explanation,
 )
 
 __all__ = [
@@ -143,4 +144,5 @@ __all__ = [
     "plot_global_explanation_importance",
     "plot_instance_explanation",
     "plot_logistic_regression_instance_view",
+    "plot_sim2real_explanation",
 ]

@@ -97,6 +97,17 @@ def get_trial_instance_explanation(
         (explanation_pool[INSTANCE_ID_COL].astype(int) == instance_id)
         & (explanation_pool[EXPLANATION_METHOD_COL].astype(str).str.lower() == xai_method)
     ]
+    if "xai_type" in explanation_pool.columns:
+        # A corpus-loaded pool (see combined_explanations_from_corpus) carries
+        # both the attribution and importance family under the same
+        # expMethod -- what differs is which published file a row came from,
+        # not a value expMethod alone can filter on. Disambiguating on the
+        # trial's own xai_type here is a no-op for a real-generated pool,
+        # which only ever generates one family per run and so never carries
+        # this column at all.
+        trial_xai_type = str(trial_info.get("xai_type", "")).strip().lower()
+        if trial_xai_type:
+            matches = matches[matches["xai_type"].astype(str).str.lower() == trial_xai_type]
     if matches.empty:
         return {}
 

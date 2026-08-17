@@ -7,7 +7,7 @@ import base64
 import html
 import json
 import uuid
-from contextlib import redirect_stdout
+from contextlib import contextmanager, redirect_stdout
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Optional, Sequence
@@ -34,6 +34,7 @@ from src.experiment_planner import (
 )
 from src.workflow_standard import (
     DEFAULT_EXPLANATION_INSTANCE_LIMIT,
+    PREDICTION_ONLY_METHOD,
     ensure_prediction_coverage,
 )
 import src.xai_adapter as xai_adapter_api
@@ -106,6 +107,22 @@ class xaikitTest:
         #: populated by ``prepare_dataset(dataset_id=[...])``. Empty for an
         #: ordinary single-dataset study.
         self.data_by_dataset: dict[str, PreparedDataset] = {}
+        #: Per-dataset equivalents of the singular training/explanation fields
+        #: below, populated by ``train_AI_model_for_dataset``/
+        #: ``explanations_for_dataset`` for a multi-dataset study whose
+        #: dataset(s) are not (fully) served by a published corpus -- e.g. one
+        #: level covered by CoAX's corpus and another that needs a real
+        #: trained model. A dataset served entirely by its corpus has no entry
+        #: here; ``use_dataset`` swaps in ``None``/unset for it, which is
+        #: correct because ``source="corpus"``/``"assets"`` reads neither.
+        self.trained_ai_model_by_dataset: dict[str, Any] = {}
+        self.model_manager_by_dataset: dict[str, Any] = {}
+        self.model_by_dataset: dict[str, Any] = {}
+        self.model_name_by_dataset: dict[str, Any] = {}
+        self.training_info_by_dataset: dict[str, Any] = {}
+        self.combined_explanations_by_dataset: dict[str, pd.DataFrame] = {}
+        self.combined_explanation_path_by_dataset: dict[str, Any] = {}
+        self.explanation_paths_by_dataset: dict[str, list[Path]] = {}
         self.model_manager = None
         self.model = None
         self.trained_ai_model = None
@@ -466,7 +483,59 @@ class xaikitTest:
         show_available: bool,
         show_summary: bool,
         cognitive_model_id: Optional[str],
+        custom_dataset: Optional[Any] = None,
     ) -> PreparedDataset:
+        if custom_dataset is not None:
+            # A caller-supplied TabularDataset (load_custom_dataset), not one
+            # of the 9 bundled ids. Feature selection below still applies --
+            # in particular the coax/coxam num_features fallback, since
+            # coax_loader_feature_cols/coxam_loader_feature_cols will always
+            # raise KeyError for a dataset_id they have never seen, correctly
+            # routing a custom dataset onto "rank by target correlation, keep
+            # the top 5/6" the same way any uncovered bundled dataset does.
+            if show_available:
+                print(f"Available training datasets: [{dataset_id!r} (custom)]")
+            resolved_agent = str(cognitive_model_id or self.cognitive_model_id or "").lower().strip()
+            if feature_cols is None and resolved_agent == "coxam" and num_features is None:
+                num_features = 6
+                rank_features_by_target = True
+            elif feature_cols is None and resolved_agent == "coax" and num_features is None:
+                num_features = 5
+                rank_features_by_target = True
+            return prepare_dataset(
+                dataset_id,
+                dataset=custom_dataset,
+                model_type=model_type,
+                feature_cols=feature_cols,
+                num_features=num_features,
+                rank_features_by_target=rank_features_by_target,
+                use_default_features=False,
+                requires_one_hot_encoding=requires_one_hot_encoding,
+                test_size=test_size,
+                random_state=random_state,
+                show_available=False,
+                show_summary=show_summary,
+            )
+
+        if str(dataset_id).lower().strip() == "sim2real":
+            # No standard raw dataset to split: Sim2Real's rows are a fixed
+            # published corpus, and its train/test split is that corpus's own
+            # `training`/`test` labels (deltas.csv), not a fresh
+            # train_test_split -- feature_cols/num_features/test_size/
+            # random_state do not apply and are silently ignored, the same way
+            # they would be for any other fixed-corpus source.
+            from src.data_loaders import print_dataset_split_summary
+            from src.virtual_experiment_executor.experiment_simualtion.Sim2Real.sim2real_trial_executor import (
+                build_sim2real_dataset_split,
+            )
+
+            if show_available:
+                print("Available training datasets:", ["sim2real (published corpus)"])
+            split = build_sim2real_dataset_split()
+            if show_summary:
+                print_dataset_split_summary(split)
+            return PreparedDataset(split=split)
+
         resolved_agent = str(cognitive_model_id or self.cognitive_model_id or "").lower().strip()
         if feature_cols is None and use_default_features and resolved_agent == "coxam":
             try:
@@ -526,6 +595,12 @@ class xaikitTest:
         self,
         dataset_id: str | Sequence[str],
         *,
+        csv_path: Optional[str] = None,
+        dataframe: Optional[Any] = None,
+        target_col: Optional[str] = None,
+        categorical_cols: Optional[Sequence[str]] = None,
+        positive_class: Optional[Any] = None,
+        threshold: Optional[float] = None,
         model_type: str = "mlp",
         feature_cols: Optional[Sequence[str]] = None,
         num_features: Optional[int] = None,
@@ -548,7 +623,30 @@ class xaikitTest:
                 and a ``dataset`` between-subjects IV with those levels is
                 registered automatically -- ``generate_trials()`` then samples
                 each participant's trials from only their assigned dataset,
-                never mixing instance ids across datasets.
+                never mixing instance ids across datasets. When ``csv_path``/
+                ``dataframe`` is given, this is just the name recorded on the
+                result -- it does not have to be one of the 9 bundled ids.
+            csv_path: Load a custom dataset from this CSV instead of one of
+                the bundled ids. Pass this or ``dataframe``, not both, and
+                pass ``target_col`` alongside either one. Not supported for
+                the multi-dataset (list of ids) form.
+            dataframe: Load a custom dataset from this in-memory dataframe
+                instead of one of the bundled ids. See ``csv_path``.
+            target_col: The column to predict, required with ``csv_path``/
+                ``dataframe``. Must have exactly two distinct values -- the
+                same binary-target restriction every bundled dataset already
+                has -- unless ``threshold`` or ``positive_class`` is given.
+            categorical_cols: Feature columns to treat as categorical beyond
+                the ones auto-detected by dtype (every non-numeric column).
+                Only used with ``csv_path``/``dataframe``.
+            positive_class: Which ``target_col`` value maps to class 1;
+                one-vs-rest for a target with any number of distinct values
+                (e.g. Iris' 3-class ``Species``). Ignored when ``threshold``
+                is given. Only used with ``csv_path``/``dataframe``.
+            threshold: Binarize a continuous/ordinal ``target_col`` as
+                ``target_col >= threshold`` -> class 1 -- most real target
+                columns are not already two-valued. Only used with
+                ``csv_path``/``dataframe``.
             model_type: Model the encoding should suit, e.g. ``mlp``.
             feature_cols: Use exactly these columns, skipping selection.
             num_features: Keep this many features when selecting.
@@ -576,13 +674,38 @@ class xaikitTest:
                 curated default (which can be a different count) -- CoXAM's
                 own datasets are always 6 features, so a freshly trained one
                 matches that shape. Has no effect when ``feature_cols`` is
-                given explicitly, or for any other agent.
+                given explicitly, or for any other agent. A custom dataset
+                (``csv_path``/``dataframe``) is never covered by either
+                corpus, so it always takes this top-N-by-target-correlation
+                path: 5 features for ``"coax"``, 6 for ``"coxam"``.
 
         Returns:
             The prepared dataset (single id), also stored on ``self.data``; or
             ``{dataset_id: PreparedDataset}`` (list of ids), also stored on
             ``self.data_by_dataset``.
         """
+        custom_dataset = None
+        if csv_path is not None or dataframe is not None:
+            if isinstance(dataset_id, (list, tuple)):
+                raise ValueError(
+                    "csv_path/dataframe is not supported for a multi-dataset "
+                    "study (dataset_id was a list)."
+                )
+            if target_col is None:
+                raise ValueError("target_col is required with csv_path/dataframe.")
+            from src.data_loaders import load_custom_dataset
+
+            custom_dataset = load_custom_dataset(
+                csv_path=csv_path,
+                dataframe=dataframe,
+                target_col=target_col,
+                feature_cols=feature_cols,
+                categorical_cols=categorical_cols,
+                positive_class=positive_class,
+                threshold=threshold,
+                dataset_name=str(dataset_id),
+            )
+
         if isinstance(dataset_id, (list, tuple)):
             dataset_ids = list(dataset_id)
             if len(dataset_ids) < 2:
@@ -623,9 +746,199 @@ class xaikitTest:
             show_available=show_available,
             show_summary=show_summary,
             cognitive_model_id=cognitive_model_id,
+            custom_dataset=custom_dataset,
         )
         self.data_by_dataset = {}
         return self.data
+
+    @contextmanager
+    def use_dataset(self, dataset_id: str):
+        """View one multi-dataset level's own training/explanation state as
+        the study's current singular one, so ``evaluate()``/``explanations()``/
+        ``_run_agent_experiment()``/the generic executor run unmodified
+        against it.
+
+        Read-only: whatever a caller does inside the block against the
+        singular fields (``self.data``, ``self.trained_ai_model``, ...) is
+        discarded on exit, restoring what was there before -- it does not
+        persist back into ``*_by_dataset``. ``train_AI_model_for_dataset``/
+        ``explanations_for_dataset`` are the counterparts that do persist,
+        since they are the only things meant to change a dataset's stored
+        state.
+        """
+        if dataset_id not in self.data_by_dataset:
+            raise KeyError(
+                f"No prepared dataset for dataset_id={dataset_id!r}. Prepared: "
+                f"{sorted(self.data_by_dataset)}."
+            )
+        saved = (
+            self.data, self.trained_ai_model, self.model_manager, self.model,
+            self.model_name, self.training_info, self.metrics,
+            self.ai_predictions_by_instance, self.combined_explanations,
+            self.combined_explanation_path, self.explanation_paths,
+        )
+        self.data = self.data_by_dataset[dataset_id]
+        self.trained_ai_model = self.trained_ai_model_by_dataset.get(dataset_id)
+        self.model_manager = self.model_manager_by_dataset.get(dataset_id)
+        self.model = self.model_by_dataset.get(dataset_id)
+        self.model_name = self.model_name_by_dataset.get(dataset_id)
+        self.training_info = self.training_info_by_dataset.get(dataset_id)
+        self.metrics = {}
+        self.ai_predictions_by_instance = None
+        self.combined_explanations = self.combined_explanations_by_dataset.get(dataset_id)
+        self.combined_explanation_path = self.combined_explanation_path_by_dataset.get(dataset_id)
+        self.explanation_paths = self.explanation_paths_by_dataset.get(dataset_id, [])
+        try:
+            yield self
+        finally:
+            (
+                self.data, self.trained_ai_model, self.model_manager, self.model,
+                self.model_name, self.training_info, self.metrics,
+                self.ai_predictions_by_instance, self.combined_explanations,
+                self.combined_explanation_path, self.explanation_paths,
+            ) = saved
+
+    def train_AI_model_for_dataset(self, dataset_id: str, **train_kwargs: Any) -> Any:
+        """Train a real AI model for one level of a multi-dataset study.
+
+        ``train_AI_model`` operates on ``self.data`` singular -- calling it
+        directly in a multi-dataset study would overwrite whichever dataset
+        was trained last onto the one shared ``self.trained_ai_model``, and
+        the next dataset's training would silently clobber it again. This
+        instead trains against ``self.data_by_dataset[dataset_id]``
+        specifically and stashes the result into the per-dataset stores, so
+        training dataset B never touches dataset A's already-trained model.
+
+        Args:
+            dataset_id: Which prepared dataset (from ``data_by_dataset``) to
+                train against.
+            **train_kwargs: Forwarded to ``train_AI_model`` (``model_type``,
+                ``target_score``, ...).
+
+        Returns:
+            The trained model, also stored in ``trained_ai_model_by_dataset``.
+        """
+        if dataset_id not in self.data_by_dataset:
+            raise KeyError(
+                f"No prepared dataset for dataset_id={dataset_id!r}. Prepared: "
+                f"{sorted(self.data_by_dataset)}."
+            )
+        original_data = self.data
+        self.data = self.data_by_dataset[dataset_id]
+        try:
+            self.train_AI_model(**train_kwargs)
+        finally:
+            self.trained_ai_model_by_dataset[dataset_id] = self.trained_ai_model
+            self.model_manager_by_dataset[dataset_id] = self.model_manager
+            self.model_by_dataset[dataset_id] = self.model
+            self.model_name_by_dataset[dataset_id] = self.model_name
+            self.training_info_by_dataset[dataset_id] = self.training_info
+            self.data = original_data
+            self.trained_ai_model = None
+            self.model_manager = None
+            self.model = None
+            self.model_name = None
+            self.training_info = None
+            self.ai_predictions_by_instance = None
+        return self.trained_ai_model_by_dataset[dataset_id]
+
+    def explanations_for_dataset(
+        self, dataset_id: str, **explanation_kwargs: Any
+    ) -> tuple[Optional[Path], Optional[pd.DataFrame]]:
+        """Generate one dataset's explanation table, for a multi-dataset study.
+
+        Requires ``train_AI_model_for_dataset(dataset_id, ...)`` to have run
+        first -- explanations need a real trained model to explain, and a
+        dataset served by a published corpus instead never needs this at all
+        (the corpus ships its own explanation vectors).
+        """
+        if self.trained_ai_model_by_dataset.get(dataset_id) is None:
+            raise KeyError(
+                f"No trained AI model for dataset_id={dataset_id!r}. Call "
+                "train_AI_model_for_dataset(dataset_id, ...) first -- or, if "
+                "this dataset is served by a published corpus, no explanation "
+                "table is needed for it at all."
+            )
+        with self.use_dataset(dataset_id):
+            path, table = self.explanations(**explanation_kwargs)
+            self.combined_explanations_by_dataset[dataset_id] = table
+            self.combined_explanation_path_by_dataset[dataset_id] = path
+            self.explanation_paths_by_dataset[dataset_id] = list(self.explanation_paths)
+        return path, table
+
+    def _stamp_resolved_xai_method_on_trials(
+        self, resolved_method: str, *, dataset_id: Optional[str] = None
+    ) -> None:
+        """Give every relevant trial a real ``xai_method`` value.
+
+        ``xai_type`` names the shown explanation family/condition (e.g. CoAX's
+        none/importance/attribution), which is not necessarily the same
+        vocabulary as the generated method name (CoAX's published corpus
+        explains a given dataset with one fixed method regardless of
+        xai_type -- see ``COAX_CORPUS_XAI_METHOD``). Without a real
+        ``xai_method`` value on each trial, ``get_trial_instance_explanation``
+        (the generic executor's lookup, used by baseline models) falls back to
+        ``xai_type`` and can never match the pool's real ``expMethod``,
+        silently treating every XAI-visible trial as if it had no explanation
+        -- a baseline that "succeeds" while reading nothing.
+
+        Args:
+            resolved_method: The one method every relevant trial should read
+                (a real ``expMethod`` value, e.g. ``"lime"``, not an
+                ``xai_type`` like ``"attribution"``).
+            dataset_id: Restrict to this dataset's own trial rows -- required
+                whenever ``self.trials`` is the *shared* multi-dataset trial
+                list (``explanations_for_dataset``/``load_coax_corpus_explanations``
+                call this once per dataset while it still is), since stamping
+                unscoped would also overwrite another dataset's trials with
+                this dataset's resolved method.
+        """
+        for trial in self.trials:
+            if dataset_id is not None and trial.get("dataId") != dataset_id:
+                continue
+            xai_type = str(trial.get("xai_type", "none")).strip().lower()
+            trial["xai_method"] = (
+                "none" if xai_type in {"none", "no_xai", "control"} else resolved_method
+            )
+
+    def load_coax_corpus_explanations(self, dataset_id: Optional[str] = None) -> pd.DataFrame:
+        """Load the published CoAX corpus's own explanation vectors as
+        ``combined_explanations``, for a declared baseline (KNN, ...) to read
+        without needing a real trained AI model.
+
+        A baseline reads predictions/explanations/features -- it does not
+        explain the AI model itself -- so a corpus-covered dataset can serve
+        it exactly the way ``run_coax_study(source='corpus')`` already serves
+        the primary agent, instead of generating a redundant real table.
+        Also stamps ``xai_method`` on this dataset's trials (see
+        ``_stamp_resolved_xai_method_on_trials``) -- without it the generic
+        executor's lookup silently finds nothing, even though the pool itself
+        is populated.
+
+        Args:
+            dataset_id: Which dataset's corpus rows to load; defaults to
+                ``self.data.dataset_id`` for a single-dataset study.
+
+        Returns:
+            The loaded table, also stored on ``combined_explanations``.
+        """
+        from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_human_replay import (
+            combined_explanations_from_corpus,
+        )
+
+        resolved_dataset_id = dataset_id or getattr(self.data, "dataset_id", None)
+        if resolved_dataset_id is None:
+            raise RuntimeError(
+                "No dataset to load corpus explanations for. Call prepare_dataset(...) first."
+            )
+        pool = combined_explanations_from_corpus(resolved_dataset_id)
+        real_methods = pool.loc[pool["expMethod"] != PREDICTION_ONLY_METHOD, "expMethod"]
+        if not real_methods.empty and "xai_method" not in self.iv_config:
+            self._stamp_resolved_xai_method_on_trials(
+                str(real_methods.iloc[0]), dataset_id=resolved_dataset_id
+            )
+        self.combined_explanations = pool
+        return pool
 
     def generate_trials(
         self,
@@ -641,6 +954,7 @@ class xaikitTest:
         shuffle_instances: bool = True,
         max_trial_instances: Optional[int] = DEFAULT_EXPLANATION_INSTANCE_LIMIT,
         allowed_instance_ids: Optional[Sequence[int]] = None,
+        training_instance_ids: Optional[Sequence[int]] = None,
         seed: int = 42,
         output_dir: str | Path = "experiment_output",
         preview_rows: int = 10,
@@ -652,10 +966,13 @@ class xaikitTest:
             model_name: Name recorded on the trials; defaults to the trained model.
             participants_per_between_condition: Simulated participants per
                 between-subjects cell.
-            num_training: Instances shown in the training phase.
+            num_training: Instances shown in the training phase. In corpus
+                mode, drawn from ``training_instance_ids`` instead of a
+                prepared dataset's own training split.
             num_testing: Held-out instances shown in the testing phase.
             balance_by_ai_prediction: Draw each phase equally from both predicted
-                classes. Requires a trained or loaded AI model.
+                classes. Requires a trained or loaded AI model; not available
+                in corpus mode.
             counterbalancing_strategy: How conditions are ordered across
                 participants; ``auto`` picks from the design.
             trial_randomization_strategy: How trials are ordered within a
@@ -669,6 +986,21 @@ class xaikitTest:
                 corpus can serve -- pass
                 ``CoAXAssetRepository.available_instance_ids()`` to keep trials
                 runnable against a fixed study set. Unset samples freely.
+
+                **Corpus mode:** if no dataset was prepared (``prepare_dataset()``
+                was never called, so ``self.data`` is ``None``) and this is
+                given, trials are built directly from these ids instead of a
+                prepared dataset's split -- e.g. a Sim2Real study, whose
+                stimuli are a fixed published corpus:
+                ``allowed_instance_ids=sim2real_available_instance_ids(split="test")``.
+                Incompatible with ``balance_by_ai_prediction``. If
+                ``num_training > 0`` in this mode, also pass
+                ``training_instance_ids``.
+            training_instance_ids: Corpus mode's training pool, the
+                training-side counterpart to ``allowed_instance_ids`` --
+                e.g. ``sim2real_available_instance_ids(split="training")``.
+                Required if ``num_training > 0`` in corpus mode; unused
+                otherwise.
             seed: Seed for sampling and ordering.
             output_dir: Where the trial tables are written.
             preview_rows: Rows to print when ``show`` is True.
@@ -684,6 +1016,17 @@ class xaikitTest:
                 raise ValueError(
                     "balance_by_ai_prediction is not yet supported for a "
                     "multi-dataset study (prepare_dataset was given a list of ids)."
+                )
+            data = None
+        elif self.data is None and allowed_instance_ids is not None:
+            # Corpus mode: no prepared dataset, trials sample directly from an
+            # externally supplied instance pool -- e.g. Sim2Real's published
+            # corpus, which prepare_dataset() never touches.
+            if balance_by_ai_prediction:
+                raise ValueError(
+                    "balance_by_ai_prediction needs a trained AI model's "
+                    "predictions, which corpus mode (no "
+                    "prepare_dataset()/train_AI_model()) never has."
                 )
             data = None
         else:
@@ -721,6 +1064,7 @@ class xaikitTest:
             shuffle_instances=shuffle_instances,
             max_trial_instances=max_trial_instances,
             allowed_instance_ids=allowed_instance_ids,
+            training_instance_ids=training_instance_ids,
             seed=seed,
             output_dir=self._resolve_output_path(output_dir),
         )
@@ -1191,22 +1535,7 @@ class xaikitTest:
             )
 
         if "xai_method" not in self.iv_config and len(resolved_methods) == 1 and self.trials:
-            # `xai_type` names the shown explanation family/condition (e.g.
-            # CoAX's none/importance/attribution), which is not necessarily
-            # the same vocabulary as the generated method name (CoAX's
-            # published corpus explains a given dataset with one fixed
-            # method regardless of xai_type -- see COAX_CORPUS_XAI_METHOD).
-            # Without a real `xai_method` value on each trial,
-            # `get_trial_instance_explanation` (the generic executor's
-            # lookup, used by baseline models) falls back to `xai_type` and
-            # can never match the pool's real `expMethod`, silently treating
-            # every XAI-visible trial as if it had no explanation.
-            resolved_method = str(resolved_methods[0])
-            for trial in self.trials:
-                xai_type = str(trial.get("xai_type", "none")).strip().lower()
-                trial["xai_method"] = (
-                    "none" if xai_type in {"none", "no_xai", "control"} else resolved_method
-                )
+            self._stamp_resolved_xai_method_on_trials(str(resolved_methods[0]))
 
         if methods is None and show_checks:
             print(f"Using stored XAI methods from the design: {resolved_methods}")
@@ -1612,19 +1941,30 @@ class xaikitTest:
                 "Call generate_trials() on this study first."
             )
 
-        original_data, original_trials = self.data, self.trials
+        original_trials = self.trials
         results: list[pd.DataFrame] = []
         try:
             for level in levels:
-                self.data = self.data_by_dataset[level]
                 self.trials = trials_by_level[level]
-                agent_results = self._run_agent_experiment(
-                    mode=mode,
-                    participant_id=participant_id,
-                    condition_filter=condition_filter,
-                    explanation_pool=explanation_pool,
-                    runner_kwargs=dict(runner_kwargs),
-                )
+                level_kwargs = dict(runner_kwargs)
+                # A dataset this study trained a real model for (see
+                # train_AI_model_for_dataset) needs source="study"/"fit"; one
+                # served entirely by a published corpus needs "corpus"/
+                # "assets". Mixed multi-dataset studies need this decided per
+                # level, so the server passes a {level: source} mapping here
+                # instead of one flat string when it knows the mix -- a plain
+                # string (or nothing) is left alone, same as before.
+                source = level_kwargs.get("source")
+                if isinstance(source, dict):
+                    level_kwargs["source"] = source.get(level)
+                with self.use_dataset(level):
+                    agent_results = self._run_agent_experiment(
+                        mode=mode,
+                        participant_id=participant_id,
+                        condition_filter=condition_filter,
+                        explanation_pool=explanation_pool,
+                        runner_kwargs=level_kwargs,
+                    )
                 if agent_results is None:
                     raise ValueError(
                         "Multi-dataset simulation requires a research-agent "
@@ -1640,7 +1980,7 @@ class xaikitTest:
                 tagged[DATASET_IV_NAME] = level
                 results.append(tagged)
         finally:
-            self.data, self.trials = original_data, original_trials
+            self.trials = original_trials
 
         if not results:
             raise RuntimeError(
@@ -2180,20 +2520,33 @@ class xaikitTest:
             # Unlike CoXAM, a CoAX xai_type level (none/importance/attribution)
             # does not decide the method -- the published corpus explains a
             # given dataset with exactly one method regardless of xai_type
-            # (see COAX_CORPUS_XAI_METHOD), so a single-dataset study resolves
-            # to that one method rather than generating every method CoAX has
-            # ever used. Falls back to the framework default (both methods)
-            # for a dataset outside the corpus, or a multi-dataset study,
-            # where there is no single dataset to resolve against.
+            # (see COAX_CORPUS_XAI_METHOD), so a study resolves to that one
+            # method rather than generating every method CoAX has ever used.
+            # ``self.data`` (not ``data_by_dataset``) is the source of truth
+            # for which single dataset applies: a plain single-dataset study
+            # sets it directly, and ``explanations_for_dataset``'s
+            # ``use_dataset`` swap sets it just as unambiguously for one level
+            # of a multi-dataset study -- ``data_by_dataset`` being populated
+            # at the same time does not make the dataset any less known.
             from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_trial_executor import (
                 COAX_CORPUS_XAI_METHOD,
             )
 
             data = getattr(self, "data", None)
-            if data is not None and not getattr(self, "data_by_dataset", None):
+            if data is not None:
                 method = COAX_CORPUS_XAI_METHOD.get(data.dataset_id)
                 if method:
                     return [method]
+                # No corpus precedent for this dataset (a freshly-trained one,
+                # e.g. mushrooms) -- CoAX still only ever needs one explanation
+                # vector per instance (attribution/importance are the same
+                # vector, abs-transformed), so generating every framework
+                # method here would leave trials with no xai_method column to
+                # disambiguate between them at simulation time. Default to the
+                # framework's first method rather than all of them.
+                default_methods = self.XAI_METHODS_BY_FRAMEWORK.get(framework, ())
+                if default_methods:
+                    return [default_methods[0]]
         return list(self.XAI_METHODS_BY_FRAMEWORK.get(framework, ()))
 
     def _iv_config_for_explanations(

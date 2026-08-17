@@ -462,13 +462,23 @@ def _run_coax_study_from_corpus(
         )
         if method_trials.empty:
             continue
+        # "none"/"no_xai"/"control" is not a real corpus method -- it's what
+        # _stamp_resolved_xai_method_on_trials writes for a trial whose
+        # xai_type displays no explanation at all. get_trial_payload already
+        # skips the explanation lookup for those via xai_type, not xai_method,
+        # so no method filter is needed (or servable: the corpus never
+        # collected an explanation for a condition that never showed one).
+        # Treated the same as the "no xai_method column at all" case below.
+        repository_method = (
+            None if str(method).strip().lower() in {"none", "no_xai", "control"} else method
+        )
         runs.append(
             run_coax_experiment_executor(
                 method_trials,
                 models,
                 mode="whole_experiment",
                 data_repository=build_coax_study_repository(
-                    resolved_data_id, method, tables=tables
+                    resolved_data_id, repository_method, tables=tables
                 ),
                 train_with_explanation=train_with_explanation,
                 dvs=getattr(study, "DVs", None) if dvs is None else dvs,

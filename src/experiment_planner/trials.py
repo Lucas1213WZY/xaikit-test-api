@@ -66,6 +66,11 @@ class TrialBuildConfig:
     #: participant's trials then sample only from their own assigned dataset's
     #: instances instead of one dataset shared by everyone.
     data_by_dataset: Optional[dict[str, PreparedDataset]] = None
+    #: Corpus mode's training pool: a fixed published corpus (data and
+    #: data_by_dataset both None) has no PreparedDataset to draw a training
+    #: split from, so its training instances -- if it has any -- are named
+    #: here directly, the training-side counterpart to allowed_instance_ids.
+    training_instance_ids: Optional[Sequence[int]] = None
 
 
 @dataclass
@@ -110,12 +115,16 @@ def init_trial_build_config(
     trials_json: str = "trials.json",
     summary_json: str = "design_summary.json",
     data_by_dataset: Optional[dict[str, PreparedDataset]] = None,
+    training_instance_ids: Optional[Sequence[int]] = None,
 ) -> TrialBuildConfig:
     """Collect trial-generation settings in one notebook-friendly config object.
 
     Args:
-        data: The prepared dataset trials are sampled from. Pass ``None`` (and
-            use ``data_by_dataset`` instead) for a multi-dataset study.
+        data: The prepared dataset trials are sampled from. Pass ``None`` for a
+            multi-dataset study (use ``data_by_dataset`` instead) or a
+            corpus-backed study with no prepared dataset at all (use
+            ``allowed_instance_ids`` instead, and leave ``data_by_dataset``
+            unset too).
         iv_config: Independent variables defining the conditions. For a
             multi-dataset study this must declare a between-subjects IV named
             ``DATASET_IV_NAME`` ("dataset") whose levels match
@@ -123,18 +132,26 @@ def init_trial_build_config(
         cvs: Control variables recorded on each trial.
         model_name: Name recorded on the trials.
         participants_per_between_condition: Participants per between-subjects cell.
-        num_training: Instances shown in the training phase.
+        num_training: Instances shown in the training phase. In corpus mode
+            (``data`` and ``data_by_dataset`` both ``None``) this many are
+            drawn from ``training_instance_ids`` instead of a prepared
+            dataset's own training split -- 0 if the corpus has no training
+            instances at all.
         num_testing: Held-out instances shown in the testing phase.
         ai_predictions_by_instance: Predicted label per instance, required for
             prediction-balanced sampling. Not yet supported together with
-            ``data_by_dataset``.
+            ``data_by_dataset`` or in corpus mode.
         counterbalancing_strategy: How conditions are ordered across
             participants; ``auto`` picks from the design.
         trial_randomization_strategy: How trials are ordered within a participant.
         instance_wise_explanation: Give each instance its own explanation.
         shuffle_instances: Shuffle the instance pool before sampling.
         max_trial_instances: Cap on distinct instances used.
-        allowed_instance_ids: Restrict sampling to these instances.
+        allowed_instance_ids: Restrict sampling to these instances. In corpus
+            mode (``data`` and ``data_by_dataset`` both ``None``) this is
+            required and *is* the testing instance pool, not just a filter on
+            one -- e.g. ``sim2real_available_instance_ids(split="test")`` for
+            a Sim2Real study, which has no locally prepared dataset at all.
         seed: Seed for sampling and ordering.
         output_dir: Directory the artifacts are written to.
         trials_csv: Filename for the trial table.
@@ -143,6 +160,12 @@ def init_trial_build_config(
         data_by_dataset: Multi-dataset alternative to ``data`` -- one prepared
             dataset per level of the ``DATASET_IV_NAME`` between-subjects IV,
             keyed by dataset id.
+        training_instance_ids: Corpus mode's training pool, the training-side
+            counterpart to ``allowed_instance_ids`` -- e.g.
+            ``sim2real_available_instance_ids(split="training")``. Required if
+            ``num_training > 0`` in corpus mode; ignored otherwise (and
+            ignored outside corpus mode, where training instances come from
+            the prepared dataset as usual).
 
     Returns:
         The assembled config, ready for ``generate_experimental_trials``.
@@ -151,8 +174,30 @@ def init_trial_build_config(
         raise ValueError("num_training cannot be negative.")
     if num_testing < 1:
         raise ValueError("num_testing must be at least 1.")
-    if (data is None) == (data_by_dataset is None):
-        raise ValueError("Pass exactly one of data or data_by_dataset.")
+    if data is not None and data_by_dataset is not None:
+        raise ValueError("Pass at most one of data or data_by_dataset.")
+    corpus_mode = data is None and data_by_dataset is None
+    if corpus_mode and not allowed_instance_ids:
+        raise ValueError(
+            "Pass data, data_by_dataset, or allowed_instance_ids. The last is "
+            "for a study whose instances come from a fixed published corpus "
+            "rather than a locally prepared dataset (e.g. Sim2Real) -- pass "
+            "the corpus's own instance ids, e.g. "
+            "sim2real_available_instance_ids(split='test')."
+        )
+    if corpus_mode and num_training > 0 and not training_instance_ids:
+        raise ValueError(
+            "num_training > 0 in corpus mode (data=None, data_by_dataset=None) "
+            "requires training_instance_ids -- the training-side counterpart "
+            "to allowed_instance_ids, e.g. "
+            "sim2real_available_instance_ids(split='training')."
+        )
+    if corpus_mode and ai_predictions_by_instance is not None:
+        raise ValueError(
+            "AI-prediction-balanced sampling is not supported in corpus mode: "
+            "it requires a trained AI model, which corpus mode (no "
+            "prepare_dataset/train_AI_model) never has."
+        )
     if data_by_dataset is not None and ai_predictions_by_instance is not None:
         raise ValueError(
             "AI-prediction-balanced sampling is not yet supported for "
@@ -174,6 +219,9 @@ def init_trial_build_config(
         max_trial_instances=max_trial_instances,
         data_by_dataset=data_by_dataset,
         allowed_instance_ids=list(allowed_instance_ids) if allowed_instance_ids is not None else None,
+        training_instance_ids=(
+            list(training_instance_ids) if training_instance_ids is not None else None
+        ),
         seed=seed,
         output_dir=Path(output_dir),
         trials_csv=trials_csv,
@@ -218,6 +266,7 @@ def generate_experimental_trials(
     )
 
     multi_dataset = config.data_by_dataset is not None
+    corpus_mode = config.data is None and not multi_dataset
     if multi_dataset and DATASET_IV_NAME not in experiment_structure.between_ivs:
         raise ValueError(
             f"data_by_dataset was given, but iv_config has no between-subjects "
@@ -283,6 +332,48 @@ def generate_experimental_trials(
             train_instance_ids=None,
             train_instance_ids_by_level=train_instance_ids_by_level,
             dataset_id=None,
+            num_training=config.num_training,
+            condition_columns=[
+                *experiment_structure.between_ivs,
+                *experiment_structure.block_within_ivs,
+            ],
+            test_only_columns=list(experiment_structure.trial_within_ivs),
+            seed=config.seed,
+        )
+        # config.ai_predictions_by_instance is guaranteed None here --
+        # init_trial_build_config already rejects that combination.
+    elif corpus_mode:
+        # No PreparedDataset at all: allowed_instance_ids (required and
+        # validated non-empty by init_trial_build_config) *is* the instance
+        # pool, not a filter on one -- e.g. Sim2Real's published corpus, which
+        # study.prepare_dataset() never touches.
+        trial_instance_ids = list(dict.fromkeys(int(i) for i in config.allowed_instance_ids))
+        if config.max_trial_instances is not None:
+            trial_instance_ids = trial_instance_ids[:config.max_trial_instances]
+        instance_pool = [
+            {"dataId": "corpus", "instanceId": str(instance_id)}
+            for instance_id in trial_instance_ids
+        ]
+
+        trials = build_trial_sequence(
+            assignments=assignments,
+            instance_pool=instance_pool,
+            trials_per_participant=config.num_testing,
+            controlled_vars=controlled_vars,
+            id_map={"dataId": "dataId", "instanceId": "instanceId"},
+            trial_randomized_ivs=experiment_structure.trial_within_ivs or None,
+            trial_randomization_strategy=config.trial_randomization_strategy,
+            instance_wise_explanation=config.instance_wise_explanation,
+            shuffle_instances=config.shuffle_instances,
+            seed=config.seed,
+        )
+        # init_trial_build_config already requires training_instance_ids
+        # whenever num_training > 0 here, so an empty list only happens when
+        # num_training is 0 too (the corpus has no training instances).
+        trials = _add_training_and_testing_phases(
+            trials,
+            train_instance_ids=list(config.training_instance_ids or []),
+            dataset_id="corpus",
             num_training=config.num_training,
             condition_columns=[
                 *experiment_structure.between_ivs,
@@ -369,6 +460,8 @@ def generate_experimental_trials(
             config.data.dataset_id
             if config.data is not None
             else list(config.data_by_dataset)
+            if config.data_by_dataset is not None
+            else "corpus"
         ),
         "id_map": {"dataId": "dataId", "instanceId": "instanceId"},
     }

@@ -37,6 +37,7 @@ __version__ = "0.1.0"
 # Core API
 from .unified_loader import UnifiedDataLoader
 from .xai_dataset import CognitiveExplanationRecord, XAIDatasetLoader, XAIDatasetParser
+from .custom_dataset import load_custom_dataset
 from .original_dataset import list_original_datasets, load_original_dataset
 from .workflow import (
     DEFAULT_DATASET_FEATURES,
@@ -73,6 +74,7 @@ __all__ = [
     "CognitiveExplanationRecord",
     "DEFAULT_DATASET_FEATURES",
     "get_default_feature_cols",
+    "load_custom_dataset",
     "load_original_dataset",
     "list_original_datasets",
     "DatasetSplit",

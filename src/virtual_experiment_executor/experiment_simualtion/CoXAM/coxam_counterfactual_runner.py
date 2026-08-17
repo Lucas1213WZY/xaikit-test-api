@@ -17,6 +17,7 @@ combo saving, and forward-trial priming being required before
 from __future__ import annotations
 
 import os
+import warnings
 from typing import Any, Mapping, Optional, Sequence
 
 import numpy as np
@@ -49,6 +50,13 @@ _CONDITION_TO_XAI_TYPE = {
     "decision_tree": "DT",
     "linear_regression": "LR",
     "hybrid": "DT+LR",
+}
+
+#: Matches ``coxam_study_runner._TASK_BY_DV_NAME`` -- kept local rather than
+#: imported to avoid coupling the two runners' module-load order.
+_TASK_BY_DV_NAME: dict[str, str] = {
+    "forward_accuracy": "forward",
+    "counterfactual_accuracy": "counterfactual",
 }
 
 
@@ -111,15 +119,29 @@ def _result_row(
     """One output row per trial, matching the forward runner's shape.
 
     The counterfactual DV is ``success``: whether the change the participant
-    named actually flipped the AI's prediction. It fills any DV whose name
-    mentions accuracy, the same convention the forward runner and
-    ``run_experiment_executor`` use.
+    named actually flipped the AI's prediction. It fills DV(s) whose name
+    maps to the counterfactual task -- never ``forward_accuracy``, which
+    names the *other* agent's run (see ``coxam_study_runner._result_row``,
+    which is the mirror-image guard for the forward side).
     """
     success = info.get("success")
+    scorable = [
+        name for name in (dvs or {}) if "accuracy" in name.lower() or "success" in name.lower()
+    ]
+    mislabelled = [
+        name for name in scorable if _TASK_BY_DV_NAME.get(name, "counterfactual") != "counterfactual"
+    ]
+    if mislabelled and success is not None:
+        warnings.warn(
+            f"This is a counterfactual-simulation run, but DV(s) {sorted(mislabelled)} name "
+            "another task and will be left unfilled here. Run once per task (see "
+            "DesignExport.user_tasks) and combine the results.",
+            stacklevel=2,
+        )
     dv_columns = {
         name: int(success)
-        for name in (dvs or {})
-        if ("accuracy" in name.lower() or "success" in name.lower()) and success is not None
+        for name in scorable
+        if name not in mislabelled and success is not None
     }
     return {
         **dv_columns,

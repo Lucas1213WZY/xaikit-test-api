@@ -557,6 +557,138 @@ def plot_explanation_visual(
     return fig, axes
 
 
+def plot_sim2real_explanation(
+    pair: Any,
+    *,
+    title: Optional[str] = None,
+    income_labels: Tuple[str, str] = ("Below $50,000", "Above $50,000"),
+    show_ai_prediction: bool = True,
+):
+    """Plot one Sim2Real instance's projected explanation.
+
+    Mirrors the apparatus's own trial screen
+    (``xaikit-test-ui-apparatus/local/sim2real/study.html``): one row per raw
+    feature, a centre-anchored bar colored red for an attribution that pushes
+    the prediction toward the lower-income class and blue for one that pushes
+    it toward the higher-income class -- the same color convention
+    ``plot_explanation_visual`` uses. The changed feature -- the counterfactual
+    manipulation the participant was asked to reason about -- is highlighted,
+    the same role the apparatus's yellow "Change to consider" panel plays.
+
+    Unlike ``plot_explanation_visual``, this takes a projected pair rather than
+    a raw explanation table: Sim2Real's 67 encoded dimensions are already
+    reduced to the study's 12 raw features (age, education, ...) with the
+    active one-hot level resolved per instance, and there is no
+    ``PreparedDataset`` to read a raw-value meter from.
+
+    Args:
+        pair: One instance's projection, from
+            ``Sim2RealAttributionProjector.project(instance_id, exp_property=...)``.
+            Pass ``normalize_by_i_max=True`` there to scale bars the same way
+            the apparatus's own chart does (each row against its own
+            explanation's largest attribution); without it, bars here scale to
+            the largest attribution among the features shown instead.
+        title: Figure title; built from ``pair`` if omitted.
+        income_labels: Axis-end labels for the two prediction classes
+            (index 0 = negative/lower, index 1 = positive/higher).
+        show_ai_prediction: Show the AI's original prediction alongside the
+            explanation, the same panel ``plot_explanation_visual`` draws.
+
+    Returns:
+        ``(figure, axes)``.
+    """
+    import matplotlib
+
+    _patch_matplotlib_inline_rcparams(matplotlib)
+    import matplotlib.pyplot as plt
+
+    features = list(pair.feature_names)
+    original_values = list(pair.original_feature_values)
+    changed_values = list(pair.changed_feature_values)
+    attributions = np.asarray(pair.original_attributions, dtype=float)
+    changed_features = set(pair.changed_feature_names)
+
+    row_count = len(features)
+    y_positions = np.arange(row_count)
+    fig_height = max(4, 0.55 * row_count + 1.6)
+    width_ratios = [2.0, 1.8, 2.7]
+    if show_ai_prediction:
+        width_ratios.append(2.0)
+    fig, axes = plt.subplots(
+        1,
+        len(width_ratios),
+        figsize=(9.5 if show_ai_prediction else 7.5, fig_height),
+        gridspec_kw={"width_ratios": width_ratios},
+    )
+    attr_ax, value_ax, panel_ax = axes[:3]
+    pred_ax = axes[3] if show_ai_prediction else None
+
+    non_panel_axes = [attr_ax, value_ax]
+    if pred_ax is not None:
+        non_panel_axes.append(pred_ax)
+    for ax in non_panel_axes + [panel_ax]:
+        ax.set_ylim(-0.8, row_count - 0.2)
+        ax.invert_yaxis()
+        ax.axis("off")
+
+    attr_ax.set_title("Feature", fontweight="bold", pad=10)
+    value_ax.set_title("Value", fontweight="bold", pad=10)
+    panel_ax.set_title("Attribution", fontweight="bold", pad=10)
+
+    # The changed feature's row gets a light highlight band across every
+    # panel, echoing the apparatus's yellow "Change to consider" panel.
+    for idx, feature in enumerate(features):
+        if feature in changed_features:
+            for ax in non_panel_axes + [panel_ax]:
+                ax.axhspan(idx - 0.4, idx + 0.4, color="#fff6d9", zorder=0)
+
+    for idx, feature in enumerate(features):
+        is_changed = feature in changed_features
+        label_color = "#b0790a" if is_changed else "#111111"
+        label_text = _format_feature_label(feature) + (" *" if is_changed else "")
+        attr_ax.text(
+            1.0, idx, label_text, ha="right", va="center",
+            color=label_color, fontsize=11,
+            fontweight="bold" if is_changed else "normal",
+        )
+
+        if is_changed:
+            value_text = (
+                f"{_format_feature_value(original_values[idx])} "
+                f"→ {_format_feature_value(changed_values[idx])}"
+            )
+            value_ax.text(0.5, idx, value_text, ha="center", va="center", fontsize=10, color="#b0790a")
+        else:
+            value_ax.text(0.5, idx, _format_feature_value(original_values[idx]), ha="center", va="center", fontsize=11)
+
+    max_value = max(float(np.abs(attributions).max()), 1e-9)
+    panel_ax.set_xlim(-max_value * 1.15, max_value * 1.15)
+    colors = ["#ef2d32" if value < 0 else "#3f8ee8" for value in attributions]
+    panel_ax.barh(y_positions, attributions, height=0.55, color=colors, zorder=2)
+    panel_ax.axvline(0, color="#222222", linewidth=0.9, zorder=1)
+    panel_ax.text(-max_value, row_count - 0.05, income_labels[0], color="#ef2d32", ha="left", va="top")
+    panel_ax.text(max_value, row_count - 0.05, income_labels[1], color="#3f8ee8", ha="right", va="top")
+    panel_ax.set_yticks([])
+    panel_ax.set_xticks([])
+    for spine in panel_ax.spines.values():
+        spine.set_visible(True)
+        spine.set_linewidth(1.3)
+
+    if pred_ax is not None:
+        pred_ax.set_xlim(0, 1)
+        pred_ax.text(0.5, 0.30, "AI prediction", ha="center", va="center", fontweight="bold", fontsize=11)
+        pred_label = income_labels[pair.ai_prediction]
+        pred_ax.add_patch(plt.Rectangle((0.12, 0.55), 0.76, 0.55, fill=False, linewidth=1.3, color="#111111"))
+        pred_ax.text(0.5, 0.82, pred_label, ha="center", va="center", color=_class_text_color(pair.ai_prediction), fontsize=12)
+
+    if title is None:
+        property_label = pair.exp_property or "baseline"
+        title = f"Sim2Real instance {pair.instance_id} — {property_label}"
+    fig.suptitle(title, y=1.02, fontweight="bold")
+    fig.tight_layout()
+    return fig, axes
+
+
 def plot_logistic_regression_instance_view(
     surrogate: Any,
     instance: Any,
