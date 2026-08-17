@@ -507,6 +507,24 @@ def run_coxam_study(
         # different observation space and a different DV, so it has its own
         # runner. Bundle construction and the coverage preflight above are
         # shared, which is why the dispatch happens here rather than earlier.
+        #
+        # Unlike forward's source="assets" surrogate-reading path, this always
+        # needs a real trained_ai_model: it evaluates arbitrary participant-
+        # proposed feature perturbations, which no static corpus table can
+        # answer. The source == "fit" guard above does not cover this --
+        # source="assets" reaches here too whenever the design's own task
+        # routing (not this call's source) says counterfactual -- so without
+        # this, a None model reaches predict_fn below and crashes with an
+        # AttributeError that names neither the cause nor the fix.
+        if trained_ai_model is None:
+            raise RuntimeError(
+                "Counterfactual simulation needs a real trained AI model to "
+                "evaluate arbitrary perturbed instances -- the published corpus "
+                "only covers forward simulation's fixed instance set. Call "
+                "study.train_AI_model(...) first (the dataset stage should "
+                "already do this for a design whose DVs/user_task ask for the "
+                "counterfactual task -- see _coxam_needs_real_generation)."
+            )
         from .coxam_counterfactual_runner import run_coxam_counterfactual_study
 
         # Resolved once: the transform refits its one-hot encoder per call, and

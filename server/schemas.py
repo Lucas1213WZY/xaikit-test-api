@@ -144,6 +144,19 @@ class SimulationRequest(BaseModel):
             "(a corpus-covered dataset -- see /dataset's model_skipped_reason)."
         ),
     )
+    coxam_task: Optional[str] = Field(
+        None,
+        description=(
+            "CoXAM designs only. 'forward' or 'counterfactual', forcing which "
+            "agent this call runs. CoXAM runs the two tasks as separate agents "
+            "(see DesignExport.user_tasks), so a design naming both "
+            "forward_accuracy and counterfactual_accuracy as DVs needs one "
+            "/simulate call per task -- pass this to get the second one, then "
+            "combine the two runs' results. Defaults to whatever the trials' own "
+            "user_task column says (from a design that varies task as an IV), "
+            "or forward_accuracy if neither says otherwise."
+        ),
+    )
     coxam_policy: Optional[str] = Field(
         None,
         description=(

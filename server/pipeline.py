@@ -239,6 +239,26 @@ def _coax_needs_real_generation(design: Any, framework: str, dataset_id: str) ->
     return not set(declared) <= (_coax_corpus_methods(dataset_id) | {"none"})
 
 
+def _coxam_needs_real_generation(design: Any, framework: str) -> bool:
+    """Whether this design's counterfactual task forces real CoXAM training,
+    overriding a corpus-covered dataset's usual skip.
+
+    CoXAM's published corpus stores fitted DT/LR surrogates and static
+    predictions for a fixed instance set -- ``run_coxam_study(source="assets")``
+    reads those directly for forward simulation, but counterfactual simulation
+    evaluates arbitrary participant-proposed feature perturbations against the
+    real AI model (see ``counterfactual_env.py``'s ``predict_fn``), which no
+    static corpus table can answer. A design whose DVs/``user_task`` ask for
+    the counterfactual task needs a real ``trained_ai_model`` even on a dataset
+    CoXAM's corpus otherwise covers -- skipping training here would let a later
+    ``/simulate`` call for that task crash on a ``None`` model instead of
+    surfacing the cause at the dataset stage.
+    """
+    if framework != "coxam":
+        return False
+    return "counterfactual_simulation" in getattr(design, "user_tasks", [])
+
+
 def _coax_baseline_servable_from_corpus(design: Any, framework: str, dataset_id: str) -> bool:
     """Whether a declared ``mlProxyBaselines`` model can read this dataset's
     published CoAX corpus directly instead of needing a real trained model.
@@ -396,8 +416,10 @@ def _finish_multi_dataset_stage(
     models_payload: dict[str, Any] = {}
     for dataset_id in dataset_ids:
         skip_reason = _corpus_skip_reason(framework, dataset_id)
-        needs_real = skip_reason is None or _coax_needs_real_generation(
-            study.design_export, framework, dataset_id
+        needs_real = (
+            skip_reason is None
+            or _coax_needs_real_generation(study.design_export, framework, dataset_id)
+            or _coxam_needs_real_generation(study.design_export, framework)
         )
         if not needs_real:
             # run_coxam_study(source="assets")/run_coax_study(source="corpus")
@@ -454,7 +476,12 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
       predictions and DT/LR surrogates, never ``trained_ai_model``. Training
       here would be a full MLP run spent on a model nothing downstream reads.
       A CoXAM dataset the corpus does *not* cover still trains, since only
-      ``source="fit"`` can serve it.
+      ``source="fit"`` can serve it -- and so does one the corpus does cover
+      if the design's DVs/``user_task`` also ask for the counterfactual task
+      (see ``_coxam_needs_real_generation``): that task evaluates arbitrary
+      perturbed instances against the real model, which no static corpus
+      table can serve, so skipping training here would only defer the
+      failure to a later ``/simulate`` call with a much less clear error.
     * **A multi-dataset study**, per dataset -- ``_finish_multi_dataset_stage``
       trains a real model (via ``train_AI_model_for_dataset``, which trains
       against ``data_by_dataset[dataset_id]`` and stores the result under
@@ -510,9 +537,17 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
         # models rather than per-instance explanation vectors, so it cannot
         # be served the same way without a surrogate evaluator that does not
         # exist yet -- a CoXAM baseline still forces real training/generation.
-        needs_real_ai = _coax_needs_real_generation(design, framework, data.dataset_id) or (
-            needs_baselines
-            and not _coax_baseline_servable_from_corpus(design, framework, data.dataset_id)
+        # A CoXAM design that also needs the counterfactual task forces it too
+        # (see _coxam_needs_real_generation): the corpus has no live model to
+        # evaluate arbitrary perturbed instances against, unlike forward's
+        # surrogate-reading path.
+        needs_real_ai = (
+            _coax_needs_real_generation(design, framework, data.dataset_id)
+            or _coxam_needs_real_generation(design, framework)
+            or (
+                needs_baselines
+                and not _coax_baseline_servable_from_corpus(design, framework, data.dataset_id)
+            )
         )
         skip_reason = None if needs_real_ai else _corpus_skip_reason(framework, data.dataset_id)
         return _finish_dataset_stage(study, request, dataset_payload, skip_reason)
@@ -997,6 +1032,40 @@ def _design_coax_params(study: xaikitTest) -> Optional[dict[str, dict[str, Any]]
     return _broadcast_coax_params(resolved)
 
 
+def _merge_coxam_task_results(
+    study: xaikitTest, coxam_task: Optional[str], results: pd.DataFrame
+) -> pd.DataFrame:
+    """Fold one CoXAM task's run into the study's running multi-task table.
+
+    CoXAM's forward and counterfactual tasks are separate agents run via
+    separate ``/simulate`` calls (``SimulationRequest.coxam_task``), but
+    ``study.run_experiment`` overwrites ``study.simulated_results`` on every
+    call -- so without this, calling the counterfactual leg after the forward
+    one would silently discard the forward rows, and ``posthoc_for``/
+    ``analysis_for`` for whichever DV ran first would then 400 with "missing
+    columns" the moment the second call finished, trading one unreachable DV
+    for the other instead of making both reachable.
+
+    Keyed by the *requested* task, not the resolved one, and only merged
+    across calls that explicitly named a task: a caller who never sets
+    ``coxam_task`` (the common case, and every call before this field
+    existed) keeps today's one-slot, last-call-wins behavior exactly, since
+    every such call collapses onto the same ``None`` key and just replaces
+    it, matching ``study.run_experiment``'s own overwrite semantics.
+    """
+    if coxam_task is None:
+        study._coxam_task_results = None
+        return results
+    task_results = getattr(study, "_coxam_task_results", None) or {}
+    task_results[coxam_task] = results
+    study._coxam_task_results = task_results
+    if len(task_results) == 1:
+        return results
+    merged = pd.concat(list(task_results.values()), ignore_index=True)
+    study.simulated_results = merged
+    return merged
+
+
 def _resolve_coax_params(
     study: xaikitTest, request: SimulationRequest
 ) -> Optional[dict[str, dict[str, Any]]]:
@@ -1108,7 +1177,9 @@ def run_simulation_stage(
             source=coxam_source,
             policy_override=request.coxam_policy,
             eval_params=normalize_cognitive_params("coxam", request.coxam_eval_params),
+            user_task=request.coxam_task,
         )
+        results = _merge_coxam_task_results(study, request.coxam_task, results)
     elif runner == "sim2real":
         # Counterfactual-only, and its corpus supplies its own stimuli and
         # ground truth, so it needs neither a task switch nor a trained model.
