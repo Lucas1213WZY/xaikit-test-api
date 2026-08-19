@@ -10,7 +10,7 @@ import uuid
 from contextlib import contextmanager, redirect_stdout
 from copy import deepcopy
 from pathlib import Path
-from typing import Any, Callable, Optional, Sequence
+from typing import Any, Callable, Mapping, Optional, Sequence
 
 import numpy as np
 import pandas as pd
@@ -1032,20 +1032,30 @@ class xaikitTest:
         else:
             data = self._require_data()
             if balance_by_ai_prediction:
-                from src.workflow_standard import prediction_labels
+                if self.ai_predictions_by_instance is not None:
+                    ai_predictions_by_instance = self.ai_predictions_by_instance
+                elif self.trained_ai_model is not None:
+                    from src.workflow_standard import prediction_labels
 
-                trained_ai_model = self._require_trained_ai_model()
-                predictions = prediction_labels(
-                    trained_ai_model.predict(data.split.X_model)
-                )
-                ai_predictions_by_instance = {
-                    int(instance_id): _as_python_scalar(prediction)
-                    for instance_id, prediction in zip(
-                        data.split.raw_instance_ids,
-                        predictions,
+                    trained_ai_model = self._require_trained_ai_model()
+                    predictions = prediction_labels(
+                        trained_ai_model.predict(data.split.X_model)
                     )
-                }
-                self.ai_predictions_by_instance = ai_predictions_by_instance
+                    ai_predictions_by_instance = {
+                        int(instance_id): _as_python_scalar(prediction)
+                        for instance_id, prediction in zip(
+                            data.split.raw_instance_ids,
+                            predictions,
+                        )
+                    }
+                    self.ai_predictions_by_instance = ai_predictions_by_instance
+                else:
+                    raise RuntimeError(
+                        "balance_by_ai_prediction=True requires either manually "
+                        "supplied predictions (set_ai_predictions(...)) or a "
+                        "trained AI model (train_AI_model(...) / "
+                        "load_AI_model(...))."
+                    )
         if model_name is not None:
             self.model_name = model_name
         self.trial_config = experiment_planner_api.init_trial_build_config(
@@ -1139,6 +1149,23 @@ class xaikitTest:
         self.prediction_table_path = None
         self.prediction_table = None
         return self.model
+
+    def set_ai_predictions(self, predictions_by_instance: Mapping[int, Any]) -> None:
+        """Manually supply AI predictions keyed by instance id.
+
+        Lets ``generate_trials(balance_by_ai_prediction=True)`` run before
+        ``train_AI_model``/``load_AI_model`` -- e.g. when predictions were
+        computed elsewhere and trials should be generated first. A later
+        ``train_AI_model``/``load_AI_model`` call still resets this, and
+        ``explanations()`` still needs a real trained/loaded model.
+
+        Args:
+            predictions_by_instance: Mapping from instance id to predicted label.
+        """
+        self.ai_predictions_by_instance = {
+            int(instance_id): _as_python_scalar(prediction)
+            for instance_id, prediction in predictions_by_instance.items()
+        }
 
     #: Which named ``train_AI_model`` parameters each model type accepts, split
     #: by where they go: ``build`` reaches the constructor, ``train`` reaches the

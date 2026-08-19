@@ -161,6 +161,15 @@ Train the AI model *before* this stage if you want prediction-balanced
 sampling. With `balance_by_ai_prediction=True`, each phase draws equally from
 the two predicted classes, so participants do not see a run of one answer.
 
+If you need trials generated before a model exists — predictions came from
+somewhere else, or you want to inspect trial structure before training — call
+[`set_ai_predictions`](api/src/api.html#xaikitTest.set_ai_predictions) with a
+`{instance_id: prediction}` mapping first; `generate_trials` will use it
+instead of requiring a trained model. Whatever model you train afterward for
+`explanations()` should agree with those predictions, since trial balancing
+and the eventual explanations will otherwise be based on different
+predictions.
+
 ```python
 result = exp.generate_trials(
     participants_per_between_condition=24,
