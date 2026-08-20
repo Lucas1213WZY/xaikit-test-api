@@ -866,6 +866,82 @@ class xaikitTest:
             self.explanation_paths_by_dataset[dataset_id] = list(self.explanation_paths)
         return path, table
 
+    def store_combined_explanations(
+        self,
+        tables: Sequence[pd.DataFrame],
+        *,
+        output_dir: str | Path = "generated_explanation",
+        model_name: Optional[str] = None,
+    ) -> tuple[Optional[Path], Optional[pd.DataFrame]]:
+        """Concatenate, save, and store explanation/prediction tables built outside ``explanations()``.
+
+        For workflows that build their own tables directly -- e.g. via
+        ``create_xai_method`` for the explanation and a hand-built prediction
+        table -- this does the same concat/save/store step ``explanations()``
+        does internally, so ``run_experiment()`` and the plotting helpers all
+        read from ``combined_explanations`` the same way afterward.
+
+        Args:
+            tables: Explanation/prediction DataFrames to concatenate, e.g. a
+                prediction-only table and one or more method tables.
+            output_dir: Where to save the combined CSV.
+            model_name: Used in the saved filename; defaults to ``self.model_name``.
+
+        Returns:
+            The saved path and the combined table, also stored on
+            ``self.combined_explanations`` / ``self.combined_explanation_path``.
+        """
+        data = self._require_data()
+        config = xai_adapter_api.init_explanation_run(
+            data=data,
+            iv_config={},
+            trained_ai_model=self.trained_ai_model,
+            model_name=model_name or self.model_name or "mlp",
+            output_dir=self._resolve_output_path(output_dir),
+        )
+        path, combined = xai_adapter_api.combine_explanation_tables(list(tables), config)
+        self.combined_explanation_path = path
+        self.combined_explanations = combined
+        return path, combined
+
+    def prediction_only_table(self, *, model_name: Optional[str] = None) -> pd.DataFrame:
+        """AI predictions for every prepared instance, as prediction-only explanation rows.
+
+        A trial instance needs an AI prediction whether or not it also gets a
+        real explanation -- e.g. CoAX's ``none`` condition is still scored
+        against it. Pair this with a real method's table (e.g. built directly
+        via ``create_xai_method``) and pass both to
+        ``store_combined_explanations``.
+
+        Args:
+            model_name: Value written to the ``modelName`` column; defaults to
+                ``self.model_name``.
+
+        Returns:
+            A DataFrame with ``dataId``/``modelName``/``expMethod``/``instanceId``/``pred`` columns.
+        """
+        data = self._require_data()
+        trained_ai_model = self._require_trained_ai_model()
+        return xai_adapter_api.prediction_only_table(
+            data,
+            trained_ai_model,
+            model_name=model_name or self.model_name or "mlp",
+        )
+
+    def instance_ids_requiring_explanation(self) -> list[int]:
+        """Instance ids the generated trials actually need a real explanation for.
+
+        Any trial whose ``xai_method``/``xai_type`` shows one: a training
+        trial, or a testing trial with ``tested_w_xai=True``. Use this to
+        scope a manually-built explanation (e.g. via ``create_xai_method``) to
+        exactly the instances the study's trials will display, instead of
+        explaining the whole dataset or guessing a sample size.
+
+        Returns:
+            The instance ids, in the order they first appear in the trials.
+        """
+        return list(self._trial_ids_requiring_explanations() or [])
+
     def _stamp_resolved_xai_method_on_trials(
         self, resolved_method: str, *, dataset_id: Optional[str] = None
     ) -> None:
@@ -2125,6 +2201,37 @@ class xaikitTest:
             label_column=data.label_column,
         )
         return self.simulated_results
+
+    def condition_counts(
+        self,
+        results: Optional[pd.DataFrame] = None,
+        *,
+        by: Optional[Sequence[str]] = None,
+    ) -> pd.DataFrame:
+        """Row counts per condition, to sanity-check trial/response coverage.
+
+        Answers "did every condition get the rows I expect" -- the usual
+        check right after ``generate_trials()`` or ``run_experiment()``.
+
+        Args:
+            results: Rows to count; defaults to ``self.simulated_results``,
+                falling back to the generated trials if no simulation has run
+                yet.
+            by: Columns to group by; defaults to ``phase`` plus every
+                registered IV name that is actually present in ``results``.
+
+        Returns:
+            One row per group, with a ``rows`` count column.
+        """
+        if results is None:
+            results = (
+                self.simulated_results
+                if self.simulated_results is not None
+                else pd.DataFrame(self.trials)
+            )
+        if by is None:
+            by = [column for column in ("phase", *self.iv_config) if column in results.columns]
+        return results.groupby(list(by), dropna=False).size().reset_index(name="rows")
 
     def save_results(
         self,

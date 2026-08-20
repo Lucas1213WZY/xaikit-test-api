@@ -138,6 +138,38 @@ def predict_labels(trained_ai_model: Any, X: np.ndarray) -> np.ndarray:
     return prediction_labels(trained_ai_model.predict(X))
 
 
+def prediction_only_table(
+    data: PreparedDataset,
+    trained_ai_model: Any,
+    *,
+    model_name: str = "mlp",
+) -> pd.DataFrame:
+    """Predict every instance in ``data`` and format it as prediction-only rows.
+
+    A trial instance needs an AI prediction whether or not it also gets a real
+    explanation -- e.g. CoAX's ``none`` condition is still scored against it --
+    so this covers the whole dataset, not just the instances a real method
+    explains. The ``expMethod`` column is always :data:`PREDICTION_ONLY_METHOD`,
+    matching what ``generate_ai_prediction_table``/``explanations()`` produce.
+
+    Args:
+        data: The prepared dataset to predict over.
+        trained_ai_model: The model to predict with.
+        model_name: Value written to the ``modelName`` column.
+
+    Returns:
+        A DataFrame with ``dataId``/``modelName``/``expMethod``/``instanceId``/``pred`` columns.
+    """
+    predictions = predict_labels(trained_ai_model, data.split.X_model)
+    return pd.DataFrame({
+        DATA_ID_COL: data.dataset_id,
+        MODEL_NAME_COL: model_name,
+        EXPLANATION_METHOD_COL: PREDICTION_ONLY_METHOD,
+        INSTANCE_ID_COL: [int(i) for i in data.split.raw_instance_ids],
+        PREDICTION_COL: predictions,
+    })
+
+
 def generate_ai_prediction_table(
     config: ExplanationRunConfig,
 ) -> tuple[Path, pd.DataFrame]:

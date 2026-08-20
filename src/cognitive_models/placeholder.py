@@ -351,12 +351,16 @@ def default_cognitive_params(
 
     The three agents take disjoint parameters, so one shared default dict
     cannot be valid for any two of them. The CoAX-shaped
-    ``cog_retrieval_threshold=-0.3`` sits outside CoXAM's supported range and
-    used to make every coxam design report a validation error; the same set
-    reaching a sim2real design was worse than a range error, because
+    ``cog_retrieval_threshold`` used to be ``-0.3``, which sat outside both
+    CoXAM's and CoAX's own supported ranges and made every coxam design (and
+    a plain ``coax`` selection) report a spurious validation error; the same
+    set reaching a sim2real design was worse than a range error, because
     ``Sim2RealFittedAttributionSum`` accepts none of those names at all -- they
     are ACT-R encoding and drift-diffusion *timing* parameters, and its model
-    has no timing component.
+    has no timing component. ``-2.3`` is CoAX's own reference-CLI default for
+    ``retrieval_threshold`` (see ``DEFAULT_COAX_PARAMS`` in
+    ``coax_trial_executor.py``), and sits inside every range this set gets
+    checked against.
     """
     normalized = str(cognitive_model_id or "").strip().lower().replace("-", "_")
     if normalized == "sim2real":
@@ -372,7 +376,7 @@ def default_cognitive_params(
             params.update(COXAM_COUNTERFACTUAL_PARAMS)
         return params or dict(COXAM_COGNITIVE_PARAMS)
     return {
-        "cog_retrieval_threshold": -0.3,
+        "cog_retrieval_threshold": -2.3,
         "cog_latency_factor": 0.2,
         "cog_T_enc": 1.5,
         "cog_T_op": 0.5,

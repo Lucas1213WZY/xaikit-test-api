@@ -27,6 +27,7 @@ from .api import (
     get_xai_methods_from_design,
     init_explanation_run,
     predict_labels,
+    prediction_only_table,
 )
 from .attribution import (
     Attribution,
@@ -99,6 +100,7 @@ __all__ = [
     "get_xai_methods_from_design",
     "init_explanation_run",
     "predict_labels",
+    "prediction_only_table",
     "CSVDatasetAdapter",
     "PrecomputedCSVXAIMethod",
     "Attribution",
