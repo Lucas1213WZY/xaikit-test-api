@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 import importlib.util
 from pathlib import Path
-from typing import Any, Mapping, Optional
+from typing import Any, Callable, Mapping, Optional
 import warnings
 
 import pandas as pd
@@ -15,6 +15,7 @@ import pandas as pd
 from src.data_loaders import UnifiedDataLoader
 from src.data_loaders.sources.coax_adapter import feature_prefix
 from src.experiment_planner import select_trial_rows
+from src.virtual_experiment_executor.participant_pools import provenance_columns
 
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -556,6 +557,8 @@ def run_coax_experiment_executor(
     output_probabilities: bool = True,
     train_with_explanation: bool = True,
     dvs: Optional[Mapping[str, Any]] = None,
+    participant_models: Optional[Callable[[Any], Any]] = None,
+    participant_draws: Optional[Mapping[Any, Any]] = None,
 ) -> pd.DataFrame:
     """Execute CoAX strategies over generated trial rows.
 
@@ -573,6 +576,13 @@ def run_coax_experiment_executor(
     Pass ``dvs`` (e.g. ``study.DVs``) to fill accuracy DV columns using the same
     convention as ``run_experiment_executor``, so the result frame can be handed
     back to the study object for analysis and plotting.
+
+    ``participant_models`` builds one participant's condition -> model mapping on
+    demand, called once per participant, so every participant can run its own
+    fitted parameters instead of the study's one shared set -- what
+    ``mode="diverse_participant"`` uses. It wins over ``cognitive_model``.
+    ``participant_draws`` carries the matching provenance, keyed by
+    ``(participantId, model_key)``, and is stamped onto every result row.
 
     The runner stays separate from xaikitTest so the study object can remain
     focused on experimental design and trial generation.
@@ -633,7 +643,15 @@ def run_coax_experiment_executor(
 
     for _participant_key, participant_rows in participant_groups:
         clock = SimulationClock()
-        participant_models: dict[str, Any] = {}
+        models_by_key: dict[Any, Any] = {}
+        # Resolved per participant rather than once for the study: in diverse
+        # mode each participant carries its own fitted parameters, so it needs
+        # its own template set to deepcopy from.
+        templates = (
+            model_templates
+            if participant_models is None
+            else _resolve_model_templates(participant_models(_participant_key))
+        )
 
         for _, row in participant_rows.iterrows():
             trial = row.to_dict()
@@ -644,13 +662,14 @@ def run_coax_experiment_executor(
             tested_w_xai = _canonical_tested_condition(trial.get("tested_w_xai", trial.get("Tested w/ XAI", False)))
             with_explanation = phase == "training" or tested_w_xai
 
-            model_key = _select_model_key(model_templates, xai_type, tested_w_xai)
-            if model_key not in participant_models:
+            model_key = _select_model_key(templates, xai_type, tested_w_xai)
+            if model_key not in models_by_key:
                 # One instance per participant so memory accumulates across their trials.
-                model = deepcopy(model_templates[model_key])
+                model = deepcopy(templates[model_key])
                 model.time = clock
-                participant_models[model_key] = model
-            model = participant_models[model_key]
+                models_by_key[model_key] = model
+            model = models_by_key[model_key]
+            draw = (participant_draws or {}).get((_participant_key, model_key))
 
             model.new_instance()
 
@@ -683,6 +702,7 @@ def run_coax_experiment_executor(
                 return {
                     **dv_columns,
                     **trial,
+                    **provenance_columns(draw),
                     "phase": phase,
                     "step": step,
                     # tested_w_xai is a testing-phase IV. Training rows leave it

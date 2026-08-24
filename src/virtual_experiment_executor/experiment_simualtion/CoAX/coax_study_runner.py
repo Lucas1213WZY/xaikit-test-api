@@ -20,6 +20,11 @@ from typing import Any, Mapping, Optional, Sequence
 import pandas as pd
 
 from src.experiment_planner import select_trial_rows
+from src.virtual_experiment_executor.participant_pools import (
+    draw_participant_parameters,
+    draws_to_frame,
+    is_diverse_mode,
+)
 
 from .coax_trial_executor import (
     COAX_STRATEGIES_BY_XAI_TYPE,
@@ -260,6 +265,9 @@ def run_coax_study(
     data_id: Optional[str] = None,
     dvs: Optional[Mapping[str, Any]] = None,
     train_with_explanation: bool = True,
+    sampling_seed: int = 0,
+    sampling_replace: Optional[bool] = None,
+    parameter_pool: Optional[pd.DataFrame] = None,
     store: bool = True,
 ) -> pd.DataFrame:
     """Execute a study's trials with CoAX participants and return the step rows.
@@ -271,9 +279,21 @@ def run_coax_study(
 
     ``mode`` takes the same values as ``study.run_experiment``:
     ``trial_by_trial``, ``participant_by_participant``, ``whole_condition``
-    (with ``condition_filter``) or ``whole_experiment``. Selection is applied
-    once, before trials are grouped by XAI method, so ``trial_by_trial`` yields
-    one trial and not one trial per method.
+    (with ``condition_filter``), ``whole_experiment`` or
+    ``diverse_participant``. Selection is applied once, before trials are
+    grouped by XAI method, so ``trial_by_trial`` yields one trial and not one
+    trial per method.
+
+    ``diverse_participant`` runs the same trials as ``whole_experiment`` but
+    deals every participant its own parameters, drawn per condition cell from
+    the 330 participants in
+    ``assets/human_data/CoAX/coax_fitted_strategies.csv`` rather than running
+    :data:`FITTED_COAX_PARAMS`'s population means for everybody. That table's own
+    docstring explains why this is the better default: the fitted distributions
+    are bimodal (41% of SensitiveFeatures participants sit at the sensitivity
+    floor of 1.0, the rest spread 19-100), so no single value describes the
+    population, and the means had to be hand-corrected against real accuracy to
+    be usable at all.
 
     ``source`` picks where the instances, AI predictions and explanation vectors
     come from:
@@ -337,6 +357,26 @@ def run_coax_study(
     if isinstance(models, Mapping):
         _assert_models_cover(selected, models)
 
+    participant_models = participant_draws = None
+    if is_diverse_mode(mode):
+        if not isinstance(models, Mapping):
+            raise ValueError(
+                "mode='diverse_participant' needs the per-condition model mapping "
+                "coax_models_for_trials() builds, so each condition's strategy is "
+                "known before its parameters are drawn. Pass cognitive_model as a "
+                "{xai_type: model} mapping, or leave it unset."
+            )
+        participant_models, participant_draws = coax_participant_models(
+            selected,
+            models,
+            data_id=_pool_data_id(data_id, selected, dataset),
+            seed=sampling_seed,
+            replace=sampling_replace,
+            pool=parameter_pool,
+        )
+        if store:
+            study.participant_parameters = draws_to_frame(participant_draws)
+
     if source == "corpus":
         return _run_coax_study_from_corpus(
             study,
@@ -346,6 +386,8 @@ def run_coax_study(
             dataset=dataset,
             dvs=dvs,
             train_with_explanation=train_with_explanation,
+            participant_models=participant_models,
+            participant_draws=participant_draws,
             store=store,
         )
 
@@ -377,6 +419,8 @@ def run_coax_study(
                 data_repository=repository,
                 train_with_explanation=train_with_explanation,
                 dvs=study.DVs if dvs is None else dvs,
+                participant_models=participant_models,
+                participant_draws=participant_draws,
             )
         )
 
@@ -390,6 +434,142 @@ def run_coax_study(
     if store:
         study.simulated_results = results
     return results
+
+
+def _pool_data_id(
+    data_id: Optional[str], trials: pd.DataFrame, dataset: Any
+) -> Optional[str]:
+    """Which dataset the fitted pool should be filtered to, or None if unclear.
+
+    The soft counterpart of :func:`_resolve_corpus_data_id`: a corpus run must
+    know the dataset because an instance id means different things in each, but
+    a *parameter* draw can simply widen across datasets rather than fail.
+    """
+    if data_id is not None:
+        return str(data_id)
+    for column in ("dataId", "dataset", "dataset_id", "appId"):
+        if column in trials.columns:
+            names = {str(value) for value in trials[column].dropna().unique()}
+            if len(names) == 1:
+                return next(iter(names))
+    dataset_id = getattr(dataset, "dataset_id", None)
+    return None if dataset_id is None else str(dataset_id)
+
+
+def coax_participant_models(
+    trials: pd.DataFrame,
+    models: Mapping[Any, Any],
+    *,
+    data_id: Optional[str] = None,
+    seed: int = 0,
+    replace: Optional[bool] = None,
+    pool: Optional[pd.DataFrame] = None,
+) -> tuple[Any, dict[Any, Any]]:
+    """One CoAX model per participant per condition, from the fitted pool.
+
+    Returns ``(participant_models, draws)``: a callable the executor calls once
+    per participant to get that participant's condition -> model mapping, and
+    the draws behind it keyed by ``(participantId, model_key)`` for provenance.
+
+    The strategy is *not* drawn -- it is read off the model the runner already
+    built for that condition (``coax_models_for_trials`` picks it from
+    ``PREFERRED_COAX_STRATEGY_BY_XAI_TYPE``, and an explicit mapping overrides
+    that). Only the parameters vary per participant, and they are filtered to
+    rows fitted for that same strategy, so an AttributionSum participant is
+    never handed a SensitiveFeatures participant's ``sensitivity``.
+
+    A model key that carries ``tested_w_xai`` narrows the draw to that tested
+    condition; a plain ``xai_type`` key draws across both, since one model then
+    serves both halves of that participant's session.
+    """
+    condition_columns = [
+        column for column in ("xai_type", "tested_w_xai") if column in trials.columns
+    ]
+    if "participantId" not in trials.columns or not condition_columns:
+        return None, {}
+
+    draws: dict[Any, Any] = {}
+    parameters_by_participant: dict[Any, dict[Any, dict[str, Any]]] = {}
+    strategy_by_key: dict[Any, str] = {}
+
+    cells = trials[["participantId", *condition_columns]].drop_duplicates()
+    cells = cells.assign(
+        __xai_type=[_canonical_xai_type(value) for value in cells["xai_type"]]
+        if "xai_type" in cells.columns
+        else "none",
+        __tested=[
+            _canonical_tested_condition(value)
+            for value in cells.get("tested_w_xai", pd.Series([False] * len(cells)))
+        ],
+    )
+    cells["__key"] = [
+        _select_pool_model_key(models, row["__xai_type"], row["__tested"])
+        for _, row in cells.iterrows()
+    ]
+
+    xai_method = None
+    if "xai_method" in trials.columns:
+        methods = {str(value) for value in trials["xai_method"].dropna().unique()}
+        xai_method = next(iter(methods)) if len(methods) == 1 else None
+
+    for offset, (key, rows) in enumerate(cells.groupby("__key", sort=False)):
+        strategy = type(models[key]).__name__
+        strategy_by_key[key] = strategy
+        condition: dict[str, Any] = {"strategy": strategy}
+        if data_id is not None:
+            condition["dataId"] = data_id
+        if xai_method is not None:
+            condition["xai_method"] = xai_method
+        condition["xai_type"] = rows["__xai_type"].iloc[0]
+        if isinstance(key, tuple):
+            # The key distinguishes tested conditions, so the draw should too.
+            condition["tested_w_xai"] = rows["__tested"].iloc[0]
+
+        participants = sorted(rows["participantId"].dropna().unique().tolist(), key=str)
+        cell_draws = draw_participant_parameters(
+            "coax",
+            condition=condition,
+            participants=participants,
+            seed=int(seed) + offset,
+            replace=replace,
+            # xai_method is nearly redundant with dataId in the CoAX corpus (one
+            # method per dataset), tested_w_xai halves an already narrow cell,
+            # and dropping dataId borrows another dataset's fits -- which is
+            # still a real human, and the only option for mushrooms, which was
+            # never fitted.
+            relax=("xai_method", "tested_w_xai", "dataId"),
+            pool=pool,
+        )
+        for participant, draw in cell_draws.items():
+            draws[(participant, key)] = draw
+            parameters_by_participant.setdefault(participant, {})[key] = draw.parameters
+
+    def participant_models(participant_id: Any) -> dict[Any, Any]:
+        """This participant's models, falling back to the shared one per key."""
+        drawn = parameters_by_participant.get(participant_id, {})
+        built = dict(models)
+        for key, parameters in drawn.items():
+            if not parameters:
+                continue
+            xai_type = key[0] if isinstance(key, tuple) else key
+            built[key] = make_coax_model(
+                strategy_by_key[key],
+                **fitted_coax_params(strategy_by_key[key], xai_type, **parameters),
+            )
+        return built
+
+    return participant_models, draws
+
+
+def _select_pool_model_key(models: Mapping[Any, Any], xai_type: str, tested: bool) -> Any:
+    """The key the executor will select for this condition, resolved up front."""
+    for key in ((xai_type, tested), xai_type):
+        if key in models:
+            return key
+    raise ValueError(
+        f"No CoAX model registered for xai_type={xai_type!r} tested_w_xai={tested!r}; "
+        f"registered keys: {sorted(models, key=repr)}."
+    )
 
 
 def _resolve_corpus_data_id(
@@ -433,6 +613,8 @@ def _run_coax_study_from_corpus(
     dataset: Any,
     dvs: Optional[Mapping[str, Any]],
     train_with_explanation: bool,
+    participant_models: Optional[Any] = None,
+    participant_draws: Optional[Mapping[Any, Any]] = None,
     store: bool,
 ) -> pd.DataFrame:
     """Run selected trials against the published CoAX user-study corpus.
@@ -482,6 +664,8 @@ def _run_coax_study_from_corpus(
                 ),
                 train_with_explanation=train_with_explanation,
                 dvs=getattr(study, "DVs", None) if dvs is None else dvs,
+                participant_models=participant_models,
+                participant_draws=participant_draws,
             )
         )
 
@@ -559,6 +743,7 @@ def _assert_models_cover(trials: pd.DataFrame, models: Mapping[Any, Any]) -> Non
 
 __all__ = [
     "FITTED_COAX_PARAMS",
+    "coax_participant_models",
     "FITTED_PARAMETER_FILE",
     "ORDER_COLUMN",
     "PREDICTION_ONLY_METHOD",
