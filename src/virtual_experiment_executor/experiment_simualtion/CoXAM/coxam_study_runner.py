@@ -26,6 +26,13 @@ import pandas as pd
 
 from src.ai_models.model_api import _labels_and_scores_from_predictions
 from src.experiment_planner import select_trial_rows
+from src.virtual_experiment_executor.participant_pools import (
+    canon_coxam_condition,
+    draw_participant_parameters,
+    draws_to_frame,
+    is_diverse_mode,
+    provenance_columns,
+)
 
 from .coxam_trial_executor import (
     TrialDrivenCombinedStrategyPolicyEnv,
@@ -309,6 +316,7 @@ def run_coxam_episode(
     policy_override: Optional[str] = None,
     fixed_eval_params: Optional[dict[str, float]] = None,
     dvs: Optional[Mapping[str, Any]] = None,
+    seed: Optional[int] = None,
 ) -> pd.DataFrame:
     """Run one forced episode and return one DV row per trial.
 
@@ -326,6 +334,11 @@ def run_coxam_episode(
             config,
             condition_name=condition_name,
             instances_per_episode=len(trials),
+            # Every episode is built from the same config, so without a per-
+            # episode seed two participants with the same trial order draw the
+            # same strategy-simulation noise and are indistinguishable even when
+            # their parameters differ.
+            **({} if seed is None else {"seed": int(seed)}),
         ),
         sub_policies=sub_policies,
         training=False,
@@ -364,6 +377,83 @@ def run_coxam_episode(
     return pd.DataFrame(rows)
 
 
+def _episode_participant(group_key: Any, rows: pd.DataFrame) -> Any:
+    """The participant an episode belongs to, however the group was keyed."""
+    if isinstance(group_key, tuple):
+        return group_key[0]
+    if group_key is not None:
+        return group_key
+    if "participantId" in rows.columns and not rows["participantId"].empty:
+        return rows["participantId"].iloc[0]
+    return None
+
+
+def _trial_complexity(trials: pd.DataFrame) -> Optional[str]:
+    """The design's complexity level, if it declares one.
+
+    CoXAM's fits are split by complexity (it selects the surrogate variant: low
+    = LR sparse / DT depth 2, high = LR dense / DT depth 3), so a design that
+    varies it should draw within it. A design that does not simply matches
+    across both halves.
+    """
+    for column in ("complexity", "xai_complexity", "Complexity"):
+        if column in trials.columns:
+            values = {str(value).strip().lower() for value in trials[column].dropna().unique()}
+            if len(values) == 1:
+                return next(iter(values))
+    return None
+
+
+def draw_coxam_participants(
+    trials: pd.DataFrame,
+    *,
+    pool_name: str,
+    app_id: str,
+    seed: int = 0,
+    replace: Optional[bool] = None,
+    pool: Optional[pd.DataFrame] = None,
+) -> dict[Any, Any]:
+    """One fitted CoXAM participant per virtual participant, per condition.
+
+    Drawn per condition cell so a decision_tree participant gets parameters
+    fitted to somebody who saw decision trees. The seed is offset per cell so
+    two cells do not deal the same rows in the same order.
+
+    ``relax`` gives up complexity before condition: the wine_quality forward
+    fits were run per explanation family and have no ``hybrid`` cell at all, so
+    a hybrid participant is served by that dataset's DT and LR fits rather than
+    by nothing.
+    """
+    if "participantId" not in trials.columns:
+        return {}
+
+    complexity = _trial_complexity(trials)
+    records = trials.to_dict("records")
+    conditions = pd.Series(
+        [canon_coxam_condition(_trial_condition(row)) for row in records],
+        index=trials.index,
+    )
+
+    draws: dict[Any, Any] = {}
+    for offset, (condition, rows) in enumerate(trials.groupby(conditions, sort=True)):
+        cell: dict[str, Any] = {"dataId": app_id, "condition": condition}
+        if complexity is not None:
+            cell["complexity"] = complexity
+        participants = sorted(rows["participantId"].dropna().unique().tolist(), key=str)
+        draws.update(
+            draw_participant_parameters(
+                pool_name,
+                condition=cell,
+                participants=participants,
+                seed=int(seed) + offset,
+                replace=replace,
+                relax=("complexity", "condition", "dataId"),
+                pool=pool,
+            )
+        )
+    return draws
+
+
 def run_coxam_study(
     study: Any,
     *,
@@ -377,6 +467,9 @@ def run_coxam_study(
     dvs: Optional[Mapping[str, Any]] = None,
     policy_override: Optional[str] = None,
     eval_params: Optional[dict[str, float]] = None,
+    sampling_seed: int = 0,
+    sampling_replace: Optional[bool] = None,
+    parameter_pool: Optional[pd.DataFrame] = None,
     store: bool = True,
 ) -> pd.DataFrame:
     """Execute a study's trials with CoXAM's meta-policy and return the step rows.
@@ -394,6 +487,18 @@ def run_coxam_study(
     ``tutorials/decision_tree_logistic_regression_experiment_workflow.ipynb``
     exactly, rather than reading anything the generic explanation stage
     produced.
+
+    ``mode="diverse_participant"`` runs the same trials as
+    ``whole_experiment`` but gives every participant its own cognitive
+    parameters, drawn from the participants fitted in
+    ``assets/human_data/CoXAM/`` and filtered to that participant's own
+    condition cell. Both tasks draw from their own pool -- forward from the
+    three forward fits normalized onto the meta-policy's three free parameters,
+    counterfactual from the 270-participant replay -- and each episode also gets
+    its own environment seed. Without it every participant runs the environment
+    midpoints and the only variance left is which instances each participant
+    happened to see. ``eval_params`` still wins over a drawn value, so a fixed
+    parameter can be held constant while the rest vary.
 
     ``source`` picks where the surrogates come from:
 
@@ -538,9 +643,13 @@ def run_coxam_study(
             study,
             bundle=bundle,
             predict_fn=predict_fn,
+            mode=mode,
             trials=selected.drop(columns=[ORDER_COLUMN]),
             dvs=resolved_dvs,
             cognitive_params=eval_params,
+            sampling_seed=sampling_seed,
+            sampling_replace=sampling_replace,
+            parameter_pool=parameter_pool,
             store=store,
         )
 
@@ -564,24 +673,47 @@ def run_coxam_study(
         else [(None, selected)]
     )
 
+    participant_draws = (
+        draw_coxam_participants(
+            selected,
+            pool_name="coxam_forward",
+            app_id=app_id,
+            seed=sampling_seed,
+            replace=sampling_replace,
+            pool=parameter_pool,
+        )
+        if is_diverse_mode(mode)
+        else {}
+    )
+    if participant_draws and store:
+        study.participant_parameters = draws_to_frame(participant_draws)
+
     runs = []
-    for group_key, group_rows in episode_groups:
+    for offset, (group_key, group_rows) in enumerate(episode_groups):
         ordered = group_rows.sort_values(ORDER_COLUMN, kind="stable")
         condition_name = _participant_condition(ordered, group_key)
-        runs.append(
-            run_coxam_episode(
-                ordered,
-                bundle=bundle,
-                condition_name=condition_name,
-                meta_policy=meta_policy,
-                uses_action_masks=uses_action_masks,
-                sub_policies=sub_policies,
-                config=config,
-                policy_override=policy_override,
-                fixed_eval_params=eval_params,
-                dvs=resolved_dvs,
-            )
+        draw = participant_draws.get(_episode_participant(group_key, ordered))
+        # A drawn value is the participant's own; an explicit eval_params is the
+        # caller pinning a parameter, so it wins.
+        episode_params = (
+            {**draw.parameters, **(eval_params or {})} if draw is not None else eval_params
         )
+        episode = run_coxam_episode(
+            ordered,
+            bundle=bundle,
+            condition_name=condition_name,
+            meta_policy=meta_policy,
+            uses_action_masks=uses_action_masks,
+            sub_policies=sub_policies,
+            config=config,
+            policy_override=policy_override,
+            fixed_eval_params=episode_params,
+            dvs=resolved_dvs,
+            seed=None if draw is None else int(config.seed) + offset,
+        )
+        for column, value in provenance_columns(draw).items():
+            episode[column] = value
+        runs.append(episode)
 
     results = pd.concat(runs, ignore_index=True, sort=False)
     if ORDER_COLUMN in results.columns:
@@ -604,6 +736,7 @@ def run_coxam_study(
 
 __all__ = [
     "ORDER_COLUMN",
+    "draw_coxam_participants",
     "run_coxam_episode",
     "run_coxam_study",
 ]

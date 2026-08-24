@@ -31,6 +31,11 @@ from src.cognitive_models.cognitive_models.CoXAM.counterfactual_env import (  # 
     CounterfactualPolicyEnv,
 )
 from src.experiment_planner import select_trial_rows  # noqa: E402
+from src.virtual_experiment_executor.participant_pools import (  # noqa: E402
+    draws_to_frame,
+    is_diverse_mode,
+    provenance_columns,
+)
 
 from .coxam_trial_executor import (  # noqa: E402
     TRAINED_POLICIES_ROOT,
@@ -228,6 +233,9 @@ def run_coxam_counterfactual_study(
     trials: Optional[pd.DataFrame | Sequence[dict[str, Any]]] = None,
     dvs: Optional[Mapping[str, Any]] = None,
     cognitive_params: Optional[Mapping[str, float]] = None,
+    sampling_seed: int = 0,
+    sampling_replace: Optional[bool] = None,
+    parameter_pool: Optional[pd.DataFrame] = None,
     seed: int = 0,
     store: bool = True,
 ) -> pd.DataFrame:
@@ -236,6 +244,15 @@ def run_coxam_counterfactual_study(
     ``bundle`` and ``predict_fn`` are built by ``run_coxam_study``, which owns
     surrogate fitting and the instance-coverage preflight; this function only
     adds the counterfactual policy and environment on top of them.
+
+    Under ``mode="diverse_participant"`` each participant's three cognitive
+    parameters come from one of the 270 participants in
+    ``coxam_counterfactual_replay.csv``, filtered to that participant's own
+    condition and complexity. The replay's fitted ranges match this
+    checkpoint's trained ranges almost exactly (kappa -1.998..0.497 against
+    [-2.0, 0.5], epsilon 0.051..0.499 against [0.0, 0.5], gamma 0.0001..0.0200
+    against [0.0, 0.02]), so the draw needs no rescaling to stay inside what the
+    policy was trained on.
     """
     trials_df = pd.DataFrame(study.trials if trials is None else trials).copy()
     if trials_df.empty:
@@ -250,6 +267,23 @@ def run_coxam_counterfactual_study(
 
     policy = load_counterfactual_policy()
 
+    from .coxam_study_runner import draw_coxam_participants, _episode_participant
+
+    participant_draws = (
+        draw_coxam_participants(
+            selected,
+            pool_name="coxam_counterfactual",
+            app_id=str(getattr(bundle, "app_id", "")),
+            seed=sampling_seed,
+            replace=sampling_replace,
+            pool=parameter_pool,
+        )
+        if is_diverse_mode(mode)
+        else {}
+    )
+    if participant_draws and store:
+        study.participant_parameters = draws_to_frame(participant_draws)
+
     group_columns = [
         column for column in ("participantId", "block") if column in selected.columns
     ]
@@ -260,19 +294,28 @@ def run_coxam_counterfactual_study(
     )
 
     runs = []
-    for offset, (_key, rows) in enumerate(groups):
+    for offset, (key, rows) in enumerate(groups):
         ordered = rows.sort_values(ORDER_COLUMN, kind="stable")
-        runs.append(
-            run_coxam_counterfactual_episode(
-                ordered,
-                bundle=bundle,
-                predict_fn=predict_fn,
-                policy=policy,
-                cognitive_params=cognitive_params,
-                dvs=study.DVs if dvs is None else dvs,
-                seed=seed + offset,
-            )
+        draw = participant_draws.get(_episode_participant(key, ordered))
+        # A drawn value is the participant's own; an explicit cognitive_params
+        # is the caller pinning a parameter, so it wins.
+        episode_params = (
+            {**draw.parameters, **(cognitive_params or {})}
+            if draw is not None
+            else cognitive_params
         )
+        episode = run_coxam_counterfactual_episode(
+            ordered,
+            bundle=bundle,
+            predict_fn=predict_fn,
+            policy=policy,
+            cognitive_params=episode_params,
+            dvs=study.DVs if dvs is None else dvs,
+            seed=seed + offset,
+        )
+        for column, value in provenance_columns(draw).items():
+            episode[column] = value
+        runs.append(episode)
 
     results = pd.concat(runs, ignore_index=True, sort=False)
     if ORDER_COLUMN in results.columns:
