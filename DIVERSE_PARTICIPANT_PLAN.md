@@ -1,5 +1,13 @@
 # `mode="diverse_participant"` — implementation plan
 
+**Status: implemented 2026-08-24.** Eight commits, `ff4f711`..`abf4600`, with
+tests in `tests/test_participant_pools.py`,
+`tests/test_{coax,coxam,sim2real}_diverse_participant.py`,
+`tests/test_api_diverse_participant.py` and
+`tests/test_server_diverse_participant.py`. Sections 1-3 are the reasoning
+behind it and still describe what was built; section 4 describes the code as it
+now stands. Section 9 records what was measured and what is left.
+
 Draft, 2026-08-24. Adds a simulation mode that gives every virtual participant
 its **own** cognitive parameters, drawn from the pool of parameters fitted to
 the real study participants, filtered by the condition the virtual participant
@@ -446,3 +454,70 @@ must keep passing untouched.
    use it (it is part of that fit); CoXAM forward stays opt-in — confirm.
 4. Should `diverse_participant` become the default mode for the tutorials, or
    stay opt-in?
+
+
+---
+
+## 9. What landed, and what it measured
+
+### Commits
+
+| commit | what |
+| --- | --- |
+| `ff4f711` | `src/virtual_experiment_executor/participant_pools.py` — the four pools, matching, and the sampler |
+| `5641be1` | `select_trial_rows` accepts the mode |
+| `8d7eb37` | condition relaxation for cells the fit never covered |
+| `64b1521` | Sim2Real: per-participant model, strategy and lapse RNG |
+| `6deecf8` | CoAX: per-participant model templates via `participant_models` |
+| `99abefb` | CoXAM: per-participant parameters plus a per-episode env seed |
+| `013b3fc` | `study.run_experiment` / `save_results` |
+| `abf4600` | `/simulate`, including the mlProxyBaselines fix |
+
+### Measured
+
+**Sim2Real, the tutorial's own design** (12 participants per condition, the full
+published corpus, `pairwise_condition_tests` with Holm):
+
+| | `whole_experiment` | `diverse_participant` |
+| --- | --- | --- |
+| SD, faithful / sparse / sparse_robust | **0.0000 / 0.0000 / 0.0000** | 0.1925 / 0.1718 / 0.1177 |
+| largest \|t\| | 7.21e+15 | 2.72 |
+| smallest p (raw) | 2.5e-320 | 0.0149 |
+| smallest p (Holm) | 1.5e-319 | 0.0894 |
+
+**CoAX** (6 participants per condition, corpus-backed, training + testing
+blocks): within-condition SD 0.0000 -> 0.098 (attribution) and 0.132
+(importance).
+
+**CoXAM forward** (8 participants per condition, wine_quality, surrogates
+fitted against a freshly trained MLP), within-condition SD:
+
+| condition | `whole_experiment` | `diverse_participant` |
+| --- | --- | --- |
+| decision_tree | 0.0554 | 0.1567 |
+| hybrid | 0.0522 | 0.0668 |
+| logistic_regression | 0.0579 | 0.0999 |
+
+Note what this does *not* claim. CoXAM's shared-parameter SD was never zero --
+its participants see different instances -- so the mode does not rescue it from
+a divide-by-nothing; it replaces item-sampling noise with variance that is
+mostly real individual differences. Nor do p-values move in one direction: in
+this run the strongest comparison got *stronger* (p 0.021 -> 0.009), because
+both the means and the spreads move. The MLP is retrained per run and is not
+seeded, so these numbers vary run to run; the SD increase is the stable part.
+
+Two limits worth knowing. The logistic_regression and hybrid conditions move
+least, because the LR surrogate reproduces the AI on nearly every instance --
+near that ceiling no parameter has leverage, so individual differences have
+little to express. And wine_quality has no fitted `opportunity_cost`
+(section 3.3), so only two of the three parameters vary there.
+
+### Left to do
+
+1. Re-run both `tutorials/bug-fix/*.ipynb` under the new mode and refresh their
+   stored outputs.
+2. Decide the `ddm_s -> decision_noise` policy (section 8, question 1). It is
+   currently clipped; the pool spec's `ranges` is the single place to change it.
+3. wine_quality's missing forward `opportunity_cost` (section 8, question 2) is
+   still unfilled -- the runner keeps its default there.
+4. Whether the tutorials should default to the new mode (section 8, question 4).
