@@ -267,6 +267,44 @@ responses = exp.run_experiment(mode="participant_by_participant")
 csv_path, json_path = exp.save_results(out_dir="simulated_results")
 ```
 
+### Giving each participant its own parameters
+
+`mode` selects how much of the experiment runs: `trial_by_trial`,
+`participant_by_participant`, `whole_condition` (with `condition_filter`),
+`whole_experiment`, and `diverse_participant`.
+
+The first four run **one parameter set for the whole study**, which makes each
+condition's N participants one person taking N sessions. Where every
+participant also sees the same trials, that leaves a within-condition standard
+deviation of exactly zero, and any test comparing conditions then divides by
+approximately nothing -- t statistics in the billions and p-values that
+underflow to 0.
+
+`diverse_participant` runs the same trials as `whole_experiment` but deals each
+participant its own cognitive parameters, drawn from the humans the selected
+agent was fitted to (`assets/human_data/`) and filtered to that participant's
+own condition. Research agents only -- a proxy baseline has no fitted
+population and is refused.
+
+```python
+exp.set_cognitive_model(cognitive_model_id="coxam")   # or coax / sim2real
+responses = exp.run_experiment(mode="diverse_participant", sampling_seed=0)
+
+exp.participant_parameters   # who each participant was dealt, and what came with it
+```
+
+Each result row carries `fitted_participant_id`, `parameter_source` and the
+`sampled_*` values behind it, and `save_results` writes the assignment next to
+the results as `participant_parameters.csv`. `sampling_seed` makes the
+assignment reproducible; `sampling_replace=True` draws independently instead of
+dealing distinct people; `parameter_pool` substitutes your own fitted table.
+
+A `parameter_source` of `pool_relaxed:...` means that exact condition cell was
+never fitted (CoAX never fitted mushrooms; the wine_quality CoXAM forward fits
+have no hybrid cell) and the named axes were widened to find the nearest real
+participant. `fitted_mean_fallback` means nothing matched at all and those
+participants ran the framework's population defaults -- identical to each other.
+
 See [`run_experiment`](api/src/api.html#xaikitTest.run_experiment),
 [`save_results`](api/src/api.html#xaikitTest.save_results), and
 [`src.virtual_experiment_executor`](api/src/virtual_experiment_executor.html).

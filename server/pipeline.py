@@ -17,6 +17,7 @@ import pandas as pd
 
 from src.api import xaikitTest
 from src.cognitive_models import is_baseline_model_id, normalize_baseline_model_id
+from src.virtual_experiment_executor.participant_pools import is_diverse_mode
 from src.experiment_planner.design_export import normalize_cognitive_params
 from src.cognitive_models.baseline_models import BASELINE_MODEL_IDS
 from src.result_visualizer import plot_dv_by_two_ivs, plot_iv_dv_grid
@@ -1112,6 +1113,21 @@ def _per_dataset_or_single_source(
     }
 
 
+def _sampling_kwargs(request: SimulationRequest) -> dict[str, Any]:
+    """The diverse-mode sampling options, or nothing for every other mode.
+
+    Passed only when the mode asks for them: the runners accept them always,
+    but sending them for a shared-parameter run would imply the run sampled
+    something when it did not.
+    """
+    if not is_diverse_mode(request.mode):
+        return {}
+    return {
+        "sampling_seed": request.sampling_seed,
+        "sampling_replace": request.sampling_replace,
+    }
+
+
 def run_simulation_stage(
     study: xaikitTest,
     request: SimulationRequest,
@@ -1123,7 +1139,16 @@ def run_simulation_stage(
     ``mode`` is the API layer's own selection vocabulary, so the same endpoint
     serves a single-trial walkthrough and the full experiment:
     ``trial_by_trial``, ``participant_by_participant``, ``whole_condition``
-    (with ``condition_filter``) and ``whole_experiment``.
+    (with ``condition_filter``), ``whole_experiment`` and
+    ``diverse_participant``.
+
+    ``diverse_participant`` runs the whole experiment with one fitted human's
+    parameters per virtual participant. Two consequences here. The declared
+    ``mlProxyBaselines`` still run in ``whole_experiment`` -- they have no
+    fitted population, and ``run_experiment`` refuses the mode for them -- which
+    the payload reports as ``baseline_mode`` so the difference is visible rather
+    than assumed. And the assignment is saved next to the results as
+    ``participant_parameters.csv``, reported under ``files``.
 
     coax/coxam are dispatched through ``study.run_experiment(...)`` rather
     than calling ``run_coax_study``/``run_coxam_study`` directly -- the two
@@ -1158,6 +1183,7 @@ def run_simulation_stage(
                 params=_resolve_coax_params(study, request),
             ),
             source=coax_source,
+            **_sampling_kwargs(request),
         )
     elif runner == "coxam":
         coxam_source = request.coxam_source
@@ -1178,6 +1204,7 @@ def run_simulation_stage(
             policy_override=request.coxam_policy,
             eval_params=normalize_cognitive_params("coxam", request.coxam_eval_params),
             user_task=request.coxam_task,
+            **_sampling_kwargs(request),
         )
         results = _merge_coxam_task_results(study, request.coxam_task, results)
     elif runner == "sim2real":
@@ -1193,6 +1220,7 @@ def run_simulation_stage(
             strategy=request.sim2real_strategy,
             cognitive_params=normalize_cognitive_params("sim2real", request.sim2real_params),
             normalize_by_i_max=request.sim2real_normalize_by_i_max,
+            **_sampling_kwargs(request),
         )
     else:
         baseline_model_id = resolve_baseline_model_id(study, request.baseline_model_id)
@@ -1222,10 +1250,18 @@ def run_simulation_stage(
     # a trained_ai_model and explanation table are guaranteed to exist here.
     design = study.design_export
     baseline_model_ids = list(getattr(design, "baseline_model_ids", None) or [])
+    # A proxy baseline has no fitted human population, so run_experiment
+    # refuses diverse_participant for it. Running those comparisons in
+    # whole_experiment keeps the mode usable for the designs that declare both,
+    # and baseline_mode below says which mode they actually ran in.
+    baseline_mode = "whole_experiment" if is_diverse_mode(request.mode) else request.mode
     if runner != "baseline" and baseline_model_ids:
         primary_model_id = study.cognitive_model_id
         primary_cognitive_model = study.cognitive_model
         primary_cognitive_params = study.cognitive_params
+        # Each baseline run clears this; the primary run's draw is what the
+        # payload and the saved file should describe.
+        primary_participant_parameters = study.participant_parameters
         tagged = results.copy()
         tagged["cognitive_model_id"] = primary_model_id
         variants = [tagged]
@@ -1235,7 +1271,7 @@ def run_simulation_stage(
                 model_kwargs=request.baseline_model_kwargs,
             )
             baseline_results = study.run_experiment(
-                mode=request.mode,
+                mode=baseline_mode,
                 participant_id=request.participant_id,
                 condition_filter=request.condition_filter,
             )
@@ -1249,6 +1285,7 @@ def run_simulation_stage(
         study.cognitive_model = primary_cognitive_model
         study.cognitive_model_id = primary_model_id
         study.cognitive_params = primary_cognitive_params
+        study.participant_parameters = primary_participant_parameters
         results = pd.concat(variants, ignore_index=True)
         study.simulated_results = results
 
@@ -1259,6 +1296,7 @@ def run_simulation_stage(
         "cognitive_model_id": study.cognitive_model_id,
         "baseline_model_ids": baseline_model_ids,
         "mode": request.mode,
+        "baseline_mode": baseline_mode if baseline_model_ids else None,
         "participant_id": request.participant_id,
         "condition_filter": jsonable(request.condition_filter),
         "counts": {
@@ -1276,7 +1314,12 @@ def run_simulation_stage(
             else []
         ),
         "preview": frame_records(results, limit=request.preview_rows),
-        "files": {"csv": csv_path, "json": json_path},
+        "participant_parameters": frame_records(study.participant_parameters),
+        "files": {
+            "csv": csv_path,
+            "json": json_path,
+            "participant_parameters": study.participant_parameters_path,
+        },
     }
 
 

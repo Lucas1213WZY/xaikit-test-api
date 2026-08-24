@@ -127,11 +127,30 @@ class SimulationRequest(BaseModel):
         "whole_experiment",
         description=(
             "trial_by_trial | participant_by_participant | whole_condition | "
-            "whole_experiment"
+            "whole_experiment | diverse_participant. The last runs the whole "
+            "experiment but gives every virtual participant its own cognitive "
+            "parameters, drawn from the humans the selected agent was fitted to "
+            "and filtered to that participant's own condition. Research agents "
+            "only -- a baseline model has no fitted population and is refused."
         ),
     )
     participant_id: Optional[int] = None
     condition_filter: Optional[dict[str, Any]] = None
+    sampling_seed: int = Field(
+        0,
+        description=(
+            "diverse_participant only. Makes the participant -> fitted-human "
+            "assignment reproducible across runs."
+        ),
+    )
+    sampling_replace: Optional[bool] = Field(
+        None,
+        description=(
+            "diverse_participant only. None (the default) deals distinct fitted "
+            "people while the pool lasts, then reshuffles; true draws i.i.d. "
+            "instead, which lets one person be dealt to several participants."
+        ),
+    )
     coax_strategies: Optional[dict[str, str]] = None
     coax_params: Optional[dict[str, Any]] = None
     coax_source: Optional[str] = Field(
