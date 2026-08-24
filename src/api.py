@@ -15,6 +15,7 @@ from typing import Any, Callable, Mapping, Optional, Sequence
 import numpy as np
 import pandas as pd
 
+from src.virtual_experiment_executor.participant_pools import is_diverse_mode
 from src.cognitive_models import (
     default_cognitive_params,
     dummy_cognitive_model,
@@ -152,6 +153,10 @@ class xaikitTest:
         self.simulated_results: Optional[pd.DataFrame] = None
         self.simulated_csv_path: Optional[str] = None
         self.simulated_json_path: Optional[str] = None
+        #: One row per virtual participant under mode="diverse_participant":
+        #: which fitted human it was dealt and the parameters that came with it.
+        self.participant_parameters: Optional[pd.DataFrame] = None
+        self.participant_parameters_path: Optional[str] = None
         self.study_protocol: dict[str, Any] = default_study_protocol()
         self.walkthrough_previewed: bool = False
         self.walkthrough_approved: bool = False
@@ -2046,10 +2051,18 @@ class xaikitTest:
 
         original_trials = self.trials
         results: list[pd.DataFrame] = []
+        drawn_parameters: list[pd.DataFrame] = []
+        self.participant_parameters = None
         try:
-            for level in levels:
+            for level_index, level in enumerate(levels):
                 self.trials = trials_by_level[level]
                 level_kwargs = dict(runner_kwargs)
+                # Each level runs its own draw; without a per-level offset every
+                # level would deal its pool rows in the same order. The levels'
+                # participants are disjoint by construction, so the assignments
+                # stay independent.
+                if is_diverse_mode(mode) and "sampling_seed" not in level_kwargs:
+                    level_kwargs["sampling_seed"] = level_index
                 # A dataset this study trained a real model for (see
                 # train_AI_model_for_dataset) needs source="study"/"fit"; one
                 # served entirely by a published corpus needs "corpus"/
@@ -2082,6 +2095,11 @@ class xaikitTest:
                 tagged = agent_results.copy()
                 tagged[DATASET_IV_NAME] = level
                 results.append(tagged)
+                if self.participant_parameters is not None:
+                    level_parameters = self.participant_parameters.copy()
+                    level_parameters[DATASET_IV_NAME] = level
+                    drawn_parameters.append(level_parameters)
+                    self.participant_parameters = None
         finally:
             self.trials = original_trials
 
@@ -2091,6 +2109,8 @@ class xaikitTest:
                 f"condition_filter={condition_filter!r} in any dataset."
             )
         self.simulated_results = pd.concat(results, ignore_index=True)
+        if drawn_parameters:
+            self.participant_parameters = pd.concat(drawn_parameters, ignore_index=True)
         return self.simulated_results
 
     def run_experiment(
@@ -2118,7 +2138,10 @@ class xaikitTest:
 
         Args:
             mode: ``participant_by_participant`` runs one participant;
-                other modes run the whole set.
+                other modes run the whole set. ``diverse_participant`` runs the
+                whole set *and* deals every participant its own cognitive
+                parameters, drawn from the humans the agent was fitted to and
+                filtered to that participant's own condition -- see below.
             participant_id: Which participant to run in per-participant mode.
             condition_filter: Restrict to trials matching these IV values.
             explanation_pool: Explanations to draw from; defaults to the
@@ -2138,12 +2161,39 @@ class xaikitTest:
         Raises:
             RuntimeError: If approval is required but has not been given.
             TypeError: If ``runner_kwargs`` is passed without an agent selected.
+            ValueError: If ``diverse_participant`` is asked of a model with no
+                fitted human population behind it.
+
+        ``mode="diverse_participant"`` exists because every other mode runs one
+        parameter set for the whole study, which makes each condition's N
+        participants one person taking N sessions. The effect is not subtle: a
+        Sim2Real study reports a within-condition SD of exactly 0.0 in three of
+        four conditions (t reaches 1e15 and p underflows to zero), and a CoXAM
+        study reports p = 2.7e-10 for an effect whose only variance source is
+        which instances each participant happened to see. In diverse mode each
+        participant is dealt one real fitted participant's parameters from
+        ``assets/human_data``, and the assignment is recorded on every result
+        row and in ``participant_parameters``. Tune it with ``sampling_seed``,
+        ``sampling_replace`` and ``parameter_pool``.
         """
+        if is_diverse_mode(mode) and (self.cognitive_model_id or "") not in self._AGENT_RUNNERS:
+            raise ValueError(
+                "mode='diverse_participant' draws parameters from the humans an "
+                f"agent was fitted to, and {self.cognitive_model_id!r} has no such "
+                "population. Select a research agent "
+                f"({', '.join(self._AGENT_RUNNERS)}) via set_cognitive_model"
+                "(cognitive_model_id=...), or run mode='whole_experiment'."
+            )
         if require_walkthrough_approval and not self.walkthrough_approved:
             raise RuntimeError(
                 "Experiment execution is locked. Preview the complete walkthrough and "
                 "click 'Approve walkthrough' first."
             )
+        if not is_diverse_mode(mode):
+            # Otherwise a later shared-parameter run would still save (and claim)
+            # the previous diverse run's assignment.
+            self.participant_parameters = None
+            self.participant_parameters_path = None
 
         if self.data_by_dataset:
             return self._run_multi_dataset_experiment(
@@ -2241,20 +2291,30 @@ class xaikitTest:
         """Save simulated experiment results as CSV and JSON.
 
         Args:
-            out_dir: Directory the two files are written to.
+            out_dir: Directory the files are written to.
 
         Returns:
-            The CSV and JSON paths.
+            The CSV and JSON paths. A ``diverse_participant`` run also writes
+            ``participant_parameters.csv`` next to them and records it on
+            ``participant_parameters_path``; the return value stays a 2-tuple.
 
         Raises:
             RuntimeError: If called before ``run_experiment``.
         """
         if self.simulated_results is None:
             raise RuntimeError("Call run_experiment(...) before save_results(...).")
+        resolved_out_dir = self._resolve_output_path(out_dir)
         self.simulated_csv_path, self.simulated_json_path = virtual_experiment_api.save_simulated_results(
             self.simulated_results,
-            out_dir=self._resolve_output_path(out_dir),
+            out_dir=resolved_out_dir,
         )
+        # A side artifact, deliberately not a third return value: the server
+        # unpacks exactly two paths from this call.
+        if self.participant_parameters is not None:
+            path = Path(resolved_out_dir) / "participant_parameters.csv"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            self.participant_parameters.to_csv(path, index=False)
+            self.participant_parameters_path = str(path)
         return self.simulated_csv_path, self.simulated_json_path
 
     def analyze_iv_dv(
