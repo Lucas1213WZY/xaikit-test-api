@@ -172,6 +172,43 @@ def test_draw_with_replacement_is_iid():
     assert len(set(assigned)) < len(assigned)
 
 
+def test_relaxation_widens_one_axis_at_a_time():
+    """A cell the fit never covered borrows the nearest one, and says which."""
+    from src.virtual_experiment_executor.participant_pools import match_with_relaxation
+
+    exact, dropped = match_with_relaxation(
+        COXAM_FORWARD_POOL,
+        {"dataId": "wine_quality", "condition": "decision_tree"},
+        relax=("complexity", "condition"),
+    )
+    assert not exact.empty and dropped == ()
+
+    # The wine_quality forward fits were run per explanation family, so hybrid
+    # has no cell of its own.
+    widened, dropped = match_with_relaxation(
+        COXAM_FORWARD_POOL,
+        {"dataId": "wine_quality", "condition": "hybrid"},
+        relax=("complexity", "condition"),
+    )
+    assert not widened.empty
+    assert dropped == ("complexity", "condition")
+    assert set(widened["dataId"]) == {"wine_quality"}
+
+
+def test_relaxed_draw_is_still_a_real_person_not_a_fallback():
+    with pytest.warns(UserWarning, match="relaxed"):
+        draws = draw_participant_parameters(
+            "coxam_forward",
+            condition={"dataId": "wine_quality", "condition": "hybrid"},
+            participants=[1, 2, 3],
+            relax=("complexity", "condition"),
+        )
+    for draw in draws.values():
+        assert draw.parameter_source.startswith("pool_relaxed")
+        assert not draw.is_fallback
+        assert draw.parameters
+
+
 def test_unfitted_cell_falls_back_and_says_so():
     """CoAX never fitted mushrooms -- fall back loudly, do not raise."""
     with pytest.warns(UserWarning, match="mushrooms|No coax participants"):

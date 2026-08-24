@@ -490,7 +490,46 @@ class ParticipantDraw:
 
     @property
     def is_fallback(self) -> bool:
-        return self.parameter_source != "pool"
+        """True only when nothing was drawn at all.
+
+        A relaxed draw (``pool_relaxed:...``) is still a real fitted human, just
+        not one from this exact cell, so it does not count as a fallback.
+        """
+        return self.parameter_source == "fitted_mean_fallback"
+
+
+def match_with_relaxation(
+    spec: PoolSpec,
+    condition: Mapping[str, Any],
+    *,
+    relax: Sequence[str] = (),
+    pool: Optional[pd.DataFrame] = None,
+) -> tuple[pd.DataFrame, tuple[str, ...]]:
+    """Match the exact cell, then widen along ``relax`` until something matches.
+
+    Real fitted populations have holes a simulated design does not: CoXAM's
+    wine_quality forward fits were run per explanation family, so a ``hybrid``
+    participant has no cell of its own, and CoAX fitted three of its four
+    datasets. Widening one named axis at a time keeps the closest available
+    match -- a hybrid participant drawn from that dataset's DT and LR fits is a
+    far better stand-in than the framework's global mean -- and reports which
+    axes it had to give up, so the compromise is visible in the results table
+    rather than hidden.
+
+    Returns the matched rows and the axes that were dropped to get them.
+    """
+    matched = match_pool_rows(spec, condition, pool=pool)
+    if not matched.empty:
+        return matched, ()
+    for depth in range(1, len(relax) + 1):
+        dropped = tuple(relax[:depth])
+        widened = {
+            key: value for key, value in condition.items() if key not in dropped
+        }
+        matched = match_pool_rows(spec, widened, pool=pool)
+        if not matched.empty:
+            return matched, dropped
+    return matched, tuple(relax)
 
 
 def draw_participant_parameters(
@@ -500,6 +539,7 @@ def draw_participant_parameters(
     participants: Sequence[Any],
     seed: int = 0,
     replace: Optional[bool] = None,
+    relax: Sequence[str] = (),
     pool: Optional[pd.DataFrame] = None,
 ) -> dict[Any, ParticipantDraw]:
     """Deal one fitted parameter row to each virtual participant.
@@ -513,12 +553,24 @@ def draw_participant_parameters(
     ``seed`` makes the assignment reproducible; callers vary it per condition
     cell so two cells do not deal the same pool rows in the same order.
 
+    ``relax`` names condition axes that may be given up, in order, when the
+    exact cell is empty -- see :func:`match_with_relaxation`.
+
     An unmatched cell is not an error: the runner keeps whatever defaults it
     uses today, and the draw records ``parameter_source="fitted_mean_fallback"``
     so the results table says so instead of quietly looking like a real draw.
     """
     spec = POOLS[pool_name]
-    matched = match_pool_rows(spec, condition, pool=pool)
+    matched, dropped = match_with_relaxation(spec, condition, relax=relax, pool=pool)
+    source = "pool" if not dropped else "pool_relaxed:" + ",".join(dropped)
+    if dropped and not matched.empty:
+        warnings.warn(
+            f"No {pool_name} participants were fitted for the exact condition "
+            f"{dict(condition)!r}; drew from the pool with {list(dropped)} relaxed "
+            "instead. The results table records this as "
+            f"parameter_source={source!r}.",
+            stacklevel=2,
+        )
 
     if matched.empty:
         warnings.warn(
@@ -558,7 +610,7 @@ def draw_participant_parameters(
             fitted_participant_id=(
                 row[spec.id_column] if spec.id_column in row.index else None
             ),
-            parameter_source="pool",
+            parameter_source=source,
             pool_name=pool_name,
         )
     return draws
@@ -629,5 +681,6 @@ __all__ = [
     "is_diverse_mode",
     "load_pool",
     "match_pool_rows",
+    "match_with_relaxation",
     "provenance_columns",
 ]
