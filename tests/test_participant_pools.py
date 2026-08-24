@@ -254,3 +254,27 @@ def test_is_diverse_mode_recognizes_the_mode():
     assert is_diverse_mode(" Diverse_Participant ")
     assert not is_diverse_mode("whole_experiment")
     assert not is_diverse_mode(None)
+
+
+# -- trial selection ------------------------------------------------------
+
+
+def test_diverse_mode_selects_the_whole_experiment():
+    """Selection is identical to whole_experiment; only the runner differs."""
+    from src.experiment_planner import select_trial_rows
+
+    trials = pd.DataFrame(
+        {"participantId": [1, 1, 2, 2], "instanceId": [10, 11, 10, 11]}
+    )
+    assert len(select_trial_rows(trials, "diverse_participant")) == len(trials)
+    pd.testing.assert_frame_equal(
+        select_trial_rows(trials, "diverse_participant"),
+        select_trial_rows(trials, "whole_experiment"),
+    )
+
+
+def test_unknown_mode_names_the_new_one():
+    from src.experiment_planner import select_trial_rows
+
+    with pytest.raises(ValueError, match="diverse_participant"):
+        select_trial_rows(pd.DataFrame({"participantId": [1]}), "nonsense_mode")

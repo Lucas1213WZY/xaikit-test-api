@@ -379,6 +379,14 @@ def select_trial_rows(
 
     Returns:
         The matching subset of ``trials_df``.
+
+    ``diverse_participant`` selects exactly what ``whole_experiment`` selects --
+    every generated trial. The two differ in what the *runner* then does with
+    the selection: diverse mode draws one fitted parameter row per participant
+    (see ``virtual_experiment_executor.participant_pools``) instead of running
+    one shared parameter set for everybody. Keeping the alias here means a
+    runner called directly, without going through ``xaikitTest.run_experiment``,
+    still accepts the mode rather than failing on selection.
     """
     mode = mode.lower()
     selected = trials_df.copy()
@@ -398,10 +406,10 @@ def select_trial_rows(
             selected = selected[selected[col].astype(str) == str(value)]
         return selected.copy()
 
-    if mode in {"experiment", "whole_experiment"}:
+    if mode in {"experiment", "whole_experiment", "diverse_participant"}:
         return selected.copy()
 
     raise ValueError(
         "mode must be one of: trial_by_trial, participant_by_participant, "
-        "whole_condition, whole_experiment"
+        "whole_condition, whole_experiment, diverse_participant"
     )
