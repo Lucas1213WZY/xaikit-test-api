@@ -30,6 +30,10 @@ from src.cognitive_models.cognitive_models.Sim2Real.gcm_strategies import (
     Sim2RealAttributionProjector,
     Sim2RealFittedAttributionSum,
 )
+from src.virtual_experiment_executor.participant_pools import (
+    ParticipantDraw,
+    provenance_columns,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 
@@ -497,8 +501,13 @@ def build_sim2real_model(
         return model
 
     resolved = fitted_sim2real_params(exp_property)
+    # comparison_C is a real constructor parameter and the participant-level fit
+    # selects it per person (it is the switch between a graded slope and a hard
+    # threshold), but it is not in NEUTRAL_SIM2REAL_PARAMS -- so without naming
+    # it here a drawn participant's own value would be silently dropped.
+    accepted = set(NEUTRAL_SIM2REAL_PARAMS) | {"comparison_C"}
     for key, value in (params or {}).items():
-        if key in NEUTRAL_SIM2REAL_PARAMS:
+        if key in accepted:
             resolved[key] = value
     # missing_attributions="zero" keeps a trial whose source attribution is NaN
     # runnable; "raise" would abort a whole study for one gap in the corpus.
@@ -587,6 +596,7 @@ def run_sim2real_experiment_executor(
     normalize_by_i_max: bool = False,
     strategy: str = AUTO_STRATEGY,
     seed: Optional[int] = DEFAULT_SIM2REAL_SEED,
+    participant_draws: Optional[Mapping[Any, ParticipantDraw]] = None,
 ) -> pd.DataFrame:
     """Run each trial through the fitted model and return one row per trial.
 
@@ -596,6 +606,13 @@ def run_sim2real_experiment_executor(
     aggregation where ``faithful`` did not), so one shared model would
     misrepresent three conditions out of four. Pass ``model`` to override that
     and use a single model everywhere.
+
+    ``participant_draws`` maps ``participantId`` to one fitted human's
+    parameters (see ``participant_pools``). With it, each participant gets its
+    own model -- its own parameters, its own fitted strategy and its own lapse
+    RNG -- which is what ``mode="diverse_participant"`` is for. Without it every
+    participant in a condition runs the same model, and since the corpus serves
+    every participant the same test instances, their responses are identical.
 
     ``normalize_by_i_max`` defaults to False, matching how the baked
     ``FITTED_SIM2REAL_PARAMS`` were actually fitted. Measured against real
@@ -619,33 +636,55 @@ def run_sim2real_experiment_executor(
             "sim2real_available_instance_ids(), ...)."
         )
 
-    models: dict[Optional[str], Sim2RealFittedAttributionSum] = {}
+    models: dict[Any, Sim2RealFittedAttributionSum] = {}
     rows: list[dict[str, Any]] = []
     # Seeded so a study reproduces run to run; only conditions with a lapse
     # (see SIM2REAL_LAPSE_BY_PROPERTY) draw from it at all.
     rng = np.random.default_rng(seed)
+    participant_rngs: dict[Any, np.random.Generator] = {}
     for _, trial in trials.iterrows():
         record = trial.to_dict()
         instance_id = int(record["instanceId"])
         exp_property = _trial_exp_property(record)
+        participant = record.get("participantId")
+        draw = (participant_draws or {}).get(participant)
 
         if model is not None:
             trial_model = model
         else:
-            if exp_property not in models:
+            # Keyed by participant as well as condition in diverse mode: each
+            # participant carries its own fitted row, so one shared model per
+            # condition would collapse them back into one person again. With no
+            # draws the key is (None, property), i.e. today's per-condition cache.
+            cache_key = (participant if draw is not None else None, exp_property)
+            if cache_key not in models:
                 # Resolved per condition, not once for the study: under
                 # strategy="auto" sparse simulates with exemplar similarity and
                 # the rest with attribution_sum (see
                 # SIM2REAL_STRATEGY_BY_PROPERTY).
-                trial_strategy = sim2real_strategy_for(exp_property, strategy)
-                models[exp_property] = build_sim2real_model(
-                    sim2real_params_for(exp_property, trial_strategy, cognitive_params),
+                #
+                # A drawn participant brings its own strategy: the
+                # participant-level fit selected one per person (sparse splits
+                # 6 sensitive_features / 3 attribution_sum / 3 salient_features),
+                # which is a real individual difference the flat table averages
+                # away. An explicit strategy= still overrides both.
+                drawn = dict(draw.parameters) if draw is not None else {}
+                trial_strategy = (
+                    str(drawn["strategy"])
+                    if drawn.get("strategy") and strategy == AUTO_STRATEGY
+                    else sim2real_strategy_for(exp_property, strategy)
+                )
+                # Caller overrides win over the draw, the same precedence
+                # cognitive_params has over the fitted population everywhere else.
+                merged = {**drawn, **(cognitive_params or {})}
+                models[cache_key] = build_sim2real_model(
+                    sim2real_params_for(exp_property, trial_strategy, merged),
                     exp_property=exp_property,
                     strategy=trial_strategy,
                     projector=projector,
                     normalize_by_i_max=normalize_by_i_max,
                 )
-            trial_model = models[exp_property]
+            trial_model = models[cache_key]
 
         pair = projector.project(
             instance_id,
@@ -654,16 +693,26 @@ def run_sim2real_experiment_executor(
         )
         comparison = trial_model.compare(pair)
         truth = int(projector.increase_labels([instance_id])[0])
-        rows.append(
-            _result_row(
-                record,
-                comparison,
-                truth=truth,
-                dvs=dvs,
-                lapse=sim2real_lapse_for(exp_property),
-                rng=rng,
+        # One RNG per participant in diverse mode, so two people do not lapse on
+        # exactly the same trials -- the shared stream would tie their responses
+        # together even where their parameters differ.
+        if draw is not None:
+            trial_rng = participant_rngs.setdefault(
+                participant,
+                np.random.default_rng([int(seed or 0), abs(hash(str(participant))) % (2**32)]),
             )
+        else:
+            trial_rng = rng
+        row = _result_row(
+            record,
+            comparison,
+            truth=truth,
+            dvs=dvs,
+            lapse=sim2real_lapse_for(exp_property),
+            rng=trial_rng,
         )
+        row.update(provenance_columns(draw))
+        rows.append(row)
     return pd.DataFrame(rows)
 
 
