@@ -540,3 +540,55 @@ def test_the_non_zero_count_orders_genuinely_sparse_explanations():
 
     assert counts["sparse"] < counts["sparse_robust"] < counts["faithful"] < counts["robust"]
     assert counts["sparse"] == pytest.approx(1.0)
+
+
+# -- robustness that is comparable across methods --------------------------
+
+
+def test_relative_input_stability_is_invariant_to_the_explanation_scale():
+    """The reason RIS exists, and why the Lipschitz estimate alone is not enough.
+
+    The local Lipschitz estimate divides an absolute explanation difference by an
+    absolute input difference, so it carries the explanation's units: rescaling
+    the same explanation by 1000 multiplies it by 1000. That makes LIME's
+    surrogate coefficients and SHAP's probability-space contributions
+    incomparable. Agarwal et al. (2022) make both differences relative to their
+    own magnitude, so the units cancel.
+    """
+    from src.xai_adapter.metrics import relative_input_stability
+
+    rng = np.random.default_rng(0)
+    X = rng.uniform(0.5, 1.5, size=(40, 4))
+    W = rng.normal(size=(40, 4))
+
+    lipschitz = [np.nanmean(robustness_loss(X, W * s, radius=0.6)) for s in (1.0, 10.0, 1000.0)]
+    ris = [np.nanmean(relative_input_stability(X, W * s, radius=0.6)) for s in (1.0, 10.0, 1000.0)]
+
+    # The Lipschitz estimate tracks the units...
+    assert lipschitz[1] == pytest.approx(lipschitz[0] * 10.0, rel=1e-6)
+    assert lipschitz[2] == pytest.approx(lipschitz[0] * 1000.0, rel=1e-6)
+    # ...RIS does not move at all.
+    assert ris[1] == pytest.approx(ris[0], rel=1e-9)
+    assert ris[2] == pytest.approx(ris[0], rel=1e-9)
+
+
+def test_relative_input_stability_still_detects_real_instability():
+    """Scale invariance must not cost sensitivity to the thing being measured.
+
+    The contrast has to be *how much the explanation varies between neighbours*,
+    not how large it is: RIS divides by the explanation's own magnitude, so
+    simply inflating the attributions moves numerator and denominator together
+    and leaves the score alone -- which is the invariance the metric is for.
+    """
+    from src.xai_adapter.metrics import relative_input_stability
+
+    rng = np.random.default_rng(0)
+    X = rng.uniform(0.5, 1.5, size=(40, 4))
+    identical = np.tile(rng.normal(size=(1, 4)), (40, 1))  # same explanation everywhere
+    varying = rng.normal(size=(40, 4))                     # a different one each time
+
+    stable_score = np.nanmean(relative_input_stability(X, identical, radius=0.6))
+    unstable_score = np.nanmean(relative_input_stability(X, varying, radius=0.6))
+
+    assert stable_score == pytest.approx(0.0, abs=1e-9)
+    assert unstable_score > stable_score

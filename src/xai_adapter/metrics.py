@@ -19,7 +19,10 @@ robustness; this module now covers all three:
   explanation calls important and check the model's output actually moves.
 * complexity -- effective complexity (non-zero count), Gini sparseness
   (Chalasani et al. 2020) and attribution entropy (Bhatt et al. 2020).
-* robustness -- the local Lipschitz estimate of Alvarez-Melis & Jaakkola (2018).
+* robustness -- the local Lipschitz estimate of Alvarez-Melis & Jaakkola (2018)
+  and Relative Input Stability (Agarwal et al. 2022). The first is scale
+  dependent and so compares runs of one method; the second normalises both
+  differences by their own magnitude and so compares across methods.
 
 Why perturbation-based faithfulness rather than the reconstruction loss: the
 reconstruction loss has to know whether a method's numbers are *coefficients*
@@ -55,6 +58,7 @@ QUALITY_COLUMNS: tuple[str, ...] = (
     "sparsity_gini",
     "complexity_entropy",
     "robustness_lipschitz",
+    "robustness_ris",
     "quality_note",
 )
 
@@ -678,6 +682,67 @@ def robustness_loss(
     return losses
 
 
+
+def relative_input_stability(
+    X,
+    W,
+    *,
+    radius: Optional[float] = None,
+    radius_quantile: float = 0.10,
+    neighbor_pool_size: int = 1000,
+    random_state: int = 0,
+    eps_min: float = 1e-6,
+) -> np.ndarray:
+    """Relative Input Stability (Agarwal et al. 2022), per instance.
+
+    ``max_j || (w_i - w_j) / w_i || / max(|| (x_i - x_j) / x_i ||, eps_min)``
+
+    The local Lipschitz estimate divides an *absolute* explanation difference by
+    an absolute input difference, so its value carries the units of whatever the
+    explanation is measured in. That makes it a fair comparison between two runs
+    of the same method and an unfair one between methods: on adult, LIME scores
+    3.87 and SHAP 0.43, which mixes a genuine stability difference with the fact
+    that LIME's local-surrogate coefficients and SHAP's probability-space
+    contributions are not the same quantity.
+
+    RIS was introduced to fix exactly that: both differences are made *relative*
+    to their own magnitudes before dividing, so the units cancel and the result
+    is comparable across methods. Quantus reports it alongside the Lipschitz
+    estimate for the same reason, so both are kept here.
+
+    Lower is more stable. ``eps_min`` guards the division where a feature or an
+    attribution is zero.
+    """
+    X_arr = ensure_2d(X)
+    W_arr = ensure_2d(W)
+    n_rows = X_arr.shape[0]
+
+    if n_rows > neighbor_pool_size:
+        rng = np.random.default_rng(random_state)
+        pool = rng.choice(n_rows, size=neighbor_pool_size, replace=False)
+    else:
+        pool = np.arange(n_rows)
+    X_pool, W_pool = X_arr[pool], W_arr[pool]
+
+    if radius is None:
+        sample = X_pool[: min(len(pool), 200)]
+        pairwise = np.linalg.norm(sample[:, None, :] - sample[None, :, :], axis=2)
+        radius = _resolve_radius(pairwise, None, radius_quantile)
+
+    out = np.full(n_rows, np.nan, dtype=float)
+    for i in range(n_rows):
+        distances = np.linalg.norm(X_pool - X_arr[i], axis=1)
+        mask = (distances > 0.0) & (distances <= radius)
+        if not np.any(mask):
+            continue
+        x_denominator = np.where(np.abs(X_arr[i]) < eps_min, eps_min, X_arr[i])
+        w_denominator = np.where(np.abs(W_arr[i]) < eps_min, eps_min, W_arr[i])
+        input_change = np.linalg.norm((X_arr[i] - X_pool[mask]) / x_denominator, axis=1)
+        explanation_change = np.linalg.norm((W_arr[i] - W_pool[mask]) / w_denominator, axis=1)
+        out[i] = float(np.max(explanation_change / np.maximum(input_change, eps_min)))
+    return out
+
+
 def robustness_loss_with_radius(X, W, **kwargs) -> tuple[np.ndarray, float]:
     """``robustness_loss`` plus the radius it actually used."""
     X_arr = ensure_2d(X)
@@ -785,6 +850,14 @@ def explanation_quality(
         empty_neighborhood="nan",
     )
 
+    ris = relative_input_stability(
+        X_arr, W_arr,
+        radius=robustness_radius,
+        radius_quantile=robustness_radius_quantile,
+        neighbor_pool_size=neighbor_pool_size,
+        random_state=random_state,
+    )
+
     return {
         "faithfulness_aopc": aopc,
         "faithfulness_corr": corr,
@@ -793,6 +866,7 @@ def explanation_quality(
         "sparsity_gini": sparsity_gini(shown),
         "complexity_entropy": complexity_entropy(shown),
         "robustness_lipschitz": lipschitz,
+        "robustness_ris": ris,
         "quality_note": "; ".join(notes),
         "score_space": space,
         "robustness_radius": resolved_radius,
