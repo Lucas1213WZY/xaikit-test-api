@@ -465,6 +465,105 @@ def _reject_single_class_model(study: xaikitTest, dataset_id: Optional[str] = No
     )
 
 
+def _published_weights_path(model_type: str, framework: str, dataset_id: str) -> Optional[Path]:
+    """The published checkpoint for this (model, agent, dataset), if shipped."""
+    from src.ai_models.paths import model_weights_dir
+
+    path = model_weights_dir(model_type, framework) / f"{dataset_id}_model_weights.pth"
+    return path if path.is_file() else None
+
+
+def _load_published_model(
+    study: xaikitTest, dataset_id: str, model_type: str, framework: str
+) -> Optional[str]:
+    """Load the AI the published study used, instead of training a new one.
+
+    A model trained fresh on the raw dataset is not the AI the human
+    participants faced. wine_quality is 86.4% one class, so a fresh MLP
+    predicts the minority class for ~7% of instances where the corpus AI
+    predicts it for ~50% -- and counterfactual simulation, which asks whether a
+    proposed feature change flips the prediction, has almost nothing to flip.
+    The published checkpoint reproduces the corpus's own predictions on the
+    corpus's instances to 94.5%.
+
+    Returns a note describing what happened, or None when the caller should
+    train instead. Nothing is loaded unless the checkpoint's input width
+    matches the prepared features: the weights are positional, and feeding them
+    a different feature set produces confident nonsense rather than an error
+    (measured: 50-51% agreement with the corpus, i.e. chance).
+    """
+    weights = _published_weights_path(model_type, framework, dataset_id)
+    if weights is None:
+        return None
+
+    data = study.data
+    split = getattr(data, "split", None)
+    if split is None or getattr(split, "X_model", None) is None:
+        return None
+    prepared_width = int(np.asarray(split.X_model).shape[1])
+
+    from src.ai_models.model_api import ModelManager, _shape_from_checkpoint
+
+    try:
+        checkpoint_width = int(_shape_from_checkpoint(str(weights))["input_dim"])
+    except Exception:  # noqa: BLE001 - an unreadable checkpoint just means "train"
+        return None
+    if checkpoint_width != prepared_width:
+        return (
+            f"Published weights for {dataset_id!r} expect {checkpoint_width} features "
+            f"but the prepared dataset has {prepared_width}, so a fresh model was "
+            "trained instead. The weights are positional; loading them against a "
+            "different feature set would silently produce meaningless predictions."
+        )
+
+    manager = ModelManager()
+    model = manager.load_model(dataset_id, model_type, source=framework)
+
+    # The same study state train_AI_model sets, so every later stage cannot
+    # tell the difference between a loaded and a trained model.
+    study.model_manager = manager
+    study.model = model
+    study.trained_ai_model = getattr(model, "engine", model)
+    study.model_name = model_type
+    study.model_source = framework
+    study.training_info = {"loaded_from": str(weights), "trained": False}
+    study.ai_predictions_by_instance = None
+    study.prediction_table_path = None
+    study.prediction_table = None
+    return (
+        f"Loaded the published {framework} AI from {weights.name} instead of "
+        "training a fresh one, so the study explains the same model the human "
+        "participants faced. Pass use_published_model=false to train instead."
+    )
+
+
+def _should_try_published_model(
+    request: DatasetStageRequest, framework: str, dataset_id: Optional[str] = None
+) -> bool:
+    """Whether to prefer the published AI over training for this request.
+
+    Automatic only for a CoXAM design on one of the datasets CoXAM's published
+    study actually ran (``COXAM_CORPUS_FEATURES``). That restriction is the
+    whole justification: loading gives *the AI the human participants faced*,
+    which is only true for those datasets. Weights are shipped for others too
+    (prima_diabetes, german_credit, ...), but those are simply some other
+    checkpoint, and a design using one wants its own trained model.
+
+    CoAX is excluded because its corpus path already avoids training entirely.
+    An explicit ``use_published_model`` overrides all of this.
+    """
+    if request.use_published_model is not None:
+        return bool(request.use_published_model)
+    if framework != "coxam" or dataset_id is None:
+        return False
+
+    from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_trial_executor import (
+        COXAM_CORPUS_FEATURES,
+    )
+
+    return dataset_id in COXAM_CORPUS_FEATURES
+
+
 def _finish_dataset_stage(
     study: xaikitTest,
     request: DatasetStageRequest,
@@ -479,6 +578,25 @@ def _finish_dataset_stage(
         study.model_name = request.model_type
         dataset_payload["model"] = None
         dataset_payload["model_skipped_reason"] = skip_reason
+        return dataset_payload
+
+    framework = design_framework(study)
+    published_note = (
+        _load_published_model(study, study.data.dataset_id, request.model_type, framework)
+        if _should_try_published_model(request, framework, study.data.dataset_id)
+        else None
+    )
+    if published_note and study.trained_ai_model is not None:
+        _reject_single_class_model(study)
+        study.evaluate(split="both")
+        dataset_payload["model"] = {
+            "model_name": study.model_name,
+            "test_accuracy": float(study.test_accuracy()),
+            "metrics": frame_records(study.metrics_table().reset_index()),
+            "confusion_matrix": frame_records(study.confusion_matrix_table().reset_index()),
+            "model_source": "published_weights",
+            "model_source_note": published_note,
+        }
         return dataset_payload
 
     target_score, target_note = _effective_target_score(
@@ -504,6 +622,9 @@ def _finish_dataset_stage(
         "metrics": frame_records(study.metrics_table().reset_index()),
         "confusion_matrix": frame_records(study.confusion_matrix_table().reset_index()),
         "target_score_note": target_note,
+        "model_source": "trained",
+        # Set when published weights existed but could not be used.
+        "model_source_note": published_note,
     }
     return dataset_payload
 
@@ -543,7 +664,37 @@ def _finish_multi_dataset_stage(
             models_payload[dataset_id] = {"model": None, "model_skipped_reason": skip_reason}
             continue
 
+        published_note = None
         with study.use_dataset(dataset_id):
+            if _should_try_published_model(request, framework, dataset_id):
+                published_note = _load_published_model(
+                    study, dataset_id, request.model_type, framework
+                )
+            if published_note and study.trained_ai_model is not None:
+                _reject_single_class_model(study, dataset_id)
+                study.evaluate(split="both")
+                models_payload[dataset_id] = {
+                    "model": {
+                        "model_name": study.model_name,
+                        "test_accuracy": float(study.test_accuracy()),
+                        "metrics": frame_records(study.metrics_table().reset_index()),
+                        "confusion_matrix": frame_records(
+                            study.confusion_matrix_table().reset_index()
+                        ),
+                        "model_source": "published_weights",
+                        "model_source_note": published_note,
+                    },
+                    "model_skipped_reason": None,
+                }
+                # use_dataset restores the outer state on exit, so the loaded
+                # model has to be recorded per dataset -- the same five slots
+                # train_AI_model_for_dataset fills.
+                study.trained_ai_model_by_dataset[dataset_id] = study.trained_ai_model
+                study.model_manager_by_dataset[dataset_id] = study.model_manager
+                study.model_by_dataset[dataset_id] = study.model
+                study.model_name_by_dataset[dataset_id] = study.model_name
+                study.training_info_by_dataset[dataset_id] = study.training_info
+                continue
             target_score, target_note = _effective_target_score(
                 request, getattr(getattr(study.data, "split", None), "y_train", [])
             )
@@ -569,6 +720,8 @@ def _finish_multi_dataset_stage(
                     "metrics": frame_records(study.metrics_table().reset_index()),
                     "confusion_matrix": frame_records(study.confusion_matrix_table().reset_index()),
                     "target_score_note": target_note,
+                    "model_source": "trained",
+                    "model_source_note": published_note,
                 },
                 "model_skipped_reason": None,
             }

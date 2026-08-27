@@ -37,6 +37,19 @@ class DatasetStageRequest(BaseModel):
     model_type: str = "mlp"
     test_size: float = 0.4
     random_state: int = 42
+    use_published_model: Optional[bool] = Field(
+        None,
+        description=(
+            "Load the published AI the human study used, from "
+            "assets/model_weights/<model_type>/<agent>/, instead of training a "
+            "fresh one. Defaults to True for CoXAM whenever those weights exist "
+            "and their input width matches the prepared features: a model "
+            "trained fresh on an imbalanced dataset behaves nothing like the "
+            "corpus AI (wine_quality: ~7% minority predictions against the "
+            "corpus's ~50%), which makes counterfactual results incomparable "
+            "with the published study. Pass false to always train."
+        ),
+    )
     target_metric: str = "accuracy"
     target_score: Optional[float] = 0.85
     max_epochs: int = 50
