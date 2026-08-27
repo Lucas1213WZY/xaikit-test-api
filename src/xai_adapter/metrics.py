@@ -545,7 +545,21 @@ def faithfulness_correlation(
 
 
 def sparsity_loss(W, *, atol: float = 1e-12) -> np.ndarray:
-    """Count non-zero attribution weights per instance (effective complexity)."""
+    """Count non-zero attribution weights per instance (effective complexity).
+
+    Informative only for methods that genuinely zero features out -- a sparse
+    logistic-regression surrogate, a rule set, or sim2real's ``sparse`` property,
+    where it orders the four properties exactly as intended (sparse 1.0,
+    sparse_robust 2.0, faithful 3.0, robust 4.0).
+
+    For dense attribution methods it saturates: LIME and SHAP essentially never
+    return an exact zero, so on adult's five raw features both score 5.0. That
+    is a true statement about those methods, not a measurement failure -- but it
+    means the count cannot separate them, and :func:`sparsity_gini` is the
+    column to read there (0.52 vs 0.44 on the same run). Raising ``atol`` does
+    not rescue it: thresholding at 1% of each instance's peak attribution still
+    leaves LIME at 7.94 and SHAP at 7.91 of 9 model-space columns.
+    """
     weights = ensure_2d(W)
     return np.sum(np.abs(weights) > atol, axis=1).astype(float)
 

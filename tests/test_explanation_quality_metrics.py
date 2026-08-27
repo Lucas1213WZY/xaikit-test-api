@@ -516,3 +516,27 @@ def test_the_two_halves_of_a_fixed_class_score_have_opposite_signs():
     )
     assert np.nanmean(fixed[labels == 1]) > 0.0
     assert np.nanmean(fixed[labels == 0]) < 0.0
+
+
+def test_the_non_zero_count_orders_genuinely_sparse_explanations():
+    """It saturates on LIME/SHAP, so pin that it works where sparsity is real.
+
+    sim2real builds explanations to order; the count must rank them. On adult,
+    LIME and SHAP both score the full feature count because neither returns an
+    exact zero -- a true statement about those methods, but one that makes Gini
+    the column to read there.
+    """
+    from src.xai_adapter import create_xai_method
+
+    rng = np.random.default_rng(0)
+    X = rng.uniform(-1.0, 1.0, size=(20, 4))  # SparseFunction declares 4 features
+    counts = {}
+    for prop in ("sparse", "sparse_robust", "faithful", "robust"):
+        explainer = create_xai_method(
+            "xaisim2real", function_name="sparse", property_name=prop,
+            n_candidate_explanations=50, n_local_samples=20,
+        )
+        counts[prop] = sparsity_loss(explainer.explain(X).values).mean()
+
+    assert counts["sparse"] < counts["sparse_robust"] < counts["faithful"] < counts["robust"]
+    assert counts["sparse"] == pytest.approx(1.0)
