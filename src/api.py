@@ -1600,6 +1600,8 @@ class xaikitTest:
         output_dir: str | Path = "generated_explanation",
         target: int = 1,
         method_kwargs: Optional[dict[str, dict[str, Any]]] = None,
+        quality_metrics: bool = False,
+        quality_metric_kwargs: Optional[dict[str, Any]] = None,
         show_checks: bool = True,
     ) -> tuple[Optional[Path], Optional[pd.DataFrame]]:
         """Generate method-level XAI tables and combine them into one table.
@@ -1613,6 +1615,14 @@ class xaikitTest:
             target: Class index explanations are generated for.
             method_kwargs: Per-method options, keyed by method name, e.g.
                 ``{"shap": {"background_size": 100}}``.
+            quality_metrics: Score each explanation's faithfulness, complexity
+                and robustness and attach the results as columns, readable
+                afterwards via ``explanation_quality_table()``. Off by default:
+                it changes the table's column set, which existing runs and the
+                design-planner UI have not been asked to expect.
+            quality_metric_kwargs: Options for the scoring, e.g.
+                ``{"radius": 0.2, "n_subsets": 100}`` or ``{"specs": {...}}`` to
+                declare how a custom method's values must be read.
             show_checks: Print the resolved methods and validation output.
 
         Returns:
@@ -1684,6 +1694,8 @@ class xaikitTest:
             instance_ids=explanation_instance_ids,
             instance_ids_by_method=explanation_ids_by_method,
             predictions_by_instance=self.ai_predictions_by_instance,
+            quality_metrics=quality_metrics,
+            quality_metric_kwargs=quality_metric_kwargs,
         )
         self.explanation_paths, self.explanation_dfs = xai_adapter_api.generate_xai_explanation_tables(
             self.explanation_config
@@ -1700,6 +1712,34 @@ class xaikitTest:
             self.explanation_config,
         )
         return self.combined_explanation_path, self.combined_explanations
+
+    def explanation_quality_table(
+        self,
+        *,
+        by: str = "expMethod",
+        scores: bool = False,
+    ) -> pd.DataFrame:
+        """Mean explanation-quality per XAI method, from the generated table.
+
+        Mirrors ``metrics_table()`` for the AI model: ``evaluate()`` measures the
+        model, this measures the explanations of it. Empty unless
+        ``explanations(quality_metrics=True)`` produced the columns.
+
+        Args:
+            by: Column to group by; defaults to the XAI method.
+            scores: Also return normalised higher-is-better ``*_score`` columns.
+                A display convenience only -- the normalisation depends on which
+                methods happen to be in the table, so it is not comparable
+                across runs.
+
+        Raises:
+            RuntimeError: If called before ``explanations(...)``.
+        """
+        from src.xai_adapter.metrics import quality_table
+
+        return quality_table(
+            self._require_combined_explanations(), by=by, scores=scores
+        )
 
     def plot_explanation(
         self,

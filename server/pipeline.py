@@ -1118,6 +1118,27 @@ def run_trials_stage(study: xaikitTest, request: TrialsStageRequest) -> dict[str
 # -- stage 3: explanations ------------------------------------------------
 
 
+
+def _with_explanation_quality(
+    payload: dict[str, Any], pool: Any, request: ExplanationStageRequest
+) -> dict[str, Any]:
+    """Add per-method explanation quality, only when it was asked for.
+
+    The key is omitted rather than set to an empty list when the metrics are
+    off, so a default run's payload is exactly what it was before this existed
+    -- the design-planner UI is a separate project and has not been asked to
+    expect a new field.
+    """
+    if not getattr(request, "quality_metrics", False):
+        return payload
+
+    from src.xai_adapter.metrics import QUALITY_COLUMNS, quality_table
+
+    payload["quality"] = frame_records(quality_table(pool))
+    payload["quality_columns"] = list(QUALITY_COLUMNS)
+    return payload
+
+
 def run_explanations_stage(study: xaikitTest, request: ExplanationStageRequest) -> dict[str, Any]:
     """Generate one XAI table per method in the design, plus AI predictions.
 
@@ -1254,10 +1275,12 @@ def run_explanations_stage(study: xaikitTest, request: ExplanationStageRequest) 
         output_dir=request.output_dir,
         target=request.target,
         method_kwargs=request.method_kwargs,
+        quality_metrics=request.quality_metrics,
+        quality_metric_kwargs=request.quality_metric_kwargs,
         show_checks=True,
     )
     counts = pool["expMethod"].value_counts().rename_axis("expMethod").reset_index(name="rows")
-    return {
+    payload = {
         "combined_table": str(path),
         "rows": int(len(pool)),
         "by_method": frame_records(counts),
@@ -1268,6 +1291,7 @@ def run_explanations_stage(study: xaikitTest, request: ExplanationStageRequest) 
         "files": [str(item) for item in study.explanation_paths],
         "skipped_reason": None,
     }
+    return _with_explanation_quality(payload, pool, request)
 
 
 # -- stage 4: simulation --------------------------------------------------

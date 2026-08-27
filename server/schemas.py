@@ -112,6 +112,22 @@ class ExplanationStageRequest(BaseModel):
     method_kwargs: Optional[dict[str, dict[str, Any]]] = Field(
         default_factory=lambda: {"lime": {"num_samples": 1000}}
     )
+    quality_metrics: bool = Field(
+        False,
+        description=(
+            "Score each explanation's faithfulness, complexity and robustness "
+            "and return the per-method means under a 'quality' key. Off by "
+            "default: it adds columns to the explanation table and a key to this "
+            "response, neither of which existing clients were built to expect. "
+            "The key is omitted entirely unless this is true."
+        ),
+    )
+    quality_metric_kwargs: Optional[dict[str, Any]] = Field(
+        None,
+        description=(
+            "Options for the scoring, e.g. {'radius': 0.2, 'n_subsets': 100}."
+        ),
+    )
     output_dir: str = "generated_explanation"
 
 
