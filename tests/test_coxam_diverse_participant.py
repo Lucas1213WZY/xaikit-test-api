@@ -227,3 +227,59 @@ def test_episode_seed_separates_two_identical_participants(bundle):
     same_seed = _episode(bundle, params, seed=1)
     pd.testing.assert_series_equal(first["prob_correct"], same_seed["prob_correct"])
     assert not first["prob_correct"].equals(second["prob_correct"])
+
+
+# -- the counterfactual env needs a COMPLETE parameter dict ----------------
+
+
+def test_partial_cognitive_params_are_completed_for_the_counterfactual_env():
+    """The env replaces its parameter dict rather than overlaying it.
+
+    ``resolve_cognitive_params`` stores exactly the fixed values it is handed,
+    and ``build_observation`` then reads every parameter the policy observes --
+    so a partial dict (the fitted replay supplies three of the four; it never
+    fitted ``random_response_rate``) made the env raise KeyError while building
+    its observation. Caught only by running a real episode, which is why the
+    draw-level tests above missed it.
+    """
+    from src.cognitive_models.cognitive_models.CoXAM.counterfactual_env import (
+        DEFAULT_COGNITIVE_PARAMS,
+    )
+    from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_counterfactual_runner import (
+        _complete_cognitive_params,
+    )
+
+    drawn = {
+        "memory_recall_threshold": -1.0,
+        "counterfactual_overshoot_fraction": 0.3,
+        "time_penalty_weight": 0.01,
+    }
+    completed = _complete_cognitive_params(drawn)
+
+    # Every parameter the env observes must be present...
+    assert set(DEFAULT_COGNITIVE_PARAMS) <= set(completed)
+    assert "random_response_rate" in completed
+    # ...and the drawn values must survive the merge.
+    for key, value in drawn.items():
+        assert completed[key] == value
+    assert _complete_cognitive_params(None) is None
+    assert _complete_cognitive_params({}) is None
+
+
+def test_a_drawn_counterfactual_row_is_complete_enough_for_the_env():
+    """End of the chain: what the pool deals must be env-ready once completed."""
+    from src.cognitive_models.cognitive_models.CoXAM.counterfactual_env import (
+        DEFAULT_COGNITIVE_PARAMS,
+    )
+    from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_counterfactual_runner import (
+        _complete_cognitive_params,
+    )
+
+    draws = draw_coxam_participants(
+        _trials("decision_tree", complexity="high"),
+        pool_name="coxam_counterfactual",
+        app_id="wine_quality",
+    )
+    for draw in draws.values():
+        completed = _complete_cognitive_params(draw.parameters)
+        assert set(DEFAULT_COGNITIVE_PARAMS) <= set(completed)

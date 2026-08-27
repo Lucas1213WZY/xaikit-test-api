@@ -30,6 +30,7 @@ from src.cognitive_models.cognitive_models.CoXAM.counterfactual_env import (  # 
     XAI_TYPES,
     CounterfactualPolicyEnv,
 )
+from src.cognitive_models.placeholder import COXAM_COUNTERFACTUAL_PARAMS  # noqa: E402
 from src.experiment_planner import select_trial_rows  # noqa: E402
 from src.virtual_experiment_executor.participant_pools import (  # noqa: E402
     draws_to_frame,
@@ -113,6 +114,26 @@ class TrialDrivenCounterfactualEnv(CounterfactualPolicyEnv):
                 "it never samples an episode itself."
             )
         return super().reset(seed=seed, options=options)
+
+
+
+def _complete_cognitive_params(
+    params: Optional[Mapping[str, float]]
+) -> Optional[dict[str, float]]:
+    """Fill in whatever the caller did not name.
+
+    ``CounterfactualPolicyEnv.resolve_cognitive_params`` *replaces* the episode's
+    parameter dict with the fixed values it is given rather than overlaying them,
+    and ``build_observation`` then reads every parameter the policy was trained
+    to observe. So a partial dict -- the fitted pool supplies the three
+    parameters the replay actually fitted, and ``random_response_rate`` is not
+    among them -- makes the env raise ``KeyError`` on the observation it is
+    building, not on the missing input. Overlaying the task defaults keeps the
+    observation complete while the caller's own values still win.
+    """
+    if not params:
+        return None
+    return {**COXAM_COUNTERFACTUAL_PARAMS, **{k: float(v) for k, v in params.items()}}
 
 
 def _result_row(
@@ -210,7 +231,7 @@ def run_coxam_counterfactual_episode(
             "with_xai_schedule": [_with_xai(row) for row in records],
             "counterfactual_instance_ids": counterfactual_ids,
             "forward_instance_ids": list(forward_instance_ids or counterfactual_ids),
-            "cognitive_params_fixed": dict(cognitive_params) if cognitive_params else None,
+            "cognitive_params_fixed": _complete_cognitive_params(cognitive_params),
         },
     )
 
