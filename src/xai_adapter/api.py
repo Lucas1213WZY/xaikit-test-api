@@ -42,6 +42,12 @@ class ExplanationRunConfig:
     instance_ids: Optional[Sequence[Any]] = None
     instance_ids_by_method: Optional[dict[str, Sequence[Any]]] = None
     predictions_by_instance: Optional[dict[int, Any]] = None
+    #: Score each explanation's faithfulness/complexity/robustness and attach the
+    #: results as columns. Off by default: enabling it changes the explanation
+    #: table's column set and the /explanations payload, which existing runs and
+    #: the design-planner UI have not been asked to expect.
+    quality_metrics: bool = False
+    quality_metric_kwargs: Optional[dict[str, Any]] = None
 
     @property
     def dataset_id(self) -> str:
@@ -61,6 +67,8 @@ def init_explanation_run(
     instance_ids: Optional[Sequence[Any]] = None,
     instance_ids_by_method: Optional[dict[str, Sequence[Any]]] = None,
     predictions_by_instance: Optional[dict[int, Any]] = None,
+    quality_metrics: bool = False,
+    quality_metric_kwargs: Optional[dict[str, Any]] = None,
 ) -> ExplanationRunConfig:
     """Collect all shared XAI-generation settings in one object.
 
@@ -103,6 +111,8 @@ def init_explanation_run(
             for method, ids in (instance_ids_by_method or {}).items()
         } or None,
         predictions_by_instance=predictions_by_instance,
+        quality_metrics=quality_metrics,
+        quality_metric_kwargs=quality_metric_kwargs,
     )
 
 
@@ -293,6 +303,66 @@ def _fit_surrogate_if_needed(explainer: Any, config: ExplanationRunConfig) -> No
     explainer.fit(X, y)
 
 
+
+def _quality_for_method(
+    config: ExplanationRunConfig,
+    method_key: str,
+    model_space_result: Any,
+    shown_result: Any,
+    explained_instances: np.ndarray,
+) -> dict[str, Any]:
+    """Score one method's explanations, or explain why they could not be scored.
+
+    Faithfulness and robustness read the **model-space** values -- the vector the
+    model actually saw, before ``_aggregate_result_to_raw_features`` collapses
+    one-hot columns back to raw features. Complexity reads the **shown** vector,
+    because that is what a participant is asked to interpret.
+    """
+    from .metrics import explanation_quality, quality_spec
+
+    options = dict(config.quality_metric_kwargs or {})
+    overrides = options.pop("specs", None)
+    spec = quality_spec(method_key, overrides=overrides)
+    return explanation_quality(
+        config.trained_ai_model,
+        explained_instances,
+        np.asarray(model_space_result.values, dtype=float),
+        spec=spec,
+        base_values=getattr(model_space_result, "base_values", None),
+        target=config.target,
+        shown_values=np.asarray(shown_result.values, dtype=float),
+        **options,
+    )
+
+
+def _attach_quality_columns(
+    explanation_df: pd.DataFrame, quality: dict[str, Any]
+) -> pd.DataFrame:
+    """Add the per-instance quality columns to one method's explanation table."""
+    from .metrics import QUALITY_COLUMNS
+
+    for column in QUALITY_COLUMNS:
+        if column not in quality:
+            continue
+        value = quality[column]
+        explanation_df[column] = (
+            value if np.ndim(value) else [value] * len(explanation_df)
+        )
+    return explanation_df
+
+
+def _unscored_quality_columns(
+    explanation_df: pd.DataFrame, reason: str
+) -> pd.DataFrame:
+    """Mark a table whose metrics failed, without losing the explanations."""
+    from .metrics import QUALITY_METRIC_COLUMNS
+
+    for column in QUALITY_METRIC_COLUMNS:
+        explanation_df[column] = np.nan
+    explanation_df["quality_note"] = f"unscored: {reason}"
+    return explanation_df
+
+
 def generate_xai_explanation_tables(
     config: ExplanationRunConfig,
 ) -> tuple[list[Path], list[pd.DataFrame]]:
@@ -343,6 +413,10 @@ def generate_xai_explanation_tables(
             explainer = _make_explainer(method_key, config, train_data_for_xai)
             _fit_surrogate_if_needed(explainer, config)
             result = explainer.explain(explained_instances)
+            # Kept before aggregation: faithfulness and robustness must be
+            # measured against the vector the model saw, not the one-hot
+            # columns collapsed back to raw features for display.
+            model_space_result = result
             result = _aggregate_result_to_raw_features(
                 config.data,
                 result,
@@ -355,6 +429,23 @@ def generate_xai_explanation_tables(
                 model_name=config.model_name,
             )
             explanation_df[EXPLANATION_METHOD_COL] = method_key
+
+            if config.quality_metrics:
+                # A metric failure must never cost an explanation that generated
+                # fine, so this degrades to NaN + a note rather than raising into
+                # the outer handler, which would drop the whole method.
+                try:
+                    explanation_df = _attach_quality_columns(
+                        explanation_df,
+                        _quality_for_method(
+                            config, method_key, model_space_result, result,
+                            explained_instances,
+                        ),
+                    )
+                except Exception as quality_exc:
+                    reason = f"{type(quality_exc).__name__}: {quality_exc}"
+                    print(f"  Quality metrics unavailable for {method_name}: {reason}")
+                    explanation_df = _unscored_quality_columns(explanation_df, reason)
 
             out_path = config.output_dir / f"{method_key}_{config.model_name}_{config.dataset_id}.csv"
             explanation_df.to_csv(out_path, index=False)
