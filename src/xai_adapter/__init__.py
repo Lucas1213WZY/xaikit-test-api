@@ -51,6 +51,21 @@ from .concept import TCAVAdapter
 from .dataset import CSVDatasetAdapter, PrecomputedCSVXAIMethod
 from .example_based import CounterfactualAdapter, DiCEAdapter, PrototypesAdapter
 from .interpret import EBMAdapter
+from .metrics import (
+    QUALITY_COLUMNS,
+    QualitySpec,
+    complexity_entropy,
+    explanation_quality,
+    faithfulness_aopc,
+    faithfulness_correlation,
+    quality_spec,
+    quality_table,
+    register_quality_spec,
+    robustness_loss,
+    score_result,
+    sparsity_gini,
+    sparsity_loss,
+)
 from .registry import XAIAdapterRegistry, create_xai_method, get_adapter_registry, register_xai_method
 from .surrogate import (
     AnchorsAdapter,
@@ -79,6 +94,20 @@ from .visualization import (
 )
 
 __all__ = [
+    # explanation-quality metrics -- usable by any adapter, see score_result
+    "QUALITY_COLUMNS",
+    "QualitySpec",
+    "complexity_entropy",
+    "explanation_quality",
+    "faithfulness_aopc",
+    "faithfulness_correlation",
+    "quality_spec",
+    "quality_table",
+    "register_quality_spec",
+    "robustness_loss",
+    "score_result",
+    "sparsity_gini",
+    "sparsity_loss",
     "XAIAdapter",
     "XAIAdapterResult",
     "baseline_from_data",
