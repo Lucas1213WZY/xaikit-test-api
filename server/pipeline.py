@@ -360,6 +360,111 @@ def _corpus_skip_reason(framework: str, dataset_id: str) -> Optional[str]:
     return None
 
 
+#: Accuracy-shaped metrics a constant, majority-class predictor can satisfy.
+#: ``balanced_accuracy`` is deliberately absent -- a constant predictor scores
+#: 0.5 on it, which is the whole reason it is the recommended alternative.
+_MAJORITY_SATISFIABLE_METRICS = frozenset({"accuracy", "test_accuracy", "train_accuracy"})
+
+
+def _majority_class_rate(labels: Any) -> Optional[float]:
+    """Share of the most common class, i.e. what predicting one class scores.
+
+    Returns None for anything that is not a concrete 1-D label array -- a study
+    whose dataset stage was mocked, or a split that carries no labels. Silence
+    is the right answer there: the caller then leaves the target alone rather
+    than deriving a floor from something that is not a class distribution.
+    """
+    try:
+        values = np.asarray(labels)
+    except Exception:  # noqa: BLE001 - anything unarray-able is simply unknown
+        return None
+    if values.dtype == object or values.ndim != 1 or values.size == 0:
+        return None
+    _, counts = np.unique(values, return_counts=True)
+    return float(counts.max() / values.size)
+
+
+def _effective_target_score(
+    request: DatasetStageRequest, labels: Any
+) -> tuple[Optional[float], Optional[str]]:
+    """Raise an accuracy target that a constant predictor would already meet.
+
+    On an imbalanced dataset the majority-class rate *is* an accuracy floor:
+    wine_quality is 86.4% class 0, so the default ``target_score=0.85`` is
+    reached by a model that predicts class 0 for every instance. Training then
+    stops at 20 epochs reporting ``reached_target: True`` with a model that has
+    learned nothing, and the failure only surfaces much later -- in CoXAM's
+    surrogate fitting, as "the trained AI model predicts only class [0]", whose
+    advice ("train the model longer") does not address the cause.
+
+    So the target is lifted a quarter of the way from the floor to 1.0, which
+    forces training to actually separate the classes. Untouched when the caller
+    asked for a metric a constant predictor cannot satisfy (balanced_accuracy,
+    f1, ...), or when the target already clears the floor.
+    """
+    target = request.target_score
+    if target is None:
+        return target, None
+    metric = str(request.target_metric or "accuracy").strip().lower()
+    if metric not in _MAJORITY_SATISFIABLE_METRICS:
+        return target, None
+    floor = _majority_class_rate(labels)
+    if floor is None or target > floor:
+        return target, None
+    lifted = min(0.99, floor + (1.0 - floor) * 0.25)
+    return lifted, (
+        f"target_score={target} is at or below the majority-class rate "
+        f"({floor:.4f}) for this dataset, which a model predicting one class for "
+        f"every instance already reaches. Raised to {lifted:.4f} so training has "
+        f"to separate the classes; pass target_metric='balanced_accuracy' to "
+        f"score against a chance-level baseline instead."
+    )
+
+
+def _reject_single_class_model(study: xaikitTest, dataset_id: Optional[str] = None) -> None:
+    """Fail here if the trained model predicts one class for everything.
+
+    A constant classifier is not an AI worth explaining: every XAI method
+    describes it as flat, CoXAM cannot fit surrogates against it at all, and
+    every simulated participant scores its one class. Caught at the stage that
+    produced it, naming what to change, rather than several stages downstream.
+    """
+    data = study.data
+    model = study.trained_ai_model
+    if data is None or model is None:
+        return
+    split = getattr(data, "split", None)
+    if split is None or getattr(split, "X_model", None) is None:
+        return
+
+    from src.ai_models.model_api import _labels_and_scores_from_predictions
+
+    try:
+        labels, _scores = _labels_and_scores_from_predictions(model.predict(split.X_model))
+        predicted = np.unique(np.asarray(labels))
+    except Exception:  # noqa: BLE001
+        # This is a safety net, not a correctness gate: a model whose output
+        # cannot be read as labels here (a stub in a test, an exotic wrapper)
+        # is left to the stages that actually depend on its predictions, which
+        # report their own errors. The net must never become the failure.
+        return
+    if predicted.size != 1:
+        return
+
+    floor = _majority_class_rate(getattr(split, "y_train", []))
+    where = f" for dataset {dataset_id!r}" if dataset_id else ""
+    raise ValueError(
+        f"The trained AI model{where} predicts only class {predicted.tolist()} for "
+        f"every instance, so it has learned nothing to explain and no XAI method or "
+        f"cognitive simulation downstream can produce meaningful results."
+        + (f" The training data is {floor:.1%} one class, so a constant predictor "
+           f"already scores {floor:.4f} on plain accuracy." if floor else "")
+        + " Try model_type='xgboost' (which separates the classes on this data), "
+        "target_metric='balanced_accuracy' with target_score around 0.65, or a "
+        "higher target_score together with a larger max_epochs."
+    )
+
+
 def _finish_dataset_stage(
     study: xaikitTest,
     request: DatasetStageRequest,
@@ -376,15 +481,19 @@ def _finish_dataset_stage(
         dataset_payload["model_skipped_reason"] = skip_reason
         return dataset_payload
 
+    target_score, target_note = _effective_target_score(
+        request, getattr(getattr(study.data, "split", None), "y_train", [])
+    )
     study.train_AI_model(
         model_type=request.model_type,
         target_metric=request.target_metric,
-        target_score=request.target_score,
+        target_score=target_score,
         max_epochs=request.max_epochs,
         check_every_epochs=request.check_every_epochs,
         batch_size=request.batch_size,
         verbose=False,
     )
+    _reject_single_class_model(study)
     study.evaluate(split="both")
 
     dataset_payload["model"] = {
@@ -394,6 +503,7 @@ def _finish_dataset_stage(
         "training_history": frame_records(study.training_history_table()),
         "metrics": frame_records(study.metrics_table().reset_index()),
         "confusion_matrix": frame_records(study.confusion_matrix_table().reset_index()),
+        "target_score_note": target_note,
     }
     return dataset_payload
 
@@ -433,17 +543,22 @@ def _finish_multi_dataset_stage(
             models_payload[dataset_id] = {"model": None, "model_skipped_reason": skip_reason}
             continue
 
+        with study.use_dataset(dataset_id):
+            target_score, target_note = _effective_target_score(
+                request, getattr(getattr(study.data, "split", None), "y_train", [])
+            )
         study.train_AI_model_for_dataset(
             dataset_id,
             model_type=request.model_type,
             target_metric=request.target_metric,
-            target_score=request.target_score,
+            target_score=target_score,
             max_epochs=request.max_epochs,
             check_every_epochs=request.check_every_epochs,
             batch_size=request.batch_size,
             verbose=False,
         )
         with study.use_dataset(dataset_id):
+            _reject_single_class_model(study, dataset_id)
             study.evaluate(split="both")
             models_payload[dataset_id] = {
                 "model": {
@@ -453,6 +568,7 @@ def _finish_multi_dataset_stage(
                     "training_history": frame_records(study.training_history_table()),
                     "metrics": frame_records(study.metrics_table().reset_index()),
                     "confusion_matrix": frame_records(study.confusion_matrix_table().reset_index()),
+                    "target_score_note": target_note,
                 },
                 "model_skipped_reason": None,
             }
