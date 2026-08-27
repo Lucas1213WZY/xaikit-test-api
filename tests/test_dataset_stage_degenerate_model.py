@@ -39,8 +39,27 @@ def test_a_target_below_the_majority_rate_is_raised_above_it():
     score, note = _effective_target_score(request, IMBALANCED)
 
     assert score > _majority_class_rate(IMBALANCED)
-    assert score == pytest.approx(0.8983, abs=1e-4)
+    # A quarter of the headroom is 0.8983, but a lifted target never goes below
+    # the 0.90 floor.
+    assert score == pytest.approx(0.90)
     assert note and "majority-class rate" in note
+
+
+def test_a_lifted_target_never_drops_below_the_floor_constant():
+    """0.90 is the minimum; a barely-cleared target still accepts a weak model."""
+    from server.pipeline import _MINIMUM_LIFTED_TARGET
+
+    for labels in (IMBALANCED, np.array([0] * 88 + [1] * 12)):
+        score, _ = _effective_target_score(DatasetStageRequest(), labels)
+        assert score >= _MINIMUM_LIFTED_TARGET
+
+
+def test_a_floor_above_the_minimum_wins_over_it():
+    """95% one class needs more than 0.90 to be meaningful."""
+    labels = np.array([0] * 950 + [1] * 50)
+    score, _ = _effective_target_score(DatasetStageRequest(target_score=0.85), labels)
+    assert score > _majority_class_rate(labels)
+    assert score == pytest.approx(0.9625, abs=1e-4)
 
 
 def test_a_target_that_already_clears_the_floor_is_left_alone():
@@ -113,3 +132,60 @@ def test_nothing_to_check_is_not_an_error():
     """A corpus-covered dataset trains no model; that is not a failure."""
     _reject_single_class_model(SimpleNamespace(data=None, trained_ai_model=None))
     _reject_single_class_model(_study(None))
+
+
+# -- CoXAM trains on the corpus's own feature set and order ----------------
+
+
+def _selection(framework="coxam", datasets=("wine_quality",), **kwargs):
+    from server.pipeline import _corpus_feature_selection
+
+    return _corpus_feature_selection(DatasetStageRequest(**kwargs), framework, list(datasets))
+
+
+def test_coxam_defaults_to_the_corpus_feature_set_and_order():
+    """The corpus's a0..a5 are positional, so order matters as much as spelling."""
+    from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_trial_executor import (
+        coxam_loader_feature_cols,
+    )
+
+    cols, rank, note = _selection()
+    assert cols == coxam_loader_feature_cols("wine_quality")
+    # Ranking would reorder the six by target correlation, losing the positions.
+    assert rank is False
+    assert note and "positional" in note
+
+
+def test_the_default_selection_would_otherwise_drop_a_corpus_feature():
+    """prepare_dataset's default picks 5 of the corpus's 6 for wine_quality."""
+    cols, _rank, _note = _selection()
+    assert len(cols) == 6
+    assert "chlorides" in cols
+
+
+def test_an_explicit_feature_choice_is_never_overridden():
+    for kwargs in ({"feature_cols": ["Alcohol", "pH"]}, {"num_features": 4}):
+        cols, rank, note = _selection(**kwargs)
+        assert cols == kwargs.get("feature_cols")
+        assert note is None
+        assert rank is DatasetStageRequest(**kwargs).rank_features_by_target
+
+
+@pytest.mark.parametrize("framework", ["coax", "sim2real", "baseline"])
+def test_other_frameworks_are_left_alone(framework):
+    cols, _rank, note = _selection(framework=framework)
+    assert cols is None
+    assert note is None
+
+
+def test_a_dataset_the_corpus_does_not_cover_is_left_alone():
+    cols, _rank, note = _selection(datasets=("breast_cancer",))
+    assert cols is None
+    assert note is None
+
+
+def test_two_datasets_with_different_corpus_features_are_left_alone():
+    """One feature_cols cannot serve two different corpus feature sets."""
+    cols, _rank, note = _selection(datasets=("wine_quality", "mushrooms"))
+    assert cols is None
+    assert note is None

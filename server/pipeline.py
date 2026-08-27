@@ -360,6 +360,13 @@ def _corpus_skip_reason(framework: str, dataset_id: str) -> Optional[str]:
     return None
 
 
+#: Floor for a lifted accuracy target. Clearing the majority-class rate is what
+#: stops a constant predictor passing, but barely clearing it (wine_quality's
+#: rate is 0.8644, a quarter of the remaining headroom is 0.8983) still accepts
+#: a model that has barely separated the classes. 0.90 is the minimum a lifted
+#: target is allowed to be.
+_MINIMUM_LIFTED_TARGET = 0.90
+
 #: Accuracy-shaped metrics a constant, majority-class predictor can satisfy.
 #: ``balanced_accuracy`` is deliberately absent -- a constant predictor scores
 #: 0.5 on it, which is the whole reason it is the recommended alternative.
@@ -411,7 +418,10 @@ def _effective_target_score(
     floor = _majority_class_rate(labels)
     if floor is None or target > floor:
         return target, None
-    lifted = min(0.99, floor + (1.0 - floor) * 0.25)
+    # A quarter of the headroom above the floor, but never below 0.90 -- and
+    # for a dataset whose floor is already above that, never at or below the
+    # floor itself, which is the only thing that makes the target meaningful.
+    lifted = min(0.999, max(_MINIMUM_LIFTED_TARGET, floor + (1.0 - floor) * 0.25))
     return lifted, (
         f"target_score={target} is at or below the majority-class rate "
         f"({floor:.4f}) for this dataset, which a model predicting one class for "
@@ -462,6 +472,54 @@ def _reject_single_class_model(study: xaikitTest, dataset_id: Optional[str] = No
         + " Try model_type='xgboost' (which separates the classes on this data), "
         "target_metric='balanced_accuracy' with target_score around 0.65, or a "
         "higher target_score together with a larger max_epochs."
+    )
+
+
+def _corpus_feature_selection(
+    request: DatasetStageRequest, framework: str, dataset_ids: Sequence[str]
+) -> tuple[Optional[list[str]], bool, Optional[str]]:
+    """CoXAM's own feature set and order, unless the caller named its own.
+
+    CoXAM's published explanations are **positional**: ``a0..a5`` and every
+    decision-tree threshold refer to the corpus's feature order, so a study
+    prepared with a different set -- or the same set in a different order --
+    is not comparable with the corpus and cannot read it at all
+    (``source="assets"`` rejects the mismatch outright).
+
+    Two things go wrong without this. ``prepare_dataset``'s default picks the
+    top features by target correlation, which for wine_quality selects 5 of the
+    corpus's 6 and drops ``chlorides``. And ``rank_features_by_target`` reorders
+    whatever it is given, so even passing the right six by name yields the wrong
+    positions (see ``coxam_loader_feature_cols``, whose docstring says exactly
+    this).
+
+    Returns ``(feature_cols, rank_features_by_target, note)``; an explicit
+    ``feature_cols`` or ``num_features`` on the request is always left alone.
+    """
+    if framework != "coxam" or request.feature_cols or request.num_features:
+        return request.feature_cols, request.rank_features_by_target, None
+
+    from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_trial_executor import (
+        COXAM_CORPUS_FEATURES,
+        coxam_loader_feature_cols,
+    )
+
+    covered = [d for d in dataset_ids if d in COXAM_CORPUS_FEATURES]
+    if len(covered) != len(dataset_ids) or not covered:
+        return request.feature_cols, request.rank_features_by_target, None
+
+    selections = {tuple(coxam_loader_feature_cols(d)) for d in covered}
+    if len(selections) != 1:
+        # Two datasets with different corpus feature sets cannot share one
+        # feature_cols; leave the caller's selection alone rather than pick.
+        return request.feature_cols, request.rank_features_by_target, None
+
+    feature_cols = list(next(iter(selections)))
+    return feature_cols, False, (
+        f"Prepared with the CoXAM corpus's own feature set and order "
+        f"({', '.join(feature_cols)}) rather than the top features by target "
+        f"correlation, because the corpus's explanations are positional. Pass "
+        f"feature_cols or num_features to override."
     )
 
 
@@ -627,21 +685,27 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
 
     framework = design_framework(study)
     needs_baselines = bool(getattr(design, "baseline_model_ids", None))
+    feature_cols, rank_features_by_target, feature_note = _corpus_feature_selection(
+        request, framework, dataset_ids
+    )
 
     if len(dataset_ids) == 1:
         data = study.prepare_dataset(
             dataset_ids[0],
             model_type=request.model_type,
-            feature_cols=request.feature_cols,
+            feature_cols=feature_cols,
             num_features=request.num_features,
-            rank_features_by_target=request.rank_features_by_target,
+            rank_features_by_target=rank_features_by_target,
             test_size=request.test_size,
             random_state=request.random_state,
             show_available=False,
             show_summary=True,
             cognitive_model_id=framework,
         )
-        dataset_payload = {"dataset": _dataset_payload_entry(data)}
+        dataset_payload = {
+            "dataset": _dataset_payload_entry(data),
+            "feature_selection_note": feature_note,
+        }
         # A declared baseline only forces real training when it can't be
         # served from the corpus instead: a baseline (KNN, decision tree, ...)
         # is a proxy that reads predictions/explanations/features -- it does
@@ -692,9 +756,9 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
     data_by_dataset = study.prepare_dataset(
         dataset_ids,
         model_type=request.model_type,
-        feature_cols=request.feature_cols,
+        feature_cols=feature_cols,
         num_features=request.num_features,
-        rank_features_by_target=request.rank_features_by_target,
+        rank_features_by_target=rank_features_by_target,
         test_size=request.test_size,
         random_state=request.random_state,
         show_available=False,
@@ -702,6 +766,7 @@ def run_dataset_stage(study: xaikitTest, request: DatasetStageRequest) -> dict[s
         cognitive_model_id=framework,
     )
     dataset_payload = {
+        "feature_selection_note": feature_note,
         "datasets": {
             dataset_id: _dataset_payload_entry(data)
             for dataset_id, data in data_by_dataset.items()
