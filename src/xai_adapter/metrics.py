@@ -361,6 +361,34 @@ def fidelity_classification_loss(
 # -- faithfulness: perturbation-based (the standard) ----------------------
 
 
+
+def class_scores(model_or_fn, X, labels: np.ndarray) -> Optional[np.ndarray]:
+    """The model's score for one nominated class per instance.
+
+    Perturbation metrics measure how far the model's confidence *in what it
+    predicted* falls when evidence is removed. Scoring a fixed class instead
+    makes the metric cancel itself out on any dataset whose predictions are
+    mixed: on adult, masking the top features lowers p(class 1) for the 70
+    instances predicted 1 (+0.43) and raises it for the 230 predicted 0
+    (-0.14), averaging to roughly zero while both halves behaved exactly as a
+    faithful explanation should.
+    """
+    X_arr = ensure_2d(X)
+    raw = _predict(model_or_fn, X_arr)
+    rows = np.arange(X_arr.shape[0])
+    idx = np.asarray(labels).reshape(-1).astype(int)
+
+    if raw.ndim == 2:
+        if raw.shape[1] <= idx.max():
+            return None
+        return raw[rows, idx].astype(float)
+
+    flat = raw.reshape(-1).astype(float)
+    if flat.min() < 0.0 or flat.max() > 1.0:
+        return None  # a margin, not a probability: no complement to take
+    return np.where(idx == 1, flat, 1.0 - flat)
+
+
 def _masked(X: np.ndarray, baseline: np.ndarray, columns: np.ndarray) -> np.ndarray:
     """``X`` with the given per-row column indices replaced by the baseline."""
     out = X.copy()
@@ -377,6 +405,7 @@ def deletion_curve(
     baseline,
     target: Optional[int] = 1,
     steps: Optional[int] = None,
+    against: str = "predicted",
 ) -> np.ndarray:
     """Score drop as the most-attributed features are progressively masked.
 
@@ -396,14 +425,25 @@ def deletion_curve(
     steps = n_features if steps is None else int(min(steps, n_features))
 
     order = np.argsort(-np.abs(W_arr), axis=1)
-    _labels, original, _space = model_scores(model_or_fn, X_arr, target=target)
+    labels, target_scores, _space = model_scores(model_or_fn, X_arr, target=target)
+
+    # Which class the confidence is measured on, held fixed across mask sizes so
+    # every step compares like with like.
+    if against == "predicted":
+        original = class_scores(model_or_fn, X_arr, labels)
+        scored_class = labels
+    else:
+        original, scored_class = target_scores, None
     if original is None:
         return np.full((X_arr.shape[0], steps), np.nan)
 
     drops = np.empty((X_arr.shape[0], steps), dtype=float)
     for k in range(steps):
         masked = _masked(X_arr, base_row, order[:, : k + 1])
-        _l, scores, _s = model_scores(model_or_fn, masked, target=target)
+        if scored_class is None:
+            _l, scores, _s = model_scores(model_or_fn, masked, target=target)
+        else:
+            scores = class_scores(model_or_fn, masked, scored_class)
         drops[:, k] = original - (scores if scores is not None else original)
     return drops
 
@@ -416,15 +456,23 @@ def faithfulness_aopc(
     baseline,
     target: Optional[int] = 1,
     steps: Optional[int] = None,
+    against: str = "predicted",
 ) -> np.ndarray:
     """Area over the deletion curve: mean score drop across mask sizes.
 
     Higher is better. This is the headline faithfulness number because it needs
     only the attribution *ranking* -- no convention, no link function -- so it is
     comparable across LIME, SHAP and the surrogates.
+
+    ``against="predicted"`` (the default) measures the fall in the model's
+    confidence in *what it predicted*, which is what the pixel-flipping
+    literature does. ``against="target"`` scores a fixed class instead, which
+    cancels itself out on any dataset with mixed predictions -- see
+    :func:`class_scores`.
     """
     curve = deletion_curve(
-        model_or_fn, X, W, baseline=baseline, target=target, steps=steps
+        model_or_fn, X, W, baseline=baseline, target=target, steps=steps,
+        against=against,
     )
     return np.nanmean(curve, axis=1)
 
@@ -439,6 +487,7 @@ def faithfulness_correlation(
     subset_size: Optional[int] = None,
     n_subsets: int = 50,
     random_state: int = 0,
+    against: str = "predicted",
 ) -> np.ndarray:
     """Faithfulness Correlation (Bhatt et al. 2020), per instance.
 
@@ -459,7 +508,12 @@ def faithfulness_correlation(
     size = min(size, n_features)
 
     rng = np.random.default_rng(random_state)
-    _labels, original, _space = model_scores(model_or_fn, X_arr, target=target)
+    labels, target_scores, _space = model_scores(model_or_fn, X_arr, target=target)
+    if against == "predicted":
+        original = class_scores(model_or_fn, X_arr, labels)
+        scored_class = labels
+    else:
+        original, scored_class = target_scores, None
     if original is None:
         return np.full(n_rows, np.nan)
 
@@ -469,9 +523,15 @@ def faithfulness_correlation(
         columns = rng.choice(n_features, size=size, replace=False)
         masked = X_arr.copy()
         masked[:, columns] = base_row[columns]
-        _l, scores, _sp = model_scores(model_or_fn, masked, target=target)
+        if scored_class is None:
+            _l, scores, _sp = model_scores(model_or_fn, masked, target=target)
+        else:
+            scores = class_scores(model_or_fn, masked, scored_class)
         drops[:, s] = original - (scores if scores is not None else original)
-        sums[:, s] = W_arr[:, columns].sum(axis=1)
+        # Attributions explain the target class, so on an instance predicted the
+        # other way the sign must be flipped to line up with its own drop.
+        signed = W_arr[:, columns].sum(axis=1)
+        sums[:, s] = signed if scored_class is None else np.where(labels == 1, signed, -signed)
 
     out = np.full(n_rows, np.nan)
     for i in range(n_rows):

@@ -458,3 +458,61 @@ def test_a_variant_suffixed_method_name_resolves_to_its_base_spec():
 
     assert quality_spec("sim2real_property_faithful").convention == "coefficient"
     assert quality_spec("sim2real_property_sparse_robust").convention == "coefficient"
+
+
+# -- AOPC must not cancel itself out on mixed predictions ------------------
+
+
+class _MixedPredictionModel:
+    """Predicts class 0 for most instances, class 1 for a few -- like adult."""
+
+    def predict(self, X):
+        X = np.asarray(X, dtype=float)
+        positive = 1.0 / (1.0 + np.exp(-8.0 * (X[:, 0] - 0.75)))
+        return np.column_stack([1.0 - positive, positive])
+
+
+def test_aopc_measures_the_predicted_class_not_a_fixed_one():
+    """Regression: scoring a fixed class averages a faithful explanation to zero.
+
+    Masking the decisive feature lowers p(class 1) for instances predicted 1 and
+    *raises* it for instances predicted 0. On adult -- 230 of 300 instances
+    predicted 0 -- the two halves cancelled: +0.43 and -0.14 averaged to -0.008,
+    while both behaved exactly as a faithful explanation should. SHAP's AOPC came
+    out below LIME's, contradicting its much higher faithfulness correlation,
+    which is what exposed the bug.
+    """
+    rng = np.random.default_rng(0)
+    X = rng.uniform(0.0, 1.0, size=(60, 2))
+    model = _MixedPredictionModel()
+    faithful = np.tile([1.0, 0.0], (len(X), 1))
+    baseline = np.mean(X, axis=0)
+
+    labels, _scores, _space = model_scores(model, X)
+    assert 0 in set(labels.tolist()) and 1 in set(labels.tolist()), "need mixed predictions"
+
+    predicted = faithfulness_aopc(model, X, faithful, baseline=baseline)
+    fixed = faithfulness_aopc(model, X, faithful, baseline=baseline, against="target")
+
+    # Scoring the predicted class, a faithful explanation is positive nearly
+    # everywhere; scoring a fixed class, the two halves fight each other.
+    assert np.nanmean(predicted) > 0.0
+    # A clear majority, not a specific fraction -- the exact share depends on how
+    # sharp the fixture's decision boundary is. On real adult data it is 83%.
+    assert (predicted > 0).mean() > 0.5
+    assert np.nanmean(predicted) > np.nanmean(fixed)
+
+
+def test_the_two_halves_of_a_fixed_class_score_have_opposite_signs():
+    """The mechanism itself, so a future change cannot quietly reintroduce it."""
+    rng = np.random.default_rng(1)
+    X = rng.uniform(0.0, 1.0, size=(60, 2))
+    model = _MixedPredictionModel()
+    faithful = np.tile([1.0, 0.0], (len(X), 1))
+
+    labels, _s, _sp = model_scores(model, X)
+    fixed = faithfulness_aopc(
+        model, X, faithful, baseline=np.mean(X, axis=0), against="target"
+    )
+    assert np.nanmean(fixed[labels == 1]) > 0.0
+    assert np.nanmean(fixed[labels == 0]) < 0.0
