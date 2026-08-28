@@ -149,6 +149,17 @@ def _result_row(
     maps to the counterfactual task -- never ``forward_accuracy``, which
     names the *other* agent's run (see ``coxam_study_runner._result_row``,
     which is the mirror-image guard for the forward side).
+
+    ``agent_prediction`` carries the AI's prediction **after** the change the
+    participant proposed. The two tasks ask for different things -- forward asks
+    the participant to name a class, counterfactual asks them to name an edit --
+    so this column meant nothing here and was simply absent, leaving every
+    consumer that reads it (the results table, the UI panel) blank for a run
+    that had in fact produced 1080 good rows. Since
+    ``counterfactual_success`` is exactly
+    ``ai_prediction != ai_prediction_counterfactual``, the post-change
+    prediction is the participant's outcome expressed the way the shared column
+    is read, and the success flag stays available alongside it.
     """
     success = info.get("success")
     scorable = [
@@ -182,6 +193,9 @@ def _result_row(
         "delta": info.get("delta"),
         "ai_prediction": info.get("ai_prediction_original"),
         "ai_prediction_counterfactual": info.get("ai_prediction_counterfactual"),
+        # The shared column every consumer reads: what the AI predicted once the
+        # participant's proposed change was applied.
+        "agent_prediction": info.get("ai_prediction_counterfactual"),
         "counterfactual_success": success,
         "invalid_under_condition": info.get("invalid_under_condition"),
         "pred_time": info.get("time"),
