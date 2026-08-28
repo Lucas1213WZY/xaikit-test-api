@@ -610,7 +610,10 @@ def cf_change_path_dt(
       out: dict { "a0": {"p_selected", "mean_delta", "mean_time"}, ... }
     """
     rng = rng or np.random.default_rng()
-    rnd = random.Random(rng.integers(0, 2**31 - 1))
+    # int(): numpy returns np.int64, and Python 3.11+ accepts only int/str/
+    # bytes as a Random seed. This runs fine on 3.10 and raises TypeError on
+    # Colab, which is why the tutorial notebooks used to rewrite this line.
+    rnd = random.Random(int(rng.integers(0, 2**31 - 1)))
 
     x = np.asarray(feature_vector, dtype=float)
     nodes = {n["node"]: n for n in dt_exp.tree_structure}
