@@ -45,10 +45,12 @@ import src.virtual_experiment_executor as virtual_experiment_api
 from src.ai_models import evaluation as ai_eval
 from src.experiment_planner import preview as ep_preview
 from src.experiment_planner.design_export import (
+    DV_MEASURE_ALIASES,
     DesignExport,
     apply_design_export,
     load_design_export,
     parse_design_export,
+    slugify,
 )
 from src.experiment_planner.protocol import (
     default_study_protocol,
@@ -56,6 +58,28 @@ from src.experiment_planner.protocol import (
     normalize_study_protocol,
     validate_study_protocol,
 )
+
+
+def _resolve_dv_names(dvs: dict[str, Any]) -> dict[str, Any]:
+    """Map a DV spelled the way the UI names it onto the name the runners use.
+
+    ``counterfactual_simulation`` is what the design planner calls the measure
+    and what a researcher naturally writes, but the executor's column -- and the
+    name the task router looks for -- is ``counterfactual_accuracy``. The design
+    export path already resolves this; setting the design directly through the
+    API did not, so the DV stayed unrecognised, CoXAM defaulted to its forward
+    agent, and the run finished with no DV column at all. Nothing raised: the
+    failure only surfaced later, at ``analyze_iv_dv``, naming a column no stage
+    had ever been asked to produce.
+
+    An unrecognised name is passed through untouched -- a study may legitimately
+    record measures the simulator does not produce.
+    """
+    resolved: dict[str, Any] = {}
+    for name, levels in dvs.items():
+        canonical = DV_MEASURE_ALIASES.get(slugify(name), name)
+        resolved[canonical] = levels
+    return resolved
 
 
 def _model_input_dim(model: Any, _depth: int = 4) -> Optional[int]:
@@ -378,7 +402,7 @@ class xaikitTest:
         if cvs is not None:
             self.CVs = deepcopy(cvs)
         if dvs is not None:
-            self.DVs = deepcopy(dvs)
+            self.DVs = _resolve_dv_names(deepcopy(dvs))
         if self.auto_validate_design:
             self.validate_design(show=show)
         return self
@@ -429,7 +453,7 @@ class xaikitTest:
             levels: The values the measure can take.
             show: Print the validation summary afterwards.
         """
-        set_factor(self.DVs, name, levels)
+        set_factor(self.DVs, next(iter(_resolve_dv_names({name: levels}))), levels)
         if show:
             self.validate_design(show=True)
         return self
