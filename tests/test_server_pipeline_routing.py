@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -503,11 +504,16 @@ def test_num_training_falls_back_to_four_with_no_apparatus():
     assert kwargs["num_testing"] == 8
 
 
-def test_an_explicit_num_training_is_never_overridden():
-    from unittest.mock import MagicMock
+def _apparatus_study(**overrides):
+    """A study whose apparatus declares 20 tested instances out of 30 trials.
 
-    from server.pipeline import run_trials_stage
-    from server.schemas import TrialsStageRequest
+    The dataset must know about instances the apparatus did *not* declare: the
+    stage samples the training instances from what is left over, and refuses to
+    overlap the declared testing set. A bare MagicMock reports an empty split,
+    so the stage raises before it ever reaches generate_trials -- which is a
+    fixture problem, not the behaviour under test.
+    """
+    from unittest.mock import MagicMock
 
     study = MagicMock()
     study.design_export = DesignExport(
@@ -515,15 +521,57 @@ def test_an_explicit_num_training_is_never_overridden():
         procedure_steps=[], ivs=[], model_framework="KNN",
         participants_per_condition=1, trials_per_participant=30,
         apparatus_instance_ids=list(range(1, 21)),
+        **overrides,
     )
-    study.generate_trials.return_value = MagicMock(trials=pd.DataFrame({"participantId": [1]}))
+    study.data.dataset_id = "adult"
+    study.data.split.test_instance_ids = np.arange(1, 21)
+    study.data.split.train_instance_ids = np.arange(21, 61)
+    study.generate_trials.return_value = MagicMock(
+        trials=pd.DataFrame({"participantId": [1, 1], "phase": ["training", "testing"]})
+    )
+    return study
 
+
+def _trials_stage_kwargs(study, request):
+    """Run the stage far enough to capture the generate_trials call.
+
+    Reporting the exception that stopped it matters: swallowing it turned every
+    fixture mistake into 'NoneType has no attribute kwargs', which says nothing
+    about what actually went wrong.
+    """
+    from server.pipeline import run_trials_stage
+
+    error = None
     try:
-        run_trials_stage(study, TrialsStageRequest(num_training=2))
-    except Exception:
-        pass
+        run_trials_stage(study, request)
+    except Exception as exc:  # only the call into generate_trials is under test
+        error = exc
 
-    assert study.generate_trials.call_args.kwargs["num_training"] == 2
+    assert study.generate_trials.call_args is not None, (
+        f"the stage never reached generate_trials: {error!r}"
+    )
+    return study.generate_trials.call_args.kwargs
+
+
+def test_an_explicit_num_training_is_never_overridden():
+    from server.schemas import TrialsStageRequest
+
+    kwargs = _trials_stage_kwargs(_apparatus_study(), TrialsStageRequest(num_training=2))
+    assert kwargs["num_training"] == 2
+    assert kwargs["num_testing"] == 28
+
+
+def test_the_training_split_is_derived_from_the_design_not_a_flat_default():
+    """30 trials with 20 declared testing instances means 10 training trials.
+
+    The old flat default of 4 left 26 "testing" trials -- more than the
+    apparatus had testing instances to serve.
+    """
+    from server.schemas import TrialsStageRequest
+
+    kwargs = _trials_stage_kwargs(_apparatus_study(), TrialsStageRequest())
+    assert kwargs["num_training"] == 10
+    assert kwargs["num_testing"] == 20
 
 
 # -- explanations stage is a no-op for CoXAM and Sim2Real -------------------
