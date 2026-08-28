@@ -10,7 +10,7 @@ import pandas as pd
 
 from .intervals import ci95_multiplier
 from .labels import pretty
-from .palette import categorical_color
+from .palette import categorical_color, level_color
 
 #: Fraction of the space between adjacent x positions a bar actually fills.
 #: Matplotlib's own default (1.0) leaves no gap between neighbouring bars,
@@ -237,7 +237,15 @@ def plot_iv_dv_grid(
             # panel -- and the same index gives the same color in every other
             # panel and in plot_dv_by_two_ivs, so a level reads as one color
             # across the whole figure.
-            colors = [categorical_color(i) for i in range(len(plotted))]
+            #
+            # level_color keeps that positional scheme for every ordinary
+            # factor, and overrides it for the few whose levels carry meaning:
+            # tested_w_xai is blue when the explanation was shown and red when
+            # it was not, whichever way the levels happen to sort.
+            colors = [
+                level_color(iv, level, i)
+                for i, level in enumerate(plotted["level"].tolist())
+            ]
             bars = axis.bar(
                 positions,
                 plotted["mean"].to_numpy(dtype=float),
@@ -382,7 +390,7 @@ def plot_dv_by_two_ivs(
             yerr=None if errorbar is None else errors,
             capsize=4 if errorbar is not None else 0,
             label=_display_label(hue_level, hue_labels),
-            color=categorical_color(hue_index),
+            color=level_color(hue_iv, hue_level, hue_index),
             alpha=0.9,
             edgecolor="white",
             linewidth=0.6,
