@@ -129,14 +129,27 @@ def test_the_real_export_runs_the_full_pipeline_without_the_corpus_error(tmp_pat
 
     dataset_result = run_dataset_stage(study, DatasetStageRequest())
     assert set(dataset_result["datasets"]) == {"wine_quality", "mushrooms"}
-    # Both datasets are covered by CoXAM's own published corpus, so neither
-    # trains for real -- see _finish_multi_dataset_stage, which now decides
-    # this per dataset rather than requiring every dataset in the study to
-    # agree (dataset_result["models"] replaces the old single "model" key).
+    # Every dataset ends up with a real AI -- CoXAM's counterfactual environment
+    # predicts with it, so there is nothing to skip. What differs per dataset is
+    # *which* AI, and the entry records that (see _load_published_model).
     assert set(dataset_result["models"]) == {"wine_quality", "mushrooms"}
     for entry in dataset_result["models"].values():
-        assert entry["model"] is None
-        assert entry["model_skipped_reason"]
+        assert entry["model"] is not None
+        assert not entry.get("model_skipped_reason")
+
+    sources = {
+        name: entry["model"]["model_source"]
+        for name, entry in dataset_result["models"].items()
+    }
+    # wine_quality's prepared features line up with the published corpus, so the
+    # study explains the same AI the human participants faced.
+    assert sources["wine_quality"] == "published_weights"
+    # mushrooms' one-hot encoding does not: the published weights expect 9
+    # features and the prepared dataset has 10. The weights are positional, so
+    # loading them anyway would silently produce meaningless predictions --
+    # training a fresh model and saying why is the correct fallback.
+    assert sources["mushrooms"] == "trained"
+    assert "features" in dataset_result["models"]["mushrooms"]["model"]["model_source_note"]
 
     trials_result = run_trials_stage(study, TrialsStageRequest())
     assert trials_result["counts"]["trials"] > 0
