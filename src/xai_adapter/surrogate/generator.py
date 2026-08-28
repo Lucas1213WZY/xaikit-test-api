@@ -190,19 +190,41 @@ def generate_logistic_regression_table(
 
     X_model = _minmax_normalize(X_array)
 
-    classifier = LogisticRegression(C=C, random_state=random_state, max_iter=max_iter, **kwargs)
-    classifier.fit(X_model, y_array)
+    def fit_on(columns: Sequence[int]):
+        """Fit the surrogate on one column subset and score it on its own fit.
 
-    coefs = classifier.coef_[0].astype(float)
-    intercept = float(classifier.intercept_[0])
-    fidelity = float(accuracy_score(y_array, classifier.predict(X_model)))
+        Every variant is fitted and scored separately, so a row's fidelity
+        always describes the explanation printed on that same row. Reporting
+        the dense fit's accuracy next to the sparse coefficients would tell a
+        participant that a three-feature explanation matches the AI as well as
+        the six-feature one does, which is the opposite of what dropping
+        features costs. This mirrors the published corpus's own generator
+        (``CoXAM/dataset_generator/generate_datasets.py:fit_logistic_row``),
+        which likewise refits on the kept columns.
+        """
+        subset = X_model[:, list(columns)]
+        fit = LogisticRegression(C=C, random_state=random_state, max_iter=max_iter, **kwargs)
+        fit.fit(subset, y_array)
+        return (
+            fit.coef_[0].astype(float),
+            float(fit.intercept_[0]),
+            float(accuracy_score(y_array, fit.predict(subset))),
+        )
+
+    all_indices = list(range(X_array.shape[1]))
+    dense_coefs, dense_intercept, dense_fidelity = fit_on(all_indices)
 
     rows = []
     for variant in variants:
         if variant == "dense":
-            keep_indices = list(range(X_array.shape[1]))
+            keep_indices = all_indices
+            coefs, intercept, fidelity = dense_coefs, dense_intercept, dense_fidelity
         elif variant == "sparse":
-            keep_indices = _top_k_feature_indices(coefs, top_k)
+            # Selection still ranks by the dense fit's coefficients; only the
+            # numbers reported for the kept features come from the refit.
+            keep_indices = _top_k_feature_indices(dense_coefs, top_k)
+            kept_coefs, intercept, fidelity = fit_on(keep_indices)
+            coefs = dict(zip(keep_indices, kept_coefs))
         else:
             raise ValueError("variants must contain only 'dense' and/or 'sparse'")
 
