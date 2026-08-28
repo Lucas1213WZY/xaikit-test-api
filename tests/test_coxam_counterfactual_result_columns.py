@@ -80,3 +80,65 @@ def test_the_dv_and_the_participant_response_are_both_present():
     ):
         assert column in row, column
     assert row["counterfactual_accuracy"] == 1
+
+
+class _Data:
+    def __init__(self, names):
+        self.raw_feature_names = list(names)
+
+
+class _Study:
+    def __init__(self, names):
+        self.data = _Data(names)
+
+
+MUSHROOM_FEATURES = ("Bruises", "Height", "Width", "Shape", "Cap Diameter", "Gill")
+
+
+def test_the_changed_feature_is_reported_by_name_not_by_position():
+    """``a0`` is the corpus's column key, not something a reader can act on.
+
+    A participant's proposed edit is only legible as "Cap Diameter -0.60"; the
+    positional id leaves the results table and the UI showing an index whose
+    mapping lived in one dict in the trial executor.
+    """
+    row = _result_row(
+        {"phase": "testing"},
+        0,
+        _info(original=0, counterfactual=1, success=True),
+        DVS,
+        MUSHROOM_FEATURES,
+    )
+    assert row["feature_changed"] == "a4"
+    assert row["feature_changed_name"] == "Cap Diameter"
+
+
+def test_a_trial_that_changed_nothing_names_no_feature():
+    info = {**_info(original=0, counterfactual=0, success=False), "feature_changed": None}
+    row = _result_row({"phase": "testing"}, 0, info, DVS, MUSHROOM_FEATURES)
+    assert row["feature_changed"] is None
+    assert row["feature_changed_name"] is None
+
+
+def test_an_unmappable_index_falls_back_to_the_raw_id():
+    """Better an unresolved label than a confidently wrong feature name."""
+    info = {**_info(original=0, counterfactual=1, success=True), "feature_changed": "a9"}
+    assert _result_row({"phase": "testing"}, 0, info, DVS, MUSHROOM_FEATURES)[
+        "feature_changed_name"
+    ] == "a9"
+    assert _result_row({"phase": "testing"}, 0, _info(original=0, counterfactual=1, success=True), DVS)[
+        "feature_changed_name"
+    ] == "a4"
+
+
+def test_the_names_come_from_the_study_dataset_in_corpus_order():
+    from src.virtual_experiment_executor.experiment_simualtion.CoXAM.coxam_counterfactual_runner import (
+        _feature_display_names,
+    )
+
+    class _Bundle:
+        app_id = "mushrooms"
+
+    assert _feature_display_names(_Study(MUSHROOM_FEATURES), _Bundle()) == MUSHROOM_FEATURES
+    # No prepared dataset -> the published corpus table is the fallback.
+    assert _feature_display_names(object(), _Bundle()) == MUSHROOM_FEATURES

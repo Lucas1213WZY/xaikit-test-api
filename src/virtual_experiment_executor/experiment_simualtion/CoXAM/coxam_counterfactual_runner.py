@@ -17,6 +17,7 @@ combo saving, and forward-trial priming being required before
 from __future__ import annotations
 
 import os
+import re
 import warnings
 from typing import Any, Mapping, Optional, Sequence
 
@@ -136,11 +137,56 @@ def _complete_cognitive_params(
     return {**COXAM_COUNTERFACTUAL_PARAMS, **{k: float(v) for k, v in params.items()}}
 
 
+
+def _feature_display_names(study: Any, bundle: Any) -> Optional[tuple[str, ...]]:
+    """The human-readable feature names, in the corpus's positional order.
+
+    The study's own prepared dataset is the authority: a CoXAM study is
+    prepared with ``coxam_loader_feature_cols(dataset_id)``, so its raw feature
+    names already sit in the corpus's order and use the loader's spelling
+    (``chlorides`` rather than ``Chlorides``). The published corpus table is the
+    fallback for a study object that carries no dataset.
+    """
+    names = getattr(getattr(study, "data", None), "raw_feature_names", None)
+    if names:
+        return tuple(str(name) for name in names)
+
+    from .coxam_trial_executor import COXAM_CORPUS_FEATURES
+
+    return COXAM_CORPUS_FEATURES.get(str(getattr(bundle, "app_id", "")))
+
+
+def _resolve_feature_name(
+    feature: Any, feature_names: Optional[Sequence[str]]
+) -> Optional[str]:
+    """``a3`` -> ``Vinegar Taint``, so a reader is not left decoding an index.
+
+    The environment names the changed feature positionally, which is what the
+    corpus's ``a0..a5`` columns are keyed on. That is unreadable in a results
+    table or a UI, and the mapping lived only in ``COXAM_CORPUS_FEATURES``.
+
+    Returns None when nothing was changed, and falls back to the raw value for
+    anything that is not an ``a<index>`` inside the known feature set -- better
+    an unresolved label than a confidently wrong one.
+    """
+    if feature is None:
+        return None
+    text = str(feature).strip()
+    if not feature_names:
+        return text
+    match = re.fullmatch(r"a(\d+)", text)
+    if match is None:
+        return text
+    index = int(match.group(1))
+    return feature_names[index] if 0 <= index < len(feature_names) else text
+
+
 def _result_row(
     trial: Mapping[str, Any],
     step: int,
     info: Mapping[str, Any],
     dvs: Optional[Mapping[str, Any]],
+    feature_names: Optional[Sequence[str]] = None,
 ) -> dict[str, Any]:
     """One output row per trial, matching the forward runner's shape.
 
@@ -190,6 +236,11 @@ def _result_row(
         "selected_strategy": info.get("strategy"),
         "counterfactual_tree_depth": info.get("depth"),
         "feature_changed": info.get("feature_changed"),
+        # The positional id the environment uses, resolved to the name a person
+        # reads. Both are kept: the index is what the corpus tables join on.
+        "feature_changed_name": _resolve_feature_name(
+            info.get("feature_changed"), feature_names
+        ),
         "delta": info.get("delta"),
         "ai_prediction": info.get("ai_prediction_original"),
         "ai_prediction_counterfactual": info.get("ai_prediction_counterfactual"),
@@ -211,6 +262,7 @@ def run_coxam_counterfactual_episode(
     cognitive_params: Optional[Mapping[str, float]] = None,
     forward_instance_ids: Optional[Sequence[int]] = None,
     dvs: Optional[Mapping[str, Any]] = None,
+    feature_names: Optional[Sequence[str]] = None,
     seed: int = 0,
 ) -> pd.DataFrame:
     """Run one participant's counterfactual trials as a single forced episode.
@@ -253,7 +305,7 @@ def run_coxam_counterfactual_episode(
     for step, trial in enumerate(records):
         action, _ = policy.predict(obs, deterministic=True)
         obs, _reward, _terminated, _truncated, info = env.step(action)
-        rows.append(_result_row(trial, step, info, dvs))
+        rows.append(_result_row(trial, step, info, dvs, feature_names))
     return pd.DataFrame(rows)
 
 
@@ -328,6 +380,8 @@ def run_coxam_counterfactual_study(
         else [(None, selected)]
     )
 
+    feature_names = _feature_display_names(study, bundle)
+
     runs = []
     for offset, (key, rows) in enumerate(groups):
         ordered = rows.sort_values(ORDER_COLUMN, kind="stable")
@@ -346,6 +400,7 @@ def run_coxam_counterfactual_study(
             policy=policy,
             cognitive_params=episode_params,
             dvs=study.DVs if dvs is None else dvs,
+            feature_names=feature_names,
             seed=seed + offset,
         )
         for column, value in provenance_columns(draw).items():
