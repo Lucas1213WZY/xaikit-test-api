@@ -1094,7 +1094,23 @@ def normalize_cognitive_params(
     return {
         resolve_cognitive_param(framework, key): _coerce_cognitive_value(value)
         for key, value in params.items()
+        if not _is_unset_cognitive_value(value)
     }
+
+
+def _is_unset_cognitive_value(value: Any) -> bool:
+    """Did the UI actually supply this parameter?
+
+    A field the researcher left blank is exported as ``""`` (or ``null``), not
+    omitted -- ``cognitiveConfig: {"Retrieval Threshold": ""}`` is what the
+    design planner writes for an untouched slider. Treating that as a supplied
+    value overwrote the agent's default with an empty string, which every
+    counterfactual CoXAM run then died on inside ``float(v)``. Blank means
+    "use the model default", so it is dropped here.
+
+    ``0`` and ``False`` are real values and are kept.
+    """
+    return value is None or (isinstance(value, str) and not value.strip())
 
 
 def _coerce_cognitive_value(value: Any) -> Any:
@@ -1151,6 +1167,8 @@ def _apply_cognitive_model(study: Any, design: DesignExport) -> None:
     # catches.
     known = set(params) | ACCEPTED_COGNITIVE_PARAMS.get(framework, set())
     for key, value in (design.cognitive_config or {}).items():
+        if _is_unset_cognitive_value(value):
+            continue
         name = resolve_cognitive_param(framework, key)
         if known and name not in known:
             design.report.add_warning(
