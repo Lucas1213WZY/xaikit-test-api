@@ -142,3 +142,34 @@ def test_the_names_come_from_the_study_dataset_in_corpus_order():
     assert _feature_display_names(_Study(MUSHROOM_FEATURES), _Bundle()) == MUSHROOM_FEATURES
     # No prepared dataset -> the published corpus table is the fallback.
     assert _feature_display_names(object(), _Bundle()) == MUSHROOM_FEATURES
+
+
+def test_the_row_reports_the_change_the_ai_actually_saw():
+    """`delta` is the proposal; the env overshoots it and clamps it to bounds.
+
+    Rendering `delta` as "the change" states a number the model was never shown
+    -- and at a bound the two can differ by the whole overshoot margin.
+    """
+    info = {
+        **_info(original=0, counterfactual=1, success=True),
+        "delta": -0.6,
+        "feature_value_before": 3.2,
+        "feature_value_after": 2.45,
+    }
+    row = _result_row({"phase": "testing"}, 0, info, DVS, MUSHROOM_FEATURES)
+    assert row["feature_value_before"] == 3.2
+    assert row["feature_value_after"] == 2.45
+    assert row["applied_delta"] == pytest.approx(-0.75)
+    assert row["delta"] == -0.6
+
+
+def test_a_trial_that_changed_nothing_reports_no_values():
+    info = {
+        **_info(original=0, counterfactual=0, success=False),
+        "feature_changed": None,
+        "feature_value_before": None,
+        "feature_value_after": None,
+    }
+    row = _result_row({"phase": "testing"}, 0, info, DVS, MUSHROOM_FEATURES)
+    assert row["feature_value_before"] is None
+    assert row["applied_delta"] is None

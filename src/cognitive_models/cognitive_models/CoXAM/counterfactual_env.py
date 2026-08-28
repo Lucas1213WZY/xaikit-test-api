@@ -517,6 +517,7 @@ class CounterfactualPolicyEnv(gym.Env):
             changed_instance = instance
             new_label = actual_label
             success = 0
+            value_before = value_after = None
         else:
             changed_instance = apply_change_to_feature(
                 instance, feature, self.bounds, delta,
@@ -524,6 +525,14 @@ class CounterfactualPolicyEnv(gym.Env):
             )
             new_label = int(self.predict_fn(changed_instance))
             success = int(new_label != actual_label)
+            # `delta` is what the participant proposed; what the AI actually saw
+            # is that plus the overshoot margin, clamped to the feature's
+            # bounds. Report the two endpoints so a consumer can state the
+            # change that was really made rather than re-deriving it and being
+            # wrong at a bound.
+            changed_index = int(str(feature).split("=")[0][1:])
+            value_before = float(instance[changed_index])
+            value_after = float(changed_instance[changed_index])
 
         self.counts[strategy_index] += 1
         count = self.counts[strategy_index]
@@ -544,6 +553,8 @@ class CounterfactualPolicyEnv(gym.Env):
             "with_xai": with_xai,
             "feature_changed": feature,
             "delta": float(delta),
+            "feature_value_before": value_before,
+            "feature_value_after": value_after,
             "ai_prediction_original": actual_label,
             "ai_prediction_counterfactual": new_label,
             "success": int(success),

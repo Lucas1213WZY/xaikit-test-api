@@ -242,6 +242,17 @@ def _result_row(
             info.get("feature_changed"), feature_names
         ),
         "delta": info.get("delta"),
+        # What the AI was actually shown: `delta` is the proposed change, and
+        # the env overshoots it and clamps it to the feature's bounds before
+        # re-predicting. A consumer that renders `delta` as "the change" is
+        # reporting a number the model never saw.
+        "feature_value_before": info.get("feature_value_before"),
+        "feature_value_after": info.get("feature_value_after"),
+        "applied_delta": (
+            None
+            if info.get("feature_value_before") is None
+            else float(info["feature_value_after"] - info["feature_value_before"])
+        ),
         "ai_prediction": info.get("ai_prediction_original"),
         "ai_prediction_counterfactual": info.get("ai_prediction_counterfactual"),
         # The shared column every consumer reads: what the AI predicted once the
