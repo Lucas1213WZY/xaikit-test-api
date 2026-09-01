@@ -7,6 +7,7 @@ import base64
 import html
 import json
 import uuid
+import warnings
 from contextlib import contextmanager, redirect_stdout
 from copy import deepcopy
 from pathlib import Path
@@ -1045,6 +1046,42 @@ class xaikitTest:
         self.combined_explanations = pool
         return pool
 
+    def _impossible_cells_for(
+        self, framework: Optional[str]
+    ) -> Optional[tuple[dict[str, Any], ...]]:
+        """The agent's non-existent condition cells, for trial generation.
+
+        Resolution is explicit-argument-first because ``cognitive_model_id``
+        defaults to ``"placeholder"`` and is only replaced by
+        ``set_cognitive_model``, which a study commonly calls *after*
+        generating trials. Silently returning nothing in that case would drop
+        the rules with no sign that anything was skipped, so a design that
+        looks like it needs them warns instead.
+        """
+        resolved = str(framework or self.cognitive_model_id or "").strip().lower()
+        if resolved == "coax":
+            from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_trial_executor import (
+                COAX_IMPOSSIBLE_CELLS,
+            )
+
+            return COAX_IMPOSSIBLE_CELLS
+        if resolved in {"", "placeholder"} and self._design_has_no_xai_level():
+            warnings.warn(
+                "This design has an xai_type level of 'none', whose trials show "
+                "no explanation -- but no agent is selected yet, so its condition "
+                "rules cannot be applied and a 'none' participant will still get "
+                "tested_w_xai=True trials. Pass framework='coax' to "
+                "generate_trials(...), or call set_cognitive_model(...) first.",
+                UserWarning,
+                stacklevel=3,
+            )
+        return None
+
+    def _design_has_no_xai_level(self) -> bool:
+        """Whether the design declares an ``xai_type`` level meaning 'none'."""
+        levels = (self.iv_config.get("xai_type") or {}).get("levels") or []
+        return any(str(level).strip().lower() == "none" for level in levels)
+
     def generate_trials(
         self,
         *,
@@ -1061,6 +1098,7 @@ class xaikitTest:
         max_trial_instances: Optional[int] = DEFAULT_EXPLANATION_INSTANCE_LIMIT,
         allowed_instance_ids: Optional[Sequence[int]] = None,
         training_instance_ids: Optional[Sequence[int]] = None,
+        framework: Optional[str] = None,
         seed: int = 42,
         output_dir: str | Path = "experiment_output",
         preview_rows: int = 10,
@@ -1121,6 +1159,14 @@ class xaikitTest:
                 e.g. ``sim2real_available_instance_ids(split="training")``.
                 Required if ``num_training > 0`` in corpus mode; unused
                 otherwise.
+            framework: Which agent the trials are for, so its own condition
+                rules apply while they are built -- CoAX's ``none`` arm has no
+                ``tested_w_xai=True`` half, since it shows no explanation to
+                withhold. Defaults to ``cognitive_model_id``, which is only set
+                once ``set_cognitive_model`` has run; a study that generates
+                trials first (as the tutorials do) must name the agent here or
+                the rules cannot be applied. A design with a ``none`` level and
+                no resolvable agent warns rather than silently skipping them.
             seed: Seed for sampling and ordering.
             output_dir: Where the trial tables are written.
             preview_rows: Rows to print when ``show`` is True.
@@ -1129,6 +1175,7 @@ class xaikitTest:
         Returns:
             The result, also stored on ``trial_result``/``trials``.
         """
+        impossible_cells = self._impossible_cells_for(framework)
         multi_dataset = bool(self.data_by_dataset)
         ai_predictions_by_instance = None
         if multi_dataset:
@@ -1199,6 +1246,7 @@ class xaikitTest:
                 max_trial_instances=max_trial_instances,
                 allowed_instance_ids=allowed_instance_ids,
                 training_instance_ids=training_instance_ids,
+                impossible_cells=impossible_cells,
                 seed=session_seed,
                 output_dir=self._resolve_output_path(session_output_dir),
             )
@@ -2504,6 +2552,7 @@ class xaikitTest:
         participant_column: str = "participantId",
         phase: Optional[str] = "testing",
         errorbar: Optional[str] = "ci95",
+        level_labels: Optional[dict[str, dict[Any, str]]] = None,
         title: Optional[str] = "Experiment results",
         value_labels: bool = True,
     ) -> Any:
@@ -2517,6 +2566,10 @@ class xaikitTest:
             phase: Restrict to one trial phase, e.g. ``testing``.
             errorbar: Error bar statistic -- ``ci95`` (Student-t 95% CI half-width,
                 the default), ``sem``, ``std``, or None to hide them.
+            level_labels: Display names per IV level, e.g.
+                ``{"tested_w_xai": {True: "w/ XAI", False: "w/o XAI"}}``.
+                Without it a boolean IV is drawn as ``True``/``False`` -- the
+                storage value rather than the condition it stands for.
             title: Figure title.
             value_labels: Print the value above each bar.
 
@@ -2542,6 +2595,7 @@ class xaikitTest:
                 for name, config in self.iv_config.items()
                 if name in resolved_ivs
             },
+            level_labels=level_labels,
             title=title,
             value_labels=value_labels,
         )

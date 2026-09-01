@@ -151,6 +151,19 @@ COAX_STRATEGIES_BY_XAI_TYPE: dict[str, list[str]] = {
     "attribution": ["SensitiveFeatures", "AttributionSum"],
 }
 
+#: Condition cells CoAX's design does not have. The `none` arm shows no
+#: explanation on any trial -- COAX_STRATEGIES_BY_XAI_TYPE gives it only
+#: SensitiveFeatures, and instance_ids_requiring_explanation() never requests
+#: an explanation for it -- so a `none` trial marked `tested_w_xai=True` is not
+#: a second condition, it is the same no-explanation screen with a flag flipped.
+#: Generating both halves manufactures a comparison that cannot differ, splits
+#: the arm's trials across two identical cells, and charges the multiple-
+#: comparison correction for the extra pairs.
+COAX_IMPOSSIBLE_CELLS: tuple[dict[str, Any], ...] = (
+    {"xai_type": "none", "tested_w_xai": True},
+)
+
+
 # Strategies the reference pipeline removes for a specific tested condition.
 COAX_STRATEGY_EXCLUSIONS: dict[tuple[str, bool], set[str]] = {
     ("importance", False): {"ImportanceCategorization"},

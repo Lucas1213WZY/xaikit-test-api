@@ -226,3 +226,59 @@ def test_ci95_multiplier_matches_the_shared_helper():
     grid = plot_iv_dv_grid(df, ivs=["condition"], dvs=["dv"], phase="testing")
     row = grid.summary.iloc[0]
     assert row["ci95"] == pytest.approx(row["sem"] * ci95_multiplier(int(row["count"])))
+
+
+# -- per-level display labels in the grid -----------------------------------
+
+
+def _boolean_responses() -> pd.DataFrame:
+    """A boolean IV as the trial table stores it -- real bools, not strings."""
+    rows = [
+        {
+            "participantId": p,
+            "tested_w_xai": tested,
+            "phase": "testing",
+            "forward_accuracy": 0.6,
+        }
+        for p in range(4)
+        for tested in (True, False)
+    ]
+    return pd.DataFrame(rows)
+
+
+def test_grid_draws_boolean_levels_as_true_false_without_labels():
+    """The behaviour level_labels exists to override: a boolean factor shows
+    its storage value, which names the column rather than the condition."""
+    grid = plot_iv_dv_grid(
+        _boolean_responses(),
+        ivs=["tested_w_xai"],
+        dvs=["forward_accuracy"],
+        iv_levels={"tested_w_xai": [True, False]},
+    )
+    ticks = [text.get_text() for text in grid.axes[0, 0].get_xticklabels()]
+    assert ticks == ["True", "False"]
+
+
+def test_grid_level_labels_rename_ticks_without_reordering_them():
+    grid = plot_iv_dv_grid(
+        _boolean_responses(),
+        ivs=["tested_w_xai"],
+        dvs=["forward_accuracy"],
+        iv_levels={"tested_w_xai": [True, False]},
+        level_labels={"tested_w_xai": {True: "w/ XAI", False: "w/o XAI"}},
+    )
+    ticks = [text.get_text() for text in grid.axes[0, 0].get_xticklabels()]
+    assert ticks == ["w/ XAI", "w/o XAI"]
+
+
+def test_grid_level_labels_leave_other_ivs_prettified():
+    """A label map for one IV must not silence pretty() on the others."""
+    data = _responses(n_x=2, n_hue=1).rename(columns={"x": "xai_type"})
+    grid = plot_iv_dv_grid(
+        data,
+        ivs=["xai_type"],
+        dvs=["dv"],
+        level_labels={"tested_w_xai": {True: "w/ XAI"}},
+    )
+    ticks = [text.get_text() for text in grid.axes[0, 0].get_xticklabels()]
+    assert ticks == ["X0", "X1"]

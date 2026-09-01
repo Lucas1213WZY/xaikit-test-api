@@ -10,7 +10,7 @@ changes in ``src/``.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Optional, Sequence
+from typing import Any, Mapping, Optional, Sequence
 
 import numpy as np
 import pandas as pd
@@ -20,7 +20,13 @@ from src.cognitive_models import is_baseline_model_id, normalize_baseline_model_
 from src.virtual_experiment_executor.participant_pools import is_diverse_mode
 from src.experiment_planner.design_export import normalize_cognitive_params
 from src.cognitive_models.baseline_models import BASELINE_MODEL_IDS
-from src.result_visualizer import plot_dv_by_two_ivs, plot_iv_dv_grid
+from src.result_visualizer import (
+    display_labels,
+    display_order,
+    level_display,
+    plot_dv_by_two_ivs,
+    plot_iv_dv_grid,
+)
 from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_study_runner import (
     coax_models_for_trials,
 )
@@ -1083,6 +1089,9 @@ def run_trials_stage(study: xaikitTest, request: TrialsStageRequest) -> dict[str
         num_testing=int(num_testing),
         balance_by_ai_prediction=balance_by_ai_prediction,
         allowed_instance_ids=allowed_instance_ids,
+        # The wizard picks the user model before this runs, so unlike a
+        # notebook the agent is known here and its condition rules apply.
+        framework=framework,
         seed=request.seed,
         output_dir=request.output_dir,
         preview_rows=0,
@@ -1863,17 +1872,32 @@ def interaction_plot_payload(
     hue_iv = resolve_variable_name(study, hue_iv)
     dv = resolve_variable_name(study, dv)
     _reject_runner_internal(study, x_iv, hue_iv)
+    results = require_results(study)
+    # Presentation only: a factor with no registered convention gets None back
+    # and keeps the helper's own ordering and labelling.
+    x_levels = display_order(x_iv, _observed_levels(results, x_iv))
+    hue_levels = display_order(hue_iv, _observed_levels(results, hue_iv))
     plot = plot_dv_by_two_ivs(
-        require_results(study),
+        results,
         x_iv=x_iv,
         hue_iv=hue_iv,
         dv=dv,
         phase=phase,
         errorbar=errorbar,
         title=title,
+        x_levels=x_levels,
+        hue_levels=hue_levels,
+        x_labels=display_labels(x_iv, _observed_levels(results, x_iv)),
+        hue_labels=display_labels(hue_iv, _observed_levels(results, hue_iv)),
     )
+    # The UI draws its own chart from `summary`, so the labels the figure's
+    # ticks and legend carry have to travel with the rows too -- the same
+    # `*_label` convention analysis_payload and posthoc_payload already use.
+    summary = plot.summary.copy()
+    summary["x_level_label"] = [level_display(x_iv, value) for value in summary["x_level"]]
+    summary["hue_level_label"] = [level_display(hue_iv, value) for value in summary["hue_level"]]
     return _plot_payload(
-        plot.summary,
+        _in_display_order(summary, {"x_level": x_levels, "hue_level": hue_levels}),
         plot.figure,
         include_png=include_png,
         spec={"kind": "interaction", "x_iv": x_iv, "hue_iv": hue_iv, "dv": dv, "phase": phase},
@@ -1905,19 +1929,98 @@ def grid_plot_payload(
         else list(getattr(design, "simulatable_dvs", []))
     )
     _reject_runner_internal(study, *ivs)
+    results = require_results(study)
+    iv_levels = {
+        iv: order
+        for iv in ivs
+        if (order := display_order(iv, _observed_levels(results, iv))) is not None
+    }
+    level_labels = {
+        iv: labels
+        for iv in ivs
+        if (labels := display_labels(iv, _observed_levels(results, iv))) is not None
+    }
     grid = plot_iv_dv_grid(
-        require_results(study),
+        results,
         ivs=ivs,
         dvs=dvs,
         phase=phase,
         errorbar=errorbar,
         title=title,
+        iv_levels=iv_levels,
+        level_labels=level_labels,
     )
+    summary = grid.summary.copy()
+    summary["level_label"] = [
+        level_display(iv, level) for iv, level in zip(summary["iv"], summary["level"])
+    ]
     return _plot_payload(
-        grid.summary,
+        _in_display_order(summary, {}, per_iv_levels=iv_levels),
         grid.figure,
         include_png=include_png,
         spec={"kind": "grid", "ivs": ivs, "dvs": dvs, "phase": phase},
+    )
+
+
+def _observed_levels(results: pd.DataFrame, column: str) -> list[Any]:
+    """The distinct values a results column actually carries."""
+    if column not in results:
+        return []
+    return list(pd.unique(results[column].dropna()))
+
+
+def _rank_of(ordered: Optional[Sequence[Any]]) -> dict[Any, int]:
+    """Position lookup for a level, keyed by the value the summary carries.
+
+    ``display_order`` returns the observed values themselves, so the summary's
+    own values index this directly -- an unranked level sorts last.
+    """
+    return {level: index for index, level in enumerate(ordered or [])}
+
+
+def _in_display_order(
+    summary: pd.DataFrame,
+    column_levels: Mapping[str, Optional[Sequence[Any]]],
+    *,
+    per_iv_levels: Optional[Mapping[str, Sequence[Any]]] = None,
+) -> pd.DataFrame:
+    """Sort summary rows into the order the figure draws them.
+
+    The UI renders its own chart from these rows rather than the PNG, so rows
+    left in groupby order would disagree with the figure the same request can
+    return alongside them.
+    """
+    if summary.empty:
+        return summary
+    ordered = summary.copy()
+    sort_columns: list[str] = []
+
+    if per_iv_levels is not None and {"iv", "dv", "level"} <= set(ordered.columns):
+        # One block per (dv, iv) panel, in the order the grid built them; only
+        # the levels *within* a panel are reordered.
+        panel = ordered["dv"].astype(str) + "\x00" + ordered["iv"].astype(str)
+        ordered["__block"] = pd.factorize(panel)[0]
+        ranks = {iv: _rank_of(levels) for iv, levels in per_iv_levels.items()}
+        ordered["__level_rank"] = [
+            ranks.get(iv, {}).get(level, len(ranks.get(iv, {})))
+            for iv, level in zip(ordered["iv"], ordered["level"])
+        ]
+        sort_columns = ["__block", "__level_rank"]
+    else:
+        for column, levels in column_levels.items():
+            if levels is None or column not in ordered:
+                continue
+            rank = _rank_of(levels)
+            key = f"__{column}_rank"
+            ordered[key] = [rank.get(value, len(rank)) for value in ordered[column]]
+            sort_columns.append(key)
+
+    if not sort_columns:
+        return summary
+    return (
+        ordered.sort_values(sort_columns, kind="stable")
+        .drop(columns=sort_columns)
+        .reset_index(drop=True)
     )
 
 

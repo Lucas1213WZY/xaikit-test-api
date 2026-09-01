@@ -18,7 +18,7 @@ import random
 from collections import Counter
 from itertools import permutations, product
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping, Sequence
 
 import numpy as np
 
@@ -500,6 +500,40 @@ def assign_participants(
 
 # ── 4. TRIAL SEQUENCING ────────────────────────────────────────────────────────
 
+def _cell_values_match(left: Any, right: Any) -> bool:
+    """Compare one condition value across the spellings a design uses.
+
+    A trial table carries `tested_w_xai` as a real bool and `xai_type` as a
+    string, while a rule is written in whichever spelling reads best; matching
+    on the lowercased text makes `True`/`"True"` and `none`/`"None"` the same
+    cell either way.
+    """
+    if isinstance(left, bool) or isinstance(right, bool):
+        return bool(left) == bool(right)
+    return str(left).strip().lower() == str(right).strip().lower()
+
+
+def _cell_is_impossible(
+    cell: Mapping[str, Any],
+    impossible_cells: Sequence[Mapping[str, Any]] | None,
+) -> bool:
+    """Whether a full condition cell matches any declared impossible cell.
+
+    A rule matches when every column it names matches; columns it does not
+    name are free, so `{"xai_type": "none", "tested_w_xai": True}` blocks that
+    combination in every dataset and session.
+    """
+    for rule in impossible_cells or ():
+        if not rule:
+            continue
+        if all(
+            key in cell and _cell_values_match(cell[key], value)
+            for key, value in rule.items()
+        ):
+            return True
+    return False
+
+
 def build_trial_sequence(
     assignments: list[dict],
     instance_pool: list[dict] | None = None,
@@ -515,6 +549,7 @@ def build_trial_sequence(
     seed: int | None = None,
     instance_pool_by_level: dict[Any, list[dict]] | None = None,
     pool_selector_key: str | None = None,
+    impossible_cells: Sequence[Mapping[str, Any]] | None = None,
 ) -> list[dict]:
     """
     Build a flat trial-level sequence for all participants.
@@ -557,6 +592,17 @@ def build_trial_sequence(
                               randomized at trial level rather than block level.
         trial_randomization_strategy:
                               'balanced' (default) or 'random'.
+        impossible_cells:     Condition cells that do not exist, each a partial
+                              {column: value} match against a participant's
+                              between-subjects assignment plus one trial-level
+                              combo. A matching combo is dropped for that
+                              participant only, so the remaining cells are
+                              re-balanced over their full trial budget rather
+                              than leaving a hole. Used for a within-subjects
+                              factor that is undefined in some between-subjects
+                              condition -- e.g. CoAX's `none` arm shows no
+                              explanation, so it has no `tested_w_xai=True`
+                              half to generate.
         instance_wise_explanation:
                               If True, copy remaining instance_pool explanation
                               columns such as pred, expMethod, i_max, a0_i, ...
@@ -593,7 +639,7 @@ def build_trial_sequence(
     # Resolve ID column names from map, or fall back to defaults then auto
     data_id_col     = (id_map or {}).get("dataId",     "dataId")
     instance_id_col = (id_map or {}).get("instanceId", "instanceId")
-    trial_condition_combos = (
+    all_trial_condition_combos = (
         factorial_conditions(trial_randomized_ivs)
         if trial_randomized_ivs
         else [{}]
@@ -618,6 +664,21 @@ def build_trial_sequence(
         between_cols = {k: v for k, v in assignment.items()
                         if k not in ("participantId", "within_order")}
         n_blocks = len(within_order)
+
+        # Trial-level cells this participant's between-subjects condition
+        # actually has. Filtering here rather than dropping rows afterwards is
+        # what lets the balanced split re-divide the participant's whole trial
+        # budget over the cells that remain.
+        trial_condition_combos = [
+            combo
+            for combo in all_trial_condition_combos
+            if not _cell_is_impossible({**between_cols, **combo}, impossible_cells)
+        ]
+        if not trial_condition_combos:
+            raise ValueError(
+                f"Participant {p_id}'s condition {between_cols} has no possible "
+                "trial-level cells left after applying impossible_cells."
+            )
 
         if instance_pool_by_level is not None:
             level = assignment.get(pool_selector_key)

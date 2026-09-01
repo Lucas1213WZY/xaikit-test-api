@@ -131,6 +131,7 @@ def plot_iv_dv_grid(
     phase: Optional[str] = "testing",
     errorbar: Optional[str] = "ci95",
     iv_levels: Optional[Mapping[str, Sequence[Any]]] = None,
+    level_labels: Optional[Mapping[str, Mapping[Any, str]]] = None,
     title: Optional[str] = "Experiment results",
     value_labels: bool = True,
 ) -> ResultGrid:
@@ -145,6 +146,12 @@ def plot_iv_dv_grid(
         errorbar: Error bar statistic -- ``ci95`` (Student-t 95% CI half-width,
             the default), ``sem``, ``std``, or None to hide them.
         iv_levels: Level order per IV.
+        level_labels: Display names per IV level, e.g.
+            ``{"tested_w_xai": {True: "w/ XAI", False: "w/o XAI"}}``. Without
+            it a level is drawn as ``pretty(level)``, which renders a boolean
+            factor as ``True``/``False`` -- the storage value, not the
+            condition it stands for. The same role ``x_labels``/``hue_labels``
+            play in ``plot_dv_by_two_ivs``.
         title: Figure title.
         value_labels: Print the value above each bar.
     """
@@ -257,7 +264,13 @@ def plot_iv_dv_grid(
                 edgecolor="white",
                 linewidth=0.6,
             )
-            axis.set_xticks(positions, [pretty(level) for level in plotted["level"]])
+            axis.set_xticks(
+                positions,
+                [
+                    _display_label(level, (level_labels or {}).get(iv))
+                    for level in plotted["level"]
+                ],
+            )
             axis.tick_params(axis="x", rotation=25, labelsize=8)
             axis.tick_params(axis="y", labelsize=8)
             axis.set_xlabel(pretty(iv), fontsize=9)

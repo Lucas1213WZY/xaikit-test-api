@@ -6,7 +6,13 @@ from .grid import (
     plot_dv_by_two_ivs,
     plot_iv_dv_grid,
 )
-from .labels import pretty, prettify_condition_label
+from .labels import (
+    display_labels,
+    display_order,
+    level_display,
+    pretty,
+    prettify_condition_label,
+)
 from .study_comparisons import (
     STUDY_NAMES,
     available_studies,
@@ -36,6 +42,9 @@ __all__ = [
     "InteractionPlot",
     "ResultGrid",
     "comparison_panel",
+    "display_labels",
+    "display_order",
+    "level_display",
     "participant_summary",
     "plot_dv_by_two_ivs",
     "plot_iv_dv_grid",

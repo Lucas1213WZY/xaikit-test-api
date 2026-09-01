@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import random
-from typing import Any, Optional, Sequence
+from typing import Any, Mapping, Optional, Sequence
 import warnings
 
 from src.data_loaders import PreparedDataset, load_csv_records, load_json_config
@@ -73,6 +73,14 @@ class TrialBuildConfig:
     #: split from, so its training instances -- if it has any -- are named
     #: here directly, the training-side counterpart to allowed_instance_ids.
     training_instance_ids: Optional[Sequence[int]] = None
+    #: Condition cells that do not exist, each a partial {column: value} match
+    #: against a between-subjects assignment plus a trial-level combo. A
+    #: participant whose condition matches never gets that trial-level level,
+    #: and their whole trial budget is split over the cells that remain. Set by
+    #: the caller from the agent's own condition rules -- see
+    #: COAX_IMPOSSIBLE_CELLS, where the `none` arm has no `tested_w_xai=True`
+    #: half because it shows no explanation to withhold.
+    impossible_cells: Optional[Sequence[Mapping[str, Any]]] = None
 
 
 @dataclass
@@ -118,6 +126,7 @@ def init_trial_build_config(
     summary_json: str = "design_summary.json",
     data_by_dataset: Optional[dict[str, PreparedDataset]] = None,
     training_instance_ids: Optional[Sequence[int]] = None,
+    impossible_cells: Optional[Sequence[Mapping[str, Any]]] = None,
 ) -> TrialBuildConfig:
     """Collect trial-generation settings in one notebook-friendly config object.
 
@@ -233,6 +242,7 @@ def init_trial_build_config(
         trials_csv=trials_csv,
         trials_json=trials_json,
         summary_json=summary_json,
+        impossible_cells=list(impossible_cells) if impossible_cells is not None else None,
     )
 
 
@@ -337,6 +347,7 @@ def generate_experimental_trials(
             instance_wise_explanation=config.instance_wise_explanation,
             shuffle_instances=config.shuffle_instances,
             seed=config.seed,
+            impossible_cells=config.impossible_cells,
         )
         trials = _add_training_and_testing_phases(
             trials,
@@ -377,6 +388,7 @@ def generate_experimental_trials(
             instance_wise_explanation=config.instance_wise_explanation,
             shuffle_instances=config.shuffle_instances,
             seed=config.seed,
+            impossible_cells=config.impossible_cells,
         )
         # init_trial_build_config already requires training_instance_ids
         # whenever num_training > 0 here, so an empty list only happens when
@@ -413,6 +425,7 @@ def generate_experimental_trials(
             instance_wise_explanation=config.instance_wise_explanation,
             shuffle_instances=config.shuffle_instances,
             seed=config.seed,
+            impossible_cells=config.impossible_cells,
         )
         trials = _add_training_and_testing_phases(
             trials,
