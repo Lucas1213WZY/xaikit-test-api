@@ -19,6 +19,7 @@ from .config import (
 )
 from .counterbalance import (
     assign_participants,
+    between_condition_combos,
     build_trial_sequence,
     choose_counterbalancing,
     export_design_summary,
@@ -26,6 +27,7 @@ from .counterbalance import (
     export_trials_json,
     factorial_conditions,
     make_within_condition_order_labels,
+    resolve_participant_counts,
 )
 from .support import validate_ui_config_support
 
@@ -45,7 +47,7 @@ class TrialBuildConfig:
     iv_config: dict[str, dict[str, Any]]
     cvs: dict[str, list[Any]]
     model_name: Optional[str] = None
-    participants_per_between_condition: int = 24
+    participants_per_between_condition: int | dict[Any, int] = 24
     num_training: int = 0
     num_testing: int = 12
     ai_predictions_by_instance: Optional[dict[int, Any]] = None
@@ -99,7 +101,7 @@ def init_trial_build_config(
     cvs: dict[str, list[Any]],
     *,
     model_name: Optional[str] = None,
-    participants_per_between_condition: int = 24,
+    participants_per_between_condition: int | dict[Any, int] = 24,
     num_training: int = 0,
     num_testing: int = 12,
     ai_predictions_by_instance: Optional[dict[int, Any]] = None,
@@ -131,7 +133,11 @@ def init_trial_build_config(
             ``data_by_dataset``'s keys.
         cvs: Control variables recorded on each trial.
         model_name: Name recorded on the trials.
-        participants_per_between_condition: Participants per between-subjects cell.
+        participants_per_between_condition: Participants per between-subjects
+            cell. An ``int`` allocates equally. A mapping from one
+            between-subjects IV's levels to counts allocates unequally, for a
+            study that assigned participants in a ratio rather than evenly --
+            e.g. ``{'none': 17, 'importance': 66, 'attribution': 36}``.
         num_training: Instances shown in the training phase. In corpus mode
             (``data`` and ``data_by_dataset`` both ``None``) this many are
             drawn from ``training_instance_ids`` instead of a prepared
@@ -258,11 +264,16 @@ def generate_experimental_trials(
         if experiment_structure.between_ivs
         else [{}]
     )
-    n_participants = config.participants_per_between_condition * len(between_groups)
+    participant_counts = resolve_participant_counts(
+        config.participants_per_between_condition,
+        between_condition_combos(experiment_structure.between_ivs or None),
+    )
+    n_participants = sum(participant_counts)
     assignments = assign_participants(
         n_participants,
         orders,
         experiment_structure.between_ivs or None,
+        participants_per_group=participant_counts,
     )
 
     multi_dataset = config.data_by_dataset is not None
@@ -884,11 +895,16 @@ def generate_trials_from_ui_config(
         if design_roles.between_ivs
         else [{}]
     )
-    n_participants = sampling_cfg["participants_per_between_condition"] * len(between_groups)
+    participant_counts = resolve_participant_counts(
+        sampling_cfg["participants_per_between_condition"],
+        between_condition_combos(design_roles.between_ivs or None),
+    )
+    n_participants = sum(participant_counts)
     assignments = assign_participants(
         n_participants,
         orders,
         design_roles.between_ivs or None,
+        participants_per_group=participant_counts,
     )
 
     instance_pool = load_csv_records(dataset_cfg["explanation_csv"])

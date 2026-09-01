@@ -1049,7 +1049,8 @@ class xaikitTest:
         self,
         *,
         model_name: Optional[str] = None,
-        participants_per_between_condition: int = 24,
+        participants_per_between_condition: int | dict[Any, int] = 24,
+        num_sessions: int = 1,
         num_training: int = 0,
         num_testing: int = 12,
         balance_by_ai_prediction: bool = False,
@@ -1070,7 +1071,21 @@ class xaikitTest:
         Args:
             model_name: Name recorded on the trials; defaults to the trained model.
             participants_per_between_condition: Simulated participants per
-                between-subjects cell.
+                between-subjects cell. An ``int`` allocates equally. A mapping
+                from one between-subjects IV's levels to counts allocates
+                unequally, which a study that randomized over condition-cells
+                rather than over IV levels needs -- CoAX assigned participants
+                equally across seven cells (``none`` x1, ``importance`` x4,
+                ``attribution`` x2), giving a 1:4:2 ratio across ``xai_type``:
+                ``{'none': 17, 'importance': 66, 'attribution': 36}``.
+            num_sessions: How many sittings each participant completes. Each
+                session redraws that participant's instances from a
+                session-specific seed and is stamped in a ``session`` column,
+                so a repeated-measures study whose participants return is
+                generated as one table rather than concatenated by hand.
+                Participant ids are stable across sessions -- the same people
+                come back -- which is what lets an analysis treat session as a
+                within-subjects factor.
             num_training: Instances shown in the training phase. In corpus
                 mode, drawn from ``training_instance_ids`` instead of a
                 prepared dataset's own training split.
@@ -1163,32 +1178,63 @@ class xaikitTest:
                     )
         if model_name is not None:
             self.model_name = model_name
-        self.trial_config = experiment_planner_api.init_trial_build_config(
-            data=data,
-            data_by_dataset=self.data_by_dataset if multi_dataset else None,
-            iv_config=self.iv_config,
-            cvs=self.CVs,
-            model_name=model_name,
-            participants_per_between_condition=participants_per_between_condition,
-            num_training=num_training,
-            num_testing=num_testing,
-            ai_predictions_by_instance=ai_predictions_by_instance,
-            counterbalancing_strategy=counterbalancing_strategy,
-            trial_randomization_strategy=trial_randomization_strategy,
-            instance_wise_explanation=instance_wise_explanation,
-            shuffle_instances=shuffle_instances,
-            max_trial_instances=max_trial_instances,
-            allowed_instance_ids=allowed_instance_ids,
-            training_instance_ids=training_instance_ids,
-            seed=seed,
-            output_dir=self._resolve_output_path(output_dir),
-        )
-        self.trial_result = experiment_planner_api.generate_experimental_trials(
-            self.trial_config,
-            show=show,
-            preview_rows=preview_rows,
-        )
-        self.trials = self.trial_result.trials
+        if num_sessions < 1:
+            raise ValueError(f"num_sessions must be >= 1, got {num_sessions}.")
+
+        def _build(session_seed: int, session_output_dir: str | Path):
+            return experiment_planner_api.init_trial_build_config(
+                data=data,
+                data_by_dataset=self.data_by_dataset if multi_dataset else None,
+                iv_config=self.iv_config,
+                cvs=self.CVs,
+                model_name=model_name,
+                participants_per_between_condition=participants_per_between_condition,
+                num_training=num_training,
+                num_testing=num_testing,
+                ai_predictions_by_instance=ai_predictions_by_instance,
+                counterbalancing_strategy=counterbalancing_strategy,
+                trial_randomization_strategy=trial_randomization_strategy,
+                instance_wise_explanation=instance_wise_explanation,
+                shuffle_instances=shuffle_instances,
+                max_trial_instances=max_trial_instances,
+                allowed_instance_ids=allowed_instance_ids,
+                training_instance_ids=training_instance_ids,
+                seed=session_seed,
+                output_dir=self._resolve_output_path(session_output_dir),
+            )
+
+        # One session is the common case and must stay byte-identical to what
+        # it produced before sessions existed: same seed, same output path, no
+        # `session` column added to a design that has no sessions.
+        if num_sessions == 1:
+            self.trial_config = _build(seed, output_dir)
+            self.trial_result = experiment_planner_api.generate_experimental_trials(
+                self.trial_config, show=show, preview_rows=preview_rows,
+            )
+            self.trials = self.trial_result.trials
+            return self.trial_result
+
+        # Each session redraws instances from its own seed, so a participant
+        # does not see the same items twice -- which is the point of running
+        # more than one sitting. Participant ids are assigned from the design
+        # and so are already stable across sessions.
+        sessions = []
+        result = None
+        for session in range(1, num_sessions + 1):
+            config = _build(seed + session - 1, Path(output_dir) / f"session_{session}")
+            result = experiment_planner_api.generate_experimental_trials(
+                config, show=show and session == 1, preview_rows=preview_rows,
+            )
+            for row in result.trials:
+                sessions.append({**row, "session": session})
+            if session == 1:
+                self.trial_config = config
+
+        # The last session's result carries the right assignments and design
+        # roles; only its trial table is partial, so that is what is replaced.
+        result.trials = sessions
+        self.trial_result = result
+        self.trials = sessions
         return self.trial_result
 
     def load_AI_model(

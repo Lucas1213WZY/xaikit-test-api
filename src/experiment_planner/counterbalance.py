@@ -352,10 +352,90 @@ def make_psychopy_trial_handler(order: list, *, n_reps: int = 1, seed: int | Non
 
 # ── 3. PARTICIPANT ASSIGNMENT ──────────────────────────────────────────────────
 
+def between_condition_combos(
+    between_iv_groups: dict[str, list] | None = None,
+) -> list[dict]:
+    """The between-subjects factorial cells, in the order participants fill them.
+
+    Split out of :func:`assign_participants` so a caller can resolve a
+    per-condition allocation against exactly the cells the assignment will use,
+    rather than rebuilding the product and hoping the two orders agree.
+    """
+    if not between_iv_groups:
+        return [{}]
+    names = list(between_iv_groups.keys())
+    levels = [between_iv_groups[name] for name in names]
+    return [dict(zip(names, combo)) for combo in product(*levels)]
+
+
+def resolve_participant_counts(
+    participants_per_between_condition: int | dict[Any, int],
+    between_combos: list[dict],
+) -> list[int]:
+    """How many participants each between-subjects cell receives.
+
+    An ``int`` allocates equally, which is the balanced default. A mapping
+    allocates by the level of one between-subjects IV, which is what an
+    unequal-allocation study needs: CoAX, for instance, assigned participants
+    equally across seven condition-cells (``none`` x1, ``importance`` x4,
+    ``attribution`` x2), so the three ``xai_type`` levels received participants
+    in a 1:4:2 ratio. Expressing that as one scalar is impossible, and rounding
+    it to a balanced design silently changes the study.
+
+    The mapping's keys must match the levels of exactly one between-subjects
+    IV. Requiring uniqueness rather than guessing means a mapping that could
+    address two factors is an error at generation time instead of an allocation
+    the caller did not intend -- and with a second between IV such as
+    ``dataset``, every cell of that factor correctly receives the same
+    per-level count.
+    """
+    if isinstance(participants_per_between_condition, dict):
+        mapping = participants_per_between_condition
+        if not mapping:
+            raise ValueError("participants_per_between_condition mapping is empty.")
+        if not any(combo for combo in between_combos):
+            raise ValueError(
+                "participants_per_between_condition was given as a mapping, but "
+                "the design has no between-subjects IV to allocate over."
+            )
+        levels_by_iv: dict[str, set] = {}
+        for combo in between_combos:
+            for name, level in combo.items():
+                levels_by_iv.setdefault(name, set()).add(level)
+        keys = set(mapping)
+        candidates = [name for name, levels in levels_by_iv.items() if keys == levels]
+        if not candidates:
+            raise ValueError(
+                f"participants_per_between_condition keys {sorted(map(str, keys))} "
+                f"match no between-subjects IV's levels exactly. Available: "
+                + "; ".join(
+                    f"{name}={sorted(map(str, levels))}"
+                    for name, levels in levels_by_iv.items()
+                )
+            )
+        if len(candidates) > 1:
+            raise ValueError(
+                f"participants_per_between_condition keys match more than one "
+                f"between-subjects IV ({sorted(candidates)}), so which factor to "
+                f"allocate over is ambiguous. Rename a level to disambiguate."
+            )
+        iv_name = candidates[0]
+        counts = [int(mapping[combo[iv_name]]) for combo in between_combos]
+    else:
+        counts = [int(participants_per_between_condition)] * len(between_combos)
+
+    if any(count < 0 for count in counts):
+        raise ValueError(f"participants_per_between_condition must be >= 0, got {counts}.")
+    if not any(counts):
+        raise ValueError("participants_per_between_condition allocates 0 participants.")
+    return counts
+
+
 def assign_participants(
     n_participants: int,
     counterbalance_orders: list[list],
     between_iv_groups: dict[str, list] | None = None,
+    participants_per_group: list[int] | None = None,
 ) -> list[dict]:
     """
     Assign each participant to a counterbalancing order and between-subjects group.
@@ -363,28 +443,47 @@ def assign_participants(
     Source: NYUCCL/counterbalancing — round-robin assignment.
 
     Args:
-        n_participants:          Total number of participants.
+        n_participants:          Total number of participants. Ignored when
+                                 ``participants_per_group`` is given, which
+                                 states the total per cell directly.
         counterbalance_orders:   List of within-subjects condition orderings.
         between_iv_groups:       {'IV_name': [level1, level2, ...]} for between IVs.
                                  Participants are round-robin assigned across all
                                  between-subjects factorial combinations.
+        participants_per_group:  Per-cell counts aligned with
+                                 :func:`between_condition_combos`, for an unequal
+                                 allocation. Cells are then filled one at a time
+                                 and the within-order round robin restarts in
+                                 each, so every cell stays internally
+                                 counterbalanced -- which a global round robin
+                                 over unequal cells would not give.
 
     Returns:
         List of participant assignment dicts.
     """
     n_orders = len(counterbalance_orders)
+    between_combos = between_condition_combos(between_iv_groups)
 
-    # Generate all between-subjects factorial combinations
-    if between_iv_groups:
-        b_names = list(between_iv_groups.keys())
-        b_levels = [between_iv_groups[k] for k in b_names]
-        between_combos = [dict(zip(b_names, combo)) for combo in product(*b_levels)]
-    else:
-        between_combos = [{}]
-
-    n_between = len(between_combos)
     assignments = []
 
+    if participants_per_group is not None:
+        if len(participants_per_group) != len(between_combos):
+            raise ValueError(
+                f"participants_per_group has {len(participants_per_group)} entries "
+                f"but the design has {len(between_combos)} between-subjects cells."
+            )
+        participant_id = 1
+        for between_group, count in zip(between_combos, participants_per_group):
+            for index in range(count):
+                assignments.append({
+                    "participantId": participant_id,
+                    "within_order": counterbalance_orders[index % n_orders],
+                    **between_group,
+                })
+                participant_id += 1
+        return assignments
+
+    n_between = len(between_combos)
     for p_idx in range(n_participants):
         participant_id = p_idx + 1
         order = counterbalance_orders[p_idx % n_orders]
