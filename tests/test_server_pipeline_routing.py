@@ -556,9 +556,15 @@ def _trials_stage_kwargs(study, request):
 def test_an_explicit_num_training_is_never_overridden():
     from server.schemas import TrialsStageRequest
 
-    kwargs = _trials_stage_kwargs(_apparatus_study(), TrialsStageRequest(num_training=2))
+    with pytest.warns(UserWarning, match="without replacement"):
+        kwargs = _trials_stage_kwargs(_apparatus_study(), TrialsStageRequest(num_training=2))
     assert kwargs["num_training"] == 2
-    assert kwargs["num_testing"] == 28
+    # 30 - 2 leaves 28 testing trials, but the apparatus declares only 20
+    # testing instances and a block draws them without replacement -- so the
+    # testing phase is clamped to what the corpus can serve, with a warning.
+    # The old expectation of 28 was a split that could not actually run.
+    # num_training itself is still exactly what was asked for.
+    assert kwargs["num_testing"] == 20
 
 
 def test_the_training_split_is_derived_from_the_design_not_a_flat_default():

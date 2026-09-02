@@ -109,12 +109,19 @@ XAI_METHOD_ALIASES: dict[str, str] = {
     "captum_deeplift": "deeplift",
 }
 
-#: Sim2Real's one published corpus, and the curated instance split every prior
-#: export declared explicitly (testing 10-30, training 0-9) -- the defaults a
+#: Sim2Real's one published corpus and its instance split -- the defaults a
 #: Sim2Real design falls back to when it leaves them unspecified, since the
 #: corpus never changes from study to study.
+#:
+#: Testing is ids 10-38, the corpus's own ``split`` column
+#: (``assets/explanations/xai_desiderata/deltas.csv``: 29 test rows, ids 10-38,
+#: carrying qids 0-28) and the set the published study actually ran -- its
+#: human trials contain exactly those 29 distinct qids. An earlier default
+#: stopped at 30, which silently dropped 8 of the study's own instances
+#: (ids 31-38, qids 21-28) and capped every defaulted design's testing phase
+#: at 21 trials.
 SIM2REAL_DEFAULT_DATASET_ID = "adult"
-SIM2REAL_DEFAULT_TEST_INSTANCE_IDS: tuple[int, ...] = tuple(range(10, 31))
+SIM2REAL_DEFAULT_TEST_INSTANCE_IDS: tuple[int, ...] = tuple(range(10, 39))
 SIM2REAL_DEFAULT_TRAIN_INSTANCE_IDS: tuple[int, ...] = tuple(range(0, 10))
 
 # ML-proxy baseline labels the UI offers, mapped onto the ids

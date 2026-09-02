@@ -10,6 +10,7 @@ changes in ``src/``.
 from __future__ import annotations
 
 from pathlib import Path
+import warnings
 from typing import Any, Mapping, Optional, Sequence
 
 import numpy as np
@@ -917,6 +918,23 @@ def run_trials_stage(study: xaikitTest, request: TrialsStageRequest) -> dict[str
                 f"{total_trials} trials per participant the design records."
             )
 
+    # Trials inside a block draw instances without replacement, so a testing
+    # phase can never be longer than the corpus can serve. Deriving both counts
+    # above already lands on the pool size, but a caller who names either one
+    # can overshoot it -- and the failure then surfaces deep in
+    # build_trial_sequence as "need 30, got 29", naming no corpus. Run the
+    # study the corpus supports and say so, rather than refusing outright.
+    corpus_testing_warning = None
+    if apparatus_test_count and num_testing > apparatus_test_count:
+        corpus_testing_warning = (
+            f"num_testing={num_testing} exceeds the {apparatus_test_count} testing "
+            f"instances this design's published corpus can serve, and trials draw "
+            f"without replacement. Running with {apparatus_test_count}, the number "
+            f"the original study used."
+        )
+        warnings.warn(corpus_testing_warning, UserWarning, stacklevel=2)
+        num_testing = apparatus_test_count
+
     apparatus_test_ids = sorted(set(getattr(design, "apparatus_instance_ids", [])))
     split_overridden = bool(apparatus_test_ids)
     data_by_dataset = getattr(study, "data_by_dataset", None)
@@ -1113,6 +1131,7 @@ def run_trials_stage(study: xaikitTest, request: TrialsStageRequest) -> dict[str
         },
         "num_training": int(num_training),
         "num_testing": int(num_testing),
+        **({"warning": corpus_testing_warning} if corpus_testing_warning else {}),
         "participants_per_between_condition": int(participants),
         "by_condition": (
             frame_records(trials.groupby(condition_columns).size().reset_index(name="trials"))
