@@ -85,6 +85,16 @@ HUMAN_TRIALS_FILE = (
     COAX_STUDY_ROOT / "data" / "user study results" / "3-datasets-jan-09-2026-trials.csv"
 )
 
+#: The publishable copy of the same log: identical schema apart from ``appId``
+#: being spelled ``dataId``, and participants renumbered per study by
+#: ``assets/build_human_data.py``. Its ids are the ones
+#: ``coax_fitted_strategies.csv`` uses, so this is the copy that joins to the
+#: parameter pool -- all 626 fitted person-sessions are present in it.
+ANONYMISED_HUMAN_TRIALS_FILE = (
+    Path(__file__).resolve().parents[4]
+    / "assets" / "human_data" / "CoAX" / "coax_human_trials.csv"
+)
+
 #: One row per (participant, session, XAIType, tested) with the fitted strategy
 #: and its parameters.
 FITTED_PARAMS_FILE = (
@@ -320,6 +330,10 @@ def load_coax_human_trials(
     """
     log = pd.read_csv(path, low_memory=False)
     log = log[log["Step"].astype(str).str.strip().str.lower() == "infer"].copy()
+    # The anonymised copy spells this column dataId; the raw one appId. Same
+    # meaning, and the rename below turns it back into dataId either way.
+    if "appId" not in log.columns and "dataId" in log.columns:
+        log = log.rename(columns={"dataId": "appId"})
     log["appId"] = log["appId"].map(_canonical_data_id)
 
     if data_ids is not None:

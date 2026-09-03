@@ -45,6 +45,8 @@ POST /api/studies/{id}/analysis       analyze_iv_dv per IV x DV -- condition mea
 POST /api/studies/{id}/posthoc        pairwise_condition_tests -- pairwise condition means + corrected p-values
 POST /api/studies/{id}/plots/interaction   one DV by two IVs
 POST /api/studies/{id}/plots/grid          every DV by every IV
+GET  /api/coax-paper-reference             the CoAX paper's published accuracy cells
+GET  /api/studies/{id}/coax-paper-comparison   this run's cells next to the paper's
 ```
 
 The four stage endpoints return `202` with a job immediately — training and
@@ -84,7 +86,35 @@ one endpoint serves a step-through and the full run:
 {"mode": "participant_by_participant", "participant_id": 3}  // one participant
 {"mode": "whole_condition", "condition_filter": {"xai_type": "attribution"}}
 {"mode": "whole_experiment"}                                 // everything
+{"mode": "diverse_participant", "sampling_seed": 0}          // per-participant parameters
+{"mode": "fitted_population", "sampling_seed": 0}            // per-participant whole people
 ```
+
+The last two run the whole experiment but give each virtual participant its own
+cognitive parameters, drawn from the humans the agent was fitted to. Research
+agents only — a proxy baseline has no fitted population, and its comparison runs
+fall back to `whole_experiment` (the payload's `baseline_mode` says so).
+
+They differ in what is drawn:
+
+| mode | draws | strategy per condition |
+| --- | --- | --- |
+| `diverse_participant` | parameters, filtered to that participant's cell | one, from `PREFERRED_COAX_STRATEGY_BY_XAI_TYPE` |
+| `fitted_population` | a whole `(Participant ID, Session)` unit — parameters *and* strategy, for both tested halves | the fitted population's own mixture |
+
+`fitted_population` is CoAX-only, since only CoAX's pool records a fitted
+strategy per condition. It matters because the fitted population is not one
+strategy: its `importance` cells split four ways, and its `attribution` w/o XAI
+cell is majority `SensitiveFeatures` rather than the preferred `AttributionSum`.
+Each virtual participant is one real person, so their w/ XAI and w/o XAI halves
+are comparable. Result rows carry `strategy`, `human_pai`, `fitted_mai` and
+`fitted_nll` alongside the usual `fitted_participant_id` / `parameter_source`
+provenance.
+
+`GET /api/studies/{id}/coax-paper-comparison` then puts such a run next to the
+CoAX paper's published Human and CoAX bars, in the same panel shape
+`/api/human-comparison` serves. Build its reference first with
+`python assets/build_coax_paper_reference.py`.
 
 Each run is saved as CSV and JSON under
 `<runs_dir>/<study_id>/simulated_results/<mode>/`, and the most recent run is

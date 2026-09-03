@@ -168,6 +168,17 @@ class PoolSpec:
     dedupe_by_participant: bool = False
     #: Built by a function rather than read straight from one CSV.
     builder: Optional[str] = None
+    #: Columns identifying one *whole fitted person* when a caller wants to deal
+    #: people rather than cells -- see :func:`draw_participant_units`. Empty for
+    #: pools whose rows are already one per participant.
+    unit_columns: Sequence[str] = ()
+    #: CSV column -> draw attribute, for values that are not model parameters:
+    #: the fitted strategy, and the fit-quality columns worth carrying into the
+    #: results table. Read only by :func:`draw_participant_units`, so a pool that
+    #: sets it does not change what :func:`draw_participant_parameters` returns.
+    attribute_columns: Mapping[str, str] = field(default_factory=dict)
+    #: Canonicalizers for ``attribute_columns``, by CSV column name.
+    attribute_canon: Mapping[str, Callable[[Any], str]] = field(default_factory=dict)
 
 
 #: CoAX: 1,133 fitted assignments over 330 participants. The column names are
@@ -196,6 +207,24 @@ COAX_POOL = PoolSpec(
         "scaling_factor": "scaling_factor",
     },
     integer_parameters=frozenset({"k"}),
+    # One fitted person is one participant *in one session*: `Strategy` is unique
+    # within (Participant ID, Session, Tested w/ XAI) for all 1,133 rows, but 287
+    # of the 626 units switch strategy between their two tested halves, and 219
+    # participants are fitted a different strategy in session 2 than in session 1.
+    # Dealing the (id, session) unit therefore keeps one coherent person whose
+    # two halves are the same human -- which is what the paper's within-subject
+    # Attribution effect (.66 w/o XAI -> .85 w/ XAI) is measured across.
+    unit_columns=("Participant ID", "Session"),
+    attribute_columns={
+        "Strategy": "strategy",
+        "PAI": "human_pai",
+        "MAI": "fitted_mai",
+        "NLL": "fitted_nll",
+        # Carried so a caller can find this person's own logged trials, which
+        # are keyed by (Participant ID, Session) -- see coax_population_trials.
+        "Session": "fitted_session",
+    },
+    attribute_canon={"Strategy": canon_coax_strategy},
 )
 
 
@@ -478,6 +507,25 @@ def _row_parameters(spec: PoolSpec, row: pd.Series) -> dict[str, Any]:
     return parameters
 
 
+def _row_attributes(spec: PoolSpec, row: pd.Series) -> dict[str, Any]:
+    """The drawn row's non-parameter values -- its strategy and fit quality.
+
+    Kept apart from :func:`_row_parameters` because these are never passed to a
+    model constructor: the strategy *selects* the constructor, and PAI/MAI/NLL
+    describe the fit rather than configure it.
+    """
+    attributes: dict[str, Any] = {}
+    for column, name in spec.attribute_columns.items():
+        if column not in row.index:
+            continue
+        value = row[column]
+        if value is None or (isinstance(value, float) and np.isnan(value)):
+            continue
+        canon = spec.attribute_canon.get(column)
+        attributes[name] = canon(value) if canon is not None else value
+    return attributes
+
+
 @dataclass(frozen=True)
 class ParticipantDraw:
     """One virtual participant's assignment from the pool."""
@@ -487,6 +535,14 @@ class ParticipantDraw:
     fitted_participant_id: Optional[Any]
     parameter_source: str
     pool_name: str
+    #: Non-parameter values carried off the drawn row (``strategy``,
+    #: ``human_pai``, ...). Empty unless the draw came from
+    #: :func:`draw_participant_units`, so existing callers see no new columns.
+    attributes: dict[str, Any] = field(default_factory=dict)
+    #: Which half of the session this draw configures, when a unit was dealt:
+    #: ``"true"`` / ``"false"`` from :func:`canon_tested`. ``None`` for a
+    #: whole-cell draw.
+    tested_w_xai: Optional[str] = None
 
     @property
     def is_fallback(self) -> bool:
@@ -530,6 +586,30 @@ def match_with_relaxation(
         if not matched.empty:
             return matched, dropped
     return matched, tuple(relax)
+
+
+def _deal_positions(
+    count: int,
+    options: int,
+    *,
+    seed: int = 0,
+    replace: Optional[bool] = None,
+) -> list[int]:
+    """Which of ``options`` rows each of ``count`` participants gets.
+
+    Dealt without replacement while the pool lasts, then reshuffled and dealt
+    again -- so with a pool at least as large as the study no two virtual
+    participants are the same person, and with a smaller one the empirical
+    distribution is still reproduced rather than resampled i.i.d.
+    ``replace=True`` draws independently instead.
+    """
+    rng = np.random.default_rng(seed)
+    if replace:
+        return list(rng.integers(0, options, size=count))
+    positions: list[int] = []
+    while len(positions) < count:
+        positions.extend(rng.permutation(options).tolist())
+    return positions[:count]
 
 
 def draw_participant_parameters(
@@ -592,14 +672,9 @@ def draw_participant_parameters(
             for participant in participants
         }
 
-    rng = np.random.default_rng(seed)
-    positions: list[int] = []
-    if replace:
-        positions = list(rng.integers(0, len(matched), size=len(participants)))
-    else:
-        while len(positions) < len(participants):
-            positions.extend(rng.permutation(len(matched)).tolist())
-        positions = positions[: len(participants)]
+    positions = _deal_positions(
+        len(participants), len(matched), seed=seed, replace=replace
+    )
 
     draws: dict[Any, ParticipantDraw] = {}
     for participant, position in zip(participants, positions):
@@ -613,6 +688,114 @@ def draw_participant_parameters(
             parameter_source=source,
             pool_name=pool_name,
         )
+    return draws
+
+
+def draw_participant_units(
+    pool_name: str,
+    *,
+    condition: Mapping[str, Any],
+    participants: Sequence[Any],
+    seed: int = 0,
+    replace: Optional[bool] = None,
+    relax: Sequence[str] = (),
+    pool: Optional[pd.DataFrame] = None,
+) -> dict[Any, dict[str, ParticipantDraw]]:
+    """Deal each virtual participant one whole fitted person, both halves at once.
+
+    The counterpart of :func:`draw_participant_parameters`, which deals one row
+    per *condition cell*: two cells therefore hand one virtual participant two
+    different humans' parameters, and the strategy is not drawn at all -- the
+    caller picks one per condition and filters the draw to it. That reproduces
+    neither the population's strategy mixture nor any within-subject effect.
+
+    This function deals the unit named by ``spec.unit_columns`` and returns
+    *every* row of it, keyed by :func:`canon_tested`. So one virtual participant
+    is one real person: their ``w/ XAI`` half and their ``w/o XAI`` half carry
+    that person's own strategy and own parameters for each half, and the two
+    halves are comparable because they are the same human.
+
+    ``condition`` must therefore not name ``tested_w_xai`` or ``strategy``: both
+    vary *within* a unit, and filtering on either would deal half a person. Both
+    are dropped with a warning if passed.
+
+    Returns ``{participant: {"true": draw, "false": draw}}``. A unit fitted in
+    only one half yields only that key -- 119 of the CoAX pool's 626 units.
+    """
+    spec = POOLS[pool_name]
+    if not spec.unit_columns:
+        raise ValueError(
+            f"Pool {pool_name!r} has no unit_columns, so it cannot deal whole "
+            "fitted people. Use draw_participant_parameters instead."
+        )
+
+    within_unit = {"tested_w_xai", "strategy"}
+    narrowing = within_unit & set(condition)
+    if narrowing:
+        warnings.warn(
+            f"draw_participant_units ignores {sorted(narrowing)} in `condition`: "
+            "those vary within one fitted person, and filtering on them would "
+            "deal half a participant. Drop them from the condition to silence "
+            "this.",
+            stacklevel=2,
+        )
+    condition = {key: value for key, value in condition.items() if key not in within_unit}
+    relax = tuple(axis for axis in relax if axis not in within_unit)
+
+    matched, dropped = match_with_relaxation(spec, condition, relax=relax, pool=pool)
+    source = "pool" if not dropped else "pool_relaxed:" + ",".join(dropped)
+    if dropped and not matched.empty:
+        warnings.warn(
+            f"No {pool_name} participants were fitted for the exact condition "
+            f"{dict(condition)!r}; drew from the pool with {list(dropped)} relaxed "
+            f"instead. The results table records this as parameter_source={source!r}.",
+            stacklevel=2,
+        )
+
+    if matched.empty:
+        warnings.warn(
+            f"No {pool_name} participants were fitted for condition "
+            f"{dict(condition)!r}, so this run falls back to the framework's "
+            "fitted-population defaults for these participants -- they will not "
+            "differ from each other. Check the condition against the pool, or "
+            "accept the fallback.",
+            stacklevel=2,
+        )
+        return {
+            participant: {
+                None: ParticipantDraw(
+                    participant_id=participant,
+                    parameters={},
+                    fitted_participant_id=None,
+                    parameter_source="fitted_mean_fallback",
+                    pool_name=pool_name,
+                )
+            }
+            for participant in participants
+        }
+
+    unit_columns = [column for column in spec.unit_columns if column in matched.columns]
+    units = [rows for _, rows in matched.groupby(unit_columns, sort=True, dropna=False)]
+    positions = _deal_positions(len(participants), len(units), seed=seed, replace=replace)
+
+    draws: dict[Any, dict[str, ParticipantDraw]] = {}
+    for participant, position in zip(participants, positions):
+        unit = units[int(position)]
+        by_half: dict[str, ParticipantDraw] = {}
+        for _, row in unit.iterrows():
+            half = canon_tested(row["Tested w/ XAI"]) if "Tested w/ XAI" in row.index else None
+            by_half[half] = ParticipantDraw(
+                participant_id=participant,
+                parameters=_row_parameters(spec, row),
+                fitted_participant_id=(
+                    row[spec.id_column] if spec.id_column in row.index else None
+                ),
+                parameter_source=source,
+                pool_name=pool_name,
+                attributes=_row_attributes(spec, row),
+                tested_w_xai=half,
+            )
+        draws[participant] = by_half
     return draws
 
 
@@ -631,6 +814,9 @@ def draws_to_frame(draws: Mapping[Any, ParticipantDraw]) -> pd.DataFrame:
             "fitted_participant_id": draw.fitted_participant_id,
             "parameter_source": draw.parameter_source,
         }
+        if draw.tested_w_xai is not None:
+            row["tested_w_xai"] = draw.tested_w_xai
+        row.update(draw.attributes)
         row.update({f"sampled_{key}": value for key, value in draw.parameters.items()})
         rows.append(row)
     return pd.DataFrame(rows)
@@ -645,12 +831,19 @@ def provenance_columns(draw: Optional[ParticipantDraw]) -> dict[str, Any]:
         "parameter_source": draw.parameter_source,
         "parameter_pool": draw.pool_name,
     }
+    columns.update(draw.attributes)
     columns.update({f"sampled_{key}": value for key, value in draw.parameters.items()})
     return columns
 
 
-#: Mode name that turns per-participant sampling on, everywhere it is checked.
+#: Mode name that deals each participant one fitted human's *parameters*, with
+#: the strategy fixed per condition by the runner.
 DIVERSE_PARTICIPANT_MODE = "diverse_participant"
+
+#: Mode name that deals each participant one whole fitted human -- strategy and
+#: parameters, both tested halves -- so a condition reproduces the fitted
+#: population's strategy mixture rather than one representative strategy.
+FITTED_POPULATION_MODE = "fitted_population"
 
 
 def is_diverse_mode(mode: Any) -> bool:
@@ -658,11 +851,27 @@ def is_diverse_mode(mode: Any) -> bool:
     return str(mode or "").strip().lower() == DIVERSE_PARTICIPANT_MODE
 
 
+def is_fitted_population_mode(mode: Any) -> bool:
+    """Whether this ``mode`` asks for whole fitted people, strategy included."""
+    return str(mode or "").strip().lower() == FITTED_POPULATION_MODE
+
+
+def samples_participants(mode: Any) -> bool:
+    """Whether this ``mode`` draws from a fitted population at all.
+
+    The test for "this run needs a pool, a sampling seed and per-participant
+    provenance" -- true of both sampling modes, and the right check wherever the
+    two do not need to be told apart.
+    """
+    return is_diverse_mode(mode) or is_fitted_population_mode(mode)
+
+
 __all__ = [
     "COAX_POOL",
     "COXAM_COUNTERFACTUAL_POOL",
     "COXAM_FORWARD_POOL",
     "DIVERSE_PARTICIPANT_MODE",
+    "FITTED_POPULATION_MODE",
     "HUMAN_DATA",
     "POOLS",
     "ParticipantDraw",
@@ -677,10 +886,13 @@ __all__ = [
     "canon_dataset",
     "canon_tested",
     "draw_participant_parameters",
+    "draw_participant_units",
     "draws_to_frame",
     "is_diverse_mode",
+    "is_fitted_population_mode",
     "load_pool",
     "match_pool_rows",
     "match_with_relaxation",
     "provenance_columns",
+    "samples_participants",
 ]

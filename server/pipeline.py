@@ -18,7 +18,10 @@ import pandas as pd
 
 from src.api import xaikitTest
 from src.cognitive_models import is_baseline_model_id, normalize_baseline_model_id
-from src.virtual_experiment_executor.participant_pools import is_diverse_mode
+from src.virtual_experiment_executor.participant_pools import (
+    is_fitted_population_mode,
+    samples_participants,
+)
 from src.experiment_planner.design_export import normalize_cognitive_params
 from src.cognitive_models.baseline_models import BASELINE_MODEL_IDS
 from src.result_visualizer import (
@@ -33,6 +36,7 @@ from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_study_runne
 )
 from src.virtual_experiment_executor.experiment_simualtion.CoAX.coax_trial_executor import (
     COAX_STRATEGIES_BY_XAI_TYPE,
+    _canonical_xai_type,
 )
 
 from .schemas import (
@@ -1435,13 +1439,13 @@ def _per_dataset_or_single_source(
 
 
 def _sampling_kwargs(request: SimulationRequest) -> dict[str, Any]:
-    """The diverse-mode sampling options, or nothing for every other mode.
+    """The sampling options, or nothing for a mode that draws no participants.
 
     Passed only when the mode asks for them: the runners accept them always,
     but sending them for a shared-parameter run would imply the run sampled
     something when it did not.
     """
-    if not is_diverse_mode(request.mode):
+    if not samples_participants(request.mode):
         return {}
     return {
         "sampling_seed": request.sampling_seed,
@@ -1502,6 +1506,9 @@ def run_simulation_stage(
                 pd.DataFrame(study.trials),
                 strategies=request.coax_strategies,
                 params=_resolve_coax_params(study, request),
+                # fitted_population draws a strategy per tested half, so it
+                # needs one model per half to put them in.
+                by_tested_condition=is_fitted_population_mode(request.mode),
             ),
             source=coax_source,
             **_sampling_kwargs(request),
@@ -1572,10 +1579,12 @@ def run_simulation_stage(
     design = study.design_export
     baseline_model_ids = list(getattr(design, "baseline_model_ids", None) or [])
     # A proxy baseline has no fitted human population, so run_experiment
-    # refuses diverse_participant for it. Running those comparisons in
+    # refuses the sampling modes for it. Running those comparisons in
     # whole_experiment keeps the mode usable for the designs that declare both,
     # and baseline_mode below says which mode they actually ran in.
-    baseline_mode = "whole_experiment" if is_diverse_mode(request.mode) else request.mode
+    baseline_mode = (
+        "whole_experiment" if samples_participants(request.mode) else request.mode
+    )
     if runner != "baseline" and baseline_model_ids:
         primary_model_id = study.cognitive_model_id
         primary_cognitive_model = study.cognitive_model
@@ -2064,6 +2073,341 @@ def _plot_payload(
     else:
         plt.close(figure)
     return payload
+
+
+# -- CoAX run vs the published paper tables --------------------------------
+
+COAX_PAPER_REFERENCE = Path(__file__).resolve().parents[1] / "assets" / "coax_paper_reference.json"
+
+#: The five cells the CoAX paper reports. The `none` arm shows no explanation on
+#: any trial, so it has no "tested with XAI" half -- same rule as
+#: COAX_IMPOSSIBLE_CELLS in coax_trial_executor.
+COAX_PAPER_CELLS: tuple[tuple[str, bool], ...] = (
+    ("none", False),
+    ("importance", False),
+    ("importance", True),
+    ("attribution", False),
+    ("attribution", True),
+)
+
+#: Kept short because the shared renderer draws five groups in one ~2.6in panel
+#: at 8.5pt with no rotation -- "Importance"/"Attribution" collide there, and the
+#: renderer's tick handling is common to every study's figure.
+COAX_CELL_LABELS = {
+    ("none", False): "No XAI",
+    ("importance", False): "Imp.\nw/o XAI",
+    ("importance", True): "Imp.\nw/ XAI",
+    ("attribution", False): "Attr.\nw/o XAI",
+    ("attribution", True): "Attr.\nw/ XAI",
+}
+
+PAPER_HUMAN_SERIES = "Paper - human"
+PAPER_COAX_SERIES = "Paper - CoAX"
+SIMULATED_SERIES = "Simulated agents"
+DRAWN_HUMAN_SERIES = "Drawn humans"
+
+
+def coax_paper_reference() -> Optional[dict[str, Any]]:
+    """The published CoAX accuracy tables, or None if the asset is not built."""
+    import json
+
+    if not COAX_PAPER_REFERENCE.is_file():
+        return None
+    return json.loads(COAX_PAPER_REFERENCE.read_text())
+
+
+def _scored_coax_rows(results: pd.DataFrame) -> pd.DataFrame:
+    """The testing rows a run should be scored on -- one per trial, not two.
+
+    A trial can emit both an ``infer_no_explanation`` and an
+    ``infer_with_explanation`` row, so averaging every row double-counts the
+    trials that produced two. The step that counts is the one the participant
+    actually answered under, which is the same rule the human replay uses to
+    line a simulated trial up against a logged human response
+    (``coax_human_replay._human_comparable_step``).
+    """
+    rows = results[results["phase"].astype(str).str.lower() == "testing"].copy()
+    if rows.empty:
+        return rows
+    if "step" in rows.columns:
+        tested = rows["tested_w_xai"].map(_truthy)
+        wanted = tested.map(
+            lambda flag: "infer_with_explanation" if flag else "infer_no_explanation"
+        )
+        rows = rows[rows["step"].astype(str) == wanted]
+    rows["__xai_type"] = rows["xai_type"].map(_canonical_xai_type)
+    rows["__tested"] = rows["tested_w_xai"].map(_truthy)
+    return rows
+
+
+def _truthy(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    text = str(value).strip().lower()
+    return text in {"true", "1", "yes", "w/ xai", "w_xai"}
+
+
+def _cell_series(
+    rows: pd.DataFrame,
+    *,
+    value_column: str,
+    cells: Sequence[tuple[str, bool]],
+) -> dict[tuple[str, bool], dict[str, float]]:
+    """Participant-mean-then-cell-mean of ``value_column``, per cell.
+
+    Participant means first, so a participant with more trials does not count
+    for more -- the convention the published tables and
+    ``result_visualizer.participant_summary`` both use.
+    """
+    from src.result_visualizer.human_vs_model import participant_summary
+
+    if rows.empty or value_column not in rows.columns:
+        return {}
+    frame = rows.dropna(subset=[value_column]).copy()
+    if frame.empty:
+        return {}
+    frame["__cell"] = list(zip(frame["__xai_type"], frame["__tested"]))
+    frame[value_column] = frame[value_column].astype(float)
+    summary = participant_summary(
+        frame,
+        participant_column="participantId",
+        group_column="__cell",
+        value_column=value_column,
+    )
+    return {
+        row["group"]: {"mean": row["mean"], "ci95": row["ci95"], "n": int(row["n"])}
+        for _, row in summary.iterrows()
+        if row["group"] in set(cells)
+    }
+
+
+def _half_width(record: Mapping[str, Any]) -> float:
+    if record.get("ci_upper") is None or record.get("ci_lower") is None:
+        return 0.0
+    return (record["ci_upper"] - record["ci_lower"]) / 2.0
+
+
+def _paper_series(
+    reference: Mapping[str, Any],
+    *,
+    agent: str,
+    data_id: Optional[str] = None,
+    data_ids: Optional[Sequence[str]] = None,
+) -> dict[tuple[str, bool], dict[str, float]]:
+    """One published agent's cells: for one dataset, or pooled over several.
+
+    Pooling is weighted by each cell's published ``N Rows``, which reproduces the
+    paper's own pooled table exactly (verified to 4 decimal places on all ten
+    cells) -- so a run covering all three datasets is compared against the
+    published pooled numbers, and a run covering only one is compared against
+    that dataset's share of them rather than against an average that includes
+    datasets the run never touched.
+    """
+    records = [row for row in reference["per_dataset"] if row["agent"] == agent]
+    if data_id is not None:
+        return {
+            (row["xai_type"], row["tested_w_xai"]): {
+                "mean": row["mean"],
+                "ci95": _half_width(row),
+                "n": row["n"],
+            }
+            for row in records
+            if row.get("dataId") == data_id
+        }
+
+    if data_ids:
+        records = [row for row in records if row.get("dataId") in set(data_ids)]
+
+    covers_everything = data_ids is None or set(data_ids) >= set(reference["datasets"])
+    if covers_everything:
+        # The published pooled row, so the interval is the paper's own.
+        return {
+            (row["xai_type"], row["tested_w_xai"]): {
+                "mean": row["mean"],
+                "ci95": _half_width(row),
+                "n": row["n"],
+            }
+            for row in reference["pooled"]
+            if row["agent"] == agent
+        }
+
+    totals: dict[tuple[str, bool], list[float]] = {}
+    for row in records:
+        cell = (row["xai_type"], row["tested_w_xai"])
+        bucket = totals.setdefault(cell, [0.0, 0.0])
+        bucket[0] += row["mean"] * row["n"]
+        bucket[1] += row["n"]
+    return {
+        cell: {
+            "mean": weighted / count,
+            # The paper publishes no interval for an arbitrary subset of its
+            # datasets, and re-deriving one from the per-dataset SEMs would
+            # invent a number it never reported.
+            "ci95": 0.0,
+            "n": int(count),
+        }
+        for cell, (weighted, count) in totals.items()
+        if count
+    }
+
+
+def _panel(
+    title: str,
+    *,
+    series_by_name: Mapping[str, Mapping[tuple[str, bool], Mapping[str, float]]],
+    subtitle: str,
+    note: str,
+    role: Optional[str] = None,
+) -> Optional[dict[str, Any]]:
+    """One comparison panel in the shape assets/human_vs_model_plot_data.json uses.
+
+    Cells nothing measured are dropped rather than plotted as zero, so a run
+    covering one dataset does not draw four empty bars.
+    """
+    cells = [cell for cell in COAX_PAPER_CELLS if any(cell in s for s in series_by_name.values())]
+    if not cells:
+        return None
+    series = []
+    for name, values in series_by_name.items():
+        if not values:
+            continue
+        series.append(
+            {
+                "name": name,
+                "values": [values.get(cell, {}).get("mean") for cell in cells],
+                "error": [values.get(cell, {}).get("ci95", 0.0) or 0.0 for cell in cells],
+                "n": [values.get(cell, {}).get("n", 0) for cell in cells],
+            }
+        )
+    if not series:
+        return None
+    return {
+        "title": title,
+        "dv": "Forward simulation accuracy",
+        "section": "CoAX vs published",
+        "subtitle": subtitle,
+        "role": role,
+        "note": note,
+        "categories": [COAX_CELL_LABELS[cell] for cell in cells],
+        "series": series,
+        "interval": "ci95",
+    }
+
+
+def coax_paper_comparison_payload(study: xaikitTest) -> dict[str, Any]:
+    """This run's cells next to the CoAX paper's published Human and CoAX bars.
+
+    Four series per cell: the paper's two, this run's simulated agents, and the
+    real accuracy of the very humans the run drew (``human_pai``, carried onto
+    every row by the fitted_population draw). The last is what says whether a
+    gap against the paper is the model or simply which people were sampled.
+    """
+    reference = coax_paper_reference()
+    if reference is None:
+        raise RuntimeError(
+            "assets/coax_paper_reference.json has not been built. Run "
+            "`python assets/build_coax_paper_reference.py` first."
+        )
+    if participant_runner(study) != "coax":
+        raise ValueError(
+            "The CoAX paper comparison only applies to a CoAX study; this one "
+            f"runs {participant_runner(study)!r}."
+        )
+    results = study.simulated_results
+    if results is None or len(results) == 0:
+        raise ValueError("This study has no simulated results yet. Run /simulate first.")
+
+    rows = _scored_coax_rows(pd.DataFrame(results))
+    if rows.empty:
+        raise ValueError(
+            "The simulated results carry no testing rows, so there is nothing to "
+            "compare against the paper's tested-block accuracy."
+        )
+
+    sampled = "fitted_participant_id" in rows.columns and rows["fitted_participant_id"].notna().any()
+    # Only a fitted_population draw carries the drawn human's own accuracy;
+    # diverse_participant draws parameters from a row but not that row's PAI. So
+    # the bar is keyed on the column actually being there, not on the run having
+    # sampled -- otherwise the note promises a series the panel does not carry.
+    has_drawn_accuracy = "human_pai" in rows.columns and rows["human_pai"].notna().any()
+    dataset_ids = sorted(
+        {str(value) for value in rows.get("dataId", pd.Series(dtype=str)).dropna().unique()}
+    )
+
+    def series_for(data_id: Optional[str]) -> dict[str, dict]:
+        subset = rows if data_id is None else rows[rows["dataId"].astype(str) == data_id]
+        pooling = {"data_id": data_id} if data_id else {"data_ids": dataset_ids}
+        built = {
+            PAPER_HUMAN_SERIES: _paper_series(reference, agent="human", **pooling),
+            PAPER_COAX_SERIES: _paper_series(reference, agent="coax", **pooling),
+            SIMULATED_SERIES: _cell_series(
+                subset, value_column="cognitive_correct_vs_ai", cells=COAX_PAPER_CELLS
+            ),
+        }
+        if has_drawn_accuracy:
+            built[DRAWN_HUMAN_SERIES] = _cell_series(
+                subset, value_column="human_pai", cells=COAX_PAPER_CELLS
+            )
+        return built
+
+    if has_drawn_accuracy:
+        drawn_note = (
+            " 'Drawn humans' is the published accuracy of the individual fitted "
+            "participants this run sampled, so it shows how far the sample sits "
+            "from the full population."
+        )
+    elif sampled:
+        drawn_note = (
+            " This run sampled fitted participants but records no per-participant "
+            "accuracy, so no drawn-human bar is shown -- only mode="
+            "'fitted_population' carries it."
+        )
+    else:
+        drawn_note = (
+            " This run did not sample fitted participants, so no drawn-human bar "
+            "is shown."
+        )
+    subset = bool(dataset_ids) and set(dataset_ids) < set(reference["datasets"])
+    subset_note = (
+        " This run covers "
+        + ", ".join(dataset_ids)
+        + " only, so the paper's bars are pooled over those datasets (weighted by "
+        "its published cell counts) rather than over all of "
+        + ", ".join(reference["datasets"])
+        + "; a subset carries no published interval."
+        if subset
+        else ""
+    )
+    base_note = (
+        "Test trials only, scored as agreement with the AI's prediction. Bars are "
+        "means over participant means with 95% confidence intervals; the paper's "
+        "bars carry the intervals it published." + subset_note + drawn_note
+    )
+
+    panels = [
+        _panel(
+            "Pooled across datasets",
+            series_by_name=series_for(None),
+            subtitle="every dataset",
+            note=base_note,
+            role="summary",
+        )
+    ]
+    for data_id in dataset_ids:
+        label = reference.get("dataset_labels", {}).get(data_id, data_id)
+        panels.append(
+            _panel(label, series_by_name=series_for(data_id), subtitle=data_id, note=base_note)
+        )
+
+    return {
+        "study_id": getattr(study, "study_id", None),
+        "dv": reference["dv"],
+        "dv_note": reference["dv_note"],
+        "sampled_participants": bool(sampled),
+        "has_drawn_human_accuracy": bool(has_drawn_accuracy),
+        "datasets": dataset_ids,
+        "panels": [panel for panel in panels if panel is not None],
+    }
 
 
 # -- human-vs-model comparison (precomputed, no fitting at request time) --

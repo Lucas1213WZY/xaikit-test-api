@@ -10,6 +10,7 @@ The flow mirrors the tutorial notebooks one stage at a time:
     GET  /api/studies/{id}/results       step rows as JSON (paged)
     GET  /api/studies/{id}/results.csv   the same rows as a CSV download
     GET  /api/studies/{id}/analysis      analyze_iv_dv per IV x DV
+    GET  /api/studies/{id}/coax-paper-comparison   the run vs the CoAX paper
     GET  /api/studies/{id}/posthoc       pairwise condition means + corrected p-values
     POST /api/studies/{id}/plots/...     aggregated plot data (PNG optional)
 
@@ -353,6 +354,41 @@ def get_human_comparison(study: str) -> dict[str, Any]:
             ),
         )
     return payload
+
+
+# -- CoAX run vs the published paper --------------------------------------
+
+
+@app.get("/api/coax-paper-reference")
+def get_coax_paper_reference() -> dict[str, Any]:
+    """The CoAX paper's published Human and CoAX accuracy cells, on their own.
+
+    No study needed: this lets the UI draw the target the simulation is aiming
+    at before any run exists. Built by ``assets/build_coax_paper_reference.py``.
+    """
+    payload = pipeline.coax_paper_reference()
+    if payload is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                "assets/coax_paper_reference.json has not been built. Run "
+                "`python assets/build_coax_paper_reference.py`."
+            ),
+        )
+    return payload
+
+
+@app.get("/api/studies/{study_id}/coax-paper-comparison")
+def get_coax_paper_comparison(study_id: str) -> dict[str, Any]:
+    """This study's simulated cells next to the CoAX paper's published bars.
+
+    Returns panels in the same shape ``/api/human-comparison`` serves, so the
+    existing comparison figure renders them without a client change. A run made
+    with ``mode="fitted_population"`` also carries a "Drawn humans" series --
+    the real accuracy of the fitted participants that run sampled.
+    """
+    session = _session(study_id)
+    return _guard(lambda: pipeline.coax_paper_comparison_payload(session.study))
 
 
 # -- analysis and plots ---------------------------------------------------

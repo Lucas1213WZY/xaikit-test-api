@@ -16,7 +16,11 @@ from typing import Any, Callable, Mapping, Optional, Sequence
 import numpy as np
 import pandas as pd
 
-from src.virtual_experiment_executor.participant_pools import is_diverse_mode
+from src.virtual_experiment_executor.participant_pools import (
+    is_diverse_mode,
+    is_fitted_population_mode,
+    samples_participants,
+)
 from src.cognitive_models import (
     default_cognitive_params,
     dummy_cognitive_model,
@@ -2219,7 +2223,7 @@ class xaikitTest:
                 # level would deal its pool rows in the same order. The levels'
                 # participants are disjoint by construction, so the assignments
                 # stay independent.
-                if is_diverse_mode(mode) and "sampling_seed" not in level_kwargs:
+                if samples_participants(mode) and "sampling_seed" not in level_kwargs:
                     level_kwargs["sampling_seed"] = level_index
                 # A dataset this study trained a real model for (see
                 # train_AI_model_for_dataset) needs source="study"/"fit"; one
@@ -2334,22 +2338,30 @@ class xaikitTest:
         row and in ``participant_parameters``. Tune it with ``sampling_seed``,
         ``sampling_replace`` and ``parameter_pool``.
         """
-        if is_diverse_mode(mode) and (self.cognitive_model_id or "") not in self._AGENT_RUNNERS:
+        if samples_participants(mode) and (self.cognitive_model_id or "") not in self._AGENT_RUNNERS:
             raise ValueError(
-                "mode='diverse_participant' draws parameters from the humans an "
+                f"mode={mode!r} draws parameters from the humans an "
                 f"agent was fitted to, and {self.cognitive_model_id!r} has no such "
                 "population. Select a research agent "
                 f"({', '.join(self._AGENT_RUNNERS)}) via set_cognitive_model"
                 "(cognitive_model_id=...), or run mode='whole_experiment'."
+            )
+        if is_fitted_population_mode(mode) and self.cognitive_model_id != "coax":
+            raise ValueError(
+                "mode='fitted_population' deals a whole fitted person -- their "
+                "strategy as well as their parameters -- and only CoAX's pool "
+                "records a fitted strategy per condition. "
+                f"{self.cognitive_model_id!r} has parameters but no strategy to "
+                "draw, so use mode='diverse_participant' for it."
             )
         if require_walkthrough_approval and not self.walkthrough_approved:
             raise RuntimeError(
                 "Experiment execution is locked. Preview the complete walkthrough and "
                 "click 'Approve walkthrough' first."
             )
-        if not is_diverse_mode(mode):
+        if not samples_participants(mode):
             # Otherwise a later shared-parameter run would still save (and claim)
-            # the previous diverse run's assignment.
+            # the previous sampled run's assignment.
             self.participant_parameters = None
             self.participant_parameters_path = None
 

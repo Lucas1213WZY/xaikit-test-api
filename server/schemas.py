@@ -156,11 +156,18 @@ class SimulationRequest(BaseModel):
         "whole_experiment",
         description=(
             "trial_by_trial | participant_by_participant | whole_condition | "
-            "whole_experiment | diverse_participant. The last runs the whole "
-            "experiment but gives every virtual participant its own cognitive "
-            "parameters, drawn from the humans the selected agent was fitted to "
-            "and filtered to that participant's own condition. Research agents "
-            "only -- a baseline model has no fitted population and is refused."
+            "whole_experiment | diverse_participant | fitted_population. The "
+            "last two run the whole experiment but give every virtual "
+            "participant its own cognitive parameters, drawn from the humans the "
+            "selected agent was fitted to. diverse_participant draws parameters "
+            "filtered to that participant's condition, keeping one strategy per "
+            "condition; fitted_population draws a whole fitted person -- their "
+            "strategy as well as their parameters, for both tested halves -- so "
+            "a condition reproduces the population's strategy mixture rather "
+            "than one representative strategy. Research agents only (a baseline "
+            "model has no fitted population and is refused), and "
+            "fitted_population is CoAX-only, since only its pool records a "
+            "fitted strategy per condition."
         ),
     )
     participant_id: Optional[int] = None
@@ -168,14 +175,16 @@ class SimulationRequest(BaseModel):
     sampling_seed: int = Field(
         0,
         description=(
-            "diverse_participant only. Makes the participant -> fitted-human "
+            "diverse_participant and fitted_population only. Makes the "
+            "participant -> fitted-human "
             "assignment reproducible across runs."
         ),
     )
     sampling_replace: Optional[bool] = Field(
         None,
         description=(
-            "diverse_participant only. None (the default) deals distinct fitted "
+            "diverse_participant and fitted_population only. None (the default) "
+            "deals distinct fitted "
             "people while the pool lasts, then reshuffles; true draws i.i.d. "
             "instead, which lets one person be dealt to several participants."
         ),

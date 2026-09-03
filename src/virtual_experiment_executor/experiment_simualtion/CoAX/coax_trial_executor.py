@@ -294,6 +294,24 @@ def _select_model_key(model_templates: Mapping[Any, Any], xai_type: str, tested_
     )
 
 
+def _sibling_model_keys(
+    model_templates: Mapping[Any, Any], model_key: Any, xai_type: str
+) -> list[Any]:
+    """The other keys covering this ``xai_type`` -- the halves ``model_key`` is not.
+
+    Only tuple keys have siblings. A plain ``xai_type`` key already serves both
+    tested halves with one model, and the shared key serves everything, so both
+    return nothing to teach.
+    """
+    if not isinstance(model_key, tuple):
+        return []
+    return [
+        key
+        for key in model_templates
+        if isinstance(key, tuple) and key[0] == xai_type and key != model_key
+    ]
+
+
 def _resolve_model_templates(cognitive_model: Any) -> dict[Any, Any]:
     """Normalize the ``cognitive_model`` argument into a condition -> model map.
 
@@ -552,6 +570,44 @@ class SimulationClock:
         self.current_time += float(amount)
 
 
+class _FrozenClock:
+    """A clock that reports one instant and refuses to advance.
+
+    Lent to a sibling model while it is fed a training exemplar it did not
+    itself answer, so the exemplar lands with the same timestamp the answering
+    model gave it -- and the shared ``SimulationClock`` is not advanced a second
+    time. Exemplar activation decays with elapsed time, so an extra ``add_time``
+    per training trial would quietly change what every later trial retrieves.
+    """
+
+    __slots__ = ("_at",)
+
+    def __init__(self, at: float) -> None:
+        self._at = float(at)
+
+    def get_time(self) -> float:
+        return self._at
+
+    def add_time(self, amount: float) -> None:
+        return None
+
+
+def _share_training_exemplar(sibling: Any, context: dict[str, Any], stored_at: float) -> None:
+    """Give ``sibling`` the exemplar another model was just taught.
+
+    Calls the sibling's own ``feedback`` rather than writing to its memory
+    directly: the four strategies do not store the same thing. SalientFeatures
+    stores a top-k projection of the features rather than the features, and
+    AttributionSum stores nothing at all -- so a generic ``store_exemplar`` here
+    would hand two of them an exemplar they would never have formed.
+    """
+    clock, sibling.time = sibling.time, _FrozenClock(stored_at)
+    try:
+        sibling.feedback(context)
+    finally:
+        sibling.time = clock
+
+
 def _argmax_choice(probs: Any) -> Any:
     if not probs:
         return None
@@ -572,6 +628,7 @@ def run_coax_experiment_executor(
     dvs: Optional[Mapping[str, Any]] = None,
     participant_models: Optional[Callable[[Any], Any]] = None,
     participant_draws: Optional[Mapping[Any, Any]] = None,
+    share_training_memory: bool = False,
 ) -> pd.DataFrame:
     """Execute CoAX strategies over generated trial rows.
 
@@ -596,6 +653,15 @@ def run_coax_experiment_executor(
     ``mode="diverse_participant"`` uses. It wins over ``cognitive_model``.
     ``participant_draws`` carries the matching provenance, keyed by
     ``(participantId, model_key)``, and is stamped onto every result row.
+
+    ``share_training_memory`` teaches every model registered for a trial's
+    ``xai_type`` the exemplar the answering model was just given, instead of only
+    the model the trial routed to. It exists for ``(xai_type, tested_w_xai)``
+    keys: a participant then holds one model per tested half, but training trials
+    carry no tested half to route by, so without this the ``w/ XAI`` model would
+    reach its testing block with an empty memory and answer from priors alone.
+    Off by default, because with plain ``xai_type`` keys one model already sees
+    every training trial and there is no sibling to teach.
 
     The runner stays separate from xaikitTest so the study object can remain
     focused on experimental design and trial generation.
@@ -675,13 +741,16 @@ def run_coax_experiment_executor(
             tested_w_xai = _canonical_tested_condition(trial.get("tested_w_xai", trial.get("Tested w/ XAI", False)))
             with_explanation = phase == "training" or tested_w_xai
 
-            model_key = _select_model_key(templates, xai_type, tested_w_xai)
-            if model_key not in models_by_key:
+            def model_for(key: Any) -> Any:
                 # One instance per participant so memory accumulates across their trials.
-                model = deepcopy(templates[model_key])
-                model.time = clock
-                models_by_key[model_key] = model
-            model = models_by_key[model_key]
+                if key not in models_by_key:
+                    instance = deepcopy(templates[key])
+                    instance.time = clock
+                    models_by_key[key] = instance
+                return models_by_key[key]
+
+            model_key = _select_model_key(templates, xai_type, tested_w_xai)
+            model = model_for(model_key)
             draw = (participant_draws or {}).get((_participant_key, model_key))
 
             model.new_instance()
@@ -752,7 +821,13 @@ def run_coax_experiment_executor(
 
             if is_training:
                 feedback_context = make_context(explanation if show_explanation else None)
+                stored_at = clock.get_time()
                 results[-1]["feedback_time"] = model.feedback(feedback_context)
+                if share_training_memory:
+                    for sibling_key in _sibling_model_keys(templates, model_key, xai_type):
+                        _share_training_exemplar(
+                            model_for(sibling_key), feedback_context, stored_at
+                        )
 
     unscored = sum(1 for row in results if row["cognitive_correct_vs_ai"] is None)
     if unscored:

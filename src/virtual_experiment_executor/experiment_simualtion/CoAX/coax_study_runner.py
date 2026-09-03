@@ -14,6 +14,7 @@ importance its absolute value.
 
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 from typing import Any, Mapping, Optional, Sequence
 
@@ -22,13 +23,17 @@ import pandas as pd
 from src.experiment_planner import select_trial_rows
 from src.virtual_experiment_executor.participant_pools import (
     draw_participant_parameters,
+    draw_participant_units,
     draws_to_frame,
     is_diverse_mode,
+    is_fitted_population_mode,
+    samples_participants,
 )
 
 from .coax_trial_executor import (
     COAX_STRATEGIES_BY_XAI_TYPE,
     CoAXAssetRepository,
+    coax_available_strategies,
     coax_params_for_strategy,
     default_coax_strategy,
     make_coax_model,
@@ -350,7 +355,12 @@ def run_coax_study(
     selected[ORDER_COLUMN] = range(len(selected))
 
     models = (
-        coax_models_for_trials(selected)
+        # fitted_population draws a strategy per tested half, so it needs one
+        # model per half to put them in; every other mode keeps the single
+        # model per xai_type it has always built.
+        coax_models_for_trials(
+            selected, by_tested_condition=is_fitted_population_mode(mode)
+        )
         if cognitive_model is None
         else cognitive_model
     )
@@ -358,15 +368,20 @@ def run_coax_study(
         _assert_models_cover(selected, models)
 
     participant_models = participant_draws = None
-    if is_diverse_mode(mode):
+    if samples_participants(mode):
         if not isinstance(models, Mapping):
             raise ValueError(
-                "mode='diverse_participant' needs the per-condition model mapping "
+                f"mode={mode!r} needs the per-condition model mapping "
                 "coax_models_for_trials() builds, so each condition's strategy is "
                 "known before its parameters are drawn. Pass cognitive_model as a "
                 "{xai_type: model} mapping, or leave it unset."
             )
-        participant_models, participant_draws = coax_participant_models(
+        draw_models = (
+            coax_population_models
+            if is_fitted_population_mode(mode)
+            else coax_participant_models
+        )
+        participant_models, participant_draws = draw_models(
             selected,
             models,
             data_id=_pool_data_id(data_id, selected, dataset),
@@ -376,6 +391,17 @@ def run_coax_study(
         )
         if store:
             study.participant_parameters = draws_to_frame(participant_draws)
+
+        if is_fitted_population_mode(mode):
+            # The trials follow the draw: each virtual participant runs the
+            # instances its own fitted human saw, which is the sequence those
+            # parameters were fitted against. See coax_population_trials.
+            selected = coax_population_trials(participant_draws, selected)
+            selected[ORDER_COLUMN] = range(len(selected))
+            # Those instance ids index the published corpus, not a freshly
+            # trained model's predictions, so the run has to read the corpus.
+            source = "corpus"
+            data_id = _pool_data_id(data_id, selected, dataset)
 
     if source == "corpus":
         return _run_coax_study_from_corpus(
@@ -388,9 +414,11 @@ def run_coax_study(
             train_with_explanation=train_with_explanation,
             participant_models=participant_models,
             participant_draws=participant_draws,
+            share_training_memory=is_fitted_population_mode(mode),
             store=store,
         )
 
+    share_training_memory = is_fitted_population_mode(mode)
     features = coax_feature_table(dataset)
     predictions = pool[pool["expMethod"].astype(str) == PREDICTION_ONLY_METHOD]
     if predictions.empty:
@@ -421,6 +449,7 @@ def run_coax_study(
                 dvs=study.DVs if dvs is None else dvs,
                 participant_models=participant_models,
                 participant_draws=participant_draws,
+                share_training_memory=share_training_memory,
             )
         )
 
@@ -561,6 +590,231 @@ def coax_participant_models(
     return participant_models, draws
 
 
+def coax_population_models(
+    trials: pd.DataFrame,
+    models: Mapping[Any, Any],
+    *,
+    data_id: Optional[str] = None,
+    seed: int = 0,
+    replace: Optional[bool] = None,
+    pool: Optional[pd.DataFrame] = None,
+) -> tuple[Any, dict[Any, Any]]:
+    """One CoAX model per participant per tested half, drawn as whole people.
+
+    The counterpart of :func:`coax_participant_models`, and the difference is the
+    strategy. That function reads the strategy off the model the runner already
+    built for the condition and draws only parameters *fitted to that same
+    strategy*; every participant in a condition therefore runs the one strategy
+    :data:`PREFERRED_COAX_STRATEGY_BY_XAI_TYPE` names. The fitted population is
+    not like that. Its ``importance`` cells split four ways (AttributionSum 240
+    rows, SalientFeatures 210, SensitiveFeatures 192, ImportanceCategorization
+    14) and its ``attribution`` w/o XAI cell is majority SensitiveFeatures -- so
+    running one strategy reproduces neither the mixture nor the accuracy it
+    averages to.
+
+    Here the *person* is drawn: one ``(Participant ID, Session)`` unit per
+    virtual participant, contributing that human's own strategy and parameters to
+    each tested half they were fitted in. A participant's two halves are then the
+    same human, which is what makes the within-subject Attribution effect mean
+    anything.
+
+    Requires ``models`` to be keyed by ``(xai_type, tested_w_xai)``: with one
+    model per ``xai_type`` the two halves share an instance, and only one of the
+    person's two strategies could be applied.
+
+    Returns ``(participant_models, draws)`` with the same contract
+    :func:`coax_participant_models` returns, so the executor needs no new wiring.
+    """
+    if "participantId" not in trials.columns or "xai_type" not in trials.columns:
+        return None, {}
+
+    cells = trials[["participantId", "xai_type"]].drop_duplicates()
+    cells = cells.assign(
+        __xai_type=[_canonical_xai_type(value) for value in cells["xai_type"]]
+    )
+
+    xai_method = None
+    if "xai_method" in trials.columns:
+        methods = {str(value) for value in trials["xai_method"].dropna().unique()}
+        xai_method = next(iter(methods)) if len(methods) == 1 else None
+
+    draws: dict[Any, Any] = {}
+    drawn_by_participant: dict[Any, dict[Any, Any]] = {}
+
+    for offset, (xai_type, rows) in enumerate(cells.groupby("__xai_type", sort=False)):
+        _assert_tuple_keyed(models, xai_type)
+
+        condition: dict[str, Any] = {"xai_type": xai_type}
+        if data_id is not None:
+            condition["dataId"] = data_id
+        if xai_method is not None:
+            condition["xai_method"] = xai_method
+
+        participants = sorted(rows["participantId"].dropna().unique().tolist(), key=str)
+        units = draw_participant_units(
+            "coax",
+            condition=condition,
+            participants=participants,
+            seed=int(seed) + offset,
+            replace=replace,
+            # Same reasoning as coax_participant_models: xai_method is nearly
+            # redundant with dataId in this corpus, and borrowing another
+            # dataset's fits is still a real human -- and the only option for
+            # mushrooms, which was never fitted. tested_w_xai is *not* relaxable
+            # here; it is what distinguishes a unit's two halves.
+            relax=("xai_method", "dataId"),
+            pool=pool,
+        )
+
+        for participant, by_half in units.items():
+            for half, draw in by_half.items():
+                tested = half == "true"
+                key = _select_pool_model_key(models, xai_type, tested)
+                _warn_on_illegal_strategy(draw, xai_type, tested)
+                draws[(participant, key)] = draw
+                drawn_by_participant.setdefault(participant, {})[key] = draw
+
+    def participant_models(participant_id: Any) -> dict[Any, Any]:
+        """This participant's models, falling back to the shared one per key."""
+        built = dict(models)
+        for key, draw in drawn_by_participant.get(participant_id, {}).items():
+            strategy = draw.attributes.get("strategy")
+            if not strategy:
+                # An unmatched cell: keep the condition's shared model rather
+                # than inventing a strategy for it.
+                continue
+            xai_type = key[0] if isinstance(key, tuple) else key
+            built[key] = make_coax_model(
+                strategy,
+                **fitted_coax_params(strategy, xai_type, **draw.parameters),
+            )
+        return built
+
+    return participant_models, draws
+
+
+def coax_population_trials(
+    draws: Mapping[Any, Any],
+    selected: pd.DataFrame,
+) -> pd.DataFrame:
+    """Replace the generated trials with the ones each drawn human actually saw.
+
+    ``fitted_population`` deals every virtual participant a real
+    ``(Participant ID, Session)``, and the parameters it deals were fitted by
+    maximum likelihood against that person's responses **on that person's own
+    trial sequence**. Scoring the resulting model on a different sequence
+    measures something else: in the published corpus each participant saw 46 of
+    the ~92 instances and no two participants overlap at all, so a generated
+    table typically shares only 6-14 of 40 trials with the person the parameters
+    came from, and CoAX is an exemplar-memory model whose answers depend on which
+    exemplars are in memory and how long ago they were stored.
+
+    So the trials follow the draw: each virtual participant runs its own human's
+    logged instances, in their logged order, with their training/testing split
+    and their tested halves. The design's trial table still decides *who* exists
+    and in which condition -- it just no longer decides which instances they see.
+
+    Read from the anonymised ``assets/human_data`` copy of the log, whose
+    participant ids are the ones the parameter pool uses; the raw copy under
+    ``src/cognitive_models/`` keys on un-anonymised session codes and does not
+    join.
+    """
+    # Lazy, like _run_coax_study_from_corpus: coax_human_replay imports this
+    # module's fitted-population table, so a module-level import is circular.
+    from .coax_human_replay import (
+        ANONYMISED_HUMAN_TRIALS_FILE,
+        load_coax_human_trials,
+    )
+
+    units: dict[Any, tuple[Any, Any]] = {}
+    for (participant, _key), draw in draws.items():
+        fitted_id = getattr(draw, "fitted_participant_id", None)
+        session = (getattr(draw, "attributes", None) or {}).get("fitted_session")
+        if fitted_id is None or session is None:
+            continue
+        units[participant] = (fitted_id, session)
+
+    if not units:
+        raise ValueError(
+            "mode='fitted_population' could not identify the fitted people behind "
+            "this draw, so it cannot replay their trials. This happens when the "
+            "pool matched nothing and every participant fell back to the fitted "
+            "population means."
+        )
+
+    log = load_coax_human_trials(path=ANONYMISED_HUMAN_TRIALS_FILE)
+    by_unit = {key: rows for key, rows in log.groupby(["participantId", "session"], sort=False)}
+
+    frames: list[pd.DataFrame] = []
+    missing: list[tuple[Any, Any]] = []
+    for participant, (fitted_id, session) in sorted(units.items(), key=lambda item: str(item[0])):
+        rows = by_unit.get((fitted_id, int(session)))
+        if rows is None or rows.empty:
+            missing.append((fitted_id, session))
+            continue
+        rows = rows.copy()
+        # The virtual participant keeps its own id so the design's conditions,
+        # provenance and per-participant aggregation all still line up.
+        rows["participantId"] = participant
+        frames.append(rows)
+
+    if missing:
+        warnings.warn(
+            f"{len(missing)} drawn person-session(s) have fitted parameters but no "
+            f"logged trials to replay (e.g. {missing[:3]}); those participants are "
+            "dropped from the run.",
+            stacklevel=2,
+        )
+    if not frames:
+        raise ValueError(
+            "None of the drawn people have logged trials, so mode="
+            "'fitted_population' has nothing to run."
+        )
+
+    trials = pd.concat(frames, ignore_index=True, sort=False)
+    # The executor sorts on these, and the study-level order column is rebuilt
+    # by the caller against the new table.
+    trials = trials.sort_values(["participantId", "trialId"], kind="stable")
+    return trials.reset_index(drop=True)
+
+
+def _assert_tuple_keyed(models: Mapping[Any, Any], xai_type: str) -> None:
+    """Refuse an xai_type served by one model for both tested halves."""
+    if any(isinstance(key, tuple) and key[0] == xai_type for key in models):
+        return
+    raise ValueError(
+        f"mode='fitted_population' needs one model per tested half, but xai_type "
+        f"{xai_type!r} is registered under a plain key, so both halves would share "
+        "one instance and only one of the drawn person's two strategies could be "
+        "applied. Build the mapping with "
+        "coax_models_for_trials(trials, by_tested_condition=True). Registered "
+        f"keys: {sorted(models, key=repr)}."
+    )
+
+
+def _warn_on_illegal_strategy(draw: Any, xai_type: str, tested: bool) -> None:
+    """Say so when a fitted human used a strategy the generator would not pick.
+
+    The drawn strategy wins regardless: ``COAX_STRATEGY_EXCLUSIONS`` is the
+    reference pipeline's rule for *generating* a condition, while this is what a
+    real participant was actually fitted as. A mismatch is worth surfacing
+    because it usually means the pool was relaxed onto a neighbouring cell.
+    """
+    strategy = draw.attributes.get("strategy")
+    if not strategy:
+        return
+    allowed = coax_available_strategies(xai_type, tested)
+    if strategy not in allowed:
+        warnings.warn(
+            f"Fitted participant {draw.fitted_participant_id} used {strategy!r} in "
+            f"xai_type={xai_type!r} tested_w_xai={tested!r}, which "
+            f"coax_available_strategies() excludes (allows {allowed}). Keeping the "
+            "fitted strategy -- the fit is what the human did. "
+            f"parameter_source={draw.parameter_source!r}.",
+            stacklevel=2,
+        )
+
+
 def _select_pool_model_key(models: Mapping[Any, Any], xai_type: str, tested: bool) -> Any:
     """The key the executor will select for this condition, resolved up front."""
     for key in ((xai_type, tested), xai_type):
@@ -615,6 +869,7 @@ def _run_coax_study_from_corpus(
     train_with_explanation: bool,
     participant_models: Optional[Any] = None,
     participant_draws: Optional[Mapping[Any, Any]] = None,
+    share_training_memory: bool = False,
     store: bool,
 ) -> pd.DataFrame:
     """Run selected trials against the published CoAX user-study corpus.
@@ -666,6 +921,7 @@ def _run_coax_study_from_corpus(
                 dvs=getattr(study, "DVs", None) if dvs is None else dvs,
                 participant_models=participant_models,
                 participant_draws=participant_draws,
+                share_training_memory=share_training_memory,
             )
         )
 
